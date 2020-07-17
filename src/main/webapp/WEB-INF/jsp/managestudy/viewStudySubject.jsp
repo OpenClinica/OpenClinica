@@ -1750,9 +1750,14 @@
 
         var status = participateInfo.status;
         if (status) {
-            $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
-            $('#view-access-link').show();
-            $('tr.reset-participant-access-code').show();
+            if(status == "INVALID") {
+                $('#info-participate-status').text("Contact Info Entered");
+            }
+            else {
+                $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
+                $('#view-access-link').show();
+                $('tr.reset-participant-access-code').show();
+            }
         }
     }
     

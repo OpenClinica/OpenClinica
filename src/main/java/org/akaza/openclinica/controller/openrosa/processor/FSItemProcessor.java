@@ -5,6 +5,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
@@ -382,18 +383,16 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         studySubjectBean.setUpdater(userAccountBean);
         ssdao.update(studySubjectBean);
 
+        Boolean isStudySubjectUpdated = true;
+
         if (attrValue.equals(FIRSTNAME)) {
             studySubject.getStudySubjectDetail().setFirstName(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(LASTNAME)) {
             studySubject.getStudySubjectDetail().setLastName(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(SECONDARYID)) {
             studySubject.getStudySubjectDetail().setIdentifier(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(EMAIL)) {
             studySubject.getStudySubjectDetail().setEmail(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(MOBILENUMBER)) {
             Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
             Matcher usPhoneMatch = usPhonePattern.matcher(itemValue);
@@ -401,6 +400,13 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 itemValue=US_PHONE_PREFIX+itemValue;
             }
             studySubject.getStudySubjectDetail().setPhone(itemValue);
+        }
+        else
+            isStudySubjectUpdated = false;
+
+        if(isStudySubjectUpdated){
+            if(studySubject.getUserStatus() == null) // User status should be set to ContactInfo Entered as this point
+                studySubject.setUserStatus(UserStatus.INVALID);
             studySubjectDao.saveOrUpdate(studySubject);
         }
     }
