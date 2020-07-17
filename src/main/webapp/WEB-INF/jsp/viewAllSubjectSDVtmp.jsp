@@ -418,12 +418,6 @@
         }]
     });
 
-    function clearFilter() {
-        jQuery('#sdv-items').dataTable().fnSortNeutral();
-    }
-
-    clearFilter();
-
     function translate(str) {
         var trans = {
             'VERIFIED': 'Verified',
@@ -478,6 +472,7 @@
     $('#sdv').on('click', '.popupSdv', function () {
         var popupIndex = $('#sdv button.popupSdv').index(this);
         var data = $(this).data();
+        clearFilter();
         var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
 
         function getItems() {
@@ -554,13 +549,16 @@
             getItems();
         }).change();
 
-        $('#clear-filter').click(function(){
-                jQuery('#sdv-items').dataTable().fnSortNeutral();   
-                if (data.sdvStatus === 'CHANGED_SINCE_VERIFIED') {
-                    $('#sdv-show-type input[value=y]').click();
-                } else {
-                    $('#sdv-show-type input[value=n]').click();
-                }
+        function clearFilter() {
+            jQuery('#sdv-items').dataTable().fnSortNeutral();
+            if (data.sdvStatus === 'CHANGED_SINCE_VERIFIED') {
+                $('#sdv-show-type input[value=y]').click();
+            } else {
+                $('#sdv-show-type input[value=n]').click();
+        }
+        }
+        $('#clear-filter').click(function (){
+                clearFilter();
         });
 
         var verifyButton = $(this).siblings('[name=sdvVerify]');
