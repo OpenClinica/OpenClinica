@@ -243,6 +243,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 discrepancyNoteBean.setCrfName(crf.getName());
                 studyEvent = eventCrf.getStudyEvent();
                 discrepancyNoteBean.setEventCrfWorkflowStatus(eventCrf.getWorkflowStatus());
+                discrepancyNoteBean.setCrfStatus( (eventCrf.isCurrentlyRemoved() || studyEvent.isCurrentlyRemoved()) ?
+                        resword.getString("removed") :  discrepancyNoteBean.getEventCrfWorkflowStatus().getDisplayValue() );
                 studyEventDefinition = studyEvent.getStudyEventDefinition();
                 discrepancyNoteBean.setEventName(studyEventDefinition.getName());
                 discrepancyNoteBean.setEventStart(studyEvent.getDateStart());
@@ -337,7 +339,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
-            h.put("crfStatus", discrepancyNoteBean.getEventCrfWorkflowStatus().getDisplayValue());
+            h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             DiscrepancyNoteBean parentdNBean;
