@@ -78,7 +78,6 @@
         <filter-name>localeFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
     <filter>
         <filter-name>compressFilter</filter-name>
         <filter-class>net.sf.ehcache.constructs.web.filter.GzipFilter</filter-class>
@@ -767,7 +766,7 @@
         <servlet-name>ImportCRFDataServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ImportCRFDataServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <display-name>uploadCRFData</display-name>
         <servlet-name>uploadCRFDataToHttpServerServlet</servlet-name>
@@ -1045,8 +1044,8 @@
         <servlet-name>ImportCRFDataServlet</servlet-name>
         <url-pattern>/ImportCRFData</url-pattern>
     </servlet-mapping>
-    
-      <servlet-mapping>
+
+    <servlet-mapping>
         <servlet-name>uploadCRFDataToHttpServerServlet</servlet-name>
         <url-pattern>/UploadCRFData</url-pattern>
     </servlet-mapping>
@@ -1326,7 +1325,8 @@
     <servlet-mapping>
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
-    </servlet-mapping>]
+    </servlet-mapping>
+    ]
     <servlet-mapping>
         <servlet-name>UploadDicomServlet</servlet-name>
         <url-pattern>/Dicom</url-pattern>
@@ -1455,7 +1455,6 @@
     <error-page>
         <error-code>403</error-code>
         <location>/WEB-INF/jsp/403.jsp</location>
-
     </error-page>
     <error-page>
         <error-code>500</error-code>
@@ -1526,5 +1525,13 @@
         <servlet-name>ReportsServlet</servlet-name>
         <url-pattern>/reports</url-pattern>
     </servlet-mapping>
-
+    <servlet>
+        <display-name>LoginRedirect</display-name>
+        <servlet-name>LoginRedirectServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.login.LoginRedirectServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginRedirectServlet</servlet-name>
+        <url-pattern>/LoginRedirect</url-pattern>
+    </servlet-mapping>
 </web-app>

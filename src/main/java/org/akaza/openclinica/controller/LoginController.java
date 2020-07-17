@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import org.akaza.openclinica.view.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,14 @@ public class LoginController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     KeycloakController keycloakController;
-    @PermitAll @RequestMapping(value = "/ocLogin", method = RequestMethod.GET) protected void login(final HttpServletRequest req, HttpServletResponse res) {
+
+    @PermitAll
+    @RequestMapping(value = "/ocLogin", method = RequestMethod.GET)
+    protected void login(final HttpServletRequest req, HttpServletResponse res) {
         logger.debug("Performing login");
         String authorizeUrl = "/OpenClinica";
         int port = req.getServerPort();
-        String portStr ="";
+        String portStr = "";
         if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
@@ -30,7 +34,7 @@ public class LoginController {
         try {
             res.sendRedirect(redirectUri);
         } catch (IOException e) {
-            logger.error("Error while redirecting to KeyCloak: ",e);
+            logger.error("Error while redirecting to KeyCloak: ", e);
         }
     }
 }

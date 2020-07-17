@@ -145,17 +145,19 @@
     </oauth:authorization-server>
     -->
 
-    <bean id="metadataCollectorResource" class="core.org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">
+    <bean id="metadataCollectorResource" class="core.org.akaza.openclinica.web.restful.MetadataCollectorResource"
+          name="metadataCollectorResource">
         <property name="dataSource" ref="dataSource"></property>
         <property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
         <property name="coreResources" ref="coreResources"/>
-        <property name = "studyDaoHib" ref = "studyDaoDomain"/>
+        <property name="studyDaoHib" ref="studyDaoDomain"/>
     </bean>
     <bean id="odmMetadataRestResource" class="core.org.akaza.openclinica.web.restful.ODMMetadataRestResource">
         <property name="metadataCollectorResource" ref="metadataCollectorResource"/>
     </bean>
-    <bean id="clinicalDataCollectorResource" class="core.org.akaza.openclinica.web.restful.ClinicalDataCollectorResource">
-        <property name = "generateClinicalDataService" ref = "generateClinicalDataService"></property>
+    <bean id="clinicalDataCollectorResource"
+          class="core.org.akaza.openclinica.web.restful.ClinicalDataCollectorResource">
+        <property name="generateClinicalDataService" ref="generateClinicalDataService"></property>
     </bean>
     <bean id="odmClinicalDataRestResource" class="core.org.akaza.openclinica.web.restful.ODMClinicaDataResource">
         <property name="clinicalDataCollectorResource" ref="clinicalDataCollectorResource"/>
@@ -166,14 +168,16 @@
         <property name="dataSource" ref="dataSource"></property>
         <property name="coreResources" ref="coreResources"/>
         <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
-        <property name="openRosaSubmissionController" ref="openRosaSubmissionController" />
-        <property name="xformParserHelper" ref="xformParserHelper" />
-
+        <property name="openRosaSubmissionController" ref="openRosaSubmissionController"/>
+        <property name="xformParserHelper" ref="xformParserHelper"/>
     </bean>
-
-    <bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
+    <bean id="openRosaSubmissionController"
+          class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
     </bean>
     <bean id="xformParserHelper" class="core.org.akaza.openclinica.domain.xform.XformParserHelper"/>
 
+<!--    <bean id="openClinicaAuthenticationProcessingFilter"
+          class="core.org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter">
+    </bean>-->
 
 </beans>

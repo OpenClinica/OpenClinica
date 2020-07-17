@@ -1,7 +1,6 @@
 package org.akaza.openclinica.config;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.extract.OcQrtzTriggersDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.service.SchedulerUtilService;
@@ -24,8 +23,6 @@ public class ScheduledJobConfig {
 
     @Autowired
     private StudyDao studyDao;
-    @Autowired
-    private DatasetDAO datasetDao;
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired

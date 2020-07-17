@@ -851,7 +851,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-    protected void forwardPage(Page jspPage) {
+    public void forwardPage(Page jspPage) {
         this.forwardPage(jspPage, true);
     }
 
