@@ -16,7 +16,8 @@
             ale_rec record;
 
             begin
-            ALTER TABLE study_event DISABLE TRIGGER ALL;
+            ALTER TABLE study_event DISABLE TRIGGER study_event_insert;
+            ALTER TABLE study_event DISABLE TRIGGER study_event_insert_update;
 
             -- loggers
             RAISE NOTICE ''----------------------------------   BEFORE MIGRATION   ----------------------------------'';
@@ -197,7 +198,8 @@
             RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
             END LOOP;
 
-            ALTER TABLE study_event ENABLE TRIGGER ALL;
+            ALTER TABLE study_event ENABLE TRIGGER study_event_insert;
+            ALTER TABLE study_event ENABLE TRIGGER study_event_insert_update;
 
             raise notice ''the end'';
 
