@@ -20,7 +20,9 @@
             ale_rec record;
 
             begin
-            ALTER TABLE event_crf DISABLE TRIGGER ALL;
+            ALTER TABLE event_crf DISABLE TRIGGER event_crf_initial;
+            ALTER TABLE event_crf DISABLE TRIGGER event_crf_update;
+            ALTER TABLE event_crf DISABLE TRIGGER event_crf_update_1;
 
             --loggers
             RAISE NOTICE ''************************************   BEFORE MIGRATION   ************************************************************'';
@@ -133,7 +135,9 @@
             RAISE NOTICE ''eventCrfId: % statusId: % workflowStatus: % , removed: %, archived: %'' , ec_rec.event_crf_id  ,ec_rec.status_id, ec_rec.workflow_status, ec_rec.removed,ec_rec.archived ;
             END LOOP;
 
-            ALTER TABLE event_crf ENABLE TRIGGER ALL;
+            ALTER TABLE event_crf ENABLE TRIGGER event_crf_initial;
+            ALTER TABLE event_crf ENABLE TRIGGER event_crf_update;
+            ALTER TABLE event_crf ENABLE TRIGGER event_crf_update_1;
 
             raise notice ''the end'';
 
