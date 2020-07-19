@@ -1126,14 +1126,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public void dowloadFile(File f, String contentType) throws Exception {
 
         response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
-        response.setContentType("text/xml");
+        if (contentType == null) {
+            contentType = "text/xml";
+        }
+        response.setContentType(contentType);
         response.setHeader("Pragma", "public");
 
         ServletOutputStream op = response.getOutputStream();
 
         DataInputStream in = null;
         try {
-            response.setContentType("text/xml");
+            response.setContentType(contentType);
             response.setHeader("Pragma", "public");
             response.setContentLength((int) f.length());
 
