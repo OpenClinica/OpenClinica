@@ -4,6 +4,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter;
+import core.org.akaza.openclinica.web.filter.OpenClinicaAuthenticationSuccessHandler;
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import core.org.akaza.openclinica.web.rest.client.impl.CustomerServiceClientImpl;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;

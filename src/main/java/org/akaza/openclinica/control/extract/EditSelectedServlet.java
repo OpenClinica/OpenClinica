@@ -160,7 +160,7 @@ public class EditSelectedServlet extends SecureController {
             session.setAttribute("allSelectedGroups", newsgclasses);
             request.setAttribute("allSelectedGroups", newsgclasses);
         }
-
+        
         session.setAttribute("newDataset", db);
 
         HashMap events = (HashMap) session.getAttribute(CreateDatasetServlet.EVENTS_FOR_CREATE_DATASET);
@@ -234,6 +234,7 @@ public class EditSelectedServlet extends SecureController {
                     item.setDefName(sed.getName());
                     item.setDefId(sed.getId());
                     item.setSelected(true);
+                    item.setDatasetItemMapKey(sed.getId()+"_"+item.getId());
                 }
                 allItems.addAll(items);
             }

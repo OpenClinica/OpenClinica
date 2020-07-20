@@ -1,114 +1,107 @@
-<%@page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ include file="/WEB-INF/jsp/taglibs.jsp" %>
-<!-- For Mantis Issue 6099 -->
-<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
-    <c:if test="${userBean.name!=''}">
-    <c:redirect url="/MainMenu"/>
-    </c:if>
-<!-- End of 6099-->
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-
-<title>OpenClinica</title>
-
-<meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
- <meta http-equiv="X-UA-Compatible" content="IE=11" />
-
-<link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
-<link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css'/>" type="text/css"/>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.min.js'/>"></script>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-migrate-3.1.0.min.js'/>"></script>
-<script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/ua-parser.min.js'/>"></script>
-</head>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page import="core.org.akaza.openclinica.logic.importdata.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterms"/>
+<c:choose>
+<c:when test="${userBean.sysAdmin && module=='admin'}">
+  <c:import url="../include/admin-header.jsp"/>
+</c:when>
+<c:otherwise>
+   <c:import url="../include/submit-header.jsp"/>
+</c:otherwise>
+</c:choose>
 
-<%--<c:choose>--%>
-    <%--<c:when test="${resword.locale == null}"><fmt:setLocale value="en" scope="session"/></c:when>--%>
-    <%--<c:otherwise><fmt:setLocale value="${resword.locale}" scope="session"/></c:otherwise>--%>
-<%--</c:choose>--%>
 
-<body class="login_BG" onLoad="document.getElementById('username').focus();">
-    <div class="login_BG">
-    <form action="LoginRedirect" method="post">
-        <center>
+<!-- move the alert message to the sidebar-->
+<jsp:include page="../include/sideAlert.jsp"/>
 
-        <!-- OpenClinica logo -->
-        <%String ua = request.getHeader( "User-Agent" );
-        String temp = "";
-        String iev = "";
-        if( ua != null && ua.indexOf( "MSIE" ) != -1 ) {
-            temp = ua.substring(ua.indexOf( "MSIE" ),ua.length());
-            iev = temp.substring(4, temp.indexOf(";"));
-            iev = iev.trim();
-        }
-        if(iev.length() > 1 && Double.valueOf(iev)<7) {%>
-        <div ID="OClogoIE6">&nbsp;</div>
-        <%} else {%>
-        <div ID="OClogo">&nbsp;</div>
-        <%}%>
-        <!-- end OpenClinica logo -->
-            <table width="720 px">
+<!-- then instructions-->
+<tr id="sidebar_Instructions_open">
+  <td class="sidebar_tab">
+	<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+	  <span class="icon icon-caret-down gray"></span>
+	</a>
+	<fmt:message key="instructions" bundle="${restext}"/>
+	<div class="sidebar_tab_content"></div>
+  </td>
+</tr>
 
-        <script type="text/javascript">
-            var parser = new UAParser();
-            var showMessage = false;
+<tr id="sidebar_Instructions_closed" style="display: none">
+  <td class="sidebar_tab">
+	  <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+	    <span class="icon icon-caret-right gray"></span>
+	  </a>
+    <fmt:message key="instructions" bundle="${restext}"/>
+  </td>
+</tr>
 
-            if (parser.getBrowser().name == 'IE' && parseInt(parser.getBrowser().major) < 11){
-                showMessage = true;
-            }else if (parser.getBrowser().name != 'Firefox' && parser.getBrowser().name !='Chrome' && parser.getBrowser().name != 'IE'){
-                showMessage = true;
-            }
+<jsp:include page="../include/sideInfo.jsp"/>
 
-            if (showMessage){
-                document.write("<tr> <td align='center' ><h4>"+
-                            " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                            "</h4></td> </tr>");
-            }
-        </script>
-                </table>
+<div class="boxed">
+  <div class="formlabel" align="left"><h3 class="addNewSubjectTitle"><fmt:message key="redirect_login" bundle="${resword}"/></h3></div>
+  <br>
+  <hr>
+  <table class="center">
+    <tr align="center">
+      <td>
+        <a href="/OpenClinica/pages/logout"><button type="button">Logout</button></a>
+      </td>
+      &nbsp;&nbsp;&nbsp;
+      <td>
+        <a href="/OpenClinica/MainMenu"><button type="button">Continue</button></a>
+      </td>
+    </tr>
+  </table>
+  <br>
+  <hr class="light-line"/>
+  <br>
+  <div class="description">
+    <span class="icon icon-info blue"></span>
+    <fmt:message key="bookmark_link_1" bundle="${resword}"/>
+    <a href="/OpenClinica/MainMenu">link</a>
+    <fmt:message key="bookmark_link_2" bundle="${resword}"/>
+  </div>
+</div>
 
-        <table border="0" cellpadding="0" cellspacing="0" class="loginBoxes">
-            <tr>
-                <td class="loginBox_T">&nbsp;</td>
-                <td class="loginBox_T">&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="loginBox">
-                <div ID="loginBox">
-                <!-- Login error redirect box contents -->
-                    <div id="login_redirect">
-                        <P><fmt:message key="redirect_login" bundle="${resword}"/></P>
-                        <table>
-                            <tr>
-                                <td><input class="button" name="logout" value="fmt:message key="logout" bundle="${resword}"/>" onClick="javascript:window.location.href='j_spring_security_logout'"></input></td>
-                                <td><input class="button" name="continue" value="fmt:message key="continue" bundle="${resword}"/>" onClick="javascript:window.location.href='MainMenu'"></input></td>
-                            </tr>
-                        </table>
-                        <P>
-                            <fmt:message key="bookmark_link_1" bundle="${resword}"/>
-                            <a href="${pageContext.request.contextPath}MainMenu"/>"><fmt:message key="link" bundle="${restext}"/></a>
-                            <fmt:message key="bookmark_link_2" bundle="${resword}"/>
-                        </P>
-                   </div>
-                <!-- End Login box contents -->
-                </div>
-                </td>
-            </tr>
-        </table>
+<jsp:include page="../include/footer.jsp"/>
 
-        </center>
-    </form>
-<!-- Footer -->
-<!-- End Main Content Area -->
-<jsp:include page="../login-include/login-footer.jsp"/>
+<style>
+	.boxed .description {
+		text-align: center;
+	}
+  .boxed {
+    box-sizing: border-box;
+    width: 35%;
+    border: solid grey 5px;
+    padding: 50px;
+    margin-top: 10%;
+    margin-left: 20%;
+  }
+  .boxed .msg {
+    font-style: normal;
+    font-size: 18px;
+    font-family: "Open Sans", "Helvetica Neue", Arial, Helvetica, "Yu Gothic", Meiryo, sans-serif;
+  }
+
+  hr.light-line {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  table.center {
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+</style>

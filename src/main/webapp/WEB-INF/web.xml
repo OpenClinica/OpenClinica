@@ -538,6 +538,11 @@
         <servlet-name>ViewSiteServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSiteServlet</servlet-class>
     </servlet>
+    <servlet>
+        <display-name>CreateDiscrepancyNote</display-name>
+        <servlet-name>CreateDiscrepancyNoteServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet</servlet-class>
+    </servlet>
 
     <!-- Export Excel -->
     <servlet>
@@ -759,6 +764,12 @@
         <display-name>ViewCRFVersionPreview</display-name>
         <servlet-name>ViewCRFVersionPreview</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewCRFVersionPreview</servlet-class>
+    </servlet>
+
+    <servlet>
+        <display-name>ImportData</display-name>
+        <servlet-name>ImportDataServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ImportDataServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -1038,6 +1049,11 @@
     <servlet-mapping>
         <servlet-name>VerifyImportedCRFDataServlet</servlet-name>
         <url-pattern>/VerifyImportedCRFData</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ImportDataServlet</servlet-name>
+        <url-pattern>/ImportData</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -1334,6 +1350,10 @@
     <servlet-mapping>
         <servlet-name>ViewDicomServlet</servlet-name>
         <url-pattern>/ViewDicom</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateDiscrepancyNoteServlet</servlet-name>
+        <url-pattern>/CreateDiscrepancyNote</url-pattern>
     </servlet-mapping>
 
     <!--  Export Excel -->

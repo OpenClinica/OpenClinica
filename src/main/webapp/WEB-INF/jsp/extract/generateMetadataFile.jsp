@@ -64,10 +64,6 @@ function refreshMe() {
 <b><fmt:message key="dataset_name" bundle="${resword}"/>:</b> <c:out value="${dataset.name}"/><br>
 <b><fmt:message key="description" bundle="${resword}"/>:</b> <c:out value="${dataset.description}"/></p>
 
-<%--<c:import url="../include/showTable.jsp">
-<c:param name="rowURL" value="showArchivedDatasetFileRow.jsp" />
-</c:import>
---%>
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">

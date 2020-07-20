@@ -50,6 +50,11 @@ import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
+import core.org.akaza.openclinica.web.InconsistentStateException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -540,12 +545,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             currentStudy.setStudy(getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
-                session.setAttribute("study", currentStudy);
-            } else {
+                setStudy(currentStudy, session);
+            }
+            else {
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
-                session.setAttribute("study", currentStudy);
+                setStudy(currentStudy, session);
             }
+
             request.setAttribute("requestSchema", "public");
             currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
@@ -662,6 +669,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             mayProceed();
             // pingJobServer(request);
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
+            //TODO: how do does it know to go to main menu servlet without specifying
             processRequest();
         } catch (InconsistentStateException ise) {
             logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: ", ise);
@@ -1371,7 +1379,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             currentStudy = getStudyDao().findStudyWithSPVByStudyEnvUuid(studyEnvUuid);
 
             session.setAttribute("publicStudy", currentPublicStudy);
-            session.setAttribute("study", currentStudy);
+            setStudy(currentStudy, session);
             currentRole = role;
             session.setAttribute("userRole", role);
             logger.info("Found role for this study:" + role.getRoleName());
@@ -1520,7 +1528,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // Site level
                 currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
             }
-            session.setAttribute("study", currentStudy);
+            setStudy(currentStudy, session);
             session.setAttribute("publicStudy", currentPublicStudy);
             ub.setActiveStudyId(currentPublicStudy.getStudyId());
             UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
@@ -1532,6 +1540,108 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected PermissionService getPermissionService() {
         return (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
 
+    protected void setStudy(Study study, HttpSession session) {
+        String boardUrl = study.getBoardUrl();
+        if (boardUrl == null) {
+            String accessToken = (String) session.getAttribute("accessToken");
+            if (accessToken != null) {
+                try {
+                    boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
+                    study.setBoardUrl(boardUrl);
+                }
+                catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+        session.setAttribute("study", study);
+    }
+
+    public DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        if ("itemData".equalsIgnoreCase(note.getEntityType())) {
+            int itemDataId = note.getEntityId();
+            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
+            ItemDAO idao = new ItemDAO(sm.getDataSource());
+            if (StringUtil.isBlank(note.getEntityName())) {
+                ItemBean item = (ItemBean) idao.findByPK(itemData.getItemId());
+                note.setEntityName(item.getName());
+                request.setAttribute("item", item);
+            }
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+
+            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            if (event.getDateStarted() != null)
+                note.setEventStart(event.getDateStarted());
+
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            note.setCrfName(crf.getName());
+            note.setEventCRFId(ec.getId());
+
+            if (StringUtil.isBlank(note.getSubjectName())) {
+                StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+                note.setSubjectName(ss.getName());
+            }
+
+            if (note.getDiscrepancyNoteTypeId() == 0) {
+                note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());// default
+                // value
+            }
+
+        } else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
+            int eventCRFId = note.getEntityId();
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+
+            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            note.setCrfName(crf.getName());
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+            note.setSubjectName(ss.getName());
+            note.setEventCRFId(ec.getId());
+
+        } else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
+            int eventId = note.getEntityId();
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(eventId);
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+            note.setSubjectName(ss.getName());
+
+        } else if ("studySub".equalsIgnoreCase(note.getEntityType())) {
+            int studySubjectId = note.getEntityId();
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+            note.setSubjectName(ss.getName());
+
+        } else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
+            int subjectId = note.getEntityId();
+            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentPublicStudy);
+            note.setSubjectName(ss.getName());
+        }
+
+        return note;
     }
 }

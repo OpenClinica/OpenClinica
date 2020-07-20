@@ -293,7 +293,16 @@
                     <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
                 </c:if>
             </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
+            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <c:if test="${sessionScope.baseUserRole == 'Data Manager'}">
+                <a href="${study.manager.replace('.build.','.design.').replace('/#/account-study', '')}${study.boardUrl}"><fmt:message key="design" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            </c:if>
+            <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
+                <a href="${study.manager}/${study.studyUuid}/${study.studyEnvUuid}"><fmt:message key="share" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            </c:if>
+            <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
+                <a href="${study.manager.replace('account-study','study-settings')}/${study.studyUuid}/settings"><fmt:message key="settings" bundle="${resword}"/></a>
+            </c:if>
         </div>
 
         <div id="UserInfo">
@@ -521,7 +530,7 @@
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available}">
-                    <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ImportData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_bulk_actions_log" bundle="${resword}"/></a></div>
             </div>
@@ -542,7 +551,7 @@
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available}">
-                    <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ImportData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
                     <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_bulk_actions_log" bundle="${resword}"/></a></div>
                 </c:if>
             </div>
@@ -574,7 +583,7 @@
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available}">
-                    <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ImportData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_bulk_actions_log" bundle="${resword}"/></a></div>
             </div>

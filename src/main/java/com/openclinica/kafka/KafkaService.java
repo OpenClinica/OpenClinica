@@ -380,7 +380,11 @@ public class KafkaService {
 
         formChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
         formChangeDTO.setFormCreatedDate(eventCrf.getDateCreated().toString());
-        formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
+        if (eventCrf.getDateUpdated() != null) {
+            formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
+        } else {
+            formChangeDTO.setFormUpdatedDate(eventCrf.getDateCreated().toString());
+        }
         formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
 
         return formChangeDTO;

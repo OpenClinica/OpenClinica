@@ -1296,6 +1296,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String subjectText = resword.getString("subject");
         String eventText = resword.getString("event");
         String status = resword.getString("status");
+        String signText = resword.getString("signed");
+        String lockText = resword.getString("locked");
+        String archivedText = resword.getString("archived");
 
         StudyEventBean defaultEvent = studyEvents.get(0);
         String studySubjectLabel = studySubject.getLabel();
@@ -1361,7 +1364,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.bold().append(occurrence_x_of).append(" " + (i + 1) + " of " + studyEventsSize).br();
             if (studyEventBean.getDateStarted() != null)
                 eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
-            eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue());
+            eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue()).br();
+            if (studyEventBean.isSigned()) {
+                eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
+            }
+            if (studyEventBean.isLocked()) {
+                eventDiv.append("<span class=\"icon icon-lock-new status\" alt=" + lockText + " title=" + lockText + " style=\"margin-right: 5px;\"></span>");
+            }
+            if (studyEventBean.isArchived()) {
+                eventDiv.append("<span class=\"icon icon-archived-new status\" alt=" + archivedText + " title=" + archivedText + "></span>");
+            }
             eventDiv.boldEnd().tdEnd().trEnd(0);
             // <tr><td><table>...</table></td></tr>
             eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_" + (i + 1)).style("display: none").close();
@@ -1506,7 +1518,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String occurrence_x_of = resword.getString("ocurrence");
         String subjectText = resword.getString("subject");
         String eventText = resword.getString("event");
-        String status = resword.getString("status");
+        String signText = resword.getString("signed");
+        String lockText = resword.getString("locked");
+        String archivedText = resword.getString("archived");
 
         StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
@@ -1531,6 +1545,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.bold().append(formatDate(studyEvents.get(0).getDateStarted())).boldEnd();
             }
             eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
+            if (studyEvents.size() > 0) {
+                if (studyEvents.get(0).isSigned()) {
+                    eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
+                }
+                if (studyEvents.get(0).isLocked()) {
+                    eventDiv.append("<span class=\"icon icon-lock-new status\" alt=" + lockText + " title=" + lockText + " style=\"margin-right: 5px;\"></span>");
+                }
+                if (studyEvents.get(0).isArchived()) {
+                    eventDiv.append("<span class=\"icon icon-archived-new status\" alt=" + archivedText + " title=" + archivedText + "></span>");
+                }
+            }
             eventDiv.boldEnd().tdEnd().trEnd(0);
 
         } else {
@@ -1538,7 +1563,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             if (studyEvents.size() > 0) {
                 if (studyEvents.get(0).getDateStarted() != null)
                     eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-                eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue());
+                eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue()).br();
+                if (studyEvents.get(0).isSigned()) {
+                    eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
+                }
+                if (studyEvents.get(0).isLocked()) {
+                    eventDiv.append("<span class=\"icon icon-lock-new status\" alt=" + lockText + " title=" + lockText + " style=\"margin-right: 5px;\"></span>");
+                }
+                if (studyEvents.get(0).isArchived()) {
+                    eventDiv.append("<span class=\"icon icon-archived-new status\" alt=" + archivedText + " title=" + archivedText + "></span>");
+                }
             } else {
                 eventDiv.append(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue());
             }

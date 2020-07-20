@@ -79,7 +79,7 @@
                 <tr valign="top"><td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
                     <c:out value="${crf.name}"/>
                 </td></tr>
-                <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
+                <tr valign="top"><td class="table_header_column"><fmt:message key="form_oid" bundle="${resword}"/>:</td><td class="table_cell">
                     <c:out value="${crf.oid}"/>
                 </td></tr>
             </table>
@@ -96,7 +96,7 @@
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr valign="top">
                     <td class="table_header_row_left"><fmt:message key="version_name" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="oid" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="version_space_oid" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
                 </tr>
@@ -109,7 +109,7 @@
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>
-                                   
+
                                     <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=preview" target="_blank"><span
                                             name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
@@ -135,8 +135,8 @@
         <div class="tablebox_center">
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr valign="top">
-                    <td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
+                    <td class="table_header_row_left"><fmt:message key="item_name" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="item_space_oid" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="data_type" bundle="${resword}"/></td>
                     <%--<td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>--%>
                     <td class="table_header_row"><fmt:message key="integrity_check" bundle="${resword}"/></td>
@@ -150,7 +150,7 @@
                     <%--<td class="table_cell"><c:out value="${item.versions}"/></td>--%>
                     <td class="table_cell">
                      <c:choose>
-     <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>       
+     <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>
     </c:when>
     <c:otherwise>
     <c:if test="${item.crfVersionStatus == 1 }"><span class="aka_red_highlight"><b><fmt:message key="problem" bundle="${respage}"/></b>
@@ -164,8 +164,8 @@
         </ul>
     </c:otherwise>
     </c:choose>
-                   
-                    
+
+
                     </td>
                 </tr>
                 </c:forEach>

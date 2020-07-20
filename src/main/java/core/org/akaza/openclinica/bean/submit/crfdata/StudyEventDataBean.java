@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import core.org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import core.org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 public class StudyEventDataBean {
     private ArrayList<FormDataBean> formData;
@@ -16,6 +17,7 @@ public class StudyEventDataBean {
     private String startDate;
     private String endDate;
     private String eventStatus;
+    private StudyEventWorkflowStatusEnum workflowStatus;
 
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();
@@ -93,5 +95,26 @@ public class StudyEventDataBean {
 
     public void setEventStatus(String eventStatus) {
         this.eventStatus = eventStatus;
+    }
+
+    public StudyEventWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+
+    }
+
+    public void setWorkflowStatusAsString(String workflowStatus){
+        if(workflowStatus == null)
+            workflowStatus = "";
+        this.setWorkflowStatus(StudyEventWorkflowStatusEnum.getByEnglishDescription(workflowStatus.toLowerCase()));
+    }
+
+    public String getWorkflowStatusAsString(){
+        if(this.workflowStatus == null)
+            return null;
+        return this.workflowStatus.getDisplayValue();
     }
 }

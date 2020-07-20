@@ -52,16 +52,20 @@ View
                 <td><fmt:message key="completed" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
+                <td>&nbsp;<span class="icon icon-stamp-new black"></span></td>
                 <td><fmt:message key="signed" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<span class="icon icon-lock"></span></td>
+                <td>&nbsp;<span class="icon icon-lock-new black"></span></td>
                 <td><fmt:message key="locked" bundle="${reswords}"/></td>
             </tr>
             <tr>
+                <td>&nbsp;<span class="icon icon-archived-new black"></span></td>
+                <td><fmt:message key="archived" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
                 <td>&nbsp;<span class="icon icon-file-excel red"></span></td>
-                <td><fmt:message key="invalid" bundle="${reswords}"/></td>
+                <td><fmt:message key="status_removed" bundle="${reswords}"/></td>
             </tr>
             <tr>
                 <td><fmt:message key="actions" bundle="${reswords}"/></td>
@@ -93,6 +97,14 @@ View
             <tr>
                 <td>&nbsp;<span class="icon icon-icon-sign"></span></td>
                 <td><fmt:message key="sign" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-lock"></span></td>
+                <td><fmt:message key="lock" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-lock-open"></span></td>
+                <td><fmt:message key="unlock" bundle="${reswords}"/></td>
             </tr>
         </table>
 

@@ -70,14 +70,15 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
     @Transactional
     public Integer findMaxOrdinalByStudySubjectStudyEventDefinition(int studySubjectId, int studyEventDefinitionId) {
-        String query = "select max(sample_ordinal) from study_event where study_subject_id = " + studySubjectId + " and study_event_definition_id = "
-                + studyEventDefinitionId;
-        Query q = getCurrentSession().createSQLQuery(query);
-        Number result = (Number) q.uniqueResult();
+        String query = "select max(se.sampleOrdinal) from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.studyEventDefinitionId = :studyEventDefinitionId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studySubjectId", studySubjectId);
+        q.setParameter("studyEventDefinitionId", studyEventDefinitionId);
+        Integer result = (Integer) q.uniqueResult();
         if (result == null)
             return 0;
         else
-            return result.intValue();
+            return result;
     }
 
     public List<StudyEvent> fetchListByStudyEventDefOID(String oid, Integer studySubjectId) {

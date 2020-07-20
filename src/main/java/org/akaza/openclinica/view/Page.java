@@ -8,6 +8,7 @@
 package org.akaza.openclinica.view;
 
 /**
+<<<<<<< HEAD
  * Provides a type-safe enumeration for JSP Page,converted from original static class.
  * @author jnyayapathi
  */
@@ -41,6 +42,7 @@ public enum Page {
     /**
      * Page for reset password when password is expired.
      */
+
     RESET_PASSWORD("/WEB-INF/jsp/login/resetPassword.jsp", "Reset your expired password"),
 
     // YW >>
@@ -206,9 +208,11 @@ public enum Page {
     /**
      * Page for creating crf data imports
      */
-    IMPORT_CRF_DATA("/WEB-INF/jsp/submit/import.jsp", "Import CRF Data"),
-    VERIFY_IMPORT_SERVLET("/VerifyImportedCRFData", "Verify Imported CRF Data Servlet"),
-    VERIFY_IMPORT_CRF_DATA("/WEB-INF/jsp/submit/verifyImport.jsp", "Verify Imported CRF Data"),
+    IMPORT_DATA ("/WEB-INF/jsp/managestudy/importData.jsp", "Import Data"),
+    IMPORT_DATA_SERVLET ("/ImportData", "Import Data"),
+    IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/import.jsp", "Import CRF Data"),
+    VERIFY_IMPORT_SERVLET ("/VerifyImportedCRFData", "Verify Imported CRF Data Servlet"),
+    VERIFY_IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/verifyImport.jsp", "Verify Imported CRF Data"),
 
     /**
      * Page for creating rule imports
@@ -298,6 +302,7 @@ public enum Page {
     EDIT_DATASET("/WEB-INF/jsp/extract/editDataset.jsp", "Edit Dataset"),
     VALIDATE_EDIT_FILTER("/WEB-INF/jsp/extract/validateEditFilter.jsp", "Validate Edited Filter"),
     REMOVE_FILTER("/WEB-INF/jsp/extract/removeFilter.jsp", "Remove Filter"),
+
     /**
      * Page to show errors
      */
@@ -458,8 +463,8 @@ public enum Page {
     ADVANCED_SEARCH("/WEB-INF/jsp/" + "managestudy/advancedSearch.jsp", "advanced search"),
     ADVANCED_SEARCH_SERVLET("/ParticipantSearch", "advanced search"),
 
-    JOBS("/WEB-INF/jsp/" + "managestudy/jobs.jsp", "jobs (bulk logfile)"),
-    JOBS_SERVLET("/Jobs", "jobs (bulk logfile)"),
+    JOBS ("/WEB-INF/jsp/managestudy/jobs.jsp", "jobs (bulk logfile)"),
+    JOBS_SERVLET ("/Jobs", "jobs (bulk logfile)"),
 
     REPORTS("/WEB-INF/jsp/" + "managestudy/embedded-reports.jsp", "embedded reports"),
     REPORTS_SERVLET("/reports", "embedded reports"),
@@ -478,19 +483,21 @@ public enum Page {
             "View default crf versions print"),
     VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp",
             "View default crf versions print"),
-    MANAGE_STUDY_MODULE("/pages/studymodule", null),
-    PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp", "Participant Form Servlet"),
-    UPLOAD_CRF_DATA_TO_MIRTH("/WEB-INF/jsp/submit/uploadFileToMirth.jsp", "Upload CRF Data To Mirth"),
-    ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp", "Enketo Form Servlet");
 
-    //  private final static String path = "/WEB-INF/jsp/";
-    //  public final static String servletPath = "/OpenClinica";
+     MANAGE_STUDY_MODULE ( "/pages/studymodule",null),
+     PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp","Participant Form Servlet"),
+     UPLOAD_CRF_DATA_TO_MIRTH ("/WEB-INF/jsp/submit/uploadFileToMirth.jsp", "Upload CRF Data To Mirth"),
+     ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp","Enketo Form Servlet");
 
-    private String fileName;
-    private String title;
+  //  private final static String path = "/WEB-INF/jsp/";
+  //  public final static String servletPath = "/OpenClinica";
 
-    /**
+	private String fileName;
+	private String title;
+
+	/**
      * Constructs the JSP Page instance
+     *
      * @param fileName The filename of the JSP page
      * @param title The title of the JSP page
      */
@@ -519,10 +526,10 @@ public enum Page {
         this.fileName = newFileName;
     }
 
-    
-    
+
+
   /*  public static  Page setNewPage(String fileName, String title) {
-    
+
     	for (Page p : Page.values())
     	 {
     		if( p.fileName == fileName &&	 p.title == title)
