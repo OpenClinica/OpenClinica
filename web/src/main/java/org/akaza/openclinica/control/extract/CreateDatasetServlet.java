@@ -250,7 +250,7 @@ public class CreateDatasetServlet extends SecureController {
 
                         String summary =
                             respage.getString("you_have_selected") + " " + db.getItemIds().size() + " " + respage.getString("items_totally_for_this_dataset");
-
+                        addPageMessage(summary);
                         summary += genAttMsg(db);
                         addPageMessage(summary);
 
