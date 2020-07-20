@@ -187,6 +187,7 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("changeStudySchema", newStudySchema);
         request.setAttribute("requestSchema",newStudySchema);
         Study newStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
+        getCurrentBoardUrl(newStudy, session);
 
         request.setAttribute("changeStudySchema", null);
 
@@ -219,7 +220,7 @@ public class ChangeStudyServlet extends SecureController {
             udao.update(ub);
 
             String accessToken = (String) request.getSession().getAttribute("accessToken");
-            setStudy(newStudy, session);
+            session.setAttribute("study", newStudy);
             getStudyBuildService().processModule(accessToken, newPublicStudy, ModuleProcessor.Modules.PARTICIPATE);
             request.setAttribute("changeStudySchema", newStudySchema);
             currentStudy = newStudy;
