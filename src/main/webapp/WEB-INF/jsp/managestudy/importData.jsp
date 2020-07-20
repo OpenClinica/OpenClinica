@@ -48,19 +48,41 @@
 
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<div>
-  <a href="ImportCRFData">Import CRF Data</a>
-  <div>
-    Upload an xml file that contains CRF data.
+<style>
+	.section {
+		margin-top: 20px;
+	}
+	.section a {
+		color: #3a6087;
+		font-size: 16px;
+		font-weight: bold;
+	}
+	.section .description {
+		margin-left: 0px;
+	}
+</style>
+
+<h1>
+	<span class="title_submit">
+		<fmt:message key="import_crf_data" bundle="${resworkflow}"/>
+		<a
+		  href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/import-data')">
+		  <span class=""></span>
+		</a>
+	  </span>	  
+</h1>
+
+<div class="section">
+  <a href="ImportCRFData">Import XML Data</a>
+  <div class="description">
+	<fmt:message key="import_xml_data_description" bundle="${resworkflow}"/>
   </div>
 </div>
 
-<br>
-
-<div>
-	<a href="UploadCRFData">Upload CRF Data</a>
-  <div>
-    Upload pipe delimited text files which contains CRF data and one data mapping file.
+<div class="section">
+  <a href="UploadCRFData">Import Tabular Data</a>
+  <div class="description">
+	<fmt:message key="import_tabular_data_description" bundle="${resworkflow}"/>
   </div>
 </div>
 
