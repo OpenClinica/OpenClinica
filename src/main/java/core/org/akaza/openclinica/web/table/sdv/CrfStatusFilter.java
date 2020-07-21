@@ -14,8 +14,13 @@ public class CrfStatusFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions() {
         List<Option> options = new ArrayList<Option>();
-        options.add(new Option(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue(), EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue()));
-        options.add(new Option(EventCrfWorkflowStatusEnum.LOCKED.getDisplayValue(),EventCrfWorkflowStatusEnum.LOCKED.getDisplayValue()));
+        options.add(new Option("Locked", "Locked"));
+        options.add(new Option("Signed", "Signed"));
+        options.add(new Option("Signed and Locked","Signed and Locked"));
+        options.add(new Option("Not Signed", "Not Signed"));
+        options.add(new Option("Not Locked","Not Locked"));
+        options.add(new Option("Not Signed and Not Locked","Not Signed and Not Locked"));
+
         return options;
     }
 }

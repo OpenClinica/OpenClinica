@@ -590,6 +590,8 @@
 
     limitFilterWidth('110px', 'SDV Status');
     limitFilterWidth('110px', 'SDV Requirement');
+    limitFilterWidth('120px', 'CRF Status');
+
 
     $(window).resize(setPopupPos);
 
