@@ -839,7 +839,7 @@
             /*---------------*/
             END IF;
 
-            IF((OLD.sdv_status is null and NEW.sdv_status is not null) or OLD.sdv_status <![CDATA[<>]]> NEW.sdv_status) THEN
+            IF(OLD.sdv_status <![CDATA[<>]]> NEW.sdv_status) THEN
             SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
             SELECT INTO entity_name_value ''EventCRF SDV Status'';
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id ,study_event_id, event_crf_version_id)
