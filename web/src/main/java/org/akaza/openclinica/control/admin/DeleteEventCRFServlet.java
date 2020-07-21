@@ -158,6 +158,7 @@ public class DeleteEventCRFServlet extends SecureController {
 				eventCRF.setOldStatus(eventCRF.getStatus());
 				eventCRF.setStatus(Status.RESET);
 				eventCRF.setUpdater(ub);
+				eventCRF.setValidatorId(0);//OC-12177 added to fix displaying DDE workflow status
 				ecdao.update(eventCRF);
 
 				for (ItemDataBean itemdata : itemData) {
