@@ -90,7 +90,7 @@
                     <tr>
                         <td valign="top">
                             <div class="formfieldM_BG">
-                                <input name="ebl_filterKeyword" type="text" class="formfieldM" value="" />
+                                <input name="ebl_filterKeyword" type="text" class="formfieldM" value="${table.keywordFilter}" placeholder='${table.filterPlaceHolder}'/>
                             </div>
                         </td>
                         <td valign="top">
