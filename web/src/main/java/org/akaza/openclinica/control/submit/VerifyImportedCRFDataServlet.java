@@ -190,9 +190,22 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                     // a message of Failed Validation check."
                     // System.out.println("wrapper problems found : " +
                     // wrapper.getValidationErrors().toString());
+                    int eventCrfBeanIdProcessed = 0;
                     for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                         eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                         eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
+                       
+                        /**
+                         *  OC-8255
+                         *  now  it's time to update database for the migrated CRF version
+                         */
+                        int currentCRFVersionId = eventCrfBean.getCRFVersionId();
+          			    int newCRFVersionId =  displayItemBean.getMetadata().getCrfVersionId();
+          			    if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
+          			    	eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
+          			    	eventCrfBeanIdProcessed = eventCrfBeanId;
+          			    }
+          		     
                         logger.info("found value here: " + displayItemBean.getData().getValue());
                         logger.info("found status here: " + eventCrfBean.getStatus().getName());
                         // System.out.println("found event crf bean name here: "
