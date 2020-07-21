@@ -147,6 +147,15 @@
         realInterval * 1000
     );
 
+	// hacking OC-13156 Fix border style issues in latest Chrome
+    jQuery( document ).ready(function() {
+        if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+            jQuery('input[type="text"]').each(function(){
+                jQuery(this).css('background-color', 'revert');
+            });
+        }
+    });
+
 </script>
 
 <script type="text/javaScript">
