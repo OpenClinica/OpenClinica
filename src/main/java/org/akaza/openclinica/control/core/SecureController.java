@@ -1418,20 +1418,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return customRole;
     }
 
-    protected void populateCustomUserRoles(CustomRole customRole, String username) {
-        List<ChangeStudyDTO> byUser = getStudyDao().findByUser(username);
-        List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
-        if (userRoles == null) {
-            logger.error("******************userRoles should not be null");
-            ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = getStudyBuildService().getUserRoles(request, true);
-            userRoles = responseEntity.getBody();
-        }
-        if (byUser == null) {
-            logger.error("byUser variable should not be null for username:" + username);
-        }
-        Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
-    }
-
     protected String getParticipateStatus(Study parentStudy) {
 
         String participateStatus = parentStudy.getParticipantPortal();
