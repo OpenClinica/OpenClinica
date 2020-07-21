@@ -330,6 +330,12 @@ public class KafkaService {
         formChangeDTO.setFormRemoved(eventCrfBean.getRemoved().toString());}
         if (eventCrfBean.getArchived() != null){
         formChangeDTO.setFormArchived(eventCrfBean.getArchived().toString());}
+        if (eventCrfBean.getRequired() != null){
+            formChangeDTO.setFormRequired(eventCrfBean.getRequired().toString());}
+        if (eventCrfBean.getRelevant() != null){
+            formChangeDTO.setFormRelevant(eventCrfBean.getRelevant().toString());}
+        if (eventCrfBean.getEditable() != null){
+            formChangeDTO.setFormEditable(eventCrfBean.getEditable().toString());}
 
         return formChangeDTO;
     }
@@ -367,6 +373,12 @@ public class KafkaService {
             formChangeDTO.setFormRemoved(eventCrf.getRemoved().toString());}
         if (eventCrf.getArchived() != null){
             formChangeDTO.setFormArchived(eventCrf.getArchived().toString());}
+        if (eventCrf.getRequired() != null){
+            formChangeDTO.setFormRequired(eventCrf.getRequired().toString());}
+        if (eventCrf.getRelevant() != null){
+            formChangeDTO.setFormRelevant(eventCrf.getRelevant().toString());}
+        if (eventCrf.getEditable() != null){
+            formChangeDTO.setFormEditable(eventCrf.getEditable().toString());}
 
         return formChangeDTO;
     }

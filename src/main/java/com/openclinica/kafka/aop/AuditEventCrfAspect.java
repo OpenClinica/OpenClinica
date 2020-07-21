@@ -83,8 +83,22 @@ public class AuditEventCrfAspect {
             return false;}
         if (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived())){
             return false;}
-        if (existingEventCrf.getRemoved() != null && eventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())){
-            return false;}
+        if (eventCrf.getRemoved() != null){
+            if ((existingEventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())) || existingEventCrf.getRemoved() == null){
+                return false;}}
+        if (eventCrf.getEditable() != null){
+            if ((existingEventCrf.getEditable() != null && !existingEventCrf.getEditable().equals(eventCrf.getEditable())) || existingEventCrf.getEditable() == null){
+                return false;}}
+        if (eventCrf.getRequired() != null){
+            if ((existingEventCrf.getRequired() != null && !existingEventCrf.getRequired().equals(eventCrf.getRequired())) || existingEventCrf.getRequired() == null){
+                return false;}}
+        if (eventCrf.getRelevant() != null){
+            if ((existingEventCrf.getRelevant() != null && !existingEventCrf.getRelevant().equals(eventCrf.getRelevant())) || existingEventCrf.getRelevant() == null){
+                return false;}}
+        if (eventCrf.getEditable() != null){
+            if ((existingEventCrf.getEditable() != null && !existingEventCrf.getEditable().equals(eventCrf.getEditable())) || existingEventCrf.getEditable() == null){
+            return false;}}
+
         return true;
     }
 

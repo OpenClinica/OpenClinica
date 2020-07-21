@@ -251,7 +251,7 @@ public class EventCRFServiceImpl implements EventCRFService {
 
     private boolean isValidBoolean(String booleanString){
         if (booleanString == null){
-            return false;
+            return true;
         }
         booleanString = booleanString.toLowerCase();
         if (booleanString.equals("true") || booleanString.equals("false")){
