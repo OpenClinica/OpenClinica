@@ -106,24 +106,26 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     }
                     criteria += " ) )) ";
                 }
-            } else if(property.equals("lockStatus")){
+            } else if(property.equals("crfStatus")){
                 criteria = criteria + " and ";
-                if(value.toString().equalsIgnoreCase("locked")){
-                    criteria += " (  " + columnMapping.get(property) + " = true ) ";
-                }
-                else{
-                    criteria += " ( " + columnMapping.get(property) + " is null  or " + columnMapping.get(property) + " = false ) ";
-                }
+                String[] formAttributes = (value.toString().split("and"));
 
-            }else if (property.equals("crfStatus")) {
-                    criteria = criteria + " and ";
-                if(value.toString().equalsIgnoreCase("locked")){
-                    criteria =
-                            criteria + " (  se.locked = true ) ";
-                }
-                else {
-                    criteria =
-                            criteria + " ( " + columnMapping.get(property) + " = '" + EventCrfWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' and ( se.locked is null  or  se.locked = false ) )";
+                for(int i = 0; i < formAttributes.length; i++) {
+                    String attributeValue = formAttributes[i].trim();
+                    if(i > 0)
+                        criteria = criteria + " and ";
+
+                    if (attributeValue.equalsIgnoreCase("locked")) {
+                        criteria += " ( se.locked  = true ) ";
+                    } else if(attributeValue.equalsIgnoreCase("signed")){
+                        criteria += " ( se.signed  = true ) ";
+                    }
+                    else if(attributeValue.equalsIgnoreCase("not locked")){
+                        criteria += " ( se.locked is null  or se.locked = false ) ";
+                    }
+                    else if(attributeValue.equalsIgnoreCase("not signed")){
+                        criteria += " ( se.signed is null  or se.signed = false ) ";
+                    }
                 }
             } else if (property.equals("subjectEventStatus")){
                     criteria += " and ( " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' ) ";

@@ -181,7 +181,7 @@
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="50">
                                  <table style="width: 100%;">
                                     <tr style="width: inherit;">
-                                        <td style="width: 58%; text-align: end;">
+                                        <td style="width: 54%; text-align: end;">
                                             <c:choose>
                                                 <c:when test="${dedc.status.name=='locked'}">
                                                     <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
@@ -279,7 +279,7 @@
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="50">
                                 <table style="width: 100%;">
                                     <tr style="width: inherit;">
-                                        <td style="width: 58%; text-align: end;">
+                                        <td style="width: 54%; text-align: end;">
                                             <c:choose>
                                                 <c:when test="${ dec.eventCRF.removed == true || currRow.bean.studyEvent.removed ==true}">
                                                     <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">

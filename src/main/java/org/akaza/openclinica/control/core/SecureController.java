@@ -56,6 +56,7 @@ import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.StaleStateException;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -1126,14 +1127,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public void dowloadFile(File f, String contentType) throws Exception {
 
         response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
-        response.setContentType("text/xml");
+        if (contentType == null) {
+            contentType = "text/xml";
+        }
+        response.setContentType(contentType);
         response.setHeader("Pragma", "public");
 
         ServletOutputStream op = response.getOutputStream();
 
         DataInputStream in = null;
         try {
-            response.setContentType("text/xml");
+            response.setContentType(contentType);
             response.setHeader("Pragma", "public");
             response.setContentLength((int) f.length());
 
@@ -1418,20 +1422,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return customRole;
     }
 
-    protected void populateCustomUserRoles(CustomRole customRole, String username) {
-        List<ChangeStudyDTO> byUser = getStudyDao().findByUser(username);
-        List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
-        if (userRoles == null) {
-            logger.error("******************userRoles should not be null");
-            ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = getStudyBuildService().getUserRoles(request, true);
-            userRoles = responseEntity.getBody();
-        }
-        if (byUser == null) {
-            logger.error("byUser variable should not be null for username:" + username);
-        }
-        Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
-    }
-
     protected String getParticipateStatus(Study parentStudy) {
 
         String participateStatus = parentStudy.getParticipantPortal();
@@ -1541,7 +1531,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
     }
 
-    protected void setStudy(Study study, HttpSession session) {
+    protected void getCurrentBoardUrl(Study study, HttpSession session) {
         String boardUrl = study.getBoardUrl();
         if (boardUrl == null) {
             String accessToken = (String) session.getAttribute("accessToken");
@@ -1549,12 +1539,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 try {
                     boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
+                    getStudyDao().update(study);
                 }
                 catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
             }
         }
+    }
+
+    protected void setStudy(Study study, HttpSession session) {
+        getCurrentBoardUrl(study, session);
         session.setAttribute("study", study);
     }
 

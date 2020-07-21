@@ -118,10 +118,13 @@ public class SDVUtil {
     public final static String VIEW_ICON_HTML = "<span class=\"icon icon-search\" border=\"0>";
     private ResourceBundle resformat;
     private ResourceBundle resWords;
-    private final static String FORM_LOCKED_ICON_CLASS_NAME = "icon icon-lock";
+    private final static String FORM_LOCKED_ICON_CLASS_NAME = "icon icon-lock-new status";
+    private final static String FORM_SIGNED_ICON_CLASS_NAME = "icon icon-stamp-new status";
     private final static String FORM_COMPLETED_ICON_CLASS_NAME = "icon icon-checkbox-checked green";
     private String pathPrefix;
+    private final static String COMPLETED_STATUS = "Completed";
     private final static String LOCKED_STATUS = "Locked";
+    private final static String SIGNED_STATUS = "Signed";
 
     String getIconForCrfStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
@@ -658,15 +661,15 @@ public class SDVUtil {
         this.pathPrefix = pathPrefix;
 
         String[] allColumns = new String[]{"sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName", "eventDate",
-                "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "lockStatus", "lastUpdatedDate", "lastUpdatedBy",
+                "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
                 "subjectEventStatus", "sdvStatusActions"};
 
         tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName", "eventDate",
-                "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "lockStatus", "lastUpdatedDate", "lastUpdatedBy", "subjectEventStatus",
+                "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "subjectEventStatus",
                 "sdvStatusActions");
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "studySubjectStatus"), new SubjectStatusMatcher());
 
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "lockStatus"), new LockStatusMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new CrfStatusMatcher());
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvStatus"), new SdvStatusMatcher());
 
@@ -684,8 +687,8 @@ public class SDVUtil {
         HtmlColumn studySubjectStatus = row.getColumn("studySubjectStatus");
         studySubjectStatus.getFilterRenderer().setFilterEditor(new SubjectStatusFilter());
 
-        HtmlColumn crfStatus = row.getColumn("lockStatus");
-        crfStatus.getFilterRenderer().setFilterEditor(new LockStatusFilter());
+        HtmlColumn crfStatus = row.getColumn("crfStatus");
+        crfStatus.getFilterRenderer().setFilterEditor(new CrfStatusFilter());
 
         HtmlColumn actions = row.getColumn("sdvStatusActions");
         actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(LocaleResolver.getLocale(request)));
@@ -717,7 +720,7 @@ public class SDVUtil {
 
         turnOffSorts(tableFacade,
                 new String[]{"sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName",
-                        "studySubjectStatus", "crfVersion", "sdvRequirementDefinition", "lockStatus", "lastUpdatedBy", "subjectEventStatus",
+                        "studySubjectStatus", "crfVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedBy", "subjectEventStatus",
                         "sdvStatusActions"});
 
         // Create the custom toolbar
@@ -736,7 +739,7 @@ public class SDVUtil {
         String[] allTitles = {resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"),
                 resword.getString("open_queries"), resword.getString("event_name"), resword.getString("event_date"),
                 resword.getString("subject_status"), resword.getString("CRF_name"), resword.getString("CRF_version"),
-                resword.getString("SDV_requirement"), resword.getString("lock_status"), resword.getString("last_updated_date"),
+                resword.getString("SDV_requirement"), resword.getString("crf_status"), resword.getString("last_updated_date"),
                 resword.getString("last_updated_by"), resword.getString("subject_event_status"), resword.getString("actions")};
 
         setTitles(allTitles, table);
@@ -948,14 +951,18 @@ public class SDVUtil {
             tempSDVBean.setCrfName(getCRFName(eventCRFBean.getCRFVersionId()));
             tempSDVBean.setCrfVersion(getFormLayoutName(eventCRFBean.getFormLayoutId()));
                 String eventCrfWorkflowStatus = eventCRFBean.getWorkflowStatus().getDisplayValue();
-                StringBuilder lockStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
+                StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
                 String input = "<input type=\"hidden\" statusId=\"" + eventCrfWorkflowStatus + "\" />";
                 // "<input type=\"hidden\" statusId=\"1\" />"
 //                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
-
+                crfStatusBuilder.append("<span title='" + EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue() + "' class='" + FORM_COMPLETED_ICON_CLASS_NAME + " accessCheck' border='0' style='width:62%; padding-left: 40%;'></span>");
+                if(eventCrf.getStudyEvent().isCurrentlySigned())
+                    crfStatusBuilder.append("<span title='" + SIGNED_STATUS + "' class='" + FORM_SIGNED_ICON_CLASS_NAME + " accessCheck' border='0' style='padding-left: 6%;'></span>");
                 if(eventCrf.getStudyEvent().isCurrentlyLocked())
-                    lockStatusBuilder.append("<center><a title='" + LOCKED_STATUS + "' alt='" + LOCKED_STATUS + "' class='" + FORM_LOCKED_ICON_CLASS_NAME + "' accessCheck' border='0'/></center>");
-                tempSDVBean.setLockStatus(lockStatusBuilder.toString());
+                    crfStatusBuilder.append("<span title='" + LOCKED_STATUS + "' class='" + FORM_LOCKED_ICON_CLASS_NAME + " accessCheck' border='0' style='padding-left: 6%;'></span>");
+
+                tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
+
             tempSDVBean.setSubjectEventStatus("<center><a title='"+studyEvent.getWorkflowStatus().getDisplayValue()+"' alt='"+studyEvent.getWorkflowStatus().getDisplayValue()+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(studyEvent.getWorkflowStatus())+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly

@@ -547,7 +547,7 @@ public class CoreResources implements InitializingBean {
 
         resources = resolver.getResources("classpath*:core/properties/rules_template*.xml");
         resourcesTemplate = resolver.getResources("classpath*:core/properties/import_template*.xml");
-        resourcesPipeDelimitedTemplate = resolver.getResources("classpath*:core/properties/template_pipe*.txt");
+        resourcesPipeDelimitedTemplate = resolver.getResources("classpath*:core/properties/template_*");
 
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
