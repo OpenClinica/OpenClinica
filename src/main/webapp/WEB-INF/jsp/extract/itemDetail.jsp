@@ -90,7 +90,7 @@
 
  <c:forEach var="versionItem" items="${versionItems}">
   
-  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <table border="0" cellpadding="0" cellspacing="0">
    <tr>
    <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${versionCount}"/>'); 
      javascript:setImage('ExpandGroup<c:out value="${versionCount}"/>','images/bt_Collapse.gif');"><img 
@@ -101,10 +101,10 @@
    </tr>  
    <tr id="leftnavSubRow_SubSection<c:out value="${versionCount}"/>" style="display: all" valign="top">
    <td colspan="2">
-     <div style="width: 860px">
+     <div>
          <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-         <div class="textbox_center" align="center">
+         <div class="textbox_center">
        <table border="0" cellpadding="0" cellspacing="0">
         <tr>
 
