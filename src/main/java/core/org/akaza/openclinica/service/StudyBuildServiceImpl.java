@@ -731,6 +731,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
+
+        logger.info("GET " + uri);
         ResponseEntity<StudyBuildDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyBuildDTO.class);
 
         return response.getBody().getCurrentBoardUrl();

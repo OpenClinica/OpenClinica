@@ -8,17 +8,17 @@
 package org.akaza.openclinica.view;
 
 /**
- * 
- * 
+ *
+ *
  *         Provides a type-safe enumeration for JSP Page,converted from original static class.
  *         @author jnyayapathi
  */
 public enum Page {
-	
-	
-	
-          
-  
+
+
+
+
+
 
     /**
      * Page for logging in
@@ -45,26 +45,26 @@ public enum Page {
      * Page for reset password when password is expired.
      */
                 RESET_PASSWORD("/WEB-INF/jsp/login/resetPassword.jsp", "Reset your expired password"),
-                
+
     // YW >>
 
     /**
      * Page for user to update profile
      */
                 UPDATE_PROFILE("/WEB-INF/jsp/login/updateProfile.jsp", "Update your profile"),
-                
+
 
     /**
      * Page for user to confirm inputs of updating profile
      */
                 UPDATE_PROFILE_CONFIRM("/WEB-INF/jsp/login/updateProfileConfirm.jsp", "Confirm your profile"),
-                
+
 
     /**
      * Page for user to request password
      */
                 CONTACT("/WEB-INF/jsp/login/contact.jsp", "Contact Form"),
-                
+
 
     /**
      * Page for user to request password
@@ -209,6 +209,8 @@ public enum Page {
     /**
      * Page for creating crf data imports
      */
+    IMPORT_DATA ("/WEB-INF/jsp/managestudy/importData.jsp", "Import Data"),
+    IMPORT_DATA_SERVLET ("/ImportData", "Import Data"),
     IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/import.jsp", "Import CRF Data"),
     VERIFY_IMPORT_SERVLET ("/VerifyImportedCRFData", "Verify Imported CRF Data Servlet"),
     VERIFY_IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/verifyImport.jsp", "Verify Imported CRF Data"),
@@ -286,7 +288,7 @@ public enum Page {
     ITEM_DETAIL ("/WEB-INF/jsp/extract/itemDetail.jsp", "Remove Dataset"),
     /**
      * Pages for create and show all filters, tbh
-     * 
+     *
      */
     APPLY_FILTER ("/WEB-INF/jsp/extract/applyFilter.jsp", "Apply Filter"),
     CREATE_FILTER_SCREEN_1 ("/WEB-INF/jsp/extract/createFilterScreen1.jsp", "Create Filter Screen One"),
@@ -463,7 +465,7 @@ public enum Page {
     ADVANCED_SEARCH ("/WEB-INF/jsp/" + "managestudy/advancedSearch.jsp", "advanced search"),
     ADVANCED_SEARCH_SERVLET ("/ParticipantSearch", "advanced search"),
 
-    JOBS ("/WEB-INF/jsp/" + "managestudy/jobs.jsp", "jobs (bulk logfile)"),
+    JOBS ("/WEB-INF/jsp/managestudy/jobs.jsp", "jobs (bulk logfile)"),
     JOBS_SERVLET ("/Jobs", "jobs (bulk logfile)"),
 
     REPORTS ("/WEB-INF/jsp/" + "managestudy/embedded-reports.jsp", "embedded reports"),
@@ -487,16 +489,16 @@ public enum Page {
      PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp","Participant Form Servlet"),
      UPLOAD_CRF_DATA_TO_MIRTH ("/WEB-INF/jsp/submit/uploadFileToMirth.jsp", "Upload CRF Data To Mirth"),
      ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp","Enketo Form Servlet");
-      	
+
   //  private final static String path = "/WEB-INF/jsp/";
   //  public final static String servletPath = "/OpenClinica";
-    
+
 	private String fileName;
 	private String title;
-	
+
 	/**
      * Constructs the JSP Page instance
-     * 
+     *
      * @param fileName The filename of the JSP page
      * @param title The title of the JSP page
      */
@@ -507,7 +509,7 @@ public enum Page {
 
     /**
      * Gets the title attribute of the Page object.
-     * 
+     *
      * @return The title value
      */
     public String getTitle() {
@@ -516,7 +518,7 @@ public enum Page {
 
     /**
      * Gets the fileName attribute of the Page object.
-     * 
+     *
      * @return The fileName value
      */
     public String getFileName() {
@@ -527,10 +529,10 @@ public enum Page {
         this.fileName = newFileName;
     }
 
-    
-    
+
+
   /*  public static  Page setNewPage(String fileName, String title) {
-    
+
     	for (Page p : Page.values())
     	 {
     		if( p.fileName == fileName &&	 p.title == title)

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -226,7 +227,12 @@ public class SignStudySubjectServlet extends SecureController {
                     studySub.setStatus(Status.SIGNED);
                     studySub.setUpdater(ub);
                     subdao.update(studySub);
-                    addPageMessage(respage.getString("subject_event_signed"));
+
+                    MessageFormat mf = new MessageFormat("");
+                    mf.applyPattern(respage.getString("subject_event_signed"));
+                    Object[] arguments = { studySub.getLabel() };
+                    addPageMessage(mf.format(arguments));
+
                     // forwardPage(Page.SUBMIT_DATA_SERVLET);
                     forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
                     // >> changed tbh, 06/2009

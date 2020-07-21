@@ -5,7 +5,7 @@ package core.org.akaza.openclinica.service;
  * The UserStatus enumeration.
  */
 public enum UserStatus {
-    INVALID(0, ""),
+    INVALID(0, "Contact Info Entered"),
     ACTIVE(1, "Active"), INACTIVE(2, "Inactive"), CREATED(3, "Created"), INVITED(4, "Invited");
 
     UserStatus(int code, String value) {

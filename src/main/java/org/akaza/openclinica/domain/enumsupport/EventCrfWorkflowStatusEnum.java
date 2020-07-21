@@ -29,4 +29,13 @@ public enum EventCrfWorkflowStatusEnum {
         }
         return mapObject.get(description);
     }
+
+    public static EventCrfWorkflowStatusEnum getByEnglishDescription(String description) {
+        HashMap<String, EventCrfWorkflowStatusEnum> mapObject = new HashMap<String, EventCrfWorkflowStatusEnum>();
+        for (EventCrfWorkflowStatusEnum theEnum : EventCrfWorkflowStatusEnum.values()) {
+            mapObject.put(theEnum.getEnglishDisplayValue(), theEnum);
+        }
+        mapObject.put("complete", EventCrfWorkflowStatusEnum.COMPLETED);
+        return mapObject.get(description);
+    }
 }

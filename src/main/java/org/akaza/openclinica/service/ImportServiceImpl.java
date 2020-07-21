@@ -188,6 +188,9 @@ public class ImportServiceImpl implements ImportService {
 
                 ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
                 for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+                    if(studyEventDataBean.getWorkflowStatus() == null){
+                        studyEventDataBean.setWorkflowStatusAsString(studyEventDataBean.getEventStatus());
+                    }
                     if (studyEventDataBean.getStudyEventOID() != null)
                         studyEventDataBean.setStudyEventOID(studyEventDataBean.getStudyEventOID().toUpperCase());
 
@@ -208,12 +211,11 @@ public class ImportServiceImpl implements ImportService {
                     ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                     int formDataBeanCount = 0;
                     for (FormDataBean formDataBean : formDataBeans) {
+
                         String reasonForChange = formDataBean.getReasonForChangeForCompleteForms();
                         formDataBeanCount++;
                         if (formDataBean.getFormOID() != null)
                             formDataBean.setFormOID(formDataBean.getFormOID().toUpperCase());
-                        if (formDataBean.getEventCRFStatus() != null)
-                            formDataBean.setEventCRFStatus(formDataBean.getEventCRFStatus().toLowerCase());
 
                         if (studyEventDefinition.getType().equals(COMMON) && formDataBeanCount > 1) {
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORM_MISSING_STUDY_EVENT_CONSTRUCT);
@@ -352,7 +354,7 @@ public class ImportServiceImpl implements ImportService {
                             updateEventAndSubjectStatusIfSigned(studyEvent, studySubject, userAccount);
                         }
 
-                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE))) {
+                        if (formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                             if (itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
                                 // update eventcrf status into Complete\
                                 eventCrf = updateEventCrf(eventCrf, userAccount, EventCrfWorkflowStatusEnum.COMPLETED, new Date());
@@ -1026,6 +1028,7 @@ public class ImportServiceImpl implements ImportService {
 
         if (studyEvent != null && (
                 // OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
+                                studyEvent.isCurrentlyLocked() ||
                                 studyEvent.isCurrentlyRemoved() ||
                                 studyEvent.isCurrentlyArchived() ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)  ||
@@ -1313,7 +1316,11 @@ public class ImportServiceImpl implements ImportService {
                 formDataBean.setFormLayoutName(eventCrf.getFormLayout().getXformName());
             }
         }
-
+        if (eventCrf != null) {
+            if(eventCrf.isCurrentlyArchived() || eventCrf.isCurrentlyRemoved()){
+                return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
+            }
+        }
 
         if (eventCrf == null) {
 
@@ -1483,6 +1490,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private Object validateForm(FormDataBean formDataBean, Study tenantStudy, StudyEventDefinition studyEventDefinition) {
+
         if (formDataBean.getItemGroupData() == null)
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_DOES_NOT_CONTAIN_ITEMGROUPDATA);
         CrfBean crf = null;
@@ -1536,16 +1544,15 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_FOUND);
         }
 
-        // Form Status is null , then Form has Initial Data Entry Status
-        if (formDataBean.getEventCRFStatus() == null) {
-            formDataBean.setEventCRFStatus(INITIAL_DATA_ENTRY);
+        if(formDataBean.getWorkflowStatus() == null && formDataBean.getEventCRFStatus() != null){
+            formDataBean.setWorkflowStatusAsString(formDataBean.getEventCRFStatus());
+            if(formDataBean.getWorkflowStatus() == null){
+                return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
+            }
         }
-
-        // Form Status is not acceptable
-        if (!formDataBean.getEventCRFStatus().equalsIgnoreCase(INITIAL_DATA_ENTRY) &&
-                !formDataBean.getEventCRFStatus().equalsIgnoreCase(DATA_ENTRY_COMPLETE) &&
-                !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETE)) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
+        // Form Status is null , then Form has Initial Data Entry Status
+        if (formDataBean.getWorkflowStatus() == null) {
+            formDataBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         }
 
         return formLayout;

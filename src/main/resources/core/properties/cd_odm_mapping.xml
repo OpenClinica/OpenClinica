@@ -97,6 +97,10 @@
             <bind-xml name="OpenClinica:Status" node="attribute"/>
         </field>
 
+        <field name="WorkflowStatusAsString"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:WorkflowStatus" node="attribute"/>
+        </field>
 
         <field name="FormData"
                type="core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean"
@@ -118,6 +122,11 @@
 
         <field name="EventCRFStatus" type="java.lang.String">
             <bind-xml name="OpenClinica:Status" node="attribute"/>
+        </field>
+
+        <field name="WorkflowStatusAsString"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:WorkflowStatus" node="attribute"/>
         </field>
 
         <field name="ReasonForChangeForCompleteForms" type="java.lang.String">
