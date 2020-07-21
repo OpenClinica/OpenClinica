@@ -377,7 +377,7 @@
         </label>
     </fieldset>
 
-    <a id="clear-filter" href="javascript:clearFilter()">Clear Filter</a>
+    <a id="clear-filter" href="javascript:;">Clear Filter</a>
     <table id='sdv-items' style="width:100%">
         <thead>
         <tr>
@@ -417,12 +417,6 @@
             className: 'text-right'
         }]
     });
-
-    function clearFilter() {
-        jQuery('#sdv-items').dataTable().fnSortNeutral();
-    }
-
-    clearFilter();
 
     function translate(str) {
         var trans = {
@@ -478,6 +472,7 @@
     $('#sdv').on('click', '.popupSdv', function () {
         var popupIndex = $('#sdv button.popupSdv').index(this);
         var data = $(this).data();
+        clearFilter();
         var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
 
         function getItems() {
@@ -553,6 +548,18 @@
             itemsTable.clear().draw();
             getItems();
         }).change();
+
+        function clearFilter() {
+            jQuery('#sdv-items').dataTable().fnSortNeutral();
+            if (data.sdvStatus === 'CHANGED_SINCE_VERIFIED') {
+                $('#sdv-show-type input[value=y]').click();
+            } else {
+                $('#sdv-show-type input[value=n]').click();
+        }
+        }
+        $('#clear-filter').click(function (){
+                clearFilter();
+        });
 
         var verifyButton = $(this).siblings('[name=sdvVerify]');
         $('#sdvVerify').off('click').click(function () {
