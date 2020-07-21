@@ -12,6 +12,56 @@
 		<fmt:message key="icon_key" bundle="${reswords}"/><br clear="all"><br>
 
 		<table border="0" cellpadding="4" cellspacing="0">
+            <tr>
+                <td><fmt:message key="statuses" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-doc"></span></td>
+                <td><fmt:message key="not_started" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-clock"></span></td>
+                <td><fmt:message key="not_scheduled" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-clock2"></span></td>
+                <td><fmt:message key="scheduled" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-pencil-squared orange"></span></td>
+                <td><fmt:message key="data_entry_started" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-stop-circle red"></span></td>
+                <td><fmt:message key="stopped" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-redo"></span></td>
+                <td><fmt:message key="skipped" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-checkbox-checked green"></span></td>
+                <td><fmt:message key="completed" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-stamp-new black"></span></td>
+                <td><fmt:message key="signed" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-lock-new black"></span></td>
+                <td><fmt:message key="locked" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-archived-new black"></span></td>
+                <td><fmt:message key="archived" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-file-excel red"></span></td>
+                <td><fmt:message key="invalid" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td><fmt:message key="actions" bundle="${reswords}"/></td>
+            </tr>
 		   <tr>
 				<td><span class="icon icon-search"></td>
 				<td><fmt:message key="view" bundle="${reswords}"/></td>
@@ -38,7 +88,7 @@
 				<td><fmt:message key="lock" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><span class="icon icon-icon-unArchive"></td>
+				<td><span class="icon icon-lock-open"></td>
 				<td><fmt:message key="unlock" bundle="${reswords}"/></td>
 			</tr>
 

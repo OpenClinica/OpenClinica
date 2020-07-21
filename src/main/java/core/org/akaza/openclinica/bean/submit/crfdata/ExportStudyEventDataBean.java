@@ -30,7 +30,6 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
     private String eventName;
     private StudyEvent studyEvent;
     private ArrayList<ExportFormDataBean> exportFormData;
-    private StudyEventWorkflowStatusEnum workflowStatus;
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
@@ -103,14 +102,6 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
 
     public void setStudyEvent(StudyEvent studyEvent) {
         this.studyEvent = studyEvent;
-    }
-
-    public StudyEventWorkflowStatusEnum getWorkflowStatus() {
-        return workflowStatus;
-    }
-
-    public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
-        this.workflowStatus = workflowStatus;
     }
 
     public Boolean getRemoved() {

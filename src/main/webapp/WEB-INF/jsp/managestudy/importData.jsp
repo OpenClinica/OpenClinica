@@ -48,19 +48,41 @@
 
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<div>
+<style>
+	.section {
+		margin-top: 20px;
+	}
+	.section a {
+		color: #3a6087;
+		font-size: 16px;
+		font-weight: bold;
+	}
+	.section .description {
+		margin-left: 0px;
+	}
+</style>
+
+<h1>
+	<span class="title_submit">
+		<fmt:message key="import_crf_data" bundle="${resworkflow}"/>
+		<a
+		  href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/import-data')">
+		  <span class=""></span>
+		</a>
+	  </span>	  
+</h1>
+
+<div class="section">
   <a href="ImportCRFData"><fmt:message key="import_xml_crf_data" bundle="${restext}"/></a>
-  <div>
-    <fmt:message key="import_instructions" bundle="${restext}"/>
+  <div class="description">
+	<fmt:message key="import_xml_data_description" bundle="${resworkflow}"/>
   </div>
 </div>
 
-<br>
-
-<div>
-	<a href="UploadCRFData"><fmt:message key="upload_crf_data" bundle="${restext}"/></a>
-  <div>
-  	<fmt:message key="upload_instructions" bundle="${restext}"/>
+<div class="section">
+  <a href="UploadCRFData">Import Tabular Data</a>
+  <div class="description">
+	<fmt:message key="import_tabular_data_description" bundle="${resworkflow}"/>
   </div>
 </div>
 
