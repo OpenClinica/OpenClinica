@@ -1254,4 +1254,14 @@ public class Study extends DataMapDomainObject {
         setIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_PORTAL, participantPortal);
 
     }
+
+    @Transient
+    public String getUuid() {
+        return isSite() ? study.getStudyUuid() : studyUuid;
+    }
+
+    @Transient
+    public String getEnvUuid() {
+        return isSite() ? study.getStudyEnvUuid() : studyEnvUuid;
+    }
 }

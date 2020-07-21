@@ -56,6 +56,7 @@ import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.StaleStateException;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -1527,7 +1528,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
     }
 
-    protected void setStudy(Study study, HttpSession session) {
+    protected void getCurrentBoardUrl(Study study, HttpSession session) {
         String boardUrl = study.getBoardUrl();
         if (boardUrl == null) {
             String accessToken = (String) session.getAttribute("accessToken");
@@ -1535,12 +1536,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 try {
                     boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
+                    getStudyDao().update(study);
                 }
                 catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
             }
         }
+    }
+
+    protected void setStudy(Study study, HttpSession session) {
+        getCurrentBoardUrl(study, session);
         session.setAttribute("study", study);
     }
 
