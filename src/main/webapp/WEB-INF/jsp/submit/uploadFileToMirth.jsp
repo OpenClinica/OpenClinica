@@ -107,7 +107,7 @@
 
 </form>
 <br/>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_upload_mapping_template" bundle="${resword}"/></b></a></div>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_mapping_template" bundle="${resword}"/></b></a></div>
 
 <% 
     final Logger logger = LoggerFactory.getLogger(getClass().getName());
