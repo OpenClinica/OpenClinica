@@ -141,6 +141,16 @@ public class ImportCRFDataService {
                             return null;
                         }
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        
+                        /**
+                         *  OC-8239
+                         *  need to check :
+                         *  If another user already entered a different version of the same CRF for the same Study Event & Subject
+                         */
+                        if (eventCrfBeans.isEmpty()) {
+                        	eventCrfBeans = eventCrfDAO.findByEventSubjectCRFid(studyEventBean, studySubjectBean, crfVersionBean);
+                        }
+                        
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
@@ -352,6 +362,23 @@ public class ImportCRFDataService {
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    
+                    /**
+                     * OC-8239
+                     * if can't find by the CRF version in the xml file, then need to check:
+                     * If another user already entered a different version of the same CRF for the same Study Event & Subject
+                     * if found, then will do CRF version migration
+                     */
+                    if (eventCRFBean == null) {
+                    	eventCRFBean = eventCRFDAO.findByEventCrfID(studyEvent, crfVersion);
+
+                    	if(eventCRFBean != null) {
+                			  int newCRFVersionId = crfVersion.getId();
+                			  eventCRFBean.setCRFVersionId(newCRFVersionId);
+
+                    	}
+
+                    }
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
                             crfVersion.getId());
@@ -420,7 +447,24 @@ public class ImportCRFDataService {
                                         blankCheck.put(newKey, itemDataBean);
                                         logger.info("adding " + newKey + " to blank checks");
                                         if (!metadataBeans.isEmpty()) {
-                                            ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+                                        	/** 
+                                        	 * ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+                                        	 * will cause issue--- always set the 1st one may set wrong value,
+                                        	 * should check the passed in first,
+                                        	 * if not found, then keep current default logic
+                                        	 */
+                                        	ItemFormMetadataBean metadataBean = null;
+                                        	for(ItemFormMetadataBean mdBean:metadataBeans) {
+                                        		if(mdBean.getCrfVersionId() == eventCRFBean.getCRFVersionId()) {
+                                        			metadataBean = mdBean;
+                                        			break;
+                                        		}
+                                        		
+                                        	}
+                                        	if(metadataBean == null) {
+                                        		metadataBean = metadataBeans.get(0);
+                                        	}
+                                            
                                             // also possible nullpointer
                                             displayItemBean.setData(itemDataBean);
                                             displayItemBean.setMetadata(metadataBean);

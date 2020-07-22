@@ -234,11 +234,28 @@ public class DataImportService {
                 if (wrapper.getDisplayItemBeans() != null && wrapper.getDisplayItemBeans().size() == 0) {
                     return getReturnList("fail", "", "No items to submit. Please check your XML.");
                 }
+                
+                int eventCrfBeanIdProcessed = 0;
                 for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                     eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                     eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
                     logger.debug("found value here: " + displayItemBean.getData().getValue());
                     logger.debug("found status here: " + eventCrfBean.getStatus().getName());
+                    
+                    /**
+                     *  OC-8239
+                     *  now  it's time to update database for the migrated CRF version
+                     */
+                    int currentCRFVersionId = eventCrfBean.getCRFVersionId();
+      			    int newCRFVersionId =  displayItemBean.getMetadata().getCrfVersionId();
+      			    if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
+      			    	eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, userBean.getId());
+      			    	eventCrfBeanIdProcessed = eventCrfBeanId;
+      			    	
+      			    	// also update the value in current memory
+      			    	eventCrfBean.setCRFVersionId(newCRFVersionId);
+      			    }
+      			    
                     itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                             .getData().getOrdinal());
                     if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
