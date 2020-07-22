@@ -10,13 +10,4 @@
         </addColumn>
     </changeSet>
 
-
-    <changeSet author="jkeremian" id="2020-03-23-OC-12503-02">
-        <comment>Updating the locked and signed column on study_event table</comment>
-        <sql>
-            UPDATE study_event SET locked='true' , workflow_status='DATA_ENTRY_STARTED' WHERE subject_event_status_id ='7';
-            UPDATE study_event SET signed='true' , workflow_status='DATA_ENTRY_STARTED' WHERE workflow_status ='SIGNED';
-        </sql>
-    </changeSet>
-
 </databaseChangeLog>
