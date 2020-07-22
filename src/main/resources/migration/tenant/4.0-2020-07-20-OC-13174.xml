@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    
+    <changeSet author="sbalasubramanian" id="2020-07-20-OC-13174">
+        <comment>Updating the auditLog to change old sdv_status to new sdv_status</comment>
+        <sql>
+            UPDATE audit_log_event SET old_value ='NOT_VERIFIED' where audit_log_event_type_id=32 and old_value='FALSE';
+            UPDATE audit_log_event SET new_value ='NOT_VERIFIED' where audit_log_event_type_id=32 and new_value='FALSE';
+            UPDATE audit_log_event SET old_value ='VERIFIED' where audit_log_event_type_id=32 and old_value='TRUE';
+            UPDATE audit_log_event SET new_value ='VERIFIED' where audit_log_event_type_id=32 and new_value='TRUE';
+        </sql>
+    </changeSet>
+</databaseChangeLog>
