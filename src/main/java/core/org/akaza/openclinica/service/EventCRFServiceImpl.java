@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service("EventCRFService")
 public class EventCRFServiceImpl implements EventCRFService {
@@ -229,7 +231,7 @@ public class EventCRFServiceImpl implements EventCRFService {
             validationErrors.addError(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_FORMOID));
         }
 
-        List<EventCrfWorkflowStatusEnum> enumValues = Arrays.asList(EventCrfWorkflowStatusEnum.values());
+        List<String> enumValues = Stream.of(EventCrfWorkflowStatusEnum.values()).map(Enum::name).collect(Collectors.toList());
         if (formRequestDTO.getFormWorkflowStatus() != null && !enumValues.contains(formRequestDTO.getFormWorkflowStatus())){
             validationErrors.addError(new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID));
         }
