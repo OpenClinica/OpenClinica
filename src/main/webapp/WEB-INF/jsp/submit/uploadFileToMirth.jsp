@@ -107,7 +107,6 @@
 
 </form>
 <br/>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadUploadDataTemplate"><b><fmt:message key="download_upload_data_template" bundle="${resword}"/></b></a></div>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_upload_mapping_template" bundle="${resword}"/></b></a></div>
 
 <% 
