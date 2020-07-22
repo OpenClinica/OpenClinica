@@ -14,32 +14,16 @@
             pk INTEGER;
             entity_name_value TEXT;
             BEGIN
+
             IF (TG_OP = ''UPDATE'') THEN
             IF(OLD.workflow_status <![CDATA[<>]]> NEW.workflow_status) THEN
-            /*---------------*/
             /*Event CRF status changed*/
             SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
             SELECT INTO entity_name_value ''Status'';
 
-            IF( NEW.workflow_status = ''COMPLETED'') THEN
-            IF (NEW.electronic_signature_status) THEN
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id,study_event_id, event_crf_version_id )
-            VALUES (pk, ''14'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.workflow_status, NEW.workflow_status, NEW.event_crf_id, NEW.study_event_id ,NEW.form_layout_id);
-            ELSE
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id ,study_event_id, event_crf_version_id)
-            VALUES (pk, ''8'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.workflow_status, NEW.workflow_status, NEW.event_crf_id , NEW.study_event_id ,NEW.form_layout_id);
-            END IF;
+            VALUES (pk, ''66'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.workflow_status, NEW.workflow_status, NEW.event_crf_id, NEW.study_event_id ,NEW.form_layout_id);
 
-            ELSIF( NEW.workflow_status = ''INITIAL_DATA_ENTRY'') THEN
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id ,study_event_id, event_crf_version_id)
-            VALUES (pk, ''41'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.workflow_status, NEW.workflow_status, NEW.event_crf_id , NEW.study_event_id ,NEW.form_layout_id);
-
-            ELSIF ( NEW.workflow_status = ''NOT_STARTED'') THEN
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id ,study_event_id, event_crf_version_id)
-            VALUES (pk, ''40'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.workflow_status, NEW.workflow_status, NEW.event_crf_id , NEW.study_event_id ,NEW.form_layout_id);
-
-            END IF;
-            /*---------------*/
             END IF;
 
             IF((OLD.removed is NULL and NEW.removed is not Null)
