@@ -432,7 +432,7 @@
     }
 
     function formatDateTime(date) {
-        return moment(date).utc().format('DD-MMM-YYYY hh:mm');
+        return moment(date).utc().format('DD-MMM-YYYY HH:mm');
     }
 
     function isMidnight(date) {
