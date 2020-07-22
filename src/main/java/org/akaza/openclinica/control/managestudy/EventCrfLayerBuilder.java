@@ -131,7 +131,7 @@ public class EventCrfLayerBuilder {
 
         html.append("Status").append(": ").append(eventCrfWorkflowStatus.getDisplayValue()).br();
         if (getStudyEvent() != null) {
-            if (getStudyEvent().isSigned()) {
+            if (getStudyEvent().isSigned() && !eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)) {
                 html.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
             }
             if (getStudyEvent().isLocked()) {
