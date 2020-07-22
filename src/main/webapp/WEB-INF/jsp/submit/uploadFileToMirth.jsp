@@ -68,7 +68,7 @@
 	</c:otherwise>
 </c:choose>
 
-<fmt:message key="upload_crf_data" bundle="${resworkflow}"/>
+<fmt:message key="import_tabular_crf_data" bundle="${resworkflow}"/>
 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/import-data')">
     <span class=""></span>
 </a></h1>
@@ -107,8 +107,7 @@
 
 </form>
 <br/>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadUploadDataTemplate"><b><fmt:message key="download_upload_data_template" bundle="${resword}"/></b></a></div>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_upload_mapping_template" bundle="${resword}"/></b></a></div>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_mapping_template" bundle="${resword}"/></b></a></div>
 
 <% 
     final Logger logger = LoggerFactory.getLogger(getClass().getName());
