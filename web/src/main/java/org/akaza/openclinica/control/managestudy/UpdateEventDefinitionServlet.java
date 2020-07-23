@@ -304,7 +304,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 	eventDefCrfBean.setParticipantForm(edc.isParticipantForm());
                 	eventDefCrfBean.setAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());          
                 	eventDefCrfBean.setStatus(edc.getStatus());
-                	eventDefCrfBean.setOldStatus(edc.getOldStatus());
                 	
                 	cdao.update(eventDefCrfBean);
                 }
