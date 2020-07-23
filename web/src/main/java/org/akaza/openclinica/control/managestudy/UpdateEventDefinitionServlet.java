@@ -284,8 +284,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 ArrayList <EventDefinitionCRFBean> eventDefCrfBeans = cdao.findAllByCrfDefinitionInSiteOnly(edc.getStudyEventDefinitionId(), edc.getCrfId());
                 for (EventDefinitionCRFBean eventDefCrfBean :eventDefCrfBeans){
                 	eventDefCrfBean.setParticipantForm(edc.isParticipantForm());
-                	eventDefCrfBean.setAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());          
-                	
+                	eventDefCrfBean.setAllowAnonymousSubmission(edc.isAllowAnonymousSubmission()); 
+                	eventDefCrfBean.setStatus(edc.getStatus());
                 	
                 	cdao.update(eventDefCrfBean);
                 }
