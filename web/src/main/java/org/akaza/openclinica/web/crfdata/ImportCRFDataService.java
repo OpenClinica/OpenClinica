@@ -535,7 +535,24 @@ public class ImportCRFDataService {
                                         blankCheck.put(newKey, itemDataBean);
                                         logger.info("adding " + newKey + " to blank checks");
                                         if (!metadataBeans.isEmpty()) {
-                                            ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+                                        	
+                                        	/** 
+                                        	 * ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+                                        	 * will cause issue--- always set the 1st one may set wrong value,
+                                        	 * should check the passed in first,
+                                        	 * if not found, then keep current default logic
+                                        	 */
+                                        	ItemFormMetadataBean metadataBean = null;
+                                        	for(ItemFormMetadataBean mdBean:metadataBeans) {
+                                        		if(mdBean.getCrfVersionId() == eventCRFBean.getCRFVersionId()) {
+                                        			metadataBean = mdBean;
+                                        			break;
+                                        		}
+                                        		
+                                        	}
+                                        	if(metadataBean == null) {
+                                        		metadataBean = metadataBeans.get(0);
+                                        	}
                                             // also
                                             // possible
                                             // nullpointer

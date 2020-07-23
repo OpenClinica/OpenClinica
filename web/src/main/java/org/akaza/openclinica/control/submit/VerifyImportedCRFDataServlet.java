@@ -204,6 +204,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
           			    if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
           			    	eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
           			    	eventCrfBeanIdProcessed = eventCrfBeanId;
+          			    	
+          			    	eventCrfBean.setCRFVersionId(newCRFVersionId);
           			    }
           		     
                         logger.info("found value here: " + displayItemBean.getData().getValue());
