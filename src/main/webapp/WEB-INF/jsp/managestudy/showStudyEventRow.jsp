@@ -197,7 +197,7 @@
                                                     </c:choose>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                                    <span class="icon icon-file-excel red" alt="<fmt:message key="status_semoved" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
@@ -282,7 +282,7 @@
                                         <td style="width: 54%; text-align: end;">
                                             <c:choose>
                                                 <c:when test="${ dec.eventCRF.removed == true || currRow.bean.studyEvent.removed ==true}">
-                                                    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                                    <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
                                                 </c:when>
                                                 <c:otherwise>
                                                     <c:choose>
@@ -296,7 +296,7 @@
                                                             <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                                            <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </c:otherwise>
