@@ -366,7 +366,13 @@
             cell.parent().width(width);
             cell.css('overflow', 'visible');
 
-            cell.html('<div id="dynFilterDiv"><input id="dynFilterInput" name="filter" style="width:' + (width + 2) + 'px" value="" /></div>');
+            // hacking OC-13156 Fix border style issues in latest Chrome
+            var originalStyle = 'width:' + (width + 2) + 'px';
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                originalStyle = originalStyle + '; outline: none;';
+            }
+
+            cell.html('<div id="dynFilterDiv"><input id="dynFilterInput" name="filter" style="' + originalStyle + '" value="" /></div>');
 
             var input = $('#dynFilterInput');
             input.val(originalValue);
@@ -428,7 +434,13 @@
             /* Create the dynamic select input box. */
             cell.html('<div id="dynFilterDroplistDiv" style="top:17px">');
 
-            var html = '<select id="dynFilterDroplist" name="filter" size="' + size + '">';
+            // hacking OC-13156 Fix border style issues in latest Chrome
+            var originalStyle = '';
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                originalStyle = originalStyle + 'outline: none;';
+            }
+
+            var html = '<select id="dynFilterDroplist" name="filter" size="' + size + '" style="' + originalStyle + '">';
             html += '<option value=""> </option>';
             $.each(options, function(key, value) {
                 if (key == originalValue) {

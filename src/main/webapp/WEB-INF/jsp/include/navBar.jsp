@@ -151,7 +151,16 @@
     jQuery( document ).ready(function() {
         if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
             jQuery('input[type="text"]').each(function(){
-                jQuery(this).css('background-color', 'revert');
+                jQuery(this).css({'background-color':'revert', 'outline':'none'});
+            });
+            jQuery('input[type="password"]').each(function(){
+                jQuery(this).css({'background-color':'revert', 'outline':'none'});
+            });
+            jQuery('select').each(function(){
+	            jQuery(this).css({'outline':'none'});
+	        });
+	        jQuery('.dynFilter').each(function(){
+                jQuery(this).css({'outline':'none'});
             });
         }
     });

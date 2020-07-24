@@ -654,6 +654,12 @@ $(function() {
                 sectionDiv.children('.section-body').empty().append(sectionBody);
                 setTimeout(function() {
                     datatablefy(sectionBody.find('table.datatable'));
+                    // hacking OC-13156 Fix border style issues in latest Chrome
+                    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                        jQuery('input[type="search"]').each(function(){
+                            jQuery(this).css({'background-color':'revert', 'outline':'none'});
+                        });
+                    }
                 }, 1);
             });
         }).children('.expanded').trigger('uncollapse');
