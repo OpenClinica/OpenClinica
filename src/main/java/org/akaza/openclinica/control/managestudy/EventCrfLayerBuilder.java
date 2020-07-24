@@ -112,6 +112,7 @@ public class EventCrfLayerBuilder {
         String signText = reswords.getString("signed");
         String lockText = reswords.getString("locked");
         String archiveText = reswords.getString("archived");
+        String removedText = reswords.getString("removed");
 
         // Event Div
         html.div().id("Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
@@ -128,8 +129,12 @@ public class EventCrfLayerBuilder {
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).close();
         html.append(subjectText).append(": ").append(studySubjectLabel).br();
         html.append(crfText).append(": ").append(crf.getName()).br();
+        String statusText = eventCrfWorkflowStatus.getDisplayValue();
+        if (eventCrfBean.isRemoved()) {
+            statusText = removedText.toLowerCase();
+        }
+        html.append("Status").append(": ").append(statusText).br();
 
-        html.append("Status").append(": ").append(eventCrfWorkflowStatus.getDisplayValue()).br();
         if (getStudyEvent() != null) {
             if (getStudyEvent().isSigned() && !eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)) {
                 html.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
