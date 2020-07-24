@@ -4,35 +4,58 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 
-    <changeSet  author="jkeremian"  id="OC-12650-01">
+    <changeSet  author="jkeremian"  id="OC-12650-001">
         <update tableName="audit_log_event_type">
-            <column name="name" value="study_event_workflow_status_changed"/>
-            <where>audit_log_event_type_id='17'</where>
+            <column name="name" value="study_event_archived_status_changed"/>
+            <where>audit_log_event_type_id='59'</where>
         </update>
     </changeSet>
-    <changeSet  author="jkeremian"  id="OC-12650-02">
+    <changeSet  author="jkeremian"  id="OC-12650-002">
         <update tableName="audit_log_event_type">
-            <column name="name" value="study_event_workflow_status_changed"/>
-            <where>audit_log_event_type_id='18'</where>
+            <column name="name" value="study_event_locked_status_changed"/>
+            <where>audit_log_event_type_id='60'</where>
         </update>
     </changeSet>
-    <changeSet  author="jkeremian"  id="OC-12650-03">
+    <changeSet  author="jkeremian"  id="OC-12650-003">
         <update tableName="audit_log_event_type">
-            <column name="name" value="study_event_workflow_status_changed"/>
-            <where>audit_log_event_type_id='19'</where>
+            <column name="name" value="event_crf_removed_status_changed"/>
+            <where>audit_log_event_type_id='61'</where>
         </update>
     </changeSet>
-    <changeSet  author="jkeremian"  id="OC-12650-04">
+    <changeSet  author="jkeremian"  id="OC-12650-004">
         <update tableName="audit_log_event_type">
-            <column name="name" value="study_event_workflow_status_changed"/>
-            <where>audit_log_event_type_id='20'</where>
+            <column name="name" value="event_crf_archived_status_changed"/>
+            <where>audit_log_event_type_id='62'</where>
         </update>
     </changeSet>
-    <changeSet  author="jkeremian"  id="OC-12650-05">
-        <update tableName="audit_log_event_type">
+
+
+    <changeSet  author="jkeremian"  id="OC-12650-005">
+        <insert tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" valueNumeric="63"/>
             <column name="name" value="study_event_workflow_status_changed"/>
-            <where>audit_log_event_type_id='21'</where>
-        </update>
+        </insert>
+    </changeSet>
+
+    <changeSet  author="jkeremian"  id="OC-12650-006">
+        <insert tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" valueNumeric="64"/>
+            <column name="name" value="study_event_removed_status_changed"/>
+        </insert>
+    </changeSet>
+
+    <changeSet  author="jkeremian"  id="OC-12650-007">
+        <insert tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" valueNumeric="65"/>
+            <column name="name" value="study_event_signed_status_changed"/>
+        </insert>
+    </changeSet>
+
+    <changeSet  author="jkeremian"  id="OC-12650-008">
+        <insert tableName="audit_log_event_type">
+            <column name="audit_log_event_type_id" valueNumeric="66"/>
+            <column name="name" value="event_crf_workflow_status_changed"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>

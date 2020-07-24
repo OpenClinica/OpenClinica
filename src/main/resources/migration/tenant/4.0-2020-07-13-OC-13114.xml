@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="jkeremian" id="2020-07-13-OC-13114-01"
+               dbms="postgresql" >
+        <comment>Migrating Event Crf Statuses </comment>
+        <sql>
+
+            CREATE OR REPLACE FUNCTION migrateeventcrfs()
+            RETURNS void AS
+'
+            declare
+            ec_rec  record;
+            sed_rec  record;
+            se_rec  record;
+            edc_rec  record;
+            fl_rec  record;
+            ale_rec record;
+
+            begin
+            ALTER TABLE event_crf DISABLE TRIGGER event_crf_initial;
+            ALTER TABLE event_crf DISABLE TRIGGER event_crf_update;
+            ALTER TABLE event_crf DISABLE TRIGGER event_crf_update_1;
+
+            --loggers
+            RAISE NOTICE ''************************************   BEFORE MIGRATION   ************************************************************'';
+            FOR  ec_rec IN SELECT event_crf_id, status_id, workflow_status ,removed ,archived  FROM event_crf order by event_crf_id
+            LOOP
+            RAISE NOTICE ''eventCrfId: % statusId: % workflowStatus: % , removed: %, archived: %'' , ec_rec.event_crf_id  ,ec_rec.status_id, ec_rec.workflow_status, ec_rec.removed,ec_rec.archived ;
+            END LOOP;
+
+
+
+
+            -- iterate event_crf table
+            FOR  ec_rec IN SELECT event_crf_id,study_event_id, form_layout_id, status_id, old_status_id, workflow_status ,removed ,archived  FROM event_crf order by event_crf_id
+
+            LOOP
+
+
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-13114 AC2 , AC3 , AC4
+            ---------------------------------------------------------------------------------------
+
+            select   study_event_id ,study_event_definition_id INTO se_rec from study_event se where se.study_event_id=ec_rec.study_event_id;
+            select   study_event_definition_id, study_id,status_id  INTO sed_rec from study_event_definition sed where sed.study_event_definition_id=se_rec.study_event_definition_id;
+            select   form_layout_id,crf_id ,status_id INTO fl_rec from form_layout fl where fl.form_layout_id=ec_rec.form_layout_id;
+            select   event_definition_crf_id,status_id INTO edc_rec from event_definition_crf edc where edc.study_event_definition_id=sed_rec.study_event_definition_id and edc.crf_id=fl_rec.crf_id and edc.study_id=sed_rec.study_id;
+
+
+            -- if event definition has removed or auto-removed status OR event_form definition has removed or auto-removed status
+            if (sed_rec.status_id = 5 or sed_rec.status_id = 7 or edc_rec.status_id =5 or edc_rec.status_id=7 ) then
+            update event_crf set archived =''true'' where event_crf_id = ec_rec.event_crf_id;
+              if(ec_rec.old_status_id = 5 and (edc_rec.status_id =5 or edc_rec.status_id=7) ) then
+                update event_crf set removed =''true'' where event_crf_id = ec_rec.event_crf_id;
+              end if;
+            else
+              if (ec_rec.status_id = 5 ) then
+                update event_crf set removed =''true'' where event_crf_id = ec_rec.event_crf_id;
+              end if;
+            end if;
+
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-13114 AC5
+            ---------------------------------------------------------------------------------------
+            -- if event_crf has initial_data_entry status
+            if(ec_rec.status_id=1) then
+            UPDATE event_crf SET workflow_status=''INITIAL_DATA_ENTRY'' where event_crf_id = ec_rec.event_crf_id;
+            exit;
+            end if;
+
+            -- if event_crf has completed status
+            if(ec_rec.status_id=2) then
+            UPDATE event_crf SET workflow_status=''COMPLETED'' where event_crf_id = ec_rec.event_crf_id;
+            exit;
+            end if;
+
+            -- if event_crf has data reset
+            if(ec_rec.status_id=11) then
+            UPDATE event_crf SET workflow_status=''NOT_STARTED'' where event_crf_id = ec_rec.event_crf_id;
+            exit;
+            end if;
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-13114 AC6
+            ---------------------------------------------------------------------------------------
+
+            -- if event_crf has removed, locked or auto-removed status
+            if (ec_rec.status_id = 5 or ec_rec.status_id = 6 or ec_rec.status_id = 7) then
+
+            -- iterate audit log table
+            for  ale_rec IN SELECT audit_log_event_type_id  FROM audit_log_event where audit_table = ''event_crf'' and entity_id = ec_rec.event_crf_id and entity_name=''Status''    order by audit_id desc
+            loop
+
+
+            -- if audit log has event_crf initial_data_entry
+            if(ale_rec.audit_log_event_type_id = 41) then
+            update event_crf set workflow_status=''INITIAL_DATA_ENTRY''  where event_crf_id = ec_rec.event_crf_id;
+            exit ;
+            end if;
+
+            -- if audit log has event_crf marked complete
+            if(ale_rec.audit_log_event_type_id = 8) then
+            update event_crf set workflow_status=''COMPLETED''  where event_crf_id = ec_rec.event_crf_id;
+            exit ;
+            end if;
+
+            -- if audit log has event_crf not_started
+            if(ale_rec.audit_log_event_type_id = 40) then
+            update event_crf set workflow_status=''NOT_STARTED''  where event_crf_id = ec_rec.event_crf_id;
+            exit ;
+            end if;
+
+            end loop;
+            end if;
+
+
+
+            ---------------------------------------------------------------------------------------
+
+
+            END LOOP;
+
+            -- loggers
+            RAISE NOTICE ''************************************   AFTER MIGRATION   ************************************************************'';
+            FOR  ec_rec IN SELECT event_crf_id, status_id, workflow_status ,removed ,archived  FROM event_crf order by event_crf_id
+            LOOP
+            RAISE NOTICE ''eventCrfId: % statusId: % workflowStatus: % , removed: %, archived: %'' , ec_rec.event_crf_id  ,ec_rec.status_id, ec_rec.workflow_status, ec_rec.removed,ec_rec.archived ;
+            END LOOP;
+
+            ALTER TABLE event_crf ENABLE TRIGGER event_crf_initial;
+            ALTER TABLE event_crf ENABLE TRIGGER event_crf_update;
+            ALTER TABLE event_crf ENABLE TRIGGER event_crf_update_1;
+
+            raise notice ''the end'';
+
+            end;
+'            LANGUAGE plpgsql;
+
+            select migrateeventcrfs();
+
+
+
+        </sql>
+
+    </changeSet>
+
+
+</databaseChangeLog>

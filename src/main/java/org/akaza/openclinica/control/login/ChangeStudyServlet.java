@@ -12,6 +12,7 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.ChangeStudyDTO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -41,6 +42,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -78,32 +80,32 @@ public class ChangeStudyServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource(), getStudyDao());
         Map<Integer, Study> allStudies = getStudyDao().findAll().stream().collect(Collectors.toMap(s->s.getStudyId(),s-> s));
         ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), new ArrayList<Study>( allStudies.values()));
-        CustomRole customRole = new CustomRole();
-
-        populateCustomUserRoles(customRole, ub.getName());
-        request.setAttribute("siteRoleMap", customRole.siteRoleMap);
-        request.setAttribute("studyRoleMap", customRole.studyRoleMap);
-        if(request.getAttribute("label")!=null) {
-            String label = (String) request.getAttribute("label");
-            if(label.length()>0) {
-                request.setAttribute("label", label);
-            }
-        }
-
-        ArrayList<StudyUserRoleBean> validStudies = new ArrayList<>();
-        for (int i = 0; i < studies.size(); i++) {
-            StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
-            Study study = allStudies.get(sr.getStudyId());
-            if (study != null && study.getStatus().equals(Status.PENDING)) {
-                sr.setStatus(Status.get(study.getStatus().getCode()));
-            }
-            if (study.isPublished() == false)
-                continue;
-            validStudies.add(sr);
-        }
-
 
         if (StringUtils.isEmpty(action)) {
+            CustomRole customRole = new CustomRole();
+
+            populateCustomUserRoles(customRole, ub.getName());
+            request.setAttribute("siteRoleMap", customRole.siteRoleMap);
+            request.setAttribute("studyRoleMap", customRole.studyRoleMap);
+            if(request.getAttribute("label")!=null) {
+                String label = (String) request.getAttribute("label");
+                if(label.length()>0) {
+                    request.setAttribute("label", label);
+                }
+            }
+
+            ArrayList<StudyUserRoleBean> validStudies = new ArrayList<>();
+            for (int i = 0; i < studies.size(); i++) {
+                StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
+                Study study = allStudies.get(sr.getStudyId());
+                if (study != null && study.getStatus().equals(Status.PENDING)) {
+                    sr.setStatus(Status.get(study.getStatus().getCode()));
+                }
+                if (study.isPublished() == false)
+                    continue;
+                validStudies.add(sr);
+            }
+
             request.setAttribute("studies", validStudies);
 
             forwardPage(Page.CHANGE_STUDY);
@@ -111,7 +113,7 @@ public class ChangeStudyServlet extends SecureController {
 
             validateChangeStudy(studies, new ArrayList<Study> (allStudies.values()));
             logger.info("submit");
-            changeStudy(customRole);
+            changeStudy();
             return;
         }
 
@@ -158,6 +160,20 @@ public class ChangeStudyServlet extends SecureController {
         }
     }
 
+    protected void populateCustomUserRoles(CustomRole customRole, String username) {
+        List<ChangeStudyDTO> byUser = getStudyDao().findByUser(username);
+        List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
+        if (userRoles == null) {
+            logger.error("******************userRoles should not be null");
+            ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = getStudyBuildService().getUserRoles(request, true);
+            userRoles = responseEntity.getBody();
+        }
+        if (byUser == null) {
+            logger.error("byUser variable should not be null for username:" + username);
+        }
+        Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
+    }
+
     private StudyInfoObject getProtocolInfo(int studyId, List<Study>studyList) {
         for (Study study: studyList) {
             if (study.getStudyId() == studyId) {
@@ -167,7 +183,7 @@ public class ChangeStudyServlet extends SecureController {
         }
         return null;
     }
-    private void changeStudy(CustomRole customRole) throws Exception {
+    private void changeStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         String newStudySchema = fp.getString("changeStudySchema", true);
@@ -187,6 +203,7 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("changeStudySchema", newStudySchema);
         request.setAttribute("requestSchema",newStudySchema);
         Study newStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
+        getCurrentBoardUrl(newStudy, session);
 
         request.setAttribute("changeStudySchema", null);
 

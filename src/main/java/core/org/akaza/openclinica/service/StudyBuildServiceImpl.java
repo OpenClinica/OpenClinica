@@ -721,8 +721,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             CoreResources.setRequestSchema(studyBean.getSchemaName());
     }
 
-    public String getCurrentBoardUrl(String accessToken, Study study) {
-        String appendUrl = "/study-service/api/studies/" + study.getStudyUuid();
+    public String getCurrentBoardUrl(String accessToken, Study s) {
+        String uuid = s.isSite() ? s.getStudy().getStudyUuid() : s.getStudyUuid();
+        String appendUrl = "/study-service/api/studies/" + uuid;
         String uri = sbsUrl + appendUrl;
 
         HttpHeaders headers = new HttpHeaders();
