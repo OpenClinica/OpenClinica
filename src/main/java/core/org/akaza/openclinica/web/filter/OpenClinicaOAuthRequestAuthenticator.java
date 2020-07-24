@@ -1,18 +1,17 @@
 package core.org.akaza.openclinica.web.filter;
 
 import org.keycloak.OAuth2Constants;
-import org.keycloak.adapters.*;
+import org.keycloak.adapters.KeycloakDeployment;
+import org.keycloak.adapters.OAuthRequestAuthenticator;
+import org.keycloak.adapters.OIDCAuthenticationError;
+import org.keycloak.adapters.RequestAuthenticator;
 import org.keycloak.adapters.spi.AdapterSessionStore;
 import org.keycloak.adapters.spi.AuthChallenge;
 import org.keycloak.adapters.spi.HttpFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class OpenClinicaOAuthRequestAuthenticator extends OAuthRequestAuthenticator {
 
@@ -46,10 +45,7 @@ public class OpenClinicaOAuthRequestAuthenticator extends OAuthRequestAuthentica
             String stateCookieValue = getCookieValue(deployment.getStateCookieName());
             String state = getQueryParamValue(OAuth2Constants.STATE);
             if (!state.equals(stateCookieValue)) {
-                logger.info("State cookie is not current cookie, user bookmarked old log in paged.");
-
-                HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-                request.setAttribute("redirectLoginWarning", true);
+                logger.info("State cookie is not current cookie, user bookmarked old login paged.");
                 RequestContextHolder.getRequestAttributes().setAttribute("RedirectLogin", true, RequestAttributes.SCOPE_SESSION);
                 logger.info("Setting redirect attribute so user will be redirected to warning page upon log in.");
                 return null;
