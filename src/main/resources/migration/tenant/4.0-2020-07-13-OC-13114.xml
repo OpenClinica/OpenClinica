@@ -3,10 +3,10 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="jkeremian" id="2020-07-13-OC-13114-01"
-               dbms="postgresql" >
+    <changeSet author="jkeremian" id="2020-07-13-OC-13114-001"
+               dbms="postgresql" runOnChange="true" >
         <comment>Migrating Event Crf Statuses </comment>
-        <sql>
+        <sql splitStatements="false">
 
             CREATE OR REPLACE FUNCTION migrateeventcrfs()
             RETURNS void AS
@@ -72,19 +72,19 @@
             -- if event_crf has initial_data_entry status
             if(ec_rec.status_id=1) then
             UPDATE event_crf SET workflow_status=''INITIAL_DATA_ENTRY'' where event_crf_id = ec_rec.event_crf_id;
-            exit;
+            continue;
             end if;
 
             -- if event_crf has completed status
             if(ec_rec.status_id=2) then
             UPDATE event_crf SET workflow_status=''COMPLETED'' where event_crf_id = ec_rec.event_crf_id;
-            exit;
+            continue;
             end if;
 
             -- if event_crf has data reset
             if(ec_rec.status_id=11) then
             UPDATE event_crf SET workflow_status=''NOT_STARTED'' where event_crf_id = ec_rec.event_crf_id;
-            exit;
+            continue;
             end if;
 
 
