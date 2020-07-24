@@ -107,27 +107,27 @@
             -- if audit_log has study_event scheduled
             if(ale_rec.audit_log_event_type_id = 17) then
             update study_event set workflow_status=''SCHEDULED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event data_entry_started
             if(ale_rec.audit_log_event_type_id = 18) then
             update study_event set workflow_status=''DATA_ENTRY_STARTED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event completed
             if(ale_rec.audit_log_event_type_id = 19) then
             update study_event set workflow_status=''COMPLETED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event stopped
             if(ale_rec.audit_log_event_type_id = 20) then
             update study_event set workflow_status=''STOPPED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event skipped
             if(ale_rec.audit_log_event_type_id = 21) then
             update study_event set workflow_status=''SKIPPED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
 
             end loop;
@@ -149,32 +149,32 @@
             -- if audit_log has study_event signed
             if(ale_rec.audit_log_event_type_id = 31) then
             update study_event set signed = ''true'' where study_event_id=se_rec.study_event_id;
-            continue;
+            exit;
             end if;
             -- if audit_log has study_event scheduled
             if(ale_rec.audit_log_event_type_id = 17) then
             update study_event set workflow_status=''SCHEDULED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event data_entry_started
             if(ale_rec.audit_log_event_type_id = 18) then
             update study_event set workflow_status=''DATA_ENTRY_STARTED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event completed
             if(ale_rec.audit_log_event_type_id = 19) then
             update study_event set workflow_status=''COMPLETED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event stopped
             if(ale_rec.audit_log_event_type_id = 20) then
             update study_event set workflow_status=''STOPPED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
             -- if audit_log has study_event skipped
             if(ale_rec.audit_log_event_type_id = 21) then
             update study_event set workflow_status=''SKIPPED'' where study_event_id=se_rec.study_event_id;
-            continue ;
+            exit ;
             end if;
 
             end loop;

@@ -103,19 +103,19 @@
             -- if audit log has event_crf initial_data_entry
             if(ale_rec.audit_log_event_type_id = 41) then
             update event_crf set workflow_status=''INITIAL_DATA_ENTRY''  where event_crf_id = ec_rec.event_crf_id;
-            continue ;
+            exit ;
             end if;
 
             -- if audit log has event_crf marked complete
             if(ale_rec.audit_log_event_type_id = 8) then
             update event_crf set workflow_status=''COMPLETED''  where event_crf_id = ec_rec.event_crf_id;
-            continue ;
+            exit ;
             end if;
 
             -- if audit log has event_crf not_started
             if(ale_rec.audit_log_event_type_id = 40) then
             update event_crf set workflow_status=''NOT_STARTED''  where event_crf_id = ec_rec.event_crf_id;
-            continue ;
+            exit ;
             end if;
 
             end loop;
