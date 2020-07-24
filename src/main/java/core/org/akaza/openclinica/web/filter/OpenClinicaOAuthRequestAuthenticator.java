@@ -46,7 +46,7 @@ public class OpenClinicaOAuthRequestAuthenticator extends OAuthRequestAuthentica
             String state = getQueryParamValue(OAuth2Constants.STATE);
             if (!state.equals(stateCookieValue)) {
                 logger.info("State cookie is not current cookie, user bookmarked old login paged.");
-                RequestContextHolder.getRequestAttributes().setAttribute("RedirectLogin", true, RequestAttributes.SCOPE_SESSION);
+                RequestContextHolder.getRequestAttributes().setAttribute("StateCookieInvalid", true, RequestAttributes.SCOPE_SESSION);
                 logger.info("Setting redirect attribute so user will be redirected to warning page upon log in.");
                 return null;
             }

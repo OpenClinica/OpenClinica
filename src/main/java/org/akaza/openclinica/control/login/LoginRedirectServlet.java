@@ -21,15 +21,4 @@ public class LoginRedirectServlet extends SecureController {
         forwardPage(Page.REDIRECT_LOGIN);
     }
 
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
-//        try {
-//            logger.debug("Request");
-//
-//            context.getRequestDispatcher(Page.REDIRECT_LOGIN.getFileName()).forward(request, response);
-//        } catch (Exception e) {
-//            logger.error("Error while calling the process method: ", e);
-//        }
-//    }
-
 }

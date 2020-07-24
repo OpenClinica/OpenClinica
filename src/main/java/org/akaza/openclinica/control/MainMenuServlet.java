@@ -73,18 +73,6 @@ public class MainMenuServlet extends SecureController {
 
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
 
-
-
-        if (RequestContextHolder.getRequestAttributes().getAttribute("RedirectLogin", RequestAttributes.SCOPE_SESSION) != null) {
-            if ((boolean) RequestContextHolder.getRequestAttributes().getAttribute("RedirectLogin", RequestAttributes.SCOPE_SESSION)) {
-                response.sendRedirect(request.getContextPath() + Page.REDIRECT_LOGIN_SERVLET.getFileName());
-//            forwardPage(Page.REDIRECT_LOGIN);
-                RequestContextHolder.getRequestAttributes().removeAttribute("RedirectLogin", RequestAttributes.SCOPE_SESSION);
-                return;
-            }
-        }
-
-
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
             forwardPage(Page.MENU, false);

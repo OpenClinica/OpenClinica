@@ -50,13 +50,8 @@ import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
-import core.org.akaza.openclinica.web.InconsistentStateException;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import core.org.akaza.openclinica.web.SQLInitServlet;
-import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.StaleStateException;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -64,7 +59,6 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -72,6 +66,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.mail.MessagingException;
@@ -91,7 +87,6 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class enhances the Controller in several ways.
@@ -670,7 +665,15 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             mayProceed();
             // pingJobServer(request);
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
-            //TODO: how do does it know to go to main menu servlet without specifying
+
+            //If user logged in using an expired state cookie, bring them to the login redirect.
+            if (RequestContextHolder.getRequestAttributes().getAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION) != null) {
+                if ((boolean) RequestContextHolder.getRequestAttributes().getAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION)) {
+                    response.sendRedirect(request.getContextPath() + Page.INVALID_STATE_COOKIE_WARNING_SERVLET.getFileName());
+                    RequestContextHolder.getRequestAttributes().removeAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION);
+                    return;
+                }
+            }
             processRequest();
         } catch (InconsistentStateException ise) {
             logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: ", ise);

@@ -23,7 +23,7 @@ public enum Page {
             "Unsuccessful Login Due to Account Deletion"),
     ENTERPRISE("/WEB-INF/jsp/login/enterprise.jsp", "OpenClinica Enterprise"),
     REDIRECT_LOGIN("/WEB-INF/jsp/login/loginRedirect.jsp", "Login Redirect"),
-    REDIRECT_LOGIN_SERVLET("/LoginRedirect", "Login Redirect Servlet"),
+    INVALID_STATE_COOKIE_WARNING_SERVLET("/LoginRedirect", "Login Redirect Servlet"),
 
     /**
      * Page for logging out

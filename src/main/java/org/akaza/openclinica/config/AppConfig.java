@@ -1,10 +1,8 @@
 package org.akaza.openclinica.config;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
-import core.org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter;
-import core.org.akaza.openclinica.web.filter.OpenClinicaAuthenticationSuccessHandler;
+import core.org.akaza.openclinica.web.filter.OpenClinicaSpringSecurityRequestAuthenticatorFactory;
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import core.org.akaza.openclinica.web.rest.client.impl.CustomerServiceClientImpl;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
@@ -13,33 +11,24 @@ import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakSecurityContextRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,10 +36,8 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.MalformedURLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 @SuppressWarnings("unused")
 @KeycloakConfiguration
@@ -143,31 +130,9 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         };
     }
 
-    @Bean
-    protected OpenClinicaAuthenticationProcessingFilter openClinicaAuthenticationProcessingFilter() throws Exception {
-        OpenClinicaAuthenticationProcessingFilter filter = new OpenClinicaAuthenticationProcessingFilter(authenticationManagerBean());
-        filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
-        return filter;
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher())
-                .and()
-                .sessionManagement()
-                .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
-                .and()
-                .addFilterBefore(keycloakPreAuthActionsFilter(), LogoutFilter.class)
-                .addFilterBefore(openClinicaAuthenticationProcessingFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(keycloakSecurityContextRequestFilter(), SecurityContextHolderAwareRequestFilter.class)
-                .addFilterAfter(keycloakAuthenticatedActionsRequestFilter(), KeycloakSecurityContextRequestFilter.class)
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint())
-                .and()
-                .logout()
-                .addLogoutHandler(keycloakLogoutHandler())
-                .logoutUrl("/sso/logout").permitAll()
-                .logoutSuccessUrl("/");
+        super.configure(http);
         http.authorizeRequests()
                 .antMatchers("/css/**", "/includes/**", "/images/**", "/fonts/**",
                         "/js/**",
@@ -232,5 +197,13 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public KeycloakConfigResolver keycloakConfigResolver() {
         return new CustomKeycloakConfigResolver();
+    }
+
+    @Bean
+    protected KeycloakAuthenticationProcessingFilter keycloakAuthenticationProcessingFilter() throws Exception {
+        KeycloakAuthenticationProcessingFilter filter = new KeycloakAuthenticationProcessingFilter(authenticationManagerBean());
+        filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
+        filter.setRequestAuthenticatorFactory(new OpenClinicaSpringSecurityRequestAuthenticatorFactory());
+        return filter;
     }
 }
