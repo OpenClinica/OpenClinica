@@ -177,6 +177,8 @@
 
     <bean id="discrepancyNoteUtil" class="core.org.akaza.openclinica.service.DiscrepancyNoteUtil"/>
 
+
+
     <context:component-scan base-package="org.akaza.openclinica.controller.openrosa"/>
 
 </beans>

@@ -50,13 +50,9 @@ import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
-import core.org.akaza.openclinica.web.InconsistentStateException;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import core.org.akaza.openclinica.web.SQLInitServlet;
-import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.StaleStateException;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -64,7 +60,6 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -72,6 +67,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.mail.MessagingException;
@@ -91,7 +88,8 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static core.org.akaza.openclinica.web.filter.OpenClinicaOAuthRequestAuthenticator.STATE_COOKIE_INVALID;
 
 /**
  * This class enhances the Controller in several ways.
@@ -547,8 +545,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     }
                 }
                 setStudy(currentStudy, session);
-            }
-            else {
+            } else {
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 setStudy(currentStudy, session);
@@ -670,6 +667,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             mayProceed();
             // pingJobServer(request);
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
+
+            //If user logged in using an expired state cookie, bring them to the login redirect.
+            Object isStateCookieInvalid = RequestContextHolder.getRequestAttributes().getAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION);
+
+            if (isStateCookieInvalid != null) {
+                if (BooleanUtils.isTrue((boolean) isStateCookieInvalid)) {
+                    response.sendRedirect(request.getContextPath() + Page.INVALID_STATE_COOKIE_WARNING_SERVLET.getFileName());
+                    RequestContextHolder.getRequestAttributes().removeAttribute(STATE_COOKIE_INVALID, RequestAttributes.SCOPE_SESSION);
+                    return;
+                }
+            }
             processRequest();
         } catch (InconsistentStateException ise) {
             logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: ", ise);
@@ -1540,8 +1548,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
                     getStudyDao().update(study);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
             }

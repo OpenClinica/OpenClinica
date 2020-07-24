@@ -29,6 +29,8 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +42,6 @@ import java.util.*;
 /**
  * The main controller servlet for all the work behind study sites for
  * OpenClinica.
- *
  * @author jxu
  */
 public class MainMenuServlet extends SecureController {
@@ -57,11 +58,13 @@ public class MainMenuServlet extends SecureController {
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
 
-    @Override public void mayProceed() throws InsufficientPermissionException {
+    @Override
+    public void mayProceed() throws InsufficientPermissionException {
         locale = LocaleResolver.getLocale(request);
     }
 
-    @Override public void processRequest() throws Exception {
+    @Override
+    public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
         session.setAttribute(USER_BEAN_NAME, ub);
@@ -112,7 +115,7 @@ public class MainMenuServlet extends SecureController {
         //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
         //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
         //Yufang code added by Jamuna, to optimize the query on MainMenu
-        if(currentStudy != null) {
+        if (currentStudy != null) {
             int parentStudyId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
@@ -134,7 +137,7 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId()+"&sdv_f_sdvStatus=Ready+to+verify+%2B+Changed+since+verified&sdv_s_4_eventDate=asc");
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId() + "&sdv_f_sdvStatus=Ready+to+verify+%2B+Changed+since+verified&sdv_s_4_eventDate=asc");
             return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
@@ -145,11 +148,11 @@ public class MainMenuServlet extends SecureController {
             }
 
         }
+
         logger.info("Current Role:" + currentRole.getRole().getName());
-   //     StudyUserRoleBean userRole = (StudyUserRoleBean) session.getAttribute("userRole");
-   //     logger.info("User Role:" + userRole.getName());
 
         forwardPage(Page.MENU);
+
     }
 
     private void setupStudySubjectStatusStatisticsTable() {

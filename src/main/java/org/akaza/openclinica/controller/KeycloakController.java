@@ -171,6 +171,5 @@ public class KeycloakController {
 
         }
         return ocUserUuid;
-
     }
 }
