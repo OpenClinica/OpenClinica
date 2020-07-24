@@ -51,6 +51,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -87,6 +88,8 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static core.org.akaza.openclinica.web.filter.OpenClinicaOAuthRequestAuthenticator.STATE_COOKIE_INVALID;
 
 /**
  * This class enhances the Controller in several ways.
@@ -542,8 +545,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     }
                 }
                 setStudy(currentStudy, session);
-            }
-            else {
+            } else {
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 setStudy(currentStudy, session);
@@ -667,10 +669,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
 
             //If user logged in using an expired state cookie, bring them to the login redirect.
-            if (RequestContextHolder.getRequestAttributes().getAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION) != null) {
-                if ((boolean) RequestContextHolder.getRequestAttributes().getAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION)) {
+            Object isStateCookieInvalid = RequestContextHolder.getRequestAttributes().getAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION);
+
+            if (isStateCookieInvalid != null) {
+                if (BooleanUtils.isTrue((boolean) isStateCookieInvalid)) {
                     response.sendRedirect(request.getContextPath() + Page.INVALID_STATE_COOKIE_WARNING_SERVLET.getFileName());
-                    RequestContextHolder.getRequestAttributes().removeAttribute("StateCookieInvalid", RequestAttributes.SCOPE_SESSION);
+                    RequestContextHolder.getRequestAttributes().removeAttribute(STATE_COOKIE_INVALID, RequestAttributes.SCOPE_SESSION);
                     return;
                 }
             }
@@ -863,7 +867,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-    public void forwardPage(Page jspPage) {
+    protected void forwardPage(Page jspPage) {
         this.forwardPage(jspPage, true);
     }
 
@@ -1544,8 +1548,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
                     getStudyDao().update(study);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
             }

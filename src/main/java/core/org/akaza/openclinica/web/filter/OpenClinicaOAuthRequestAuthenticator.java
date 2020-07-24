@@ -13,9 +13,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+/**
+ * Overwrites challenge method in OAuthRequestAuthtenticator to not sendError in challenge otherwise we can't redirect to login page.
+ * Change checkStateCookie to pass with a StateCookieInvalid request attribute even when the state cookies do not match,
+ * we get the request attribute later in secure controller to show a redirected login page.
+ * 
+ * @author Shu Lin Chan
+ */
 public class OpenClinicaOAuthRequestAuthenticator extends OAuthRequestAuthenticator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String STATE_COOKIE_INVALID = "StateCookieInvalid";
 
     public OpenClinicaOAuthRequestAuthenticator(RequestAuthenticator requestAuthenticator, HttpFacade facade, KeycloakDeployment deployment, int sslRedirectPort, AdapterSessionStore tokenStore) {
         super(requestAuthenticator, facade, deployment, sslRedirectPort, tokenStore);
@@ -46,7 +54,7 @@ public class OpenClinicaOAuthRequestAuthenticator extends OAuthRequestAuthentica
             String state = getQueryParamValue(OAuth2Constants.STATE);
             if (!state.equals(stateCookieValue)) {
                 logger.info("State cookie is not current cookie, user bookmarked old login paged.");
-                RequestContextHolder.getRequestAttributes().setAttribute("StateCookieInvalid", true, RequestAttributes.SCOPE_SESSION);
+                RequestContextHolder.getRequestAttributes().setAttribute(STATE_COOKIE_INVALID, true, RequestAttributes.SCOPE_SESSION);
                 logger.info("Setting redirect attribute so user will be redirected to warning page upon log in.");
                 return null;
             }

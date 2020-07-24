@@ -22,8 +22,8 @@ public enum Page {
     LOGIN_USER_ACCOUNT_DELETED("/WEB-INF/jsp/login/login.jsp" + "?action=userAccountDeleted",
             "Unsuccessful Login Due to Account Deletion"),
     ENTERPRISE("/WEB-INF/jsp/login/enterprise.jsp", "OpenClinica Enterprise"),
-    REDIRECT_LOGIN("/WEB-INF/jsp/login/loginRedirect.jsp", "Login Redirect"),
-    INVALID_STATE_COOKIE_WARNING_SERVLET("/LoginRedirect", "Login Redirect Servlet"),
+    INVALID_STATE_COOKIE_WARNING("/WEB-INF/jsp/login/invalidStateCookieWarning.jsp", "Login Redirect"),
+    INVALID_STATE_COOKIE_WARNING_SERVLET("/InvalidStateCookieWarning", "Invalid State Cookie Warning Servlet"),
 
     /**
      * Page for logging out

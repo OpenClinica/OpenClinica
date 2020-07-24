@@ -60,8 +60,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     private CustomerServiceClientImpl customerServiceClient;
     @Autowired
     ConfigurableEnvironment configurableEnvironment;
-//    @Autowired
-//    private OpenClinicaAuthenticationProcessingFilter openClinicaAuthenticationProcessingFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

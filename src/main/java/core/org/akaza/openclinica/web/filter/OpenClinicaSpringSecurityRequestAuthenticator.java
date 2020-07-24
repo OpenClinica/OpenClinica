@@ -7,6 +7,13 @@ import org.keycloak.adapters.springsecurity.authentication.SpringSecurityRequest
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Overrides superclass so we can use our custom OpenClinicaOAuthRequestAuthenticator because appConfig calls
+ * OpenClinicaSpringSecurityRequestAuthenticatorFactory -> OpenClinicaSpringSecurityRequestAuthenticator ->
+ * OpenClinicaOAuthRequestAuthenticator
+ *
+ * @author Shu Lin Chan
+ */
 public class OpenClinicaSpringSecurityRequestAuthenticator extends SpringSecurityRequestAuthenticator {
 
     public OpenClinicaSpringSecurityRequestAuthenticator(HttpFacade facade,

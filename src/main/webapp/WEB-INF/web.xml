@@ -1555,12 +1555,12 @@
         <url-pattern>/reports</url-pattern>
     </servlet-mapping>
     <servlet>
-        <display-name>LoginRedirect</display-name>
-        <servlet-name>LoginRedirectServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.login.LoginRedirectServlet</servlet-class>
+        <display-name>InvalidStateCookieWarning</display-name>
+        <servlet-name>InvalidStateCookieWarningServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.login.InvalidStateCookieWarningServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>LoginRedirectServlet</servlet-name>
-        <url-pattern>/LoginRedirect</url-pattern>
+        <servlet-name>InvalidStateCookieWarningServlet</servlet-name>
+        <url-pattern>/InvalidStateCookieWarning</url-pattern>
     </servlet-mapping>
 </web-app>

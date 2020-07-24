@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-public class LoginRedirectServlet extends SecureController {
+public class InvalidStateCookieWarningServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -18,7 +18,7 @@ public class LoginRedirectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        forwardPage(Page.REDIRECT_LOGIN);
+        forwardPage(Page.INVALID_STATE_COOKIE_WARNING);
     }
 
 }
