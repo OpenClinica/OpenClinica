@@ -149,7 +149,7 @@
             -- if audit_log has study_event signed
             if(ale_rec.audit_log_event_type_id = 31) then
             update study_event set signed = ''true'' where study_event_id=se_rec.study_event_id;
-            exit;
+            continue;
             end if;
             -- if audit_log has study_event scheduled
             if(ale_rec.audit_log_event_type_id = 17) then
