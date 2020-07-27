@@ -880,8 +880,8 @@ public class RuleSetService implements RuleSetServiceInterface {
                  }
 
                 // case 1 : group ordinal = ""
-                if (groupOrdinal.equals("") && itemDatas.size() > 0) {
-                    for (int k = 0; k < itemDatas.size(); k++) {
+                if (groupOrdinal.equals("") && itemDataSize > 0) {
+                    for (int k = 0; k < itemDataSize; k++) {
                         ExpressionBean expBean = new ExpressionBean();
                         expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), k + 1));
                         expBean.setContext(expression.getContext());
@@ -889,7 +889,7 @@ public class RuleSetService implements RuleSetServiceInterface {
                     }
                 }
                 // case 2 : group ordinal = x and itemDatas should be size >= x
-                if (!groupOrdinal.equals("") && itemDatas.size() >= Integer.valueOf(groupOrdinal)) {
+                if (!groupOrdinal.equals("") && itemDataSize >= Integer.valueOf(groupOrdinal)) {
                     ExpressionBean expBean = new ExpressionBean();
                     expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), null));
                     expBean.setContext(expression.getContext());
