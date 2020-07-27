@@ -81,6 +81,7 @@ public class ImportCRFDataService {
 
     private static final String[] ALLOWED_DATE_FORMATS = new String[]{"yyyy-MM-dd", "ddMMMyyyy", "dd/MM/yyyy"};
     private static final String DB_DATE_FORMAT = "yyyy-MM-dd";
+    private  ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 
     /*
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
@@ -196,7 +197,7 @@ public class ImportCRFDataService {
 		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
 		                	}
 		                	String msg;
-		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";    	    	
+		                	msg = recordNum + "," + studySubjectBean.getOid() + ",SUCCESS," + resword.getString("Skip");
 
 		    	    		throw new OpenClinicaException(msg, "");
 		                }else {
@@ -1721,6 +1722,7 @@ public class ImportCRFDataService {
 
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
 
         DisplayItemBeanWrapper displayItemBeanWrapper = null;
         HashMap validationErrors = new HashMap();
@@ -1787,7 +1789,7 @@ public class ImportCRFDataService {
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
                 	String msg;
-                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
+                	msg = recordNum + "," + studySubjectBean.getOid() + ",SUCCESS," + resword.getString("skip");
 
     	    		throw new OpenClinicaException(msg, "");
                 }
@@ -2028,7 +2030,7 @@ public class ImportCRFDataService {
                             logger.debug(errorKey.toString() + " -- " + hardValidator.get(errorKey));
                             hardValidationErrors.put(errorKey.toString(), hardValidator.get(errorKey));
                             // updating here 'statically' tbh 06/2008
-                            hardValidatorErrorMsgs += hardValidator.get(errorKey) + "<br/><br/>";
+                            hardValidatorErrorMsgs += hardValidator.get(errorKey);
                         }
 
                         String studyEventId = studyEvent.getId() + "";

@@ -203,6 +203,7 @@ public class DataController {
      */
     protected synchronized ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        ResourceBundle resWords= ResourceBundleProvider.getWordsBundle();
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
         
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -323,7 +324,7 @@ public class DataController {
             		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
             	}
             	String msg = e.getErrorCode() + ":" + e.getMessage();
-            	msg = recordNum + "|" + participantId + "|FAILED|" + msg;
+            	msg = recordNum + "," + participantId + ",FAILED," + msg;
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
             }
 
@@ -373,8 +374,7 @@ public class DataController {
                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
-                	String msg = "errorCode.ValidationFailed:" + err_msg;
-                	msg = recordNum + "|" + participantId + "|FAILED|" + msg;
+                	String msg = recordNum + "," + participantId + ",FAILED," + err_msg;
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
     	    		
                     return errorMsgs;
@@ -410,18 +410,13 @@ public class DataController {
                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
-                	// for skip err_msg:1|SS_SITE_SB1|SUCCESS|Skip
+                	// for skip err_msg:1,SS_SITE_SB1,SUCCESS,Skip
                 	String msg = null;
-                	if(err_msg.indexOf("SUCCESS|Skip") > -1) {
+                	String skipMessage = "SUCCESS," + resWords.getString("skip");
+                	if(err_msg.indexOf(skipMessage) > -1) {
                 		msg = err_msg;
                 	}else {
-                		if(err_msg != null && err_msg.startsWith("errorCode.")) {
-                			msg = err_msg;
-                		}else {
-                			msg = "errorCode.ValidationFailed:" + err_msg;
-                		}
-                		
-                    	msg = recordNum + "|" + participantId + "|FAILED|" + msg;
+                    	msg = recordNum + "," + participantId + ",FAILED," + msg;
                 	}
                 	
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);    	    		    	    		
@@ -475,7 +470,7 @@ public class DataController {
             		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
             	}
             	String msg = "imported";
-            	msg = recordNum + "|" + participantId + "|SUCCESS|" + msg;
+            	msg = recordNum + "," + participantId + ",SUCCESS," + resWords.getString("imported");
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
 	    	
                 ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource, studyDao);
@@ -679,10 +674,6 @@ public class DataController {
                       	}
                       }
                   }
-            	 
-            	  if(mappingFileTxt != null && logFileName !=null) {
-            		  this.getRestfulServiceHelper().getImportDataHelper().copyMappingFileToLogFile(mappingFileTxt, logFileName, request);
-            	  }
             	  
             	  if (!foundMappingFile) {            		
             		  throw new OpenClinicaSystemException("errorCode.noMappingfile", "When send files, please include one correct mapping file, named like *mapping.txt ");
