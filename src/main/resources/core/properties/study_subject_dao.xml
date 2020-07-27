@@ -108,6 +108,16 @@
 			select ss.* ,unique_identifier  from study_subject ss JOIN study st ON st.study_id=ss.study_id and (ST.study_id=? or ST.parent_study_id=?)
 		</sql>
     </query>
+		<query>
+			<name>getWithFilterAndSortForSingleEvent</name>
+			<sql>
+				select ss.* ,unique_identifier  from study_subject ss
+				JOIN study st ON st.study_id=ss.study_id
+				JOIN study_event se ON ss.study_subject_id = se.study_subject_id
+				and (ST.study_id=? or ST.parent_study_id=?)
+			</sql>
+		</query>
+
     <query>
         <name>getCountWithFilterListDiscNotes</name>
         <sql><![CDATA[SELECT COUNT( DISTINCT  SS.study_subject_id)
