@@ -318,7 +318,7 @@
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="${study.manager}/${study.uuid}/${study.envUuid}"><fmt:message key="share" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${study.manager}/${study.uuid}/${study.envUuid}"><fmt:message key="share" bundle="${resword}"/></a>
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
                 &nbsp;&nbsp;|&nbsp;&nbsp;
