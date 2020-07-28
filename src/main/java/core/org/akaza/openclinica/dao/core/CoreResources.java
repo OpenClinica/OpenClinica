@@ -113,10 +113,10 @@ public class CoreResources implements InitializingBean {
 
     private void extractMasterKeyCloakConfig(){
         MASTER_KEYCLOAK_CONFIG = new MasterKeycloakConfig();
-        MASTER_KEYCLOAK_CONFIG.setBaseUrl(DATAINFO.getProperty("auth.base-url"));
-        MASTER_KEYCLOAK_CONFIG.setRealm(DATAINFO.getProperty("auth.realm"));
-        MASTER_KEYCLOAK_CONFIG.setClientId(DATAINFO.getProperty("auth.client-id"));
-        MASTER_KEYCLOAK_CONFIG.setClientSecret(DATAINFO.getProperty("auth.client-secret"));
+        MASTER_KEYCLOAK_CONFIG.setBaseUrl(DATAINFO.getProperty("auth.base-url").trim());
+        MASTER_KEYCLOAK_CONFIG.setRealm(DATAINFO.getProperty("auth.realm").trim());
+        MASTER_KEYCLOAK_CONFIG.setClientId(DATAINFO.getProperty("auth.client-id").trim());
+        MASTER_KEYCLOAK_CONFIG.setClientSecret(DATAINFO.getProperty("auth.client-secret").trim());
     }
 
     public static MasterKeycloakConfig getMasterKeyCloakConfig() {
