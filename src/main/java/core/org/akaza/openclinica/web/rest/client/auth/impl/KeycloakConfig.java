@@ -35,7 +35,7 @@ public class KeycloakConfig {
     @Bean
     public Keycloak Keycloak() {
 
-        Properties authProperties = CoreResources.loadProperties("auth.properties");
+        Properties authProperties = CoreResources.loadProperties("datainfo.properties");
         authBaseUrl= authProperties.getProperty("auth.base-url");
         authRealm= authProperties.getProperty("auth.realm");
         authClientId= authProperties.getProperty("auth.client-id");

@@ -35,7 +35,7 @@ public class CustomKeycloakConfigResolver implements KeycloakConfigResolver {
 
     private KeycloakDeployment resolveDeployment() {
         try {
-            logger.info("Initializing keycloak deployment from keycloak.json");
+            logger.info("Initializing keycloak deployment from datainfo.properties");
             KeycloakDeployment deployment = KeycloakDeploymentBuilder.build(CoreResources.getKeyCloakConfig());
             // Customizing the http client to set time-to-live value on http connections such that they are reinitialized
             // before they get reset by AWS NAT gateway.
