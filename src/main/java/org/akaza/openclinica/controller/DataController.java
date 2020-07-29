@@ -57,6 +57,9 @@ import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import core.org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
 import core.org.akaza.openclinica.web.restful.data.validator.CRFDataImportValidator;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.service.CsvFileConverterServiceImpl;
+import org.akaza.openclinica.service.ExcelFileConverterServiceImpl;
+import org.akaza.openclinica.service.SasFileConverterServiceImpl;
 import org.checkerframework.checker.units.qual.A;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
@@ -113,6 +116,16 @@ public class DataController {
 
     @Autowired
     private StudyBuildService studyBuildService;
+
+    @Autowired
+    SasFileConverterServiceImpl sasFileConverterService;
+
+    @Autowired
+    ExcelFileConverterServiceImpl excelFileConverterService;
+
+    @Autowired
+    CsvFileConverterServiceImpl csvFileConverterService;
+
     private RestfulServiceHelper serviceHelper;
     protected UserAccountBean userBean;
     private ImportDataResponseSuccessDTO responseSuccessDTO;
@@ -575,7 +588,8 @@ public class DataController {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (serviceHelper == null) {
-            serviceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
+            serviceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao, sasFileConverterService,
+                                    excelFileConverterService, csvFileConverterService);
         }
 
         return serviceHelper;
@@ -641,11 +655,11 @@ public class DataController {
         mFiles[0] = mappingFile;
         mFiles[1] = dataFile;
         
-        String studyOID = this.getRestfulServiceHelper().getImportDataHelper().getStudyOidFromMappingFile(mappingFile);
-        getRestfulServiceHelper().setSchema(studyOID, request);
+
         
-        
-        try {       	         	  
+        try {
+            String studyOID = this.getRestfulServiceHelper().getImportDataHelper().getStudyOidFromMappingFile(mappingFile);
+            getRestfulServiceHelper().setSchema(studyOID, request);
               //only support text file
               if (mFiles[0] !=null) {
             	  boolean foundMappingFile = false;
