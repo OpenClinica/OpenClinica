@@ -303,7 +303,7 @@
                                             </c:choose>
                                         </td>
                                         <td>
-                                            <c:if test="${currRow.bean.studyEvent.signed == true}">
+                                            <c:if test="${currRow.bean.studyEvent.signed == true && dec.eventCRF.removed != true && !dec.eventCRF.isArchived() && dec.eventCRF.workflowStatus == 'COMPLETED'}">
                                                 <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
                                             </c:if>
                                             <c:if test="${currRow.bean.studyEvent.locked == true}">
