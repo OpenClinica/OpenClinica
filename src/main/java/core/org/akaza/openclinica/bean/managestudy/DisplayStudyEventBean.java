@@ -9,6 +9,7 @@ package core.org.akaza.openclinica.bean.managestudy;
 
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 
 import java.util.ArrayList;
@@ -114,19 +115,58 @@ public class DisplayStudyEventBean extends AuditableEntityBean {
     }
 
     public boolean isSignAble() {
-        boolean signAble = true;
-        // check if all uncompledCRF is Not Started
-        for (DisplayEventDefinitionCRFBean displayEventDefinitionCRFBean : uncompletedCRFs) {
-            if (displayEventDefinitionCRFBean.getEventCRF().getId() > 0) {
-                signAble = false;
+        if (!isAllCrfsInDisplayedValid() || !isAllUncompleteCrfsValid()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isAllCrfsInDisplayedValid() {
+        for (DisplayEventCRFBean dec: displayEventCRFs) {
+            EventDefinitionCRFBean edc = dec.getEventDefinitionCRF();
+            EventCRFBean eventCRFBean = dec.getEventCRF();
+            // AC1 :An event will be eligible to sign only if all non-Archived required forms in the event
+            // have Complete workflow status and are not Removed.
+            // AC2: An event will be eligible to sign only if all non-Archived forms in the event
+            // have Not Started or Complete workflow status or are Removed
+            if (!eventCRFBean.isArchived()) {
+                if (edc.isRequiredCRF()) {
+                    if (eventCRFBean.isRemoved() || !eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                        return false;
+                    }
+                } else {
+                    if (!eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
+                            && !eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                            && !eventCRFBean.isRemoved()) {
+                        return false;
+                    }
+                }
             }
         }
-        // check if all displayCRF is Completed
-        for (DisplayEventCRFBean displayEventCRFBean : displayEventCRFs) {
-            if (!displayEventCRFBean.getEventCRF().getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
-                signAble = false;
+        return true;
+    }
+
+    private boolean isAllUncompleteCrfsValid() {
+        for (DisplayEventDefinitionCRFBean dedc: uncompletedCRFs) {
+            EventDefinitionCRFBean edc = dedc.getEdc();
+            EventCRFBean eventCRFBean = dedc.getEventCRF();
+            // AC1 :An event will be eligible to sign only if all non-Archived required forms in the event
+            // have Complete workflow status and are not Removed.
+            // AC2: An event will be eligible to sign only if all non-Archived forms in the event
+            // have Not Started or Complete workflow status or are Removed
+            if (edc.isRequiredCRF()) {
+                return false;
+            } else {
+                if (eventCRFBean.getId() > 0 && !eventCRFBean.isArchived()) {
+                    if (!eventCRFBean.isRemoved()
+                            && !eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)) {
+                        return false;
+                    }
+                }
             }
+
         }
-        return signAble;
+        return true;
     }
 }
