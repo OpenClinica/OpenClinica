@@ -156,6 +156,9 @@
             jQuery('input[type="password"]').each(function(){
                 jQuery(this).css({'background-color':'revert', 'outline':'none'});
             });
+            jQuery('textarea').each(function(){
+                jQuery(this).css({'background-color':'revert', 'outline':'none'});
+            });
             jQuery('select').each(function(){
 	            jQuery(this).css({'outline':'none'});
 	        });
