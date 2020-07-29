@@ -141,7 +141,10 @@ public class ViewStudyEventsServlet extends SecureController {
             setPresetValues(fp.getPresetValues());
         }
 
-        request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
+        ArrayList statuses = SubjectEventStatus.toArrayList();
+        statuses.remove(7); // locked
+        statuses.remove(6); // signed
+        request.setAttribute(STATUS_MAP, statuses);
 
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllByStudy(currentStudy);
