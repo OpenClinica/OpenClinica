@@ -264,7 +264,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
         	String parentNm= request.getParameter("parentNm");
             String fileName= request.getParameter("fileId");          
             File file = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
-            dowloadFile(file, "text/xml");
+            dowloadFile(file, "text/csv");
             
         } else if ("delete".equalsIgnoreCase(action)) {
         	String studyID= request.getParameter("studyId");
