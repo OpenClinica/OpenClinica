@@ -22,34 +22,23 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class KeycloakConfig {
 
-
-    private String authBaseUrl;
-    private String authRealm;
-    private String authClientId;
-    private String authClientSecret;
-
     private static final int CONNECTION_POOL_SIZE = 10;
     public static final long CONNECTION_TTL = 60000;
     private static final long MIN_TOKEN_VALIDITY = 2000;
 
     @Bean
     public Keycloak Keycloak() {
-
-        Properties authProperties = CoreResources.loadProperties("auth.properties");
-        authBaseUrl= authProperties.getProperty("auth.base-url");
-        authRealm= authProperties.getProperty("auth.realm");
-        authClientId= authProperties.getProperty("auth.client-id");
-        authClientSecret= authProperties.getProperty("auth.client-secret");
+        MasterKeycloakConfig masterKeycloakConfig = CoreResources.getMasterKeyCloakConfig();
         ResteasyClient resteasyClient = new ResteasyClientBuilder()
                 .connectionPoolSize(CONNECTION_POOL_SIZE)
                 .connectionTTL(CONNECTION_TTL, TimeUnit.MILLISECONDS)
                 .build();
         Keycloak keycloak = KeycloakBuilder.builder()
-            .serverUrl(authBaseUrl)
-            .clientId(authClientId)
-            .clientSecret(authClientSecret)
+            .serverUrl(masterKeycloakConfig.getBaseUrl())
+            .clientId(masterKeycloakConfig.getClientId())
+            .clientSecret(masterKeycloakConfig.getClientSecret())
             .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-            .realm(authRealm)
+            .realm(masterKeycloakConfig.getRealm())
             .resteasyClient(resteasyClient)
             .build();
         keycloak
