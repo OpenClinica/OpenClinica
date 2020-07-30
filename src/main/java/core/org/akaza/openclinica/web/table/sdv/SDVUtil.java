@@ -1584,7 +1584,7 @@ public class SDVUtil {
     private SdvStatus getItemSdvStatus(EventCrf eventCrf, ItemData itemData) {
         if(eventCrf.getSdvStatus() == null)
             return SdvStatus.NOT_VERIFIED;
-        if (eventCrf.getSdvStatus().equals(SdvStatus.CHANGED_SINCE_VERIFIED)) {
+         if (eventCrf.getSdvStatus().equals(SdvStatus.CHANGED_SINCE_VERIFIED) && eventCrf.getLastSdvVerifiedDate() != null) {
 
             Date lastUpdatedItemDate = eventCrf.getLastSdvVerifiedDate();
             if (isOnlyDateAvailableInItemTable(itemData)) {
