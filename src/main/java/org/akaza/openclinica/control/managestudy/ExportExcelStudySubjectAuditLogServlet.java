@@ -404,62 +404,96 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         String newValue = studyEvent.getNewValue();
                         String entityName=studyEvent.getEntityName();
                         if (entityName.equals("Status")) {
-                            if (oldValue.equals("1") || oldValue.equals(StudyEventWorkflowStatusEnum.SCHEDULED))
-                                oldValue = StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
-                            else if (oldValue.equals("2") || oldValue.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
-                                oldValue = StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
-                            else if (oldValue.equals("3") || oldValue.equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))
-                                oldValue = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
-                            else if (oldValue.equals("4") || oldValue.equals(StudyEventWorkflowStatusEnum.COMPLETED))
-                                oldValue = StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue();
-                            else if (oldValue.equals("5") || oldValue.equals(StudyEventWorkflowStatusEnum.STOPPED))
-                                oldValue = StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue();
-                            else if (oldValue.equals("6") || oldValue.equals(StudyEventWorkflowStatusEnum.SKIPPED))
-                                oldValue = StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
+                            if (oldValue.equals("0"))
+                                oldValue = "invalid";
+                            else if (oldValue.equals("1"))
+                                oldValue = "scheduled";
+                            else if (oldValue.equals("2"))
+                                oldValue = "not_scheduled";
+                            else if (oldValue.equals("3"))
+                                oldValue = "data_entry_started";
+                            else if (oldValue.equals("4"))
+                                oldValue = "completed";
+                            else if (oldValue.equals("5"))
+                                oldValue = "stopped";
+                            else if (oldValue.equals("6"))
+                                oldValue = "skipped";
                             else if (oldValue.equals("7"))
                                 oldValue = "locked";
                             else if (oldValue.equals("8"))
                                 oldValue = "signed";
+                            else if (oldValue.equals(StudyEventWorkflowStatusEnum.SCHEDULED))
+                                oldValue = StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
+                            else if (oldValue.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
+                                oldValue = StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
+                            else if (oldValue.equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))
+                                oldValue = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
+                            else if (oldValue.equals(StudyEventWorkflowStatusEnum.COMPLETED))
+                                oldValue = StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue();
+                            else if (oldValue.equals(StudyEventWorkflowStatusEnum.STOPPED))
+                                oldValue = StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue();
+                            else if (oldValue.equals(StudyEventWorkflowStatusEnum.SKIPPED))
+                                oldValue = StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
 
 
-                            if (newValue.equals("1") || newValue.equals(StudyEventWorkflowStatusEnum.SCHEDULED))
-                                newValue = StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
-                            else if (newValue.equals("2") || newValue.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
-                                newValue = StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
-                            else if (newValue.equals("3") || newValue.equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))
-                                newValue = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
-                            else if (newValue.equals("4") || newValue.equals(StudyEventWorkflowStatusEnum.COMPLETED))
-                                newValue = StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue();
-                            else if (newValue.equals("5") || newValue.equals(StudyEventWorkflowStatusEnum.STOPPED))
-                                newValue = StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue();
-                            else if (newValue.equals("6") || newValue.equals(StudyEventWorkflowStatusEnum.SKIPPED))
-                                newValue = StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
+                            if (newValue.equals("0"))
+                                newValue = "invalid";
+                            else if (newValue.equals("1"))
+                                newValue = "scheduled";
+                            else if (newValue.equals("2"))
+                                newValue = "not_scheduled";
+                            else if (newValue.equals("3"))
+                                newValue = "data_entry_started";
+                            else if (newValue.equals("4"))
+                                newValue = "completed";
+                            else if (newValue.equals("5"))
+                                newValue = "removed";
+                            else if (newValue.equals("6"))
+                                newValue = "skipped";
                             else if (newValue.equals("7"))
                                 newValue = "locked";
-                            else if (newValue.equals("8") )
+                            else if (newValue.equals("8"))
                                 newValue = "signed";
-                        }else if(entityName.equals("Archived")||entityName.equals("Removed") ||entityName.equals("Locked")||entityName.equals("Signed") ){
+                            else if (newValue.equals("9"))
+                                newValue = "forzen";
+                            else if (newValue.equals(StudyEventWorkflowStatusEnum.SCHEDULED))
+                                newValue = StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
+                            else if (newValue.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
+                                newValue = StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
+                            else if (newValue.equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))
+                                newValue = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
+                            else if (newValue.equals(StudyEventWorkflowStatusEnum.COMPLETED))
+                                newValue = StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue();
+                            else if (newValue.equals(StudyEventWorkflowStatusEnum.STOPPED))
+                                newValue = StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue();
+                            else if (newValue.equals(StudyEventWorkflowStatusEnum.SKIPPED))
+                                newValue = StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
+
+
+                        } else if (entityName.equals("Archived") || entityName.equals("Removed") || entityName.equals("Locked") || entityName.equals("Signed")) {
                             if (oldValue.equals("true"))
                                 oldValue = "Yes";
                             else if (oldValue.equals("false"))
                                 oldValue = "No";
+
                             if (newValue.equals("true"))
                                 newValue = "Yes";
                             else if (newValue.equals("false"))
                                 newValue = "No";
-                        }else{
-                            newValue=newValue.toLowerCase();
+
                         }
-                                excelRow = new String[]{studyEvent.getAuditEventTypeName(), dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
-                                    entityName + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue, studyEvent.getDetails()};
-                            for (int i = 0; i < excelRow.length; i++) {
-                                label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
-                                excelSheet.addCell(label);
-                            }
-                            row++;
-                      //  }
+
+
+                        excelRow = new String[] { studyEvent.getAuditEventTypeName(), dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
+                                studyEvent.getEntityName() + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue, studyEvent.getDetails() };
+                        for (int i = 0; i < excelRow.length; i++) {
+                            label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i].toLowerCase()), cellFormat);
+                            excelSheet.addCell(label);
+                        }
+                        row++;
                     }
                 }
+
                 row++;
                 row++;
 
@@ -497,42 +531,70 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         for (int k = 0; k < eventCRFAudits.size(); k++) {
                             row--;
                             AuditBean eventCrfAudit = (AuditBean) eventCRFAudits.get(k);
-                            if (eventCrfAudit.getStudyEventId() == event.getId() && eventCrfAudit.getEventCRFId() == eventCrf.getId()) {
-                                String oldValue = eventCrfAudit.getOldValue();
-                                String newValue = eventCrfAudit.getNewValue();
-                                String entityName= eventCrfAudit.getEntityName();
-                                if (entityName.equals("Status")) {
-                                    if (oldValue.equals("1") || oldValue.equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                            String oldValue = eventCrfAudit.getOldValue();
+                            String newValue = eventCrfAudit.getNewValue();
+                            String entityName= eventCrfAudit.getEntityName();
+                                if (eventCrfAudit.getStudyEventId() == event.getId() && eventCrfAudit.getEventCRFId() == eventCrf.getId()) {
+
+
+                                    if (eventCrfAudit.getAuditEventTypeId() == 12 || entityName.equals("Status")) {
+                                    if (oldValue.equals("0"))
+                                        oldValue = "invalid";
+                                    else if (oldValue.equals("1"))
+                                        oldValue = "available";
+                                    else if (oldValue.equals("2"))
+                                        oldValue = "unavailable";
+                                    else if (oldValue.equals("3"))
+                                        oldValue = "private";
+                                    else if (oldValue.equals("4"))
+                                        oldValue = "pending";
+                                    else if (oldValue.equals("5"))
+                                        oldValue = "removed";
+                                    else if (oldValue.equals("6"))
+                                        oldValue = "locked";
+                                    else if (oldValue.equals("7"))
+                                        oldValue = "auto-removed";
+                                    else if ( oldValue.equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                         oldValue = EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue();
-                                    else if (oldValue.equals("2") || oldValue.equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                                    else if ( oldValue.equals(EventCrfWorkflowStatusEnum.COMPLETED))
                                         oldValue = EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue();
                                     else if (oldValue.equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
                                         oldValue = EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
 
-                                } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
-                                    if(oldValue == null || oldValue.isEmpty())
-                                        oldValue = "Null";
-                                    else if(resterm.getString(oldValue) != null)
-                                        oldValue = resterm.getString(oldValue);
-                                    if(newValue == null || newValue.isEmpty())
-                                        newValue ="Null";
-                                    else if(resterm.getString(newValue) != null)
-                                        newValue = resterm.getString(newValue);
                                 }else if(entityName.equals("Archived")||entityName.equals("Removed")  ){
                                     if (oldValue.equals("true"))
                                         oldValue = "Yes";
                                     else if (oldValue.equals("false"))
                                         oldValue = "No";
 
-                                }else{
-                                    oldValue=oldValue.toLowerCase();
-                                }
 
+                                } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
+                                        if (oldValue == null || oldValue.isEmpty())
+                                            oldValue = "Null";
+                                        else if (resterm.getString(oldValue) != null)
+                                            oldValue = resterm.getString(oldValue);
+                                    }
 
-                                if (entityName.equals("Status")) {
-                                    if (newValue.equals("1") || newValue.equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                if (eventCrfAudit.getAuditEventTypeId() == 12 || entityName.equals("Status")) {
+                                    if (newValue.equals("0"))
+                                        newValue = "invalid";
+                                    else if (newValue.equals("1"))
+                                        newValue = "available";
+                                    else if (newValue.equals("2"))
+                                        newValue = "unavailable";
+                                    else if (newValue.equals("3"))
+                                        newValue = "private";
+                                    else if (newValue.equals("4"))
+                                        newValue = "pending";
+                                    else if (newValue.equals("5"))
+                                        newValue = "removed";
+                                    else if (newValue.equals("6"))
+                                        newValue = "locked";
+                                    else if (newValue.equals("7"))
+                                        newValue = "auto-removed";
+                                    else if ( newValue.equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                         newValue = EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue();
-                                    else if (newValue.equals("2") || newValue.equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                                    else if ( newValue.equals(EventCrfWorkflowStatusEnum.COMPLETED))
                                         newValue = EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue();
                                     else if (newValue.equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
                                         newValue = EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
@@ -542,12 +604,17 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                         newValue = "Yes";
                                     else if (newValue.equals("false"))
                                         newValue = "No";
-                                } else {
-                                    newValue = newValue.toLowerCase();
+
+
+                                } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
+                                    if (newValue == null || newValue.isEmpty())
+                                        newValue = "Null";
+                                    else if (resterm.getString(newValue) != null)
+                                        newValue = resterm.getString(newValue);
                                 }
 
 
-                            String ordinal = "";
+                                    String ordinal = "";
                                 if (eventCrfAudit.getOrdinal() != 0) {
                                     ordinal = "(" + eventCrfAudit.getOrdinal() + ")";
                                 } else if (eventCrfAudit.getOrdinal() == 0 && eventCrfAudit.getItemDataRepeatKey() != 0) {
@@ -555,9 +622,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                 }
 
                                 excelRow = new String[] { eventCrfAudit.getAuditEventTypeName(), dateTimeFormat(eventCrfAudit.getAuditDate()),
-                                        eventCrfAudit.getUserName(), entityName + ordinal, oldValue, newValue };
+                                        eventCrfAudit.getUserName(), eventCrfAudit.getEntityName() + ordinal, oldValue, newValue };
                                 for (int i = 0; i < excelRow.length; i++) {
-                                    label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
+                                    label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i].toLowerCase()), cellFormat);
                                     excelSheet.addCell(label);
                                 }
                                 row++;
