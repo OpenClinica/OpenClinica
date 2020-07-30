@@ -16,15 +16,21 @@
             ale_rec record;
 
             begin
-            ALTER TABLE study_event DISABLE TRIGGER study_event_insert;
-            ALTER TABLE study_event DISABLE TRIGGER study_event_insert_update;
+
+            IF EXISTS (SELECT * FROM information_schema.triggers where trigger_name=''study_event_insert'')  THEN
+               ALTER TABLE study_event DISABLE TRIGGER study_event_insert;
+            END IF;
+
+            IF EXISTS (SELECT * FROM information_schema.triggers where trigger_name=''study_event_insert_update'')  THEN
+               ALTER TABLE study_event DISABLE TRIGGER study_event_insert_update;
+            END IF;
 
             -- loggers
-            RAISE NOTICE ''----------------------------------   BEFORE MIGRATION   ----------------------------------'';
-            FOR  se_rec IN SELECT study_event_id, status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
-            LOOP
-            RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
-            END LOOP;
+--            RAISE NOTICE ''----------------------------------   BEFORE MIGRATION   ----------------------------------'';
+--            FOR  se_rec IN SELECT study_event_id, status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
+--            LOOP
+--            RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
+--            END LOOP;
 
 
 
@@ -192,14 +198,19 @@
 
 
             -- loggers
-            RAISE NOTICE ''----------------------------------   AFTER MIGRATION   ----------------------------------'';
-            FOR  se_rec IN SELECT study_event_id, status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
-            LOOP
-            RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
-            END LOOP;
+--            RAISE NOTICE ''----------------------------------   AFTER MIGRATION   ----------------------------------'';
+--            FOR  se_rec IN SELECT study_event_id, status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
+--            LOOP
+--            RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
+--            END LOOP;
 
+            IF EXISTS (SELECT * FROM information_schema.triggers where trigger_name=''study_event_insert'')  THEN
             ALTER TABLE study_event ENABLE TRIGGER study_event_insert;
+            END IF;
+
+            IF EXISTS (SELECT * FROM information_schema.triggers where trigger_name=''study_event_insert_update'')  THEN
             ALTER TABLE study_event ENABLE TRIGGER study_event_insert_update;
+            END IF;
 
             raise notice ''the end'';
 

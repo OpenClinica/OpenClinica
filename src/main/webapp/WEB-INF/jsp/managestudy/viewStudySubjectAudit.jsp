@@ -206,54 +206,105 @@
                             <td class="table_header_column"><fmt:formatDate value="${studyEventAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.userName}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.entityName}"/>&nbsp;</td>
-                    <td class="table_header_column">
-                   <c:choose>
-                      <c:when test="${studyEventAudit.entityName=='Status' and studyEventAudit.oldValue eq '7'}">locked</c:when>
-
-                      <c:when test="${studyEventAudit.entityName=='Status'}">
+                            <td class="table_header_column">
                                         <c:choose>
-                                            <c:when test="${studyEventAudit.oldValue eq 'SCHEDULED' or studyEventAudit.oldValue eq '1'}">scheduled</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq 'NOT_SCHEDULED' or studyEventAudit.oldValue eq '2'}">not_scheduled</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq 'DATA_ENTRY_STARTED' or studyEventAudit.oldValue eq '3'}">data_entry_started</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq 'COMPLETED' or studyEventAudit.oldValue eq '4'}">completed</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq 'STOPPED' or studyEventAudit.oldValue eq '5'}">stopped</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq 'SKIPPED' or studyEventAudit.oldValue eq '6'}">skipped</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq 'SIGNED' or studyEventAudit.oldValue eq '8'}">signed</c:when>
-                                        </c:choose>
-                      </c:when>
-                      <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked' or studyEventAudit.entityName=='Signed'}">
-                          <c:choose>
-                             <c:when test="${ studyEventAudit.oldValue eq 'true' }">Yes</c:when>
-                             <c:when test="${ studyEventAudit.oldValue eq 'false'}">No</c:when>
-                          </c:choose>
-                      </c:when>
-                     </c:choose>
-                       &nbsp;</td>
+                                            <%--BWP issue 3300; 02/24/2009: The displayed old value is the SubjectEventStatus id;
+                                the new value is the Status id (both objects in a StudyEventBean) --%>
+                                            <c:when test="${studyEventAudit.oldValue eq '0'}">invalid</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '1'}">scheduled</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '2'}">not_scheduled</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '3'}">data_entry_started</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '4'}">completed</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '5'}">stopped</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '6'}">skipped</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '7'}">locked</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '8'}">signed</c:when>
 
+                                           <c:when test="${studyEventAudit.entityName=='Status'}">
+                                                <c:choose>
+                                                    <c:when test="${studyEventAudit.oldValue eq 'SCHEDULED' }">scheduled</c:when>
+                                                    <c:when test="${studyEventAudit.oldValue eq 'NOT_SCHEDULED' }">not_scheduled</c:when>
+                                                    <c:when test="${studyEventAudit.oldValue eq 'DATA_ENTRY_STARTED' }">data_entry_started</c:when>
+                                                    <c:when test="${studyEventAudit.oldValue eq 'COMPLETED' }">completed</c:when>
+                                                    <c:when test="${studyEventAudit.oldValue eq 'STOPPED' }">stopped</c:when>
+                                                    <c:when test="${studyEventAudit.oldValue eq 'SKIPPED' }">skipped</c:when>
+                                                </c:choose>
+                                           </c:when>
+                                           <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked' or studyEventAudit.entityName=='Signed'}">
+                                              <c:choose>
+                                                   <c:when test="${ studyEventAudit.oldValue eq 'true' }">Yes</c:when>
+                                                   <c:when test="${ studyEventAudit.oldValue eq 'false'}">No</c:when>
+                                              </c:choose>
+                                           </c:when>
+
+                                            <c:otherwise><c:out value="${studyEventAudit.oldValue}"/></c:otherwise>
+                                        </c:choose>
+                                &nbsp;</td>
 
                   <td class="table_header_column">
-                   <c:choose>
-                     <c:when test="${studyEventAudit.entityName=='Status' and studyEventAudit.newValue eq '7'}">locked</c:when>
 
-                      <c:when test="${studyEventAudit.entityName=='Status'}">
+
+    <c:choose>
+                                    <%-- A removed Study Event ...--%>
+                                    <c:when test="${studyEventAudit.newValue eq '5'}">
                                         <c:choose>
-                                            <c:when test="${studyEventAudit.newValue eq 'SCHEDULED' or studyEventAudit.newValue eq '1'}">scheduled</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq 'NOT_SCHEDULED' or studyEventAudit.newValue eq '2'}">not_scheduled</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq 'DATA_ENTRY_STARTED' or studyEventAudit.newValue eq '3'}">data_entry_started</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq 'COMPLETED' or studyEventAudit.newValue eq '4'}">completed</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq 'STOPPED' or studyEventAudit.newValue eq '5'}">stopped</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq 'SKIPPED' or studyEventAudit.newValue eq '6'}">skipped</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq 'SIGNED' or studyEventAudit.newValue eq '8'}">signed</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '0'}">invalid</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '1'}">available</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '2'}">pending</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '3'}">private</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '4'}">unavailable</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '5'}">removed</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '6'}">locked</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '7'}">auto-removed</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '8'}">signed</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '9'}">frozen</c:when>
+
+                                            <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
                                         </c:choose>
-                      </c:when>
-                      <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked' or studyEventAudit.entityName=='Signed'}">
-                                <c:choose>
-                                   <c:when test="${ studyEventAudit.newValue eq 'true' }">Yes</c:when>
-                                   <c:when test="${ studyEventAudit.newValue eq 'false'}">No</c:when>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:choose>
+                                            <c:when test="${studyEventAudit.newValue eq '0'}">invalid</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '1'}">scheduled</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '2'}">not_scheduled</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '3'}">data_entry_started</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '4'}">completed</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '5'}">stopped</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '6'}">skipped</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '7'}">locked</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '8'}">signed</c:when>
+                                           <c:when test="${studyEventAudit.entityName=='Status'}">
+                                                <c:choose>
+                                                    <c:when test="${studyEventAudit.newValue eq 'SCHEDULED' }">scheduled</c:when>
+                                                    <c:when test="${studyEventAudit.newValue eq 'NOT_SCHEDULED' }">not_scheduled</c:when>
+                                                    <c:when test="${studyEventAudit.newValue eq 'DATA_ENTRY_STARTED' }">data_entry_started</c:when>
+                                                    <c:when test="${studyEventAudit.newValue eq 'COMPLETED' }">completed</c:when>
+                                                    <c:when test="${studyEventAudit.newValue eq 'STOPPED' }">stopped</c:when>
+                                                    <c:when test="${studyEventAudit.newValue eq 'SKIPPED' }">skipped</c:when>
+                                                </c:choose>
+                                           </c:when>
+                                           <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked' or studyEventAudit.entityName=='Signed'}">
+                                              <c:choose>
+                                                   <c:when test="${ studyEventAudit.newValue eq 'true' }">Yes</c:when>
+                                                   <c:when test="${ studyEventAudit.newValue eq 'false'}">No</c:when>
+                                              </c:choose>
+                                           </c:when>
+
+                                            <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
+                                        </c:choose>
+                                    </c:otherwise>
                                 </c:choose>
-                      </c:when>
-                     </c:choose>
-                     &nbsp;</td>
+                                &nbsp;</td>
+
+
+
+
+
+
+
+
+
+
 
                              <td class="table_header_column"><c:out value="${studyEventAudit.details}"/>&nbsp;</td>
                                 
@@ -331,12 +382,20 @@
                        
                             <td class="table_header_column">
                                 <c:choose>
-                                    <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
-                                        <c:if test="${eventCRFAudit.oldValue eq 'INITIAL_DATA_ENTRY' or eventCRFAudit.oldValue eq '1'}">initial data entry</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq 'COMPLETED' or eventCRFAudit.oldValue eq '2'}">completed</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '5' or eventCRFAudit.oldValue eq '7'}">removed</c:if>
+                                  <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
+                                        <c:if test="${eventCRFAudit.oldValue eq '0'}">invalid</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '1'}">available</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '2'}">unavailable</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '3'}">private</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '4'}">pending</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '5'}">removed</c:if>
                                         <c:if test="${eventCRFAudit.oldValue eq '6'}">locked</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq 'NOT_STARTED' or eventCRFAudit.oldValue eq '11'}">not started</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '11'}">reset</c:if>
+
+                                        <c:if test="${eventCRFAudit.oldValue eq 'INITIAL_DATA_ENTRY' }">initial data entry</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq 'COMPLETED' }">completed</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq 'NOT_STARTED' }">not started</c:if>
                                     </c:when>
                                     <c:when test="${eventCRFAudit.entityName=='Removed' or eventCRFAudit.entityName=='Archived'}">
                                         <c:choose>
@@ -366,11 +425,19 @@
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when   test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
-                                        <c:if test="${eventCRFAudit.newValue eq 'INITIAL_DATA_ENTRY' or eventCRFAudit.newValue eq '1'}">initial data entry</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq 'COMPLETED' or eventCRFAudit.newValue eq '2'}">completed</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '5' or eventCRFAudit.newValue eq '7'}">removed</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '0'}">invalid</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '1'}">available</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '2'}">unavailable</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '3'}">private</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '4'}">pending</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '5'}">removed</c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '6'}">locked</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq 'NOT_STARTED' or eventCRFAudit.newValue eq '11'}">not started</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '11'}">reset</c:if>
+
+                                        <c:if test="${eventCRFAudit.newValue eq 'INITIAL_DATA_ENTRY' }">initial data entry</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq 'COMPLETED' }">completed</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq 'NOT_STARTED'}">not started</c:if>
                                     </c:when>
                                     <c:when test="${eventCRFAudit.entityName=='Removed' or eventCRFAudit.entityName=='Archived'}">
                                         <c:choose>
