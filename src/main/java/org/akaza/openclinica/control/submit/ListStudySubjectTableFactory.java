@@ -1810,7 +1810,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                                           StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String onclick = "moveObject('Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "', event); ";
-        builder.a().onclick(onclick).style('cursor: pointer;');
+        builder.a().onclick(onclick).style("cursor: pointer;");
         builder.close();
     }
 
