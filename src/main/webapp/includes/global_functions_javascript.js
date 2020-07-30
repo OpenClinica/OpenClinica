@@ -1540,6 +1540,12 @@ function LockObject( obj, e ) {
 
 
 function moveObject( obj, e ) {
+    // if it's already shown, close it
+    var o = getObject(obj);
+    if (o.style.visibility === 'visible') {
+        o.style.visibility = 'hidden';
+        return;
+    }
 
     // step 1
     var tempX = 0;
