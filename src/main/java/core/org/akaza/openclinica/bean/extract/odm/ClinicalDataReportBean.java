@@ -543,6 +543,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
                                         && (versions.size() > 1 || otherVersionAvailable)
                                         && studyBean.getStatus().equals(Status.AVAILABLE)
+                                        && !studyEvent.isCurrentlyArchived()
+                                        && !studyEvent.isCurrentlyRemoved()
                                         && !(studyEvent.isCurrentlyLocked() || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED))) {
 
                                     String reassignUrl = "/pages/managestudy/chooseCRFVersion?crfId=" + formLayout.getCrf().getCrfId() + "&crfName="
