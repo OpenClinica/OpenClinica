@@ -38,9 +38,9 @@
 
 <tr id="sidebar_Instructions_closed" style="display: none">
   <td class="sidebar_tab">
-	  <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
-	    <span class="icon icon-caret-right gray"></span>
-	  </a>
+	<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+	  <span class="icon icon-caret-right gray"></span>
+	</a>
     <fmt:message key="instructions" bundle="${restext}"/>
   </td>
 </tr>
@@ -67,13 +67,21 @@
   <br>
   <div class="description">
     <span class="icon icon-info blue"></span>
-    <fmt:message key="bookmark_link_1" bundle="${resword}"/>
-    <a href="/OpenClinica/MainMenu">link</a>
-    <fmt:message key="bookmark_link_2" bundle="${resword}"/>
+    <fmt:message key="bookmark_link" bundle="${resword}"/>
+    <a href="/OpenClinica/MainMenu"><p id="url"></p></a>
   </div>
 </div>
 
 <jsp:include page="../include/footer.jsp"/>
+
+<script>
+  $(document).ready(function(){
+    var url = window.location.href;
+    var n = url.indexOf("/OpenClinica/InvalidStateCookieWarning");
+    url = url.substring(0, n) + "/OpenClinica/MainMenu";
+    document.getElementById('url').innerHTML = url;
+  })
+</script>
 
 <style>
 	.boxed .description {
@@ -103,5 +111,4 @@
     margin-left:auto;
     margin-right:auto;
   }
-
 </style>
