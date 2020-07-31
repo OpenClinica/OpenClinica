@@ -61,8 +61,8 @@
   <c:if test='${presetValue.key == "definitionId"}'>
     <c:set var="definitionId" value="${presetValue.value}" />
   </c:if>
-  <c:if test='${presetValue.key == "statusId"}'>
-    <c:set var="statusId" value="${presetValue.value}" />
+  <c:if test='${presetValue.key == "statusDisplayValue"}'>
+    <c:set var="statusDisplayValue" value="${presetValue.value}" />
   </c:if>
 
 </c:forEach>
@@ -118,18 +118,16 @@
     <td align="right"><fmt:message key="status" bundle="${resword}"/></td>
     <td>
       <div class="formfieldM_BG">
-      <c:set var="status1" value="${statusId}"/>
-       <select name="statusId" class="formfieldM">
-        <option value="0">--<fmt:message key="all" bundle="${resword}"/>--</option>
+      <c:set var="status1" value="${statusDisplayValue}"/>
+       <select name="statusDisplayValue" class="formfieldM">
+        <option value="">--<fmt:message key="all" bundle="${resword}"/>--</option>
         <c:forEach var="status" items="${statuses}">
          <c:choose>
-          <c:when test="${status1 == status.id}">
-               <option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
+          <c:when test="${status1.equals(status)}">
+               <option value="<c:out value="${status}"/>" selected><c:out value="${status}"/>
           </c:when>
           <c:otherwise>
-               <c:if test="${status.id != '2'}">
-                  <option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
-               </c:if>
+                  <option value="<c:out value="${status}"/>"><c:out value="${status}"/>
           </c:otherwise>
          </c:choose>
       </c:forEach>
