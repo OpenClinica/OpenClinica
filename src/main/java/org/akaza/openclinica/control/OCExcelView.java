@@ -1,7 +1,10 @@
 package org.akaza.openclinica.control;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.component.Column;
@@ -16,7 +19,6 @@ import java.util.List;
 /**
  * Update setCellValue to pass RichTextString instead of HSSFRichTextString because new version of POI setCellValue
  * method expects RichTextString
- *
  * @author Shu Lin Chan
  */
 public class OCExcelView extends ExcelView {

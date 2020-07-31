@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Update ExcelView to use OCExcelView instead because POI expects a RichTextString instead of HSSFRichTextString
  * in the setCell method
- *
  * @author Shu Lin Chan
  */
 public class OCExcelViewExporter extends ExcelViewExporter {
