@@ -1424,10 +1424,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.divEnd();
         eventDiv.tdEnd().trEnd(0);
 
-        eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>").append(click_for_more_options)
-                .append("</i>").tdEnd();
-        eventDiv.trEnd(0);
-
         eventDiv.tableEnd(0);
         eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();
         repeatingIconLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
