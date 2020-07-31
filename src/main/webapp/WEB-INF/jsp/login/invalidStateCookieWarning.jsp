@@ -78,7 +78,7 @@
   $(document).ready(function(){
     var url = window.location.href;
     var n = url.indexOf("/OpenClinica/InvalidStateCookieWarning");
-    url = url.substring(0, n) + "/OpenClinica/MainMenu";
+    url = url.substring(0, n);
     document.getElementById('url').innerHTML = url;
   })
 </script>
