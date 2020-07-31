@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.bean.service.SasProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.MasterKeycloakConfig;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.Configuration;
@@ -46,6 +47,7 @@ public class CoreResources implements InitializingBean {
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
     private static KeyCloakConfiguration KEYCLOAKCONFIG;
+    private static MasterKeycloakConfig MASTER_KEYCLOAK_CONFIG;
 
     private static final String DATA_INFO_FILE_NAME = "datainfo.properties";
     private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
@@ -107,6 +109,18 @@ public class CoreResources implements InitializingBean {
 
     public static Configuration getKeyCloakConfig() {
         return KEYCLOAKCONFIG;
+    }
+
+    private void extractMasterKeyCloakConfig(){
+        MASTER_KEYCLOAK_CONFIG = new MasterKeycloakConfig();
+        MASTER_KEYCLOAK_CONFIG.setBaseUrl(DATAINFO.getProperty("auth.base-url").trim());
+        MASTER_KEYCLOAK_CONFIG.setRealm(DATAINFO.getProperty("auth.realm").trim());
+        MASTER_KEYCLOAK_CONFIG.setClientId(DATAINFO.getProperty("auth.client-id").trim());
+        MASTER_KEYCLOAK_CONFIG.setClientSecret(DATAINFO.getProperty("auth.client-secret").trim());
+    }
+
+    public static MasterKeycloakConfig getMasterKeyCloakConfig() {
+        return MASTER_KEYCLOAK_CONFIG;
     }
 
     public static void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp) {
@@ -1076,6 +1090,7 @@ public class CoreResources implements InitializingBean {
                 // copyConfig();
             }
             extractKeyCloakConfig();
+            extractMasterKeyCloakConfig();
         } catch (OpenClinicaSystemException e) {
             logger.debug(e.getMessage());
             logger.debug(e.toString());

@@ -156,6 +156,9 @@
             jQuery('input[type="password"]').each(function(){
                 jQuery(this).css({'background-color':'revert', 'outline':'none'});
             });
+            jQuery('textarea').each(function(){
+                jQuery(this).css({'background-color':'revert', 'outline':'none'});
+            });
             jQuery('select').each(function(){
 	            jQuery(this).css({'outline':'none'});
 	        });
@@ -311,14 +314,17 @@
                     <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
                 </c:if>
             </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager'}">
-                <a href="${study.manager.replace('.build.','.design.').replace('/#/account-study', '')}${study.boardUrl}"><fmt:message key="design" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${study.manager.replace('.build.','.design.').replace('/#/account-study', '')}${study.boardUrl}"><fmt:message key="design" bundle="${resword}"/></a>
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
-                <a href="${study.manager}/${study.uuid}/${study.envUuid}"><fmt:message key="share" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${study.manager}/${study.uuid}/${study.envUuid}"><fmt:message key="share" bundle="${resword}"/></a>
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
+                &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${study.manager.replace('account-study','study-settings')}/${study.uuid}/settings"><fmt:message key="settings" bundle="${resword}"/></a>
             </c:if>
         </div>

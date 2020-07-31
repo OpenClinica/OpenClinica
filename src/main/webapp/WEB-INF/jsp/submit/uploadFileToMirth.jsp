@@ -148,7 +148,7 @@
 			String studyId = pos < 0 || pos == path.length() ? "" : path.substring(0,pos);
 			
 			
-            if(fname.endsWith("_log.txt"))
+            if(fname.endsWith("_log.csv"))
             {
                 
                     { 

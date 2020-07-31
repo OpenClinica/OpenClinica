@@ -1,12 +1,18 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.akaza.openclinica</groupId>
+    <groupId>com.openclinica</groupId>
     <artifactId>OpenClinica-web</artifactId>
     <packaging>war</packaging>
-    <version>MAINLINE-SNAPSHOT</version>
+    <version>4.11.0-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
+
+    <parent>
+        <groupId>com.openclinica.parent</groupId>
+        <artifactId>oc-simple-parent</artifactId>
+        <version>0.0.7</version>
+    </parent>
 
     <properties>
         <!-- Default configuration activation -->
@@ -111,6 +117,16 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.1</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>

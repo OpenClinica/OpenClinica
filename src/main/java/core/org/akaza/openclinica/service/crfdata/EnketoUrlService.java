@@ -477,7 +477,7 @@ public class EnketoUrlService {
             auditLogEvent.setAuditTable(STUDYEVENT);
             auditLogEvent.setEntityId(studyEvent.getStudyEventId());
             auditLogEvent.setEntityName("Signed");
-            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+            auditLogEvent.setAuditLogEventType(new AuditLogEventType(65));
             auditLogEvent.setNewValue(studyEvent.getSigned().toString());
 
             List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);

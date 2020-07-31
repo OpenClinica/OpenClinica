@@ -3968,9 +3968,9 @@ public class OdmExtractDAO extends DatasetDAO {
     public String setOriginalEventCrfStatus(String value) {
         switch (value) {
             case "1":
-                return EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue();
+                return "available";
             case "2":
-                return EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue();
+                return "unavailable";
             case "5":
                 return "removed";
             case "6":
@@ -3978,7 +3978,7 @@ public class OdmExtractDAO extends DatasetDAO {
             case "7":
                 return "removed";
             case "11":
-                return EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
+                return "reset";
             default:
                 return "";
         }

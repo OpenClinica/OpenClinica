@@ -499,7 +499,7 @@
                     }
 
                     item.lastVerifiedDate = data.lastVerifiedDate;
-                    if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
+                    if (item.sdvStatus == 'CHANGED_SINCE_VERIFIED') {
                         item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16" title="<fmt:message key="value_changed_since_last_verified" bundle="${resword}"/>">';
                     }
                     if (item.lastVerifiedDate) {

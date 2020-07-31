@@ -39,6 +39,9 @@ public class ArchivedDatasetFileRow extends EntityBeanRow {
             case COL_FILERUNTIME:
                 answer = Double.compare(thisAccount.getRunTime(), argAccount.getRunTime());
                 break;
+            case COL_FILESIZE:
+                answer = Integer.compare(thisAccount.getFileSize(), argAccount.getFileSize());
+                break;
             case COL_FILECREATEDDATE:
                 answer = thisAccount.getDateCreated().compareTo(argAccount.getDateCreated());
                 break;

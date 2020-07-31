@@ -623,7 +623,7 @@ $(function() {
                         links: collectLinks(studyEventData, formData),
                         isSigned: studyEventData['@OpenClinica:Signed'] === 'Yes',
                         isLocked: studyEventData['@OpenClinica:Locked'] === 'Yes',
-                        isArchived: studyEventData['@OpenClinica:Archived'] === 'Yes'
+                        isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Status'] === 'auto-removed'
                     };
                     foreach(formData.ItemGroupData, function(igd) {
                         foreach(igd.ItemData, function(itemData) {
