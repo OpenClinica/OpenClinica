@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="jkeremian" id="2020-07-13-OC-13114-001"
+    <changeSet author="jkeremian" id="2020-07-13-OC-13114-0001"
                dbms="postgresql" runOnChange="true" >
         <comment>Migrating Event Crf Statuses </comment>
         <sql splitStatements="false">
@@ -58,7 +58,7 @@
 
             if ( (edc_rec.status_id =5 or edc_rec.status_id=7)  and not(sed_rec.status_id = 5 or sed_rec.status_id = 7)) then
                 update event_crf set archived =''true'' where event_crf_id = ec_rec.event_crf_id;
-                if(ec_rec.old_status_id = 5 or ec_rec.old_status_id = 7) then
+                if(ec_rec.old_status_id = 5 ) then
                   update event_crf set removed =''true'' where event_crf_id = ec_rec.event_crf_id;
                 end if;
             end if;
@@ -71,7 +71,7 @@
             if (
             not(edc_rec.status_id =5 or edc_rec.status_id = 7)  and
             not(sed_rec.status_id =5 or sed_rec.status_id = 7)  and
-             (ec_rec.status_id = 5 or ec_rec.status_id = 7)
+             (ec_rec.status_id = 5)
             ) then
             update event_crf set removed =''true'' where event_crf_id = ec_rec.event_crf_id;
             end if;
