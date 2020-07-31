@@ -222,10 +222,10 @@
     padding-top: 0;
   }
   .expanded > .section-header::after {
-    content: "\e92a";
+    content: "\e92b";
   }
   .collapsed > .section-header::after {
-    content: "\e92b";
+    content: "\e92c";
   }
   #reset-all-filters {
     margin-left: 30px;
