@@ -124,28 +124,9 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // NUMERIC DATE DATE NUMERIC
         // NUMERIC DATE DATE NUMERIC
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.STRING);
-
-        this.setTypeExpected(5, TypeNames.INT);
-        this.setTypeExpected(6, TypeNames.TIMESTAMP); // YW 08-17-2007,
-        // date_start
-        this.setTypeExpected(7, TypeNames.TIMESTAMP); // YW 08-17-2007,
-        // date_end
-        this.setTypeExpected(8, TypeNames.INT);
-
-        this.setTypeExpected(9, TypeNames.INT);
-        this.setTypeExpected(10, TypeNames.DATE);
-        this.setTypeExpected(11, TypeNames.DATE);
-        this.setTypeExpected(12, TypeNames.INT);
-        this.setTypeExpected(13, TypeNames.INT);
-        // YW 08-17-2007 <<
-        this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
-        this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
+        this.setTypesExpected();
         if (withSubject) {
-            this.setTypeExpected(16, TypeNames.STRING);
+            this.setTypeExpected(22, TypeNames.STRING);
         }
         // YW >>
     }

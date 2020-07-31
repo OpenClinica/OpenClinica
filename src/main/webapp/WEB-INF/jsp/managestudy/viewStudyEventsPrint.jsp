@@ -25,7 +25,7 @@
 	<c:if test='${presetValue.key == "definitionId"}'>
 		<c:set var="definitionId" value="${presetValue.value}" />
 	</c:if>
-	<c:if test='${presetValue.key == "statusId"}'>
+	<c:if test='${presetValue.key == "statusDisplayValue"}'>
 		<c:set var="statusId" value="${presetValue.value}" />
 	</c:if>
 
@@ -117,7 +117,7 @@
    </c:choose>
       <td class="table_cell"><c:out value="${currRow.studySubjectLabel}"/></td>
       <td class="table_cell"><fmt:formatDate value="${currRow.dateStarted}"  type="both" timeStyle="short" pattern="${dteFormat}"/></td>
-      <td class="table_cell"><c:out value="${currRow.subjectEventStatus.name}"/></td>
+      <td class="table_cell"><c:out value="${currRow.workflowStatus.displayValue}"/></td>
 
 
    </tr>
