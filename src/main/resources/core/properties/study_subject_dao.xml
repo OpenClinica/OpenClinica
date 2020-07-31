@@ -111,7 +111,7 @@
 		<query>
 			<name>getWithFilterAndSortForSingleEvent</name>
 			<sql>
-				select ss.* ,unique_identifier  from study_subject ss
+				select Distinct ss.* ,unique_identifier  from study_subject ss
 				JOIN study st ON st.study_id=ss.study_id
 				JOIN study_event se ON ss.study_subject_id = se.study_subject_id
 				and (ST.study_id=? or ST.parent_study_id=?)
