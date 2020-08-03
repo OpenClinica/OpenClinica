@@ -757,7 +757,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                         crfWorkflowStatus, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path, studyDao);
 
                 String iconStatus = crfWorkflowStatus.toString();
-                if (eventCrf != null && eventCrf.isRemoved()) {
+                if ((eventCrf != null && eventCrf.isRemoved()) || (studyEvent != null && studyEvent.isRemoved())) {
                     iconStatus = EventCrfStatusEnum.REMOVED.toString();
                 }
                 url.append(eventCrfLayerBuilder.buid());
