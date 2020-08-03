@@ -10,6 +10,7 @@
 <script language="JavaScript">
 window.onload = function(){
     $(".enableSaveOnload").prop("disabled", false);
+    $(".enableSaveOnload").removeAttr("title");
 }
 </script>
 <!-- move the alert message to the sidebar-->
@@ -95,8 +96,8 @@ window.onload = function(){
 <P><B><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-   <td><input type="submit" disabled name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
-   <td><input type="submit" disabled name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
+   <td><input type="submit" title="<fmt:message key="system_processing_msg" bundle="${resword}"/>" disabled name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
+   <td><input type="submit" title="<fmt:message key="system_processing_msg" bundle="${resword}"/>" disabled name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
   </tr>
 </table>
@@ -106,8 +107,8 @@ window.onload = function(){
 
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-   <td><input type="submit" disabled name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
-   <td><input type="submit" disabled name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
+   <td><input type="submit" title="<fmt:message key="system_processing_msg" bundle="${resword}"/>" disabled name="save" value="<fmt:message key="add_or_remove_items" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
+   <td><input type="submit" title="<fmt:message key="system_processing_msg" bundle="${resword}"/>" disabled name="saveContinue" value="<fmt:message key="continue_to_define_scope" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
   </tr>
 </table>
