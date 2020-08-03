@@ -47,7 +47,7 @@
 <h1><span class="title_manage">
 <fmt:message key="restore_CRF_to_event"  bundle="${resword}"/>
 </span></h1>
-<p><fmt:message key="confirm_restore_of_this_CRF_to_event"  bundle="${resword}"/><br><fmt:message key="if_signed_will_invalidate"  bundle="${resword}"/></p>
+<p><fmt:message key="confirm_restore_of_this_CRF_to_event"  bundle="${resword}"/><br><br><fmt:message key="if_signed_will_invalidate"  bundle="${resword}"/></p>
 
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
