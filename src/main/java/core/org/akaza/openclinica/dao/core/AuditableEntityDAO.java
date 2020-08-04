@@ -220,6 +220,23 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         }
     }
 
+    public void setEntityAuditInformationWithoutStatus(AuditableEntityBean aeb, HashMap hm) {
+        // grab the required information from the table
+        // so that we don't have to repeat this in every single dao
+        Date dateCreated = (Date) hm.get("date_created");
+        Date dateUpdated = (Date) hm.get("date_updated");
+        Integer ownerId = (Integer) hm.get("owner_id");
+        Integer updateId = (Integer) hm.get("update_id");
+
+        if (aeb != null) {
+            aeb.setCreatedDate(dateCreated);
+            aeb.setUpdatedDate(dateUpdated);
+            //This was throwing a ClassCastException : BWP altered in 4/2009
+            // aeb.setStatus(Status.get(statusId.intValue()));
+            aeb.setOwnerId(ownerId.intValue());
+            aeb.setUpdaterId(updateId.intValue());
+        }
+    }
     /**
      * This method executes a "findAll-style" query. Such a query has two
      * characteristics:

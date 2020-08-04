@@ -599,7 +599,6 @@ public class EnketoUrlService {
         eventCrf.setValidateString("");
         eventCrf.setValidatorAnnotations("");
         eventCrf.setValidatorId(0);
-        eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
