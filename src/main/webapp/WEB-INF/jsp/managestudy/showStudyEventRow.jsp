@@ -30,15 +30,17 @@
                 <c:out value="${currRow.bean.studyEvent.workflowStatus.displayValue}"/>
             </c:otherwise>
         </c:choose>
-        <c:if test="${currRow.bean.studyEvent.signed == true}">
-            <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
-        </c:if>
-        <c:if test="${currRow.bean.studyEvent.locked == true}">
-            <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
-        </c:if>
-        <c:if test="${currRow.bean.studyEvent.archived == true}">
-            <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
-        </c:if>
+        <div style="white-space: nowrap;">
+            <c:if test="${currRow.bean.studyEvent.signed == true}">
+                <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
+            </c:if>
+            <c:if test="${currRow.bean.studyEvent.locked == true}">
+                <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
+            </c:if>
+            <c:if test="${currRow.bean.studyEvent.archived == true}">
+                <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+            </c:if>
+        </div>
     </td>
     <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
