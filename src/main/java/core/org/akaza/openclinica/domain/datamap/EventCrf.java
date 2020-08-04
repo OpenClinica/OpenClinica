@@ -291,7 +291,7 @@ public class EventCrf extends DataMapDomainObject {
     }
 
     @Enumerated( EnumType.STRING )
-    @Column(name = "sdv_status", nullable = false)
+    @Column(name = "sdv_status")
     public SdvStatus getSdvStatus() {
         return this.sdvStatus;
     }
