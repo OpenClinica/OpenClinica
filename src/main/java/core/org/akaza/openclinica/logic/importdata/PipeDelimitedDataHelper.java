@@ -445,9 +445,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         }
         String[] dataRow = this.toArrayWithFullItems(tempDataRowStr, "|");
 
-        if (dataRow.length < headerRow.length) {
-            throw new OpenClinicaSystemException("Error-data file format not match header - less pipe than header", "errorCode.dataRowMissingPipe");
-        } else if (dataRow.length > headerRow.length) {
+        if (dataRow.length < headerRow.length || dataRow.length > headerRow.length) {
             throw new OpenClinicaSystemException("Data file format error - inconsistent number of header columns and data columns", "errorCode.inconsistentHeaderAndDataColumns");
         }
     }
