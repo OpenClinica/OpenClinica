@@ -329,7 +329,8 @@ public class RestfulServiceHelper {
 	 				while(dataFilesIt.hasNext()) {
 	 					try {
 	 						rowFile = (File) dataFilesIt.next();
-		 					
+							//validate studySubject in datafile
+		 					this.getImportDataHelper().validateStudySubject(mappingFile, rowFile);
 		 					HttpPost post = new HttpPost(importDataWSUrl);
 		 	 	 	  		/**
 		 	 	 	  		 *  add header Authorization
@@ -422,7 +423,7 @@ public class RestfulServiceHelper {
 	 					}
 	 					
 	 				}
-	 				this.getImportDataHelper().addSummaryAndMappingFileInLog(logFileName, mappingFile, request);
+	 				this.getImportDataHelper().addSummaryAndMappingFileInLog(logFileName, mappingFile, request, dataFileList.size());
 	 			   // after sent, then delete from disk
 	 				dataFilesIt = dataFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
@@ -491,13 +492,13 @@ public class RestfulServiceHelper {
 	 	 	 	    request.setAttribute("logFileName", logFileName);
 	 	 	 	    
 	 				Iterator dataFilesIt = dataFileList.iterator();
-	 				
 	 				File rowFile = null;
 					String skipMatchCriteria = null;
 	 				while(dataFilesIt.hasNext()) {
 	 					try {
 	 						rowFile = (File) dataFilesIt.next();
-		 					
+	 						//validate studySubject in datafile
+							this.getImportDataHelper().validateStudySubject(mappingFile, rowFile);
 		 					HttpPost post = new HttpPost(importDataWSUrl);
 		 	 	 	  		/**
 		 	 	 	  		 *  add header Authorization
@@ -579,14 +580,13 @@ public class RestfulServiceHelper {
 	 		            		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
 	 		            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
 	 		            	}
-	 		            	String msg = e.getErrorCode() + ":" + e.getMessage();
-	 		            	msg = recordNum + "," + participantID + ",FAILED," + msg;
+	 		            	String msg = recordNum + "," + participantID + ",FAILED," + e.getMessage();
 	 			    		this.getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
 	 		            
 	 					}
 	 					
-	 				}	
-					this.getImportDataHelper().addSummaryAndMappingFileInLog(logFileName, mappingFile, request);
+	 				}
+					this.getImportDataHelper().addSummaryAndMappingFileInLog(logFileName, mappingFile, request, dataFileList.size());
 	 			   // after sent, then delete from disk
 	 				dataFilesIt = dataFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {

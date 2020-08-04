@@ -363,8 +363,7 @@ public class DataController {
                 List<String> errorMessagesFromValidation = null;
                 String comeFromPipe = (String) request.getHeader("PIPETEXT");
             	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
-            		;
-            	}else {
+            		}else {
             		 errorMessagesFromValidation = dataImportService.validateMetaData(odmContainer, dataSource, coreResources, studyBean, userBean,
                              displayItemBeanWrappers, importedCRFStatuses);
 
@@ -424,13 +423,7 @@ public class DataController {
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
                 	// for skip err_msg:1,SS_SITE_SB1,SUCCESS,Skip
-                	String msg = null;
-                	String skipMessage = "SUCCESS," + resWords.getString("skip");
-                	if(err_msg.indexOf(skipMessage) > -1) {
-                		msg = err_msg;
-                	}else {
-                    	msg = recordNum + "," + participantId + ",FAILED," + msg;
-                	}
+                	String msg = recordNum + "," + participantId + ",FAILED," + err_msg;
                 	
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);    	    		    	    		
                     return errorMsgs;
