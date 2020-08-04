@@ -487,7 +487,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         excelRow = new String[] { studyEvent.getAuditEventTypeName(), dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
                                 studyEvent.getEntityName() + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue, studyEvent.getDetails() };
                         for (int i = 0; i < excelRow.length; i++) {
-                            label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i].toLowerCase()), cellFormat);
+                            if(i==4 || i==5)
+                                excelRow[i]=excelRow[i].toLowerCase();
+                            label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                             excelSheet.addCell(label);
                         }
                         row++;
@@ -624,7 +626,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                 excelRow = new String[] { eventCrfAudit.getAuditEventTypeName(), dateTimeFormat(eventCrfAudit.getAuditDate()),
                                         eventCrfAudit.getUserName(), eventCrfAudit.getEntityName() + ordinal, oldValue, newValue };
                                 for (int i = 0; i < excelRow.length; i++) {
-                                    label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i].toLowerCase()), cellFormat);
+                                    if(i==4 || i==5)
+                                        excelRow[i]=excelRow[i].toLowerCase();
+                                    label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                                     excelSheet.addCell(label);
                                 }
                                 row++;
