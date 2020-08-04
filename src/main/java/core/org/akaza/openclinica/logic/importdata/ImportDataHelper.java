@@ -414,7 +414,7 @@ public class ImportDataHelper {
 								skippedImportCount++;
 							else
 								successfulImportCount++;
-						else
+						else if(currentLine.contains("FAILED"))
 							failedImportCount++;
 					}
 

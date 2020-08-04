@@ -216,11 +216,12 @@ public class DataController {
      */
     protected synchronized ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
         ResourceBundle resWords= ResourceBundleProvider.getWordsBundle();
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
         
         Enumeration<String> headerNames = request.getHeaderNames();
-
+        boolean isLogUpdated = false;
      /*   if (headerNames != null) {
                 while (headerNames.hasMoreElements()) {
                         System.out.println("Header: " + request.getHeader(headerNames.nextElement()));
@@ -327,6 +328,7 @@ public class DataController {
                 errors.reject(e.getErrorCode(), e.getMessage());
                 
                 // log error into file
+                isLogUpdated = true;
                 SubjectDataBean subjectDataBean = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0);
                 String participantId = subjectDataBean == null ? null : subjectDataBean.getStudySubjectID();
                 
@@ -336,8 +338,7 @@ public class DataController {
             		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
             		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
             	}
-            	String msg = e.getErrorCode() + ":" + e.getMessage();
-            	msg = recordNum + "," + participantId + ",FAILED," + msg;
+            	String msg = recordNum + "," + participantId + ",FAILED," + e.getMessage();
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
             }
 
@@ -378,6 +379,7 @@ public class DataController {
                     /**
                      * log error into log file 
                      */
+                    isLogUpdated = true;
                   String participantId = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudySubjectID();
                     String originalFileName = request.getHeader("originalFileName");
                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
@@ -414,6 +416,7 @@ public class DataController {
                   /**
                    * log error into log file
                    */
+                  isLogUpdated = true;
                   String participantId = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudySubjectID();
                   String originalFileName = request.getHeader("originalFileName");
                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
@@ -466,7 +469,7 @@ public class DataController {
 
                 /**
                  *  Now it's time to log successful message into log file                      
-                 */ 
+                 */
                 String participantId = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudySubjectID();
                 String originalFileName = request.getHeader("originalFileName");
             	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
@@ -475,8 +478,8 @@ public class DataController {
             		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
             		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
             	}
-            	String msg = "imported";
-            	msg = recordNum + "," + participantId + ",SUCCESS," + resWords.getString("imported");
+            	isLogUpdated = true;
+            	String msg = recordNum + "," + participantId + ",SUCCESS," + resWords.getString("imported");
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
 	    	
                 ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource, studyDao);
@@ -503,6 +506,19 @@ public class DataController {
 
         } catch (Exception e) {
             logger.error("Error processing data import request ",e );
+            if(!isLogUpdated) {
+                String participantId = request.getHeader("participantLabel");
+                String originalFileName = request.getHeader("originalFileName");
+                // sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+                String recordNum = null;
+                if (originalFileName != null) {
+                    recordNum = originalFileName.substring(originalFileName.lastIndexOf("_") + 1, originalFileName.indexOf("."));
+                    originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+                }
+                String msg = recordNum + "," + participantId + ",FAILED," + respage.getString("unexpected_error_occured");
+
+                this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg, request);
+            }
             throw new Exception(e);
         }
     }
@@ -675,8 +691,7 @@ public class DataController {
                       		mappingFileTxt = file;
                       		
                       	}else {
-                      		 
-         	 	 	 	 	 logFileName = this.getRestfulServiceHelper().buildLogFileName(file.getName());
+         	 	 	 	 	 logFileName = this.getRestfulServiceHelper().buildLogFile(file.getName(), request);
          	 	 	 	     request.setAttribute("logFileName", logFileName);
                       	}
                       }
