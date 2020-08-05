@@ -102,14 +102,6 @@
     </query>
 
     <query>
-        <name>getEventCRFsByStudySubjectCompleteOrLocked</name>
-        <sql>select ec.* from event_crf ec
-             where
-             (ec.status_id = 2 or ec.status_id = 6) AND
-             ec.study_subject_id = ? </sql>
-    </query>
-
-    <query>
         <name>getEventCRFsByStudySubjectLimit</name>
         <sql>select ec.* from event_crf ec,  study_subject ss
             where  ss.study_subject_id = ? AND

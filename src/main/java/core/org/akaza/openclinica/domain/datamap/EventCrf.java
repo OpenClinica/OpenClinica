@@ -428,4 +428,10 @@ public class EventCrf extends DataMapDomainObject {
     public boolean isCurrentlyArchived() {
         return BooleanUtils.isTrue(this.getArchived());
     }
+
+    @Transient
+    public boolean isAvailable(){
+        return (!isCurrentlyRemoved() && !isCurrentlyArchived());
+    }
   }
+

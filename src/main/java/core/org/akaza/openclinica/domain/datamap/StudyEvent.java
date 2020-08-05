@@ -313,5 +313,8 @@ public class StudyEvent extends DataMapDomainObject  {
 	public boolean isCurrentlySigned() {
 		return BooleanUtils.isTrue(this.getSigned());
 	}
-
+	@Transient
+	public boolean isAvailable(){
+		return (!isCurrentlyRemoved() && !isCurrentlyArchived());
+	}
 }
