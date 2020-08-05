@@ -453,14 +453,14 @@
                           </c:choose>
                         </td>
                         <td>
-                          <c:if test="${studyEvent.signed == true}">
-                              <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
+                          <c:if test="${studyEvent.signed == true && !dec.eventCRF.isArchived() && !dec.eventCRF.isRemoved() && dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                              <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"></span>
                           </c:if>
                           <c:if test="${studyEvent.locked == true}">
-                              <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
+                              <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"></span>
                           </c:if>
                           <c:if test="${dec.eventCRF.isArchived()}">
-                              <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                              <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"></span>
                           </c:if>
                         </td>
                       </tr>
