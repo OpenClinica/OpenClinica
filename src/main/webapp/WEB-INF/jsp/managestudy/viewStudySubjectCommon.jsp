@@ -611,7 +611,7 @@ $(function() {
                     function isInactive(data) {
                         var ocstatus = data['@OpenClinica:Status'];
                         return (
-                            data['@OpenClinica:Removed'] === 'Yes' || 
+                            data['@OpenClinica:Removed'] === 'Yes' ||
                             data['@OpenClinica:Archived'] === 'Yes' ||
                             ocstatus === 'removed' || ocstatus === 'auto-removed'
                         );
@@ -624,7 +624,7 @@ $(function() {
                         updatedBy: formData['@OpenClinica:UpdatedBy'],
                         fields: copyObject(form.submissionFields),
                         links: collectLinks(studyEventData, formData),
-                        isSigned: studyEventData['@OpenClinica:Signed'] === 'Yes',
+                        isSigned: (studyEventData['@OpenClinica:Signed'] === 'Yes') && (studyEventData['@OpenClinica:Archived'] !== 'Yes') && (studyEventData['@OpenClinica:Removed'] !== 'Yes') && studyEventData['@OpenClinica:WorkflowStatus'] === 'completed',
                         isLocked: studyEventData['@OpenClinica:Locked'] === 'Yes',
                         isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Status'] === 'auto-removed'
                     };
