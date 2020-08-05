@@ -3,12 +3,90 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="jkeremian" id="2020-07-27-OC-13224-001"
-        dbms="postgresql" runOnChange="true" >
-        <comment>Updating the form_layout table changing status from locked into archived</comment>
+
+    <changeSet author="jkeremian" id="2020-08-04-OC-13224-01"
+               dbms="postgresql" runOnChange="true" >
+        <comment>Updating  form_layout table changing status </comment>
         <sql splitStatements="false">
-            UPDATE form_layout SET status_id =5 where status_id=6 ;
+            update form_layout SET status_id = 5 where status_id = 6 or status_id = 7 ;
+            update form_layout SET status_id = 1 where status_id <![CDATA[<>]]> 5 and status_id <![CDATA[<>]]> 6 and status_id <![CDATA[<>]]> 7 ;
         </sql>
     </changeSet>
+
+
+    <changeSet author="jkeremian" id="2020-08-04-OC-13224-02"
+               dbms="postgresql" runOnChange="true" >
+        <comment>Updating  study_event_definition table status </comment>
+        <sql splitStatements="false">
+            update study_event_definition set status_id = 5 where status_id = 7;
+            update study_event_definition set status_id = 1 where status_id <![CDATA[<>]]> 5 and status_id <![CDATA[<>]]> 7;
+        </sql>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2020-08-04-OC-13224-03"
+               dbms="postgresql" runOnChange="true" >
+        <comment>Updating  event_definition_crf table  status </comment>
+        <sql splitStatements="false">
+            update event_definition_crf set status_id = 1 where status_id <![CDATA[<>]]> 5 and status_id <![CDATA[<>]]> 7;
+        </sql>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2020-08-04-OC-13224-04"
+               dbms="postgresql" runOnChange="true" >
+        <comment>Migrating Event and Event Form defn metadata  Statuses </comment>
+        <sql splitStatements="false">
+
+            CREATE OR REPLACE FUNCTION migrateeventmetadata()
+            RETURNS void AS
+            '
+            declare
+            sed_rec  record;
+            edc_rec  record;
+
+            begin
+
+
+            -- iterate event_defn_crf table
+            FOR  edc_rec IN SELECT event_definition_crf_id, study_event_definition_id,  status_id  FROM event_definition_crf
+
+            LOOP
+            ---------------------------------------------------------------------------------------
+
+
+            IF (edc_rec.status_id = 7) THEN
+               select study_event_definition_id, status_id INTO sed_rec from study_event_definition  where study_event_definition_id = edc_rec.study_event_definition_id;
+
+               if (sed_rec.status_id = 5) then
+                  update event_definition_crf set status_id = 1 where event_definition_crf_id = edc_rec.event_definition_crf_id;
+               else
+                   if (sed_rec.status_id = 1) then
+                      update event_definition_crf set status_id = 5 where event_definition_crf_id = edc_rec.event_definition_crf_id;
+                   end if;
+               end if;
+
+            END IF;
+
+
+
+            ---------------------------------------------------------------------------------------
+
+
+            END LOOP;
+
+
+
+            raise notice ''the end'';
+
+            end;
+            '            LANGUAGE plpgsql;
+
+            select migrateeventmetadata();
+
+
+
+        </sql>
+
+    </changeSet>
+
 
 </databaseChangeLog>
