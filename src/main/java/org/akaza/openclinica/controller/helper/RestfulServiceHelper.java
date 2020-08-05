@@ -330,8 +330,9 @@ public class RestfulServiceHelper {
 	 					try {
 	 						rowFile = (File) dataFilesIt.next();
 							//validate studySubject in datafile
-		 					this.getImportDataHelper().validateStudySubject(mappingFile, rowFile);
+		 					String participantLabel = this.getImportDataHelper().getStudySubject(mappingFile, rowFile);
 		 					HttpPost post = new HttpPost(importDataWSUrl);
+		 					post.setHeader("participantLabel", participantLabel);
 		 	 	 	  		/**
 		 	 	 	  		 *  add header Authorization
 		 	 	 	  		 */
@@ -412,7 +413,9 @@ public class RestfulServiceHelper {
 	 	                	 */
 	 						String originalFileName = rowFile.getName();            	
 	 		            	String recordNum = null;
-	 		            	String participantID = this.getImportDataHelper().getParticipantID(mappingFile, rowFile);
+							String participantID = "";
+	 		            	if(!e.getErrorCode().equals("errorCode.participantIdHeaderNotMatchingMappingFile"))
+	 		            		participantID = this.getImportDataHelper().getParticipantID(mappingFile, rowFile);
 	 		            	if(originalFileName !=null) {
 	 		            		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
 	 		            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
@@ -488,7 +491,7 @@ public class RestfulServiceHelper {
 	 				setDataFileNameAndTimeStampForLog(request, file);
 	 				 // prepare log file
 	 	 	 	 	String logFileName = null;
-	 	 	 	 	logFileName = buildLogFileName(file.getName());
+	 	 	 	 	logFileName = buildLogFile(file.getName(), request);
 	 	 	 	    request.setAttribute("logFileName", logFileName);
 	 	 	 	    
 	 				Iterator dataFilesIt = dataFileList.iterator();
@@ -498,8 +501,9 @@ public class RestfulServiceHelper {
 	 					try {
 	 						rowFile = (File) dataFilesIt.next();
 	 						//validate studySubject in datafile
-							this.getImportDataHelper().validateStudySubject(mappingFile, rowFile);
+							String participantLabel = this.getImportDataHelper().getStudySubject(mappingFile, rowFile);
 		 					HttpPost post = new HttpPost(importDataWSUrl);
+							post.setHeader("participantLabel", participantLabel);
 		 	 	 	  		/**
 		 	 	 	  		 *  add header Authorization
 		 	 	 	  		 */	 	 	 	 		
@@ -575,7 +579,9 @@ public class RestfulServiceHelper {
 	 					}catch(OpenClinicaSystemException e) {
 	 						String originalFileName = rowFile.getName();            	
 	 		            	String recordNum = null;
-	 		            	String participantID = this.getImportDataHelper().getParticipantID(mappingFile, rowFile);
+							String participantID = "";
+							if(!e.getErrorCode().equals("errorCode.participantIdHeaderNotMatchingMappingFile"))
+	 		            		participantID = this.getImportDataHelper().getParticipantID(mappingFile, rowFile);
 	 		            	if(originalFileName !=null) {
 	 		            		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
 	 		            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
@@ -769,7 +775,7 @@ public class RestfulServiceHelper {
 		 * @param originalFileName
 		 * @return logFileName
 		 */
-		public String buildLogFileName(String originalFileName) {
+		public String buildLogFile(String originalFileName, HttpServletRequest request) {
 			String logFileName = null;
 			if(originalFileName !=null) {	            	
 				originalFileName = Files.getNameWithoutExtension(originalFileName);
@@ -779,7 +785,16 @@ public class RestfulServiceHelper {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
 			String timeStamp = simpleDateFormat.format(now);
 			logFileName =originalFileName+"_"+ timeStamp+"_log.csv";
-						
+			try {
+				String importFileDir = this.getImportDataHelper().getPersonalImportFileDir(request);
+				String logFileloc = importFileDir + logFileName;
+				File logFile = new File(logFileloc);
+				if(!logFile.exists()) {
+					logFile.createNewFile();
+				}
+			} catch (IOException e) {
+				log.error("Log file is not able to be created from pipe-delimited");
+			}
 			return logFileName;
 		}
 

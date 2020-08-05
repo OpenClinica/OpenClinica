@@ -708,7 +708,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         return studyOID;
     }
 
-    public void validateStudySubject(File mappingFile, File rawItemDataFile)throws OpenClinicaSystemException, Exception{
+    public String getStudySubject(File mappingFile, File rawItemDataFile)throws OpenClinicaSystemException, Exception{
         ResourceBundleProvider.updateLocale(Locale.US);
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(Locale.US);
         MessageFormat mf = new MessageFormat("");
@@ -724,6 +724,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
             Object[] arguments = { participantLabel };
             throw new OpenClinicaSystemException("errorCode.ValidationFailed", mf.format(arguments));
         }
+        return participantLabel;
     }
     /**
      * FormOID=F_DEMOGRAPHICS
@@ -1252,6 +1253,8 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
         String[] columnNms = getDataColumnNames(rawItemData);
         HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
+        ResourceBundleProvider.updateLocale(Locale.US);
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(Locale.US);
 
         try {
 
@@ -1301,8 +1304,9 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 
         } catch (Exception e) {
-            String msg = e.toString();
-            throw new OpenClinicaSystemException(msg, "errorCode.noParticipantID");
+
+            String msg = respage.getString("participant_id_header_not_matching_mapping_file");
+            throw new OpenClinicaSystemException("errorCode.participantIdHeaderNotMatchingMappingFile", msg);
         }
 
         return "";
