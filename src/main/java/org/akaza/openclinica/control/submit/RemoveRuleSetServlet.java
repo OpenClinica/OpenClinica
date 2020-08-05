@@ -62,7 +62,7 @@ public class RemoveRuleSetServlet extends SecureController {
             forwardPage(Page.CRF_LIST);
         } else {
             RuleSetBean ruleSetBean = null;
-            ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+            ruleSetBean = getRuleSetService().getRuleSetById(ruleSetId);
             if (action != null && action.equals("confirm")) {
                 request.setAttribute(RULESET, ruleSetBean);
                 forwardPage(Page.REMOVE_RULE_SET);

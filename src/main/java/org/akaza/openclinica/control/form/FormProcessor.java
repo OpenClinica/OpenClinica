@@ -535,41 +535,6 @@ public class FormProcessor {
         return answer;
     }
 
-    public core.org.akaza.openclinica.web.domain.EntityBeanTable getWebEntityBeanTable() {
-        core.org.akaza.openclinica.web.domain.EntityBeanTable answer = new core.org.akaza.openclinica.web.domain.EntityBeanTable();
-
-        String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
-        if (sortingColumn != null && !"".equals(sortingColumn)) {
-            answer.setSortingColumnExplicitlySet(true);
-        }
-
-        answer.setCurrPageNumber(getInt(EBL_PAGE));
-        answer.setSortingColumnInd(getInt(EBL_SORT_COLUMN));
-        answer.setKeywordFilter(getString(EBL_FILTER_KEYWORD));
-
-        // this code says that for each of the boolean properties of the table,
-        // if no value was speified on the form or in the GET query, then
-        // keep the default value for that bit
-        // otherwise, the bits will just be forced to false
-        String blnFields[] = { EBL_SORT_ORDER, EBL_FILTERED, EBL_PAGINATED };
-
-        for (int i = 0; i < blnFields.length; i++) {
-            String value = getString(blnFields[i]);
-            boolean b = getBoolean(blnFields[i]);
-            if (!"".equals(value)) {
-                if (i == 0) {
-                    answer.setAscendingSort(b);
-                } else if (i == 1) {
-                    answer.setFiltered(b);
-                } else {
-                    answer.setPaginated(b);
-                }
-            }
-        }
-
-        return answer;
-    }
-
     /**
      * Return a String which cancatenates inputed "Date", "Hour", "Minute" and
      * "am/pm" if applicable. Empty string will be returned if none of them has

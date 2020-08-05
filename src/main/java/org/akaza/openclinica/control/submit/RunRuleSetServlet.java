@@ -87,12 +87,12 @@ public class RunRuleSetServlet extends SecureController {
     private RuleSetBean getRuleSetBean(String ruleSetId, String ruleId) {
         RuleSetBean ruleSetBean = null;
         if (ruleId != null && ruleSetId != null && ruleId.length() > 0 && ruleSetId.length() > 0) {
-            ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+            ruleSetBean = getRuleSetService().getRuleSetById(ruleSetId);
             ruleSetBean = ruleSetService.filterByRules(ruleSetBean, Integer.valueOf(ruleId));
         } else if (ruleSetId != null && ruleSetId.length() > 0) {
             // getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
             // ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId, null);
-            ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+            ruleSetBean = getRuleSetService().getRuleSetById(ruleSetId);
         }
         return ruleSetBean;
     }

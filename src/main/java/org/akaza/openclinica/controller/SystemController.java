@@ -61,6 +61,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+//TODO We should remove this class, many of the endpoints are still active but not functional.
+// Ex: GET /OpenClinica/pages/auth/api/v1/system/modules (Will take a minute to timeout one of the requests)
+
 @Controller
 @RequestMapping(value = "/auth/api/v1/system")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
@@ -1126,6 +1129,7 @@ public class SystemController {
 
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getParticipateModule(Study studyBean) {
 		String portalURL = CoreResources.getField("portalURL");
 		StudyParameterValueBean spvBean = getParticipateMod(studyBean, "participantPortal");
@@ -1171,6 +1175,7 @@ public class SystemController {
 		return mapModule;
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getRuleDesignerModule(Study studyBean) {
 		String designerUrl = CoreResources.getField("designerURL");
 		String result = "";
@@ -1354,6 +1359,7 @@ public class SystemController {
 		return mapModule;
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getRuleDesignerModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ruledesigner");
@@ -1364,6 +1370,7 @@ public class SystemController {
 		return mapModule;
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getMessagingModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("messaging");
@@ -1374,6 +1381,7 @@ public class SystemController {
 		return mapModule;
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getDatamartModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("datamart");
@@ -1384,6 +1392,7 @@ public class SystemController {
 		return mapModule;
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getWebServiceModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("webservice");
@@ -1394,6 +1403,7 @@ public class SystemController {
 		return mapModule;
 	}
 
+	@Deprecated
 	public HashMap<String, Object> getLdapModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ldap");
