@@ -661,14 +661,6 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }
     }
 
-    public ArrayList getEventCRFsByStudySubjectCompleteOrLocked(int studySubjectId) {
-
-        HashMap variables = new HashMap();
-        variables.put(1, studySubjectId);
-
-        return executeFindAllQuery("getEventCRFsByStudySubjectCompleteOrLocked", variables);
-    }
-
     public ArrayList getEventCRFsByStudySubjectLimit(int studySubjectId, int studyId, int parentStudyId, int limit, int offset) {
 
         HashMap variables = new HashMap();
