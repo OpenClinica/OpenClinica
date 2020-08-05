@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -64,11 +65,17 @@ public class RandomizationServiceImpl implements RandomizationService {
 
     private class RandomizationData {
         private boolean isEnabled;
-        private RandomizationConfiguration configuration;
+        private List<RandomizationConfiguration> configurations;
+
+        public RandomizationData(boolean isEnabled, List<RandomizationConfiguration> configurations) {
+            this.isEnabled = isEnabled;
+            this.configurations = configurations;
+        }
 
         public RandomizationData(boolean isEnabled, RandomizationConfiguration configuration) {
             this.isEnabled = isEnabled;
-            this.configuration = configuration;
+            this.configurations = new ArrayList<>();
+            configurations.add(configuration);
         }
         public boolean isEnabled() {
             return isEnabled;
@@ -78,12 +85,12 @@ public class RandomizationServiceImpl implements RandomizationService {
             isEnabled = enabled;
         }
 
-        public RandomizationConfiguration getConfiguration() {
-            return configuration;
+        public List<RandomizationConfiguration> getConfigurations() {
+            return configurations;
         }
 
-        public void setConfiguration(RandomizationConfiguration configuration) {
-            this.configuration = configuration;
+        public void addConfiguration(RandomizationConfiguration configuration) {
+            this.configurations.add(configuration);
         }
     }
 
@@ -99,7 +106,7 @@ public class RandomizationServiceImpl implements RandomizationService {
                     if (StringUtils.equalsIgnoreCase(moduleEnabled, ModuleStatus.ENABLED.name())) {
                         boolean isRetrieveSuccess = false;
                         try {
-                            randomizationConfigurations.add(retrieveConfiguration(study.getStudyEnvUuid(), accessToken));
+                            randomizationConfigurations.addAll(retrieveConfigurations(study.getStudyEnvUuid(), accessToken));
                             isRetrieveSuccess = true;
                         } catch (Exception e) {
                             // we just log the exception here since we don't want to prevent user login by throwing this exception
@@ -113,20 +120,23 @@ public class RandomizationServiceImpl implements RandomizationService {
 
                 });
 
-        // if the study config is not in the existing map, then remove it
-        // Don't need to do anything crazy with thread safety here as this end point is very restricted and not multi-tenant
-        randomizationMap.entrySet().stream().forEach(entry->{
-            if (results.get(entry.getValue().getConfiguration().getStudyOID()) == null) {
-                randomizationMap.remove(entry.getKey());
-            }
-        });
+        // Clear the configuration map and re-build it.
+        randomizationMap = new ConcurrentHashMap<>();
+
         randomizationConfigurations.stream().forEach(config->{
-            randomizationMap.put(config.getStudyEnvUuid(), new RandomizationData(true, config));
+            if (randomizationMap.containsKey(config.getStudyEnvUuid())){
+                // Add to existing entry.
+                randomizationMap.get(config.getStudyEnvUuid()).addConfiguration(config);
+            } else {
+                // Doesn't exist, add as new.
+                randomizationMap.put(config.getStudyEnvUuid(), new RandomizationData(true, config));
+            }
         });
         isSuccess = results.size() == randomizationConfigurations.size() ? true: false;
         return isSuccess;
     }
-    private RandomizationConfiguration retrieveConfiguration(String studyEnvUuid, String accessToken) {
+
+    private List<RandomizationConfiguration> retrieveConfigurations(String studyEnvUuid, String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -140,11 +150,20 @@ public class RandomizationServiceImpl implements RandomizationService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid
-                    + "/configuration", HttpMethod.GET, entity, ModuleConfigDTO.class);
+        ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid
+                    + "/configurations", HttpMethod.GET, entity, new ParameterizedTypeReference<List<ModuleConfigDTO>>() {});
         if (response.hasBody())
-            return mapModuleConfigToConfig(response.getBody());
+            return mapModuleConfigsToConfigs(response.getBody());
         return null;
+    }
+
+
+    private List<RandomizationConfiguration> mapModuleConfigsToConfigs(List<ModuleConfigDTO> moduleConfigs){
+        List<RandomizationConfiguration> randomizationConfigurations = new ArrayList<>();
+        for (ModuleConfigDTO moduleConfig : moduleConfigs){
+            randomizationConfigurations.add(mapModuleConfigToConfig(moduleConfig));
+        }
+        return randomizationConfigurations;
     }
 
     private RandomizationConfiguration mapModuleConfigToConfig(ModuleConfigDTO moduleConfig){
@@ -190,8 +209,8 @@ public class RandomizationServiceImpl implements RandomizationService {
     @Override
     public void processModule(Study study, String isModuleEnabled, String accessToken) {
         if (StringUtils.equalsIgnoreCase(isModuleEnabled, ModuleStatus.ENABLED.name())) {
-            RandomizationConfiguration configuration = retrieveConfiguration(study.getStudyEnvUuid(), accessToken);
-            randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configuration));
+            List<RandomizationConfiguration> configurations = retrieveConfigurations(study.getStudyEnvUuid(), accessToken);
+            randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configurations));
         }
     }
 
@@ -235,12 +254,17 @@ public class RandomizationServiceImpl implements RandomizationService {
     }
 
     private void setStratFactors(Study publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
-                                List<RandomizeQueryResult> randomizeQueryResult, String accessToken) {
+                                List<RandomizeQueryResult> randomizeQueryResult, String accessToken, boolean isMultipleConfigurations) {
 
         RandomizationDTO randomizationDTO = new RandomizationDTO();
         randomizationDTO.setStudyUuid(publicStudy.getStudyUuid());
         randomizationDTO.setStudyEnvironmentUuid(publicStudy.getStudyEnvUuid());
         randomizationDTO.setSubjectOid(studySubjectOID);
+        if (isMultipleConfigurations){
+            randomizationDTO.setStudyEventOid(studyConfig.targetField.getEventOID());
+            randomizationDTO.setFormOid(studyConfig.targetField.getFormOID());
+        }
+
 
         Map<String, String> databaseValues = randomizeQueryResult.stream()
                 .collect(Collectors.toMap(entry -> (entry.getStudyEvent().getStudyEventDefinition().getOc_oid() + "."
@@ -273,54 +297,56 @@ public class RandomizationServiceImpl implements RandomizationService {
         if (!isEnabled)
             return;
 
-        RandomizationConfiguration studyConfig = getStudyConfig(parentPublicStudy.getStudyEnvUuid());
+        List<RandomizationConfiguration> studyConfigs = getStudyConfigs(parentPublicStudy.getStudyEnvUuid());
 
-        if (studyConfig == null) {
+        if (studyConfigs == null) {
             log.error("No RandomizeConfiguration found for this study:" + parentPublicStudy.getName());
             return;
         }
 
-        List<List<String>> stratGroups = new ArrayList<>();
+        boolean environmentHasMultipleConfigs = (studyConfigs.size() > 1) ? true : false;
+        for (RandomizationConfiguration studyConfig : studyConfigs){
+            List<List<String>> stratGroups = new ArrayList<>();
 
-        // make an array out of event_oids and item_oids
+            // make an array out of event_oids and item_oids
+            studyConfig.getStratificationFactors().values().stream()
+                    .collect(Collectors.toCollection(ArrayList::new)).stream()
+                    .forEach(line -> {
+                        String[] elements = Arrays.stream(line.split("\\.")).toArray(String[]::new);
+                        for (int index = 0; index < elements.length; index++) {
+                            if (stratGroups.size() < index + 1)
+                                stratGroups.add(new ArrayList<>());
+                            stratGroups.get(index).add(elements[index]);
+                        }
+                    });
 
-        studyConfig.getStratificationFactors().values().stream()
-                .collect(Collectors.toCollection(ArrayList::new)).stream()
-                .forEach(line -> {
-                    String[] elements = Arrays.stream(line.split("\\.")).toArray(String[]::new);
-                    for (int index = 0; index < elements.length; index++) {
-                        if (stratGroups.size() < index + 1)
-                            stratGroups.add(new ArrayList<>());
-                        stratGroups.get(index).add(elements[index]);
-                    }
-                });
-
-        if (stratGroups.size() == 0) {
-            log.error("Randomize configuration does not have stratification factors defined for this study:" + parentPublicStudy.getName()
-                    + " ParticipantId: " + studySubjectOID);
-            return;
-        }
-        // check event and item from thisItemData are part of the strat factors
-        if (itemData != null && !isItemPartOfStratFactors(stratGroups, itemData))
-            return;
+            if (stratGroups.size() == 0) {
+                log.error("Randomize configuration does not have stratification factors defined for this study:" + parentPublicStudy.getName()
+                        + " ParticipantId: " + studySubjectOID);
+                return;
+            }
+            // check event and item from thisItemData are part of the strat factors
+            if (itemData != null && !isItemPartOfStratFactors(stratGroups, itemData))
+                return;
 
 
-        String eventOID = studyConfig.targetField.getEventOID();
-        String formOID = studyConfig.targetField.getFormOID();
-        String itemGroup = studyConfig.targetField.getItemGroupOID();
-        String itemOID = studyConfig.targetField.getItemOID();
+            String eventOID = studyConfig.targetField.getEventOID();
+            String formOID = studyConfig.targetField.getFormOID();
+            String itemGroup = studyConfig.targetField.getItemGroupOID();
+            String itemOID = studyConfig.targetField.getItemOID();
 
-        List<RandomizeQueryResult> randomizeQueryResult =
-                studyEventDao.fetchItemData(new ArrayList<>(Arrays.asList(eventOID)), studySubjectOID,
-                        new ArrayList<>(Arrays.asList(formOID)), new ArrayList<>(Arrays.asList(itemGroup)), new ArrayList<>(Arrays.asList(itemOID)));
-        List<RandomizeQueryResult> newRandomizeQueryResult;
+            List<RandomizeQueryResult> randomizeQueryResult =
+                    studyEventDao.fetchItemData(new ArrayList<>(Arrays.asList(eventOID)), studySubjectOID,
+                            new ArrayList<>(Arrays.asList(formOID)), new ArrayList<>(Arrays.asList(itemGroup)), new ArrayList<>(Arrays.asList(itemOID)));
+            List<RandomizeQueryResult> newRandomizeQueryResult;
 
-        // target fields should not be populated if it already has a value
-        if ((CollectionUtils.isEmpty(randomizeQueryResult) || StringUtils.isEmpty(randomizeQueryResult.get(0).getItemData().getValue()))) {
-            // check values in all strat factors to be not null
-            if ((newRandomizeQueryResult = stratFactorValuesAvailable(stratGroups, studyConfig, studySubjectOID)) != null) {
-                // send these values over
-                setStratFactors(parentPublicStudy, studyConfig, studySubjectOID, newRandomizeQueryResult, accessToken);
+            // target fields should not be populated if it already has a value
+            if ((CollectionUtils.isEmpty(randomizeQueryResult) || StringUtils.isEmpty(randomizeQueryResult.get(0).getItemData().getValue()))) {
+                // check values in all strat factors to be not null
+                if ((newRandomizeQueryResult = stratFactorValuesAvailable(stratGroups, studyConfig, studySubjectOID)) != null) {
+                    // send these values over
+                    setStratFactors(parentPublicStudy, studyConfig, studySubjectOID, newRandomizeQueryResult, accessToken, environmentHasMultipleConfigs);
+                }
             }
         }
     }
@@ -343,13 +369,13 @@ public class RandomizationServiceImpl implements RandomizationService {
     }
 
     @Override
-    public RandomizationConfiguration getStudyConfig(String studyEnvUuid) {
+    public List<RandomizationConfiguration> getStudyConfigs(String studyEnvUuid) {
         // if there is already an entry in the map, don't put it again
         RandomizationData data = randomizationMap.get(studyEnvUuid);
         if (data == null)
             return null;
 
-        return data.getConfiguration();
+        return data.getConfigurations();
     }
 
 }
