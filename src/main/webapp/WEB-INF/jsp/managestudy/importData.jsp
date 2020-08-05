@@ -73,14 +73,14 @@
 </h1>
 
 <div class="section">
-  <a href="ImportCRFData"><fmt:message key="import_xml_crf_data" bundle="${restext}"/></a>
+  <a href="ImportCRFData"><fmt:message key="import_xml_data" bundle="${restext}"/></a>
   <div class="description">
 	<fmt:message key="import_xml_data_description" bundle="${resworkflow}"/>
   </div>
 </div>
 
 <div class="section">
-  <a href="UploadCRFData">Import Tabular Data</a>
+  <a href="UploadCRFData"><fmt:message key="import_tabular_data" bundle="${restext}"/></a>
   <div class="description">
 	<fmt:message key="import_tabular_data_description" bundle="${resworkflow}"/>
   </div>

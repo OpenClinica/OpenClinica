@@ -227,7 +227,7 @@
                         </tr>
                         <tr>
                             <td class="table_header_column"><fmt:message key="subject_event_status" bundle="${resword}"/></td>
-                            <td class="table_cell"><c:out value="${studyEvent.workflowStatus}"/></td>
+                            <td class="table_cell"><c:out value="${studyEvent.workflowStatus.displayValue}"/></td>
                         </tr>
                         <tr>
                             <td class="table_header_column"><fmt:message key="last_updated_by" bundle="${resword}"/></td>

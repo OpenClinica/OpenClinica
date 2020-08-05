@@ -241,7 +241,7 @@ public class Study extends DataMapDomainObject {
     // this.studyType = studyType;
     // }
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_study_id")
 	public Study getStudy() {
 		return this.study;

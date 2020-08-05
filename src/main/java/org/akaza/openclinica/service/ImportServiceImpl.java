@@ -629,7 +629,6 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorAnnotations("");
         eventCrf.setDateUpdated(new Date());
         eventCrf.setValidatorId(0);
-        eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
         logger.debug("Creating new Event Crf");
@@ -655,7 +654,6 @@ public class ImportServiceImpl implements ImportService {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
-        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
