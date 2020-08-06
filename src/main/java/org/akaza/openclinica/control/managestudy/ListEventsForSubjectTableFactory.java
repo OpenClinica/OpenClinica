@@ -729,6 +729,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         SubjectBean subject;
         CRFBean crf;
         EventCRFBean eventCrf;
+        FormLayoutBean formLayoutBean;
         EventDefinitionCRFBean eventDefintionCrf;
         StudyEventDefinitionBean studyEventDefinition;
 
@@ -749,6 +750,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
                 eventCrf = (EventCRFBean) display.getProps().get(property + "_eventCrf");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
+                formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCrf.getFormLayoutId());
                 studyEvents = new ArrayList<StudyEventBean>();
 
                 if (studyEvent != null) {
@@ -756,7 +758,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 }
 
                 EventCrfLayerBuilder eventCrfLayerBuilder = new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
-                        crfWorkflowStatus, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path, studyDao);
+                        crfWorkflowStatus, eventCrf, formLayoutBean, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path, studyDao);
 
                 String iconStatus = crfWorkflowStatus.toString();
                 if ((eventCrf != null && eventCrf.isRemoved()) || (studyEvent != null && studyEvent.isRemoved())) {

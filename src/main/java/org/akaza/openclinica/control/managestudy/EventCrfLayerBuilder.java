@@ -32,6 +32,7 @@ public class EventCrfLayerBuilder {
     List<StudyEventBean> studyEvents;
     EventCrfWorkflowStatusEnum eventCrfWorkflowStatus;
     EventCRFBean eventCrfBean = null;
+    FormLayoutBean formLayoutBean;
     StudySubjectBean studySubject;
     Study currentStudy;
     StudyUserRoleBean currentRole;
@@ -45,7 +46,7 @@ public class EventCrfLayerBuilder {
     StudyDao studyDao;
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, EventCrfWorkflowStatusEnum eventCrfWorkflowStatus,
-                                EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
+                                EventCRFBean eventCrfBean, FormLayoutBean formLayoutBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
                                 EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath, StudyDao studyDao) {
         super();
         this.html = new HtmlBuilder();
@@ -63,6 +64,7 @@ public class EventCrfLayerBuilder {
         this.studyEventDefinition = studyEventDefinition;
         this.contextPath = contextPath;
         this.studyDao = studyDao;
+        this.formLayoutBean = formLayoutBean;
     }
 
     StudyEventBean getStudyEvent() {
@@ -242,7 +244,8 @@ public class EventCrfLayerBuilder {
             // currentUser.isSysAdmin())) {
             if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
                 if (!hiddenCrf() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED ) {
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
+                        && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -291,7 +294,8 @@ public class EventCrfLayerBuilder {
 
                 if (getStudyEvent() != null && !currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE
                         && !getStudyEvent().isLocked() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
-                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
+                        && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -311,7 +315,8 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
+            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()
+                    && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
