@@ -222,7 +222,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     }
 
                     if (BooleanUtils.isTrue(se.getLocked()))
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("locked"));
+                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("Locked"));
                     else if (BooleanUtils.isTrue(se.getSigned()))
                         xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("signed"));
                     else if (se.getWorkflowStatus() != null)
