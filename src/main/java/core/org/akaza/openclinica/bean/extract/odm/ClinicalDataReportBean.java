@@ -221,11 +221,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
                     }
 
-                    if (BooleanUtils.isTrue(se.getRemoved()))
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
-                    else if (BooleanUtils.isTrue(se.getArchived()))
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
-                    else if (BooleanUtils.isTrue(se.getLocked()))
+                    if (BooleanUtils.isTrue(se.getLocked()))
                         xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("locked"));
                     else if (BooleanUtils.isTrue(se.getSigned()))
                         xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("signed"));
@@ -421,11 +417,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 xml.append("\" OpenClinica:UpdatedBy=\"" + StringEscapeUtils.escapeXml(updatedBy));
                             }
 
-                            if (BooleanUtils.isTrue(form.getRemoved()))
-                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
-                            else if (BooleanUtils.isTrue(form.getArchived()))
-                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
-                            else if (form.getWorkflowStatus() != null)
+                            if (BooleanUtils.isTrue(form.getRemoved())
+                                    || BooleanUtils.isTrue(form.getArchived())
+                                    || BooleanUtils.isTrue(se.getRemoved())
+                                    || BooleanUtils.isTrue(se.getArchived()))
+                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
+                            else
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
 
 
