@@ -1105,16 +1105,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    try {
-                        if (getStudyBean().getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
-                                && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
-                                && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
-                                && participateStatus(studySubjectBean).equalsIgnoreCase(ENABLED)) {
-                            url.append(viewParticipateBuilder(studySubjectBean));
-                        }
-                    } catch (Exception e) {
-                        logger.error("Error appending StudySubject into URL: ",e);
-                    }
                 }
                 value = url.toString();
             }
@@ -1137,19 +1127,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return participatModuleStatus;
     }
 
-
-    private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
-        participantPortalRegistrar = new ParticipantPortalRegistrar();
-        Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
-        Study pStudy = null;
-        if(study.isSite())
-            pStudy = study.getStudy();
-        else
-            pStudy = study;
-        String pManageStatus = participantPortalRegistrar.getCachedRegistrationStatus(pStudy.getOc_oid(), session).toString(); // ACTIVE
-        return pManageStatus;
-    }
-
     private Study getParentStudy(String studyOid) {
         Study study = getStudy(studyOid);
         if(study.isSite())
@@ -1168,29 +1145,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.append("<a name=\"" + studySubject.getLabel() + "\" class=\"pidVerification\" id=\"pid-" + studySubject.getId() + "\" onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="
                 + studySubject.getId());
         actionLink.append("\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
-        actionLink.append("&nbsp;&nbsp;&nbsp;");
-        return actionLink.toString();
-    }
-
-    private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
-        participantPortalRegistrar = new ParticipantPortalRegistrar();
-        Study study = (Study) studyDAO.findByPK(studySubject.getStudyId());
-        Study pStudy = null;
-        if(study.isSite())
-            pStudy = study.getStudy();
-        else
-            pStudy = study;
-        String url = participantPortalRegistrar.getStudyHost(pStudy.getOc_oid());
-        logger.info("URL: {}",url);
-
-        HtmlBuilder actionLink = new HtmlBuilder();
-        // actionLink.a().href("url?id=" + studySubject.getId());
-        actionLink.a().href(url + "?ssid=" + studySubject.getLabel());
-        actionLink.append("target=\"_blank\"");
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_Participate1','images/bt_Ocui_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_Participate1','images/bt_Ocui.gif');\"").close();
-        actionLink
-                .append("<span hspace=\"2\" border=\"0\" title=\"Particpate\" alt=\"Particpate\" class=\"icon icon-user\" name=\"connect_participant\"/></a>");
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }

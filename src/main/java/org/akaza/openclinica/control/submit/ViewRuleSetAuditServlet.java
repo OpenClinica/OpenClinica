@@ -62,7 +62,7 @@ public class ViewRuleSetAuditServlet extends SecureController {
             addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
             forwardPage(Page.CRF_LIST);
         } else {
-            RuleSetBean ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+            RuleSetBean ruleSetBean = getRuleSetService().getRuleSetById(ruleSetId);
             List<RuleSetAuditBean> ruleSetAudits = getRuleSetAuditDao().findAllByRuleSet(ruleSetBean);
             List<RuleSetRuleAuditBean> ruleSetRuleAudits = getRuleSetRuleAuditDao().findAllByRuleSet(ruleSetBean);
             for (RuleSetRuleAuditBean ruleSetRuleAuditBean : ruleSetRuleAudits) {

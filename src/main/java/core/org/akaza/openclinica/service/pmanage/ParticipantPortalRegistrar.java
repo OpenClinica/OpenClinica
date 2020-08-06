@@ -22,6 +22,9 @@ public class ParticipantPortalRegistrar {
     public static final String UNKNOWN = "unknown";
     public static final int PARTICIPATE_READ_TIMEOUT = 5000;
 
+    //NOTE: This method is called in SystemController which seems to be tied to all of the OC3 modules. This can likely
+    // be removed if we clean up the SystemController class and make sure it is no longer active.
+    @Deprecated
     public Authorization getAuthorization(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
@@ -40,153 +43,14 @@ public class ParticipantPortalRegistrar {
         return null;
     }
 
-    public String getCachedRegistrationStatus(String studyOid, HttpSession session) throws Exception {
-        String regStatus = (String) session.getAttribute("pManageRegistrationStatus");
-        if (regStatus == null) {
-            regStatus = getRegistrationStatus(studyOid);
-            session.setAttribute("pManageRegistrationStatus", regStatus);
-        }
-        return regStatus;
-    }
-
+    @Deprecated
     public String getRegistrationStatus(String studyOid) throws Exception {
-        return loadRegistrationStatus(studyOid);
-    }
-
-    private String loadRegistrationStatus(String studyOid) {
-        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
-        try {
-            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
-            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
-                return response[0].getAuthorizationStatus().getStatus();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.debug(ExceptionUtils.getStackTrace(e));
-        }
-        return "";
-    }
-
-    public String getHostNameAvailability(String hostName) {
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/permit/studys/name?hostName=" + hostName;
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
-        String response = null;
-        try {
-            if (!validHostNameCheck(hostName))
-                return INVALID;
-            response = rest.getForObject(pManageUrl, String.class);
-            if (response.equals("UNAVAILABLE"))
-                return UNAVAILABLE;
-            else if (response.equals("INVALID"))
-                return INVALID;
-            else if (response.equals("AVAILABLE"))
-                return AVAILABLE;
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return UNKNOWN;
-    }
-
-    public boolean validHostNameCheck(String hostName) {
-        String pManageBaseUrl = CoreResources.getField("portalURL");
-        if (hostName.contains("."))
-            return false;
-        try {
-            URL baseUrl = new URL(pManageBaseUrl);
-            String port = "";
-            if (baseUrl.getPort() > 0)
-                port = ":" + String.valueOf(baseUrl.getPort());
-            // Check that hostname makes a valid URL
-            URL customerUrl = new URL(baseUrl.getProtocol() + "://" + hostName + "." + baseUrl.getHost() + port);
-            // Check that hostname only contains alphanumeric characters and/or hyphens
-            if (hostName.matches("^[A-Za-z0-9-]+$"))
-                return true;
-        } catch (MalformedURLException mue) {
-            logger.error("Error validating customer selected Participate subdomain.");
-            logger.error(mue.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(mue));
-        }
-        return false;
-    }
-
-    public String registerStudy(String studyOid) {
-        return registerStudy(studyOid, null, null);
-    }
-
-    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO, String hostname) {
-    	String host = hostname.substring(0,hostname.indexOf("/#/login"));
-       	String pManageUrl =host + "/app/rest/oc/email";
-
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
-
-        try {
-            ParticipantDTO response = rest.postForObject(pManageUrl, participantDTO, ParticipantDTO.class);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return "";
-    }
-
-    public String registerStudy(String studyOid, String hostName, String studyName) {
-        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        Authorization authRequest = new Authorization();
-        Study authStudy = new Study();
-        authStudy.setStudyOid(studyOid);
-        authStudy.setInstanceUrl(ocUrl);
-        authStudy.setHost(hostName);
-        authStudy.setStudyName(studyName);
-        authStudy.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
-        authRequest.setStudy(authStudy);
-
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
-
-        try {
-            Authorization response = rest.postForObject(pManageUrl, authRequest, Authorization.class);
-            if (response != null && response.getAuthorizationStatus() != null)
-                return response.getAuthorizationStatus().getStatus();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return "";
-    }
-
-    public String getStudyHost(String studyOid) throws Exception {
-
-        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String pManageUrl = CoreResources.getField("portalURL");
-        String pManageUrlFull = pManageUrl + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
-        try {
-            Authorization[] response = rest.getForObject(pManageUrlFull, Authorization[].class);
-            if (response.length > 0 && response[0].getStudy() != null && response[0].getStudy().getHost() != null
-                    && !response[0].getStudy().getHost().equals("")) {
-                URL url = new URL(pManageUrl);
-                String port = "";
-                if (url.getPort() > 0)
-                    port = ":" + String.valueOf(url.getPort());
-                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/#/login";
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return "";
+        //NOTE: This method previously returned the status of the OC3 participate module as derived from the OCUI admin panel.
+        // This is different than the module status as stored in the database table "StudyParameterValue".
+        // Given all active functionality in OC4 no longer references this I am having this method return INACTIVE.
+        // The methods controllers and services still referencing this method are likely deprecated however removing them entirely
+        // would require a further look as there may be some fringe parts of the system that still reference this code.
+        return "INACTIVE";
     }
 
 }
