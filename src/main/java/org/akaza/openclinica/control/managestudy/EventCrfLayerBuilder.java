@@ -74,6 +74,7 @@ public class EventCrfLayerBuilder {
     String buid() {
         if (eventCrfBean == null) {
             eventCrfBean = new EventCRFBean(EventCrfWorkflowStatusEnum.NOT_STARTED);
+            formLayoutBean = new FormLayoutBean();
         }
 
         buildLock();
@@ -294,8 +295,7 @@ public class EventCrfLayerBuilder {
 
                 if (getStudyEvent() != null && !currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE
                         && !getStudyEvent().isLocked() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
-                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                        && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
