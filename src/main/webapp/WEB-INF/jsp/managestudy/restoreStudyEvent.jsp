@@ -81,7 +81,6 @@
 		<td class="table_header_row"><fmt:message key="date_interviewed" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
-		<td class="table_header_row"><fmt:message key="completion_status" bundle="${resword}"/></td>	
 		<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>	
 	 </tr>
  <c:forEach var="dec" items="${displayEvent.displayEventCRFs}">
@@ -91,8 +90,7 @@
 		<td class="table_cell"><fmt:formatDate value="${dec.eventCRF.dateInterviewed}" pattern="${dteFormat}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.interviewerName}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" /></td>
-		<td class="table_cell"><c:out value="${dec.stage.name}" /></td>	
-		<td class="table_cell"><c:out value="${dec.eventCRF.status.name}" /></td>	
+		<td class="table_cell"><c:out value="${dec.eventCRF.workflowStatus.getDisplayValue()}" /></td>
 	 </tr>
  </c:forEach> 
  
