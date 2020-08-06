@@ -91,8 +91,8 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
             }else{
                 html.a().id("showMore").style("display: none;").style("text-decoration: none").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
                 html.div().close().nbsp().append(resword.getString("show_more")).nbsp().divEnd().aEnd();
-                html.a().id("hide").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().style("text-decoration: none").append(resword.getString("hide")).nbsp().divEnd().aEnd();
+                html.a().id("hide").style("text-decoration: none").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append(resword.getString("hide")).nbsp().divEnd().aEnd();
             }
 
             return html.toString();
