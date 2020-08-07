@@ -89,33 +89,30 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // NUMERIC DATE DATE NUMERIC
         // NUMERIC DATE DATE NUMERIC
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.STRING);
+        this.setTypeExpected(1, TypeNames.INT);  // study_event_id
+        this.setTypeExpected(2, TypeNames.INT);  // study_event_defn_id
+        this.setTypeExpected(3, TypeNames.INT);  // study-subject_id
+        this.setTypeExpected(4, TypeNames.STRING);  //location
 
-        this.setTypeExpected(5, TypeNames.INT);
+        this.setTypeExpected(5, TypeNames.INT);   //sample_ordinal
         this.setTypeExpected(6, TypeNames.TIMESTAMP); // YW 08-17-2007,
         // date_start
         this.setTypeExpected(7, TypeNames.TIMESTAMP); // YW 08-17-2007,
         // date_end
-        this.setTypeExpected(8, TypeNames.INT);
+        this.setTypeExpected(8, TypeNames.INT);  //owner_id
 
-        this.setTypeExpected(9, TypeNames.INT);
-        this.setTypeExpected(10, TypeNames.DATE);
-        this.setTypeExpected(11, TypeNames.DATE);
-        this.setTypeExpected(12, TypeNames.INT);
-        this.setTypeExpected(13, TypeNames.INT);
-        // YW 08-17-2007 <<
-        this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
-        this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
+        this.setTypeExpected(9, TypeNames.DATE);   // date_created
+        this.setTypeExpected(10, TypeNames.DATE);  // date-ended
+        this.setTypeExpected(11, TypeNames.INT);  // update id
+        this.setTypeExpected(12, TypeNames.BOOL); // start_time_flag
+        this.setTypeExpected(13, TypeNames.BOOL); // end_time_flag
         // YW >>
-        this.setTypeExpected(16, TypeNames.STRING); // attestation
-        this.setTypeExpected(17, TypeNames.STRING);// workflow_status
-        this.setTypeExpected(18, TypeNames.BOOL);// removed
-        this.setTypeExpected(19, TypeNames.BOOL);// archived
-        this.setTypeExpected(20, TypeNames.BOOL);// locked
-        this.setTypeExpected(21, TypeNames.BOOL);// signed
+        this.setTypeExpected(14, TypeNames.STRING); // attestation
+        this.setTypeExpected(15, TypeNames.STRING);// workflow_status
+        this.setTypeExpected(16, TypeNames.BOOL);// removed
+        this.setTypeExpected(17, TypeNames.BOOL);// archived
+        this.setTypeExpected(18, TypeNames.BOOL);// locked
+        this.setTypeExpected(19, TypeNames.BOOL);// signed
 
     }
 
@@ -124,28 +121,9 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // NUMERIC DATE DATE NUMERIC
         // NUMERIC DATE DATE NUMERIC
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.STRING);
-
-        this.setTypeExpected(5, TypeNames.INT);
-        this.setTypeExpected(6, TypeNames.TIMESTAMP); // YW 08-17-2007,
-        // date_start
-        this.setTypeExpected(7, TypeNames.TIMESTAMP); // YW 08-17-2007,
-        // date_end
-        this.setTypeExpected(8, TypeNames.INT);
-
-        this.setTypeExpected(9, TypeNames.INT);
-        this.setTypeExpected(10, TypeNames.DATE);
-        this.setTypeExpected(11, TypeNames.DATE);
-        this.setTypeExpected(12, TypeNames.INT);
-        this.setTypeExpected(13, TypeNames.INT);
-        // YW 08-17-2007 <<
-        this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
-        this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
+        this.setTypesExpected();
         if (withSubject) {
-            this.setTypeExpected(16, TypeNames.STRING);
+            this.setTypeExpected(22, TypeNames.STRING);
         }
         // YW >>
     }
@@ -174,7 +152,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      */
     public Object getEntityFromHashMap(HashMap hm) {
         StudyEventBean eb = new StudyEventBean();
-        super.setEntityAuditInformation(eb, hm);
+        super.setEntityAuditInformationWithoutStatus(eb, hm);
         // STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID LOCATION
         // SAMPLE_ORDINAL DATE_START DATE_END OWNER_ID
         // STATUS_ID DATE_CREATED DATE_UPDATED UPDATE_ID
@@ -215,7 +193,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      */
     public Object getEntityFromHashMap(HashMap hm, boolean withSubject) {
         StudyEventBean eb = new StudyEventBean();
-        super.setEntityAuditInformation(eb, hm);
+        super.setEntityAuditInformationWithoutStatus(eb, hm);
         // STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID LOCATION
         // SAMPLE_ORDINAL DATE_START DATE_END OWNER_ID
         // STATUS_ID DATE_CREATED DATE_UPDATED UPDATE_ID
@@ -227,7 +205,6 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         eb.setDateStarted((Date) hm.get("date_start"));
         eb.setDateEnded((Date) hm.get("date_end"));
         // eb.setStatus(eb.getStatus());
-        int subjectEventStatuId = ((Integer) hm.get("subject_event_status_id")).intValue();
         String workflow = (String) hm.get("workflow_status");
         if (!StringUtils.isEmpty(workflow)) {
             eb.setWorkflowStatus((StudyEventWorkflowStatusEnum) StudyEventWorkflowStatusEnum.valueOf(workflow));
@@ -540,10 +517,9 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
         }
         variables.put(Integer.valueOf(7), Integer.valueOf(sb.getOwner().getId()));
-        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getStatus().getId()));
-        variables.put(Integer.valueOf(9), sb.getStartTimeFlag());
-        variables.put(Integer.valueOf(10), sb.getEndTimeFlag());
-        variables.put(Integer.valueOf(11), sb.getWorkflowStatus().toString());
+        variables.put(Integer.valueOf(8), sb.getStartTimeFlag());
+        variables.put(Integer.valueOf(9), sb.getEndTimeFlag());
+        variables.put(Integer.valueOf(10), sb.getWorkflowStatus().toString());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -607,53 +583,47 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         } else {
             variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
         }
-        if (sb.getStatus().getId() > 0) {
-            variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
-        }
-        else {
-            variables.put(Integer.valueOf(7), null);
-            nullVars.put(new Integer(7), new Integer(Types.INTEGER));
-        }
+
         // changing date_updated from java.util.Date() into postgres now() statement
         // variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
-        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getUpdater().getId()));
-        variables.put(Integer.valueOf(9), sb.getStartTimeFlag()); // YW
+        variables.put(Integer.valueOf(7), Integer.valueOf(sb.getUpdater().getId()));
+        variables.put(Integer.valueOf(8), sb.getStartTimeFlag()); // YW
         // 08-17-2007,
         // start_time_flag
-        variables.put(Integer.valueOf(10), sb.getEndTimeFlag()); // YW
+        variables.put(Integer.valueOf(9), sb.getEndTimeFlag()); // YW
         // 08-17-2007,
         // end_time_flag
-        variables.put(Integer.valueOf(11), sb.getAttestation()); // YW
+        variables.put(Integer.valueOf(10), sb.getAttestation()); // YW
 
-        variables.put(new Integer(12), sb.getWorkflowStatus().toString());
+        variables.put(new Integer(11), sb.getWorkflowStatus().toString());
 
         if (sb.getRemoved() == null) {
+            nullVars.put(new Integer(12), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(12), null);
+        } else {
+            variables.put(new Integer(12), sb.getRemoved());
+        }
+        if (sb.getArchived() == null) {
             nullVars.put(new Integer(13), new Integer(Types.BOOLEAN));
             variables.put(new Integer(13), null);
         } else {
-            variables.put(new Integer(13), sb.getRemoved());
-        }
-        if (sb.getArchived() == null) {
-            nullVars.put(new Integer(14), new Integer(Types.BOOLEAN));
-            variables.put(new Integer(14), null);
-        } else {
-            variables.put(new Integer(14), sb.getArchived());
+            variables.put(new Integer(13), sb.getArchived());
         }
 
         if (sb.getLocked() == null) {
+            nullVars.put(new Integer(14), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(14), null);
+        } else {
+            variables.put(new Integer(14), sb.getLocked());
+        }
+        if (sb.getSigned() == null) {
             nullVars.put(new Integer(15), new Integer(Types.BOOLEAN));
             variables.put(new Integer(15), null);
         } else {
-            variables.put(new Integer(15), sb.getLocked());
-        }
-        if (sb.getSigned() == null) {
-            nullVars.put(new Integer(16), new Integer(Types.BOOLEAN));
-            variables.put(new Integer(16), null);
-        } else {
-            variables.put(new Integer(16), sb.getSigned());
+            variables.put(new Integer(15), sb.getSigned());
         }
 
-        variables.put(Integer.valueOf(17), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(16), Integer.valueOf(sb.getId()));
 
         String sql = digester.getQuery("update");
         if (con == null) {

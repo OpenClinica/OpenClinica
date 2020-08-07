@@ -98,7 +98,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String US_PHONE_PREFIX = "+1 ";
 	public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
 
-
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
 
         logger.info("Executing FSItem Processor.");
@@ -405,8 +404,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             isStudySubjectUpdated = false;
 
         if(isStudySubjectUpdated){
-            if(studySubject.getUserStatus() == null) // User status should be set to ContactInfo Entered as this point
-                studySubject.setUserStatus(UserStatus.INVALID);
+            if(studySubject.getUserStatus() == null || studySubject.getUserStatus().equals(UserStatus.INVALID)) // User status should be set to ContactInfo Entered at this point
+                studySubject.setUserStatus(UserStatus.CONTACT_INFO_ENTERED);
             studySubjectDao.saveOrUpdate(studySubject);
         }
     }

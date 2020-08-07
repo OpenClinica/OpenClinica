@@ -179,8 +179,7 @@ public class DeleteEventCRFServlet extends SecureController {
                 // getDynamicsItemFormMetadataDao().delete(eventCRFId);
                 // getDynamicsItemGroupMetadataDao().delete(eventCRFId);
 
-                eventCRF.setOldStatus(eventCRF.getStatus());
-                eventCRF.setStatus(Status.RESET);
+                eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
                 eventCRF.setUpdater(ub);
                 eventCRF.setDateCompleted(null);
                 eventCRFDAO.update(eventCRF);
@@ -227,7 +226,6 @@ public class DeleteEventCRFServlet extends SecureController {
 
                 }
                 // OC-6291 event_crf status change
-                eventCRF.setOldStatus(eventCRF.getStatus());
                 eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
                 eventCRF.setUpdater(ub);
                 eventCRF.setDateCompleted(null);

@@ -499,7 +499,7 @@
                     }
 
                     item.lastVerifiedDate = data.lastVerifiedDate;
-                    if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
+                    if (item.sdvStatus == 'CHANGED_SINCE_VERIFIED') {
                         item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16" title="<fmt:message key="value_changed_since_last_verified" bundle="${resword}"/>">';
                     }
                     if (item.lastVerifiedDate) {
@@ -577,21 +577,28 @@
         setTimeout(setPopupPos, 1);
     });
 
-    var sdvTableHeaders = $('#sdv > thead').children();
-    var sdvtColumnTitles = sdvTableHeaders.filter('.header').children();
-    var sdvtFilterBoxes = sdvTableHeaders.filter('.filter').children();
+    function adjustFilterTexOverflow() {
+        limitFilterWidth('110px', 'SDV Status');
+        limitFilterWidth('110px', 'SDV Requirement');
+        limitFilterWidth('120px', 'CRF Status');
+    }
 
     function limitFilterWidth(width, columnTitle) {
+        var sdvTableHeaders = $('#sdv > thead').children();
+        var sdvtColumnTitles = sdvTableHeaders.filter('.header').children();
+        var sdvtFilterBoxes = sdvTableHeaders.filter('.filter').children();
         var colIndex = sdvtColumnTitles.find(':contains(' + columnTitle + ')').closest('td').index();
         var theFilterBox = sdvtFilterBoxes.eq(colIndex).children();
+        if(theFilterBox.children().length > 0){
+                   theFilterBox.children().contents().unwrap();
+        }
         theFilterBox.wrapInner('<div style="width:' + width + '; overflow:hidden; text-overflow:ellipsis;">');
         theFilterBox.attr('title', theFilterBox.text());
     }
-
-    limitFilterWidth('110px', 'SDV Status');
-    limitFilterWidth('110px', 'SDV Requirement');
-    limitFilterWidth('120px', 'CRF Status');
-
+    adjustFilterTexOverflow();
+    $('.dynFilter').mouseleave(function () {
+        adjustFilterTexOverflow();
+    });
 
     $(window).resize(setPopupPos);
 

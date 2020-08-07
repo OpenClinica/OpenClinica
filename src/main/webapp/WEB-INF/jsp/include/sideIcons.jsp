@@ -57,7 +57,7 @@
             </tr>
             <tr>
                 <td>&nbsp;<span class="icon icon-file-excel red"></span></td>
-                <td><fmt:message key="invalid" bundle="${reswords}"/></td>
+                <td><fmt:message key="status_removed" bundle="${reswords}"/></td>
             </tr>
             <tr>
                 <td><fmt:message key="actions" bundle="${reswords}"/></td>

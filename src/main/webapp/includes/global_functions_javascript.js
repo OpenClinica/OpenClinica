@@ -1540,6 +1540,12 @@ function LockObject( obj, e ) {
 
 
 function moveObject( obj, e ) {
+    // if it's already shown, close it
+    var o = getObject(obj);
+    if (o.style.visibility === 'visible') {
+        o.style.visibility = 'hidden';
+        return;
+    }
 
     // step 1
     var tempX = 0;
@@ -1600,7 +1606,7 @@ function hideObjects( obj ) {
         } else {
                 getObject( prevObject ).querySelector( 'a' ).click();
                 // make sure the options show up correctly
-                setTimeout(()=> {
+                setTimeout(function() {
                     const menuOn = getObject( obj.replace('Lock', 'Menu_on').replace('Event', 'Menu_on') );
                     const menuOff = getObject( obj.replace('Lock', 'Menu_off').replace('Event', 'Menu_off') );
                     if ( menuOn && menuOn.style.display === "none" ) {

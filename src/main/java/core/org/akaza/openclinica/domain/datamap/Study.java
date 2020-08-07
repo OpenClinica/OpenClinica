@@ -110,7 +110,7 @@ public class Study extends DataMapDomainObject {
     private int subjectCount;
     private String boardUrl;
     
-    @Column(name = "study_env_uuid", unique = false, nullable = false)
+    @Column(name = "study_env_uuid", unique = false)
     public String getStudyEnvUuid() {
         return studyEnvUuid;
     }
@@ -241,7 +241,7 @@ public class Study extends DataMapDomainObject {
     // this.studyType = studyType;
     // }
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_study_id")
 	public Study getStudy() {
 		return this.study;

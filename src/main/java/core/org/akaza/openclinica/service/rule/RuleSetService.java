@@ -434,48 +434,18 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     }
 
-    /*
-     * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
-     */
-    /*
-     * (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByStudy(org.akaza.openclinica.bean.managestudy.Study)
-     */
-    public List<RuleSetBean> getRuleSetsByStudy(Study study) {
-        logger.debug(" Study Id {} ", study.getStudyId());
-        List<RuleSetBean> ruleSets = getRuleSetDao().findAllByStudy(study);
-        for (RuleSetBean ruleSetBean : ruleSets) {
-            getObjects(ruleSetBean);
-        }
-        logger.info("getRuleSetsByStudy() : ruleSets Size : {}", ruleSets.size());
-        return ruleSets;
-        // return eagerFetchRuleSet(ruleSets);
-    }
-
     // . TODO: why are we including study but not using it in query
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetById(org.akaza.openclinica.bean.managestudy.StudyBean, java.lang.String)
      */
-    public RuleSetBean getRuleSetById(Study study, String id) {
-        logger.debug(" Study Id {} ", study.getStudyId());
+    public RuleSetBean getRuleSetById(String id) {
         RuleSetBean ruleSetBean = getRuleSetDao().findById(Integer.valueOf(id));
         if (ruleSetBean != null) {
             getObjects(ruleSetBean);
         }
         return ruleSetBean;
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetById(org.akaza.openclinica.bean.managestudy.StudyBean, java.lang.String,
-     * org.akaza.openclinica.domain.rule.RuleBean)
-     */
-    public List<RuleSetRuleBean> getRuleSetById(Study study, String id, RuleBean ruleBean) {
-        logger.debug(" Study Id {} ", study.getStudyId());
-        RuleSetBean ruleSetBean = getRuleSetDao().findById(Integer.valueOf(id));
-        return getRuleSetRuleDao().findByRuleSetBeanAndRuleBean(ruleSetBean, ruleBean);
     }
 
     /*
@@ -538,20 +508,6 @@ public class RuleSetService implements RuleSetServiceInterface {
         ExpressionBean expression = new ExpressionBean(targetExpression.getContext(), fullExpressionValue);
         expression.setValue(getExpressionService().replaceStudyEventDefinitionOIDWith(fullExpressionValue, String.valueOf(studyEvent.getId())));
         return expression;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterByStatusEqualsAvailableOnlyRuleSetRules(java.util.List)
-     */
-    public List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets) {
-        for (RuleSetBean ruleSet : ruleSets) {
-            for (Iterator<RuleSetRuleBean> i = ruleSet.getRuleSetRules().iterator(); i.hasNext();)
-                if (i.next().getStatus() != core.org.akaza.openclinica.domain.Status.AVAILABLE) {
-                    i.remove();
-                }
-        }
-        return ruleSets;
     }
 
     /*

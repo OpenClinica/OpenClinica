@@ -32,7 +32,6 @@ public class EventCrf extends DataMapDomainObject {
     private StudySubject studySubject;
     private CrfVersion crfVersion;
     private FormLayout formLayout;
-    private Integer statusId;
     private Date dateInterviewed;
     private String interviewerName;
     private String annotations;
@@ -48,7 +47,6 @@ public class EventCrf extends DataMapDomainObject {
     private Boolean electronicSignatureStatus;
 //    private boolean sdvStatus;
     private SdvStatus sdvStatus;
-    private Integer oldStatusId;
     private Integer sdvUpdateId;
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
@@ -75,9 +73,9 @@ public class EventCrf extends DataMapDomainObject {
     }
 
     public EventCrf(int eventCrfId, UserAccount userAccount, CompletionStatus completionStatus, StudyEvent studyEvent, StudySubject studySubject,
-            CrfVersion crfVersion, Integer statusId, Date dateInterviewed, String interviewerName, String annotations, Date dateCompleted, Integer validatorId,
+            CrfVersion crfVersion, Date dateInterviewed, String interviewerName, String annotations, Date dateCompleted, Integer validatorId,
             Date dateValidate, Date dateValidateCompleted, String validatorAnnotations, String validateString, Date dateCreated, Date dateUpdated,
-            Integer updateId, Boolean electronicSignatureStatus, SdvStatus sdvStatus, Integer oldStatusId, Integer sdvUpdateId,
+            Integer updateId, Boolean electronicSignatureStatus, SdvStatus sdvStatus,  Integer sdvUpdateId,
             List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout, Date lastSdvVerifiedDate ) {
         this.eventCrfId = eventCrfId;
         this.userAccount = userAccount;
@@ -85,7 +83,6 @@ public class EventCrf extends DataMapDomainObject {
         this.studyEvent = studyEvent;
         this.studySubject = studySubject;
         this.crfVersion = crfVersion;
-        this.statusId = statusId;
         this.dateInterviewed = dateInterviewed;
         this.interviewerName = interviewerName;
         this.annotations = annotations;
@@ -100,7 +97,6 @@ public class EventCrf extends DataMapDomainObject {
         this.updateId = updateId;
         this.electronicSignatureStatus = electronicSignatureStatus;
         this.sdvStatus = sdvStatus;
-        this.oldStatusId = oldStatusId;
         this.sdvUpdateId = sdvUpdateId;
         this.dnEventCrfMaps = dnEventCrfMaps;
         this.itemDatas = itemDatas;
@@ -169,18 +165,6 @@ public class EventCrf extends DataMapDomainObject {
 
     public void setCrfVersion(CrfVersion crfVersion) {
         this.crfVersion = crfVersion;
-    }
-
-    @Column(name = "status_id")
-    public Integer getStatusId() {
-        if (statusId != null) {
-            return statusId;
-        } else
-            return Status.AVAILABLE.getCode();
-    }
-
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
     }
 
     @Temporal(TemporalType.DATE)
@@ -307,22 +291,13 @@ public class EventCrf extends DataMapDomainObject {
     }
 
     @Enumerated( EnumType.STRING )
-    @Column(name = "sdv_status", nullable = false)
+    @Column(name = "sdv_status")
     public SdvStatus getSdvStatus() {
         return this.sdvStatus;
     }
 
     public void setSdvStatus(SdvStatus sdvStatus) {
         this.sdvStatus = sdvStatus;
-    }
-
-    @Column(name = "old_status_id")
-    public Integer getOldStatusId() {
-        return this.oldStatusId;
-    }
-
-    public void setOldStatusId(Integer oldStatusId) {
-        this.oldStatusId = oldStatusId;
     }
 
     @Column(name = "sdv_update_id")
@@ -453,4 +428,10 @@ public class EventCrf extends DataMapDomainObject {
     public boolean isCurrentlyArchived() {
         return BooleanUtils.isTrue(this.getArchived());
     }
+
+    @Transient
+    public boolean isAvailable(){
+        return (!isCurrentlyRemoved() && !isCurrentlyArchived());
+    }
   }
+

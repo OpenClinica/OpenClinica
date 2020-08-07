@@ -20,7 +20,9 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-        <fmt:message key="confirm_restore_of_this_event_to_Study"  bundle="${resword}"/> <c:out value="${study.name}"/>. <fmt:message key="the_event_and_all_data_associated_with_it"  bundle="${resword}"/>
+            <fmt:message key="confirm_restore_of_this_event_to_Study"  bundle="${resword}"/>
+            <br><br>
+            <fmt:message key="if_signed_will_invalidate"  bundle="${resword}"/>
 		</div>
 
 		</td>
@@ -79,7 +81,6 @@
 		<td class="table_header_row"><fmt:message key="date_interviewed" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
 		<td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
-		<td class="table_header_row"><fmt:message key="completion_status" bundle="${resword}"/></td>	
 		<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>	
 	 </tr>
  <c:forEach var="dec" items="${displayEvent.displayEventCRFs}">
@@ -89,8 +90,7 @@
 		<td class="table_cell"><fmt:formatDate value="${dec.eventCRF.dateInterviewed}" pattern="${dteFormat}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.interviewerName}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" /></td>
-		<td class="table_cell"><c:out value="${dec.stage.name}" /></td>	
-		<td class="table_cell"><c:out value="${dec.eventCRF.status.name}" /></td>	
+		<td class="table_cell"><c:out value="${dec.eventCRF.workflowStatus.getDisplayValue()}" /></td>
 	 </tr>
  </c:forEach> 
  

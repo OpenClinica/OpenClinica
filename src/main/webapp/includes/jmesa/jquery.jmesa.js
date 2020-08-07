@@ -417,7 +417,7 @@
             var originalValue = cell.text();
             var width = cell.width();
 
-            /* Need to first get the size of the arrary. */
+            /* Need to first get the size of the array. */
             var size = 1;
             $.each(options, function() {
                 size++;

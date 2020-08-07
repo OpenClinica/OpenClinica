@@ -222,10 +222,10 @@
     padding-top: 0;
   }
   .expanded > .section-header::after {
-    content: "\e92a";
+    content: "\e92b";
   }
   .collapsed > .section-header::after {
-    content: "\e92b";
+    content: "\e92c";
   }
   #reset-all-filters {
     margin-left: 30px;
@@ -1750,11 +1750,12 @@
 
         var status = participateInfo.status;
         if (status) {
-            if(status == "INVALID") {
+            if(status == "CONTACT_INFO_ENTERED")
                 $('#info-participate-status').text("Contact Info Entered");
-            }
-            else {
+            else
                 $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
+
+            if(status !="INVALID" && status != "CONTACT_INFO_ENTERED"){
                 $('#view-access-link').show();
                 $('tr.reset-participant-access-code').show();
             }

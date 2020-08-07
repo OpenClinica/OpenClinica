@@ -85,11 +85,6 @@ public interface RuleSetServiceInterface {
 
     public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(Study study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
 
-    /*
-     * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
-     */
-    public abstract List<RuleSetBean> getRuleSetsByStudy(Study study);
-
     public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
 
     public int getCountByStudy(Study study);
@@ -98,13 +93,9 @@ public interface RuleSetServiceInterface {
             int rowStart, int rowEnd);
 
     // . TODO: why are we including study but not using it in query
-    public abstract RuleSetBean getRuleSetById(Study study, String id);
-
-    public abstract List<RuleSetRuleBean> getRuleSetById(Study study, String id, RuleBean ruleBean);
+    public abstract RuleSetBean getRuleSetById(String id);
 
     public abstract List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, Study study);
-
-    public abstract List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets);
 
     public abstract List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets);
 

@@ -473,20 +473,9 @@ public class EnketoUrlService {
         String instance = wtr.toString();
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
         if (studyEvent.isCurrentlySigned()) {
-            AuditLogEvent auditLogEvent = new AuditLogEvent();
-            auditLogEvent.setAuditTable(STUDYEVENT);
-            auditLogEvent.setEntityId(studyEvent.getStudyEventId());
-            auditLogEvent.setEntityName("Signed");
-            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            auditLogEvent.setNewValue(studyEvent.getSigned().toString());
-
-            List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
-            for (AuditLogEvent audit : ales) {
-                String signature = audit.getDetails();
-                instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
-                        + instance.substring(instance.indexOf("</meta>"));
-                break;
-            }
+            String signature = studyEvent.getAttestation();
+            instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
+                    + instance.substring(instance.indexOf("</meta>"));
         }
         logger.debug(instance);
         return instance;
@@ -599,7 +588,6 @@ public class EnketoUrlService {
         eventCrf.setValidateString("");
         eventCrf.setValidatorAnnotations("");
         eventCrf.setValidatorId(0);
-        eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);

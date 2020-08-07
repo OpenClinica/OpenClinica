@@ -102,14 +102,6 @@
     </query>
 
     <query>
-        <name>getEventCRFsByStudySubjectCompleteOrLocked</name>
-        <sql>select ec.* from event_crf ec
-             where
-             (ec.status_id = 2 or ec.status_id = 6) AND
-             ec.study_subject_id = ? </sql>
-    </query>
-
-    <query>
         <name>getEventCRFsByStudySubjectLimit</name>
         <sql>select ec.* from event_crf ec,  study_subject ss
             where  ss.study_subject_id = ? AND
@@ -213,6 +205,8 @@
             crf.crf_id = cv.crf_id AND edc.crf_id = crf.crf_id AND cv.crf_version_id = ec.crf_version_id AND
             edc.source_data_verification_code != 4 AND edc.study_event_definition_id = sed.study_event_definition_id AND
             (ec.workflow_status='COMPLETED') AND
+            (ec.removed is null or ec.removed = false ) AND (ec.archived is null or ec.archived = false ) AND
+            (se.removed is null or se.removed = false ) AND (se.archived is null or se.archived = false ) AND
             (ss.study_id = ? or ss.study_id in (select study_id from study where parent_study_id = ?))
             AND (
 	        ( s.parent_study_id = edc.study_id 
@@ -333,10 +327,10 @@
     <query>
         <name>create</name>
         <sql>INSERT INTO EVENT_CRF (STUDY_EVENT_ID, CRF_VERSION_ID,
-            DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID, STATUS_ID,
+            DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID,
             ANNOTATIONS, OWNER_ID,
             DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS,Form_Layout_Id)
-            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
+            VALUES (?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
     </query>
     <query>
         <name>update</name>
@@ -347,7 +341,6 @@
             , DATE_INTERVIEWED=?
             , INTERVIEWER_NAME=?
             , COMPLETION_STATUS_ID=?
-            , STATUS_ID=?
             , ANNOTATIONS=?
             , DATE_COMPLETED=?
             , VALIDATOR_ID=?
@@ -360,7 +353,6 @@
             , UPDATE_ID=?
             , ELECTRONIC_SIGNATURE_STATUS=?
             , SDV_STATUS=?
-            , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
             , FORM_LAYOUT_ID=?
             , WORKFLOW_STATUS=?

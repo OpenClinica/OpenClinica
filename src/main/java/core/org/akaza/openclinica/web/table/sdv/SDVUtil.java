@@ -1345,6 +1345,7 @@ public class SDVUtil {
 
     }
 
+    //This function won't work properly, need to be removed soon
     public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, SdvStatus sdvStatus) {
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1356,7 +1357,8 @@ public class SDVUtil {
         }
 
         for (Integer studySubjectId : studySubjectIds) {
-            ArrayList<EventCRFBean> eventCrfs = eventCrfDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
+            //eventCrfDAO.getEventCRFsByStudySubjectCompleteOrLocked() is removed as part of removing old eventCrf status
+            ArrayList<EventCRFBean> eventCrfs = new ArrayList<>();
             StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
             for (EventCRFBean eventCRFBean : eventCrfs) {
                 CRFBean crfBean = crfDAO.findByVersionId(eventCRFBean.getCRFVersionId());
@@ -1584,7 +1586,7 @@ public class SDVUtil {
     private SdvStatus getItemSdvStatus(EventCrf eventCrf, ItemData itemData) {
         if(eventCrf.getSdvStatus() == null)
             return SdvStatus.NOT_VERIFIED;
-        if (eventCrf.getSdvStatus().equals(SdvStatus.CHANGED_SINCE_VERIFIED)) {
+         if (eventCrf.getSdvStatus().equals(SdvStatus.CHANGED_SINCE_VERIFIED) && eventCrf.getLastSdvVerifiedDate() != null) {
 
             Date lastUpdatedItemDate = eventCrf.getLastSdvVerifiedDate();
             if (isOnlyDateAvailableInItemTable(itemData)) {

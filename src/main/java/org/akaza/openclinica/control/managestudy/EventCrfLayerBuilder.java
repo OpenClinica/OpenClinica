@@ -32,6 +32,7 @@ public class EventCrfLayerBuilder {
     List<StudyEventBean> studyEvents;
     EventCrfWorkflowStatusEnum eventCrfWorkflowStatus;
     EventCRFBean eventCrfBean = null;
+    FormLayoutBean formLayoutBean;
     StudySubjectBean studySubject;
     Study currentStudy;
     StudyUserRoleBean currentRole;
@@ -45,7 +46,7 @@ public class EventCrfLayerBuilder {
     StudyDao studyDao;
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, EventCrfWorkflowStatusEnum eventCrfWorkflowStatus,
-                                EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
+                                EventCRFBean eventCrfBean, FormLayoutBean formLayoutBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
                                 EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath, StudyDao studyDao) {
         super();
         this.html = new HtmlBuilder();
@@ -63,6 +64,7 @@ public class EventCrfLayerBuilder {
         this.studyEventDefinition = studyEventDefinition;
         this.contextPath = contextPath;
         this.studyDao = studyDao;
+        this.formLayoutBean = formLayoutBean;
     }
 
     StudyEventBean getStudyEvent() {
@@ -72,6 +74,7 @@ public class EventCrfLayerBuilder {
     String buid() {
         if (eventCrfBean == null) {
             eventCrfBean = new EventCRFBean(EventCrfWorkflowStatusEnum.NOT_STARTED);
+            formLayoutBean = new FormLayoutBean();
         }
 
         buildLock();
@@ -130,7 +133,9 @@ public class EventCrfLayerBuilder {
         html.append(subjectText).append(": ").append(studySubjectLabel).br();
         html.append(crfText).append(": ").append(crf.getName()).br();
         String statusText = eventCrfWorkflowStatus.getDisplayValue();
-        if (eventCrfBean.isRemoved()) {
+        // AC2: If a Form has status Removed = Yes or the event the form is in has status Removed = Yes,
+        // then "removed" will be displayed instead of the form workflow status for that form.
+        if (eventCrfBean.isRemoved() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
             statusText = removedText.toLowerCase();
         }
         html.append("Status").append(": ").append(statusText).br();
@@ -148,7 +153,7 @@ public class EventCrfLayerBuilder {
         }
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
@@ -202,7 +207,7 @@ public class EventCrfLayerBuilder {
         Study subjectStudy = studyDao.findByPK(studySubject.getStudyId());
 
 
-        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
 
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -212,8 +217,10 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED && studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED
-                    && !currentRole.isMonitor() && !getStudyEvent().isLocked()) {
+            if (studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED
+                    && studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED
+                    && !currentRole.isMonitor() && !getStudyEvent().isLocked()
+                    && (getStudyEvent() != null && !getStudyEvent().isRemoved())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 restoreEventCrf(html, eventCrfBean, studySubject);
@@ -238,7 +245,8 @@ public class EventCrfLayerBuilder {
             // currentUser.isSysAdmin())) {
             if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
                 if (!hiddenCrf() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED ) {
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
+                        && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -307,7 +315,8 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
+            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()
+                    && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();

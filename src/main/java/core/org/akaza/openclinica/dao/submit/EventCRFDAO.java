@@ -89,34 +89,32 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
     @Override
     public void setTypesExpected() {
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.DATE);
-        this.setTypeExpected(5, TypeNames.STRING);
-        this.setTypeExpected(6, TypeNames.INT);
-        this.setTypeExpected(7, TypeNames.INT);
-        this.setTypeExpected(8, TypeNames.STRING);// annotations
-        this.setTypeExpected(9, TypeNames.TIMESTAMP);// completed
-        this.setTypeExpected(10, TypeNames.INT);// validator id
-        this.setTypeExpected(11, TypeNames.DATE);// date validate
-        this.setTypeExpected(12, TypeNames.TIMESTAMP);// date val. completed
-        this.setTypeExpected(13, TypeNames.STRING);
-        this.setTypeExpected(14, TypeNames.STRING);
-        this.setTypeExpected(15, TypeNames.INT);// owner id
-        this.setTypeExpected(16, TypeNames.DATE);
-        this.setTypeExpected(17, TypeNames.INT);// subject id
-        this.setTypeExpected(18, TypeNames.DATE);// date updated
-        this.setTypeExpected(19, TypeNames.INT);// updater
-        this.setTypeExpected(20, TypeNames.BOOL);// electronic_signature_status
-        this.setTypeExpected(21, TypeNames.INT);// old_status
-        this.setTypeExpected(22, TypeNames.INT); // sdv_update_id
-        this.setTypeExpected(23, TypeNames.INT); // form_layout_id
-        this.setTypeExpected(24, TypeNames.STRING);// sdv_status
-        this.setTypeExpected(25, TypeNames.DATE);// date last sdv verified
-        this.setTypeExpected(26, TypeNames.STRING);// workflow
-        this.setTypeExpected(27, TypeNames.BOOL);// removed
-        this.setTypeExpected(28, TypeNames.BOOL);// archived
+        this.setTypeExpected(1, TypeNames.INT); // event_crf_id
+        this.setTypeExpected(2, TypeNames.INT);  //study_event-id
+        this.setTypeExpected(3, TypeNames.INT);  // crf_version_id
+        this.setTypeExpected(4, TypeNames.DATE); // date_interviewed
+        this.setTypeExpected(5, TypeNames.STRING); // interviewer name
+        this.setTypeExpected(6, TypeNames.INT);  //completion status_id
+        this.setTypeExpected(7, TypeNames.STRING);// annotations
+        this.setTypeExpected(8, TypeNames.TIMESTAMP);// completed
+        this.setTypeExpected(9, TypeNames.INT);// validator id
+        this.setTypeExpected(10, TypeNames.DATE);// date validate
+        this.setTypeExpected(11, TypeNames.TIMESTAMP);// date val. completed
+        this.setTypeExpected(12, TypeNames.STRING); //validator annotation
+        this.setTypeExpected(13, TypeNames.STRING); // validate
+        this.setTypeExpected(14, TypeNames.INT);// owner id
+        this.setTypeExpected(15, TypeNames.DATE); //date_created
+        this.setTypeExpected(16, TypeNames.INT);// study_subject id
+        this.setTypeExpected(17, TypeNames.DATE);// date updated
+        this.setTypeExpected(18, TypeNames.INT);// updater
+        this.setTypeExpected(19, TypeNames.BOOL);// electronic_signature_status
+        this.setTypeExpected(20, TypeNames.INT); // sdv_update_id
+        this.setTypeExpected(21, TypeNames.INT); // form_layout_id
+        this.setTypeExpected(22, TypeNames.STRING);// sdv_status
+        this.setTypeExpected(23, TypeNames.DATE);// date last sdv verified
+        this.setTypeExpected(24, TypeNames.STRING);// workflow
+        this.setTypeExpected(25, TypeNames.BOOL);// removed
+        this.setTypeExpected(26, TypeNames.BOOL);// archived
 
 
         // if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -142,69 +140,64 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }
         variables.put(new Integer(4), ecb.getInterviewerName());
         variables.put(new Integer(5), new Integer(ecb.getCompletionStatusId()));
-        variables.put(new Integer(6), new Integer(ecb.getStatus().getId()));
-        variables.put(new Integer(7), ecb.getAnnotations());
+        variables.put(new Integer(6), ecb.getAnnotations());
         if (ecb.getDateCompleted() == null) {
-            nullVars.put(new Integer(8), new Integer(Types.TIMESTAMP));
-            variables.put(new Integer(8), null);
+            nullVars.put(new Integer(7), new Integer(Types.TIMESTAMP));
+            variables.put(new Integer(7), null);
         } else {
-            variables.put(new Integer(8), new java.sql.Timestamp(ecb.getDateCompleted().getTime()));
+            variables.put(new Integer(7), new java.sql.Timestamp(ecb.getDateCompleted().getTime()));
         }
         // variables.put(new Integer(8),ecb.getDateCompleted());
 
-        variables.put(new Integer(9), new Integer(ecb.getValidatorId()));
+        variables.put(new Integer(8), new Integer(ecb.getValidatorId()));
 
         if (ecb.getDateValidate() == null) {
-            nullVars.put(new Integer(10), new Integer(Types.DATE));
-            variables.put(new Integer(10), null);
+            nullVars.put(new Integer(9), new Integer(Types.DATE));
+            variables.put(new Integer(9), null);
         } else {
-            variables.put(new Integer(10), ecb.getDateValidate());
+            variables.put(new Integer(9), ecb.getDateValidate());
         }
         // variables.put(new Integer(10),ecb.getDateValidate());
 
         if (ecb.getDateValidateCompleted() == null) {
-            nullVars.put(new Integer(11), new Integer(Types.TIMESTAMP));
-            variables.put(new Integer(11), null);
+            nullVars.put(new Integer(10), new Integer(Types.TIMESTAMP));
+            variables.put(new Integer(10), null);
         } else {
-            variables.put(new Integer(11), new Timestamp(ecb.getDateValidateCompleted().getTime()));
+            variables.put(new Integer(10), new Timestamp(ecb.getDateValidateCompleted().getTime()));
         }
         // variables.put(new Integer(11),ecb.getDateValidateCompleted());
-        variables.put(new Integer(12), ecb.getValidatorAnnotations());
-        variables.put(new Integer(13), ecb.getValidateString());
-        variables.put(new Integer(14), new Integer(ecb.getStudySubjectId()));
-        variables.put(new Integer(15), new Integer(ecb.getUpdaterId()));
-        variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
+        variables.put(new Integer(11), ecb.getValidatorAnnotations());
+        variables.put(new Integer(12), ecb.getValidateString());
+        variables.put(new Integer(13), new Integer(ecb.getStudySubjectId()));
+        variables.put(new Integer(14), new Integer(ecb.getUpdaterId()));
+        variables.put(new Integer(15), new Boolean(ecb.isElectronicSignatureStatus()));
         if(ecb.getSdvStatus() != null)
-            variables.put(new Integer(17), ecb.getSdvStatus().toString());
+            variables.put(new Integer(16), ecb.getSdvStatus().toString());
         else {
-            nullVars.put(new Integer(17), new Integer(Types.VARCHAR));
-            variables.put(new Integer(17), null);
+            nullVars.put(new Integer(16), new Integer(Types.VARCHAR));
+            variables.put(new Integer(16), null);
         }
-        if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
-            variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
-        } else {
-            variables.put(new Integer(18), new Integer(0));
-        }
+
         // @pgawade 22-May-2011 added the sdv updater id variable
-        variables.put(new Integer(19), ecb.getSdvUpdateId());
+        variables.put(new Integer(17), ecb.getSdvUpdateId());
         // variables.put(new Integer(19), new Integer(ecb.getId()));
-        variables.put(new Integer(20), new Integer(ecb.getFormLayoutId()));
-        variables.put(new Integer(21), ecb.getWorkflowStatus().toString());
+        variables.put(new Integer(18), new Integer(ecb.getFormLayoutId()));
+        variables.put(new Integer(19), ecb.getWorkflowStatus().toString());
 
         if (ecb.getRemoved() == null) {
-            nullVars.put(new Integer(22), new Integer(Types.BOOLEAN));
-            variables.put(new Integer(22), null);
+            nullVars.put(new Integer(20), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(20), null);
         } else {
-            variables.put(new Integer(22), ecb.getRemoved());
+            variables.put(new Integer(20), ecb.getRemoved());
         }
         if (ecb.getArchived() == null) {
-            nullVars.put(new Integer(23), new Integer(Types.BOOLEAN));
-            variables.put(new Integer(23), null);
+            nullVars.put(new Integer(21), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(21), null);
         } else {
-            variables.put(new Integer(23), ecb.getArchived());
+            variables.put(new Integer(21), ecb.getArchived());
         }
 
-        variables.put(new Integer(24), new Integer( ecb.getId()));
+        variables.put(new Integer(22), new Integer( ecb.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
 
         if (isQuerySuccessful()) {
@@ -243,13 +236,12 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(4), ecb.getInterviewerName());
 
         variables.put(new Integer(5), new Integer(ecb.getCompletionStatusId()));
-        variables.put(new Integer(6), new Integer(ecb.getStatus().getId()));
-        variables.put(new Integer(7), ecb.getAnnotations());
-        variables.put(new Integer(8), new Integer(ecb.getOwnerId()));
-        variables.put(new Integer(9), new Integer(ecb.getStudySubjectId()));
-        variables.put(new Integer(10), ecb.getValidateString());
-        variables.put(new Integer(11), ecb.getValidatorAnnotations());
-        variables.put(new Integer(12), new Integer(ecb.getFormLayoutId()));
+        variables.put(new Integer(6), ecb.getAnnotations());
+        variables.put(new Integer(7), new Integer(ecb.getOwnerId()));
+        variables.put(new Integer(8), new Integer(ecb.getStudySubjectId()));
+        variables.put(new Integer(9), ecb.getValidateString());
+        variables.put(new Integer(10), ecb.getValidatorAnnotations());
+        variables.put(new Integer(11), new Integer(ecb.getFormLayoutId()));
 
         executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -261,7 +253,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
 
     public Object getEntityFromHashMap(HashMap hm) {
         EventCRFBean eb = new EventCRFBean();
-        this.setEntityAuditInformation(eb, hm);
+        this.setEntityAuditInformationWithoutStatus(eb, hm);
 
         eb.setId(((Integer) hm.get("event_crf_id")).intValue());
         eb.setStudyEventId(((Integer) hm.get("study_event_id")).intValue());
@@ -286,8 +278,6 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         
         eb.setSdvUpdateId((Integer) hm.get("sdv_update_id"));
         eb.setFormLayoutId(((Integer) hm.get("form_layout_id")).intValue());
-        Integer oldStatusId = (Integer) hm.get("old_status_id");
-        eb.setOldStatus(Status.get(oldStatusId));
         String workflow = (String) hm.get("workflow_status");
         if (!StringUtils.isEmpty(workflow)) {
             eb.setWorkflowStatus((EventCrfWorkflowStatusEnum) EventCrfWorkflowStatusEnum.valueOf(workflow));
@@ -669,14 +659,6 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         } else {
             return 0;
         }
-    }
-
-    public ArrayList getEventCRFsByStudySubjectCompleteOrLocked(int studySubjectId) {
-
-        HashMap variables = new HashMap();
-        variables.put(1, studySubjectId);
-
-        return executeFindAllQuery("getEventCRFsByStudySubjectCompleteOrLocked", variables);
     }
 
     public ArrayList getEventCRFsByStudySubjectLimit(int studySubjectId, int studyId, int parentStudyId, int limit, int offset) {

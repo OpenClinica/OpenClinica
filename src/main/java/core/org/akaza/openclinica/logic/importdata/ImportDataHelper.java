@@ -337,7 +337,7 @@ public class ImportDataHelper {
 	    }else {
 	    	 try {
               		 	    	
-	            String recordNum =  msg.substring(0,msg.indexOf("|"));
+	            String recordNum =  msg.substring(0,msg.indexOf(","));
 	 	    	File logFile;
 	 	    	String importFileDir = this.getPersonalImportFileDir(request);
 	     	    
@@ -348,7 +348,7 @@ public class ImportDataHelper {
 	 			
 	 			/**
 	 			 *  create new file and add first line
-	 			 *  RowNo | ParticipantID | Status | Message
+	 			 *  RowNo , ParticipantID , Status , Message
 	 			 */
 	 			if(!logFile.exists()) {
 	 				logFile.createNewFile();
@@ -360,7 +360,7 @@ public class ImportDataHelper {
 	 			bw = new BufferedWriter(fw);
 	             
 	 			if(isNewFile || recordNum.equals("1")) {	 			
-	 				bw.write("RowNo|ParticipantID|Status|Message");	
+	 				bw.write("Row Number,Participant ID,Status,Message");
 	 				bw.write("\n");
 	 			}
 	 			
@@ -384,72 +384,88 @@ public class ImportDataHelper {
 	 			}
 	 		}
 	    }
-	    
-	   	    
-	}  
-    
-    public void copyMappingFileToLogFile(File mappingFile, String logfileNm,HttpServletRequest request) throws IOException {
-    	BufferedWriter bw = null;
+	}
+
+	public void addSummaryAndMappingFileInLog(String logFileName, File mappingFile, HttpServletRequest request, int totalDataRowsCount){
+		BufferedWriter bw = null;
 		FileWriter fw = null;
-    	boolean isNewFile = false;
-    	
-    	try {	 	 
- 	    	File logFile;
- 	    	String importFileDir = this.getPersonalImportFileDir(request);
-     	    
- 	    	//get logFileName
- 	    	String logFileName = null;
- 	    	if(logfileNm != null) {
- 	    		logFileName =logfileNm;
- 	    	}else {
- 	    		logFileName = (String) request.getAttribute("logFileName"); 	 	    	 	 				
- 	    	}
- 	    	
- 	    	logFileName = importFileDir + logFileName;
-	 		logFile = new File(logFileName);
- 	    	
- 			/**
- 			 *  create new file and add first line
- 			 *  RowNo | ParticipantID | Status | Message
- 			 */
- 			if(!logFile.exists()) {
- 				logFile.createNewFile();
- 				isNewFile = true;				
- 			}
- 			
- 			// true = append file
- 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
- 			bw = new BufferedWriter(fw);
-             
- 			if(isNewFile ) {	 			
- 				try(Scanner sc = new Scanner(mappingFile)){
- 				   	 String currentLine;
- 					
- 				   	 while (sc.hasNextLine()) {
- 				   		 currentLine = sc.nextLine();        		 
- 					      bw.write(currentLine);
- 					      bw.write("\n");
- 					     }
- 					
- 					 }	 	 
- 			}
- 			
- 			
- 			bw.close();						
- 	       
- 	    } catch (Exception e) {
- 	    	logger.error("Exception occurred", e);
- 	    }finally {
- 			try {
- 				if (bw != null)
- 					bw.close();
- 				if (fw != null)
- 					fw.close();
- 			} catch (IOException ex) {
- 				logger.error("Exception occurred", ex);
- 			}
- 		}
-		 
+		String dataFileName = (String) request.getAttribute("dataFileName");
+		String startTimestamp = (String) request.getAttribute("startTimestamp");
+    	try {
+			File logFile;
+			String importFileDir = this.getPersonalImportFileDir(request);
+			int successfulImportCount = 0;
+			int failedImportCount = 0;
+			int skippedImportCount = 0;
+
+			logFileName = importFileDir + logFileName;
+			logFile = new File(logFileName);
+
+			if(logFile.exists()) {
+				try(Scanner sc = new Scanner(logFile)){
+					String currentLine;
+
+					while (sc.hasNextLine()) {
+						currentLine = sc.nextLine();
+						if(currentLine.startsWith("Row"))
+							continue;
+						if(currentLine.contains("SUCCESS"))
+							if(currentLine.contains("Skip"))
+								skippedImportCount++;
+							else
+								successfulImportCount++;
+						else if(currentLine.contains("FAILED"))
+							failedImportCount++;
+					}
+
+				}
+				if(failedImportCount != (totalDataRowsCount - successfulImportCount - skippedImportCount))
+				{
+					logger.error("Some logs for data imported is not available");
+					failedImportCount = totalDataRowsCount - successfulImportCount - skippedImportCount;
+				}
+				fw = new FileWriter(logFile.getAbsoluteFile(), true);
+				bw = new BufferedWriter(fw);
+				bw.write("\n");
+				bw.write("# Import Summary\n");
+				bw.write("Rows Imported (new records)=" + successfulImportCount+"\n");
+				bw.write("Rows Skipped=" + skippedImportCount+"\n");
+				bw.write("Rows Failed=" + failedImportCount+"\n");
+				bw.write("Total Rows=" + totalDataRowsCount +"\n\n");
+				if(dataFileName != null)
+					bw.write("Import Data File=" + dataFileName+"\n");
+				if(startTimestamp != null)
+					bw.write("Import Date=" + startTimestamp+"\n\n");
+				if(mappingFile != null){
+					bw.write("# Import Mapping File\n\n");
+					bw.write(getMappingFileValues(mappingFile));
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred", e);
+		}finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				logger.error("Exception occurred", ex);
+			}
+		}
+
+	}
+
+	public String getMappingFileValues(File mappingFile) throws IOException {
+		StringBuilder mappingFileSb  = new StringBuilder();
+
+		try(Scanner sc = new Scanner(mappingFile)){
+			while (sc.hasNextLine()) {
+				mappingFileSb.append(sc.nextLine()+"\n");
+			}
+
+		}
+		return mappingFileSb.toString();
 	}
 
 	/**
@@ -534,7 +550,7 @@ public class ImportDataHelper {
     	      } else {
     	        if (fileEntry.isFile()) {
     	          String fileName = fileEntry.getName();
-    	          if (fileName.endsWith("_log.txt")) {
+    	          if (fileName.endsWith("_log.csv")) {
     	        	  fileList.add(fileEntry);
     	          }
     	            

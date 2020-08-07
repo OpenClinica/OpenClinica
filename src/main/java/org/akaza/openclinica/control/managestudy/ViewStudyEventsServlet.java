@@ -9,12 +9,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -52,7 +47,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
     public static final String INPUT_DEF_ID = "definitionId";
 
-    public static final String INPUT_STATUS_ID = "statusId";
+    public static final String INPUT_STATUS_ID = "statusDisplayValue";
 
     public static final String STATUS_MAP = "statuses";
 
@@ -95,7 +90,7 @@ public class ViewStudyEventsServlet extends SecureController {
         request.setAttribute(MODULE, module);
 
         int sedId = fp.getInt("sedId");
-        int statusId = fp.getInt(INPUT_STATUS_ID);
+        String statusDisplayValue = fp.getString(INPUT_STATUS_ID);
         int definitionId = fp.getInt(INPUT_DEF_ID);
         Date startDate = fp.getDate(INPUT_STARTDATE);
         Date endDate = fp.getDate(INPUT_ENDDATE);
@@ -137,13 +132,16 @@ public class ViewStudyEventsServlet extends SecureController {
             fp.addPresetValue(INPUT_STARTDATE, fp.getString(INPUT_STARTDATE));
             fp.addPresetValue(INPUT_ENDDATE, fp.getString(INPUT_ENDDATE));
             fp.addPresetValue(INPUT_DEF_ID, fp.getInt(INPUT_DEF_ID));
-            fp.addPresetValue(INPUT_STATUS_ID, fp.getInt(INPUT_STATUS_ID));
+            fp.addPresetValue(INPUT_STATUS_ID, fp.getString(INPUT_STATUS_ID));
             setPresetValues(fp.getPresetValues());
         }
 
-        ArrayList statuses = SubjectEventStatus.toArrayList();
-        statuses.remove(7); // locked
-        statuses.remove(6); // signed
+        ArrayList statuses = new ArrayList();
+
+        for(StudyEventWorkflowStatusEnum statusEnum :StudyEventWorkflowStatusEnum.values())
+            if(!statusEnum.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
+                statuses.add(statusEnum.getDisplayValue());
+
         request.setAttribute(STATUS_MAP, statuses);
 
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
@@ -159,16 +157,16 @@ public class ViewStudyEventsServlet extends SecureController {
         request.setAttribute(DEFINITION_MAP, definitions);
 
         ArrayList allEvents = new ArrayList();
-        allEvents = genTables(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
+        allEvents = genTables(fp, definitions, startDate, endDate, sedId, definitionId, statusDisplayValue);
 
         request.setAttribute("allEvents", allEvents);
 
         // for print version
         String queryUrl = INPUT_STARTDATE + "=" + local_df.format(startDate) + "&" + INPUT_ENDDATE + "=" + local_df.format(endDate) + "&" + INPUT_DEF_ID + "="
-                + definitionId + "&" + INPUT_STATUS_ID + "=" + statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
+                + definitionId + "&" + INPUT_STATUS_ID + "=" + statusDisplayValue + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
         request.setAttribute("queryUrl", queryUrl);
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-            allEvents = genEventsForPrint(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
+            allEvents = genEventsForPrint(fp, definitions, startDate, endDate, sedId, definitionId, statusDisplayValue);
             request.setAttribute("allEvents", allEvents);
             forwardPage(Page.VIEW_STUDY_EVENTS_PRINT);
         } else {
@@ -185,10 +183,10 @@ public class ViewStudyEventsServlet extends SecureController {
      * @param endDate
      * @param sedId
      * @param definitionId
-     * @param statusId
+     * @param statusDisplayValue
      * @return
      */
-    private ArrayList genTables(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
+    private ArrayList genTables(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, String statusDisplayValue ) {
 
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
@@ -219,7 +217,7 @@ public class ViewStudyEventsServlet extends SecureController {
             int subjectScheduled = 0;
             int subjectCompleted = 0;
             int subjectDiscontinued = 0;
-            events = findEventByStatusAndDate(events, statusId, startDate, endDate);
+            events = findEventByStatusAndDate(events, statusDisplayValue, startDate, endDate);
 
             Date firstStartDateForScheduled = null;
             Date lastCompletionDate = null;
@@ -295,7 +293,7 @@ public class ViewStudyEventsServlet extends SecureController {
             HashMap args = new HashMap();
             args.put("sedId", new Integer(sed.getId()).toString());
             args.put("definitionId", new Integer(definitionId).toString());
-            args.put("statusId", new Integer(statusId).toString());
+            args.put("statusDisplayValue", statusDisplayValue);
             args.put("startDate", local_df.format(startDate));
             args.put("endDate", local_df.format(endDate));
             table.setQuery("ViewStudyEvents", args);
@@ -322,10 +320,10 @@ public class ViewStudyEventsServlet extends SecureController {
      * @param endDate
      * @param sedId
      * @param definitionId
-     * @param statusId
+     * @param statusDisplayValue
      * @return
      */
-    private ArrayList genEventsForPrint(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
+    private ArrayList genEventsForPrint(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, String statusDisplayValue) {
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
         // YW <<
@@ -353,7 +351,7 @@ public class ViewStudyEventsServlet extends SecureController {
             int subjectScheduled = 0;
             int subjectCompleted = 0;
             int subjectDiscontinued = 0;
-            events = findEventByStatusAndDate(events, statusId, startDate, endDate);
+            events = findEventByStatusAndDate(events, statusDisplayValue, startDate, endDate);
 
             Date firstStartDateForScheduled = null;
             Date lastCompletionDate = null;
@@ -442,12 +440,12 @@ public class ViewStudyEventsServlet extends SecureController {
     /**
      *
      * @param events
-     * @param statusId
+     * @param statusDisplayValue
      * @param startDate
      * @param endDate
      * @return
      */
-    private ArrayList findEventByStatusAndDate(ArrayList events, int statusId, Date startDate, Date endDate) {
+    private ArrayList findEventByStatusAndDate(ArrayList events, String statusDisplayValue, Date startDate, Date endDate) {
         ArrayList a = new ArrayList();
         for (int i = 0; i < events.size(); i++) {
             StudyEventBean se = (StudyEventBean) events.get(i);
@@ -456,12 +454,11 @@ public class ViewStudyEventsServlet extends SecureController {
             }
         }
         ArrayList b = new ArrayList();
-        if (statusId > 0) {
+        if (!statusDisplayValue.isEmpty()) {
             for (int i = 0; i < a.size(); i++) {
                 StudyEventBean se = (StudyEventBean) a.get(i);
-      //***********          if (se.getSubjectEventStatus().getId() == statusId) {
-            //        b.add(se);
-         //       }
+                if(se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.getByI18nDescription(statusDisplayValue)))
+                    b.add(se);
             }
             return b;
         }

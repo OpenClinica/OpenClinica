@@ -578,7 +578,6 @@ public class CrfBusinessLogicHelper {
             logger.info("just set subj event status to -- 5completed5 --");
         }
         logger.debug("just set subj event status, final status is " + seb.getWorkflowStatus());
-        logger.debug("final overall status is " + seb.getStatus().getName());
         seb = (StudyEventBean) sedao.update(seb,inTransaction);
 
         return true;
