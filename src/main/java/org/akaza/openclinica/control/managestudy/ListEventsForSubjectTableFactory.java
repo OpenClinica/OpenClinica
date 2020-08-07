@@ -750,7 +750,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
                 eventCrf = (EventCRFBean) display.getProps().get(property + "_eventCrf");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
-                formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCrf.getFormLayoutId());
+                if(eventCrf != null)
+                    formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCrf.getFormLayoutId());
                 studyEvents = new ArrayList<StudyEventBean>();
 
                 if (studyEvent != null) {
