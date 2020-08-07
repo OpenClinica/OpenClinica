@@ -48,8 +48,10 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -557,10 +559,12 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
 
                                 } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
-                                    if (oldValue == null || oldValue.isEmpty())
+                                    if (StringUtils.isEmpty(oldValue))
                                         oldValue = "Null";
-                                    else if (resterm.getString(oldValue) != null)
-                                        oldValue = resterm.getString(oldValue);
+                                    else if (resterm.getString(oldValue) != null) {
+                                        SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(oldValue);
+                                        oldValue = sdvStatus.getDisplayValueForNonSdvPage();
+                                    }
                                 }
 
                                 if (eventCrfAudit.getAuditEventTypeId() == 12 || entityName.equals("Status")) {
@@ -595,10 +599,12 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
 
                                 } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
-                                    if (newValue == null || newValue.isEmpty())
+                                    if (StringUtils.isEmpty(newValue))
                                         newValue = "Null";
-                                    else if (resterm.getString(newValue) != null)
-                                        newValue = resterm.getString(newValue);
+                                    else if (resterm.getString(newValue) != null) {
+                                        SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(newValue);
+                                        newValue = sdvStatus.getDisplayValueForNonSdvPage();
+                                    }
                                 }
 
 
