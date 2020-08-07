@@ -513,7 +513,7 @@
                                 </c:if>
                                 <table>
                                   <tr align="left">
-                                    <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && dec.eventCRF.removed != true && dec.eventCRF.archived != true && studyEvent.workflowStatus != 'SKIPPED' && studyEvent.workflowStatus != 'STOPPED'}">
+                                    <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && dec.eventCRF.removed != true && dec.eventCRF.archived != true && studyEvent.workflowStatus != 'SKIPPED' && studyEvent.workflowStatus != 'STOPPED' && dec.eventCRF.formLayout.status.name != 'Removed'}">
                                       <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
                                         <td>
                                           <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"

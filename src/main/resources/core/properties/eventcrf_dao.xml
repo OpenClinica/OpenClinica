@@ -102,14 +102,6 @@
     </query>
 
     <query>
-        <name>getEventCRFsByStudySubjectCompleteOrLocked</name>
-        <sql>select ec.* from event_crf ec
-             where
-             (ec.status_id = 2 or ec.status_id = 6) AND
-             ec.study_subject_id = ? </sql>
-    </query>
-
-    <query>
         <name>getEventCRFsByStudySubjectLimit</name>
         <sql>select ec.* from event_crf ec,  study_subject ss
             where  ss.study_subject_id = ? AND
@@ -335,10 +327,10 @@
     <query>
         <name>create</name>
         <sql>INSERT INTO EVENT_CRF (STUDY_EVENT_ID, CRF_VERSION_ID,
-            DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID, STATUS_ID,
+            DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID,
             ANNOTATIONS, OWNER_ID,
             DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS,Form_Layout_Id)
-            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
+            VALUES (?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
     </query>
     <query>
         <name>update</name>
@@ -349,7 +341,6 @@
             , DATE_INTERVIEWED=?
             , INTERVIEWER_NAME=?
             , COMPLETION_STATUS_ID=?
-            , STATUS_ID=?
             , ANNOTATIONS=?
             , DATE_COMPLETED=?
             , VALIDATOR_ID=?
@@ -362,7 +353,6 @@
             , UPDATE_ID=?
             , ELECTRONIC_SIGNATURE_STATUS=?
             , SDV_STATUS=?
-            , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
             , FORM_LAYOUT_ID=?
             , WORKFLOW_STATUS=?

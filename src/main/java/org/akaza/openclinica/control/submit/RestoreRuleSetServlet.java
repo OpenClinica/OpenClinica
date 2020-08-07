@@ -55,8 +55,7 @@ public class RestoreRuleSetServlet extends SecureController {
             forwardPage(Page.CRF_LIST);
         } else {
             RuleSetBean ruleSetBean = null;
-            // ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId, null);
-            ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+            ruleSetBean = getRuleSetService().getRuleSetById(ruleSetId);
             if (action.equals("confirm")) {
                 request.setAttribute(RULESET, ruleSetBean);
                 forwardPage(Page.RESTORE_RULE_SET);

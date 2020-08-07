@@ -452,4 +452,8 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     public boolean isSigned() {
         return BooleanUtils.isTrue(this.getSigned());
     }
+
+    public boolean isAvailable(){
+        return (!isRemoved() && !isArchived());
+    }
 }

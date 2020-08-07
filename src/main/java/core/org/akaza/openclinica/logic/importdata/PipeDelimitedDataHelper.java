@@ -34,6 +34,7 @@ import javax.xml.transform.stream.StreamResult;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
@@ -43,6 +44,7 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
@@ -53,7 +55,6 @@ import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -280,7 +281,8 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                     // start process item data
                     // ignore blank line
                     if (dataRows[i].toString().replaceAll("[\\n\\t\\r]", "").trim().length() > 0) {
-                        participantId = dataRow[indexofParticipantID].toString().trim();
+                        //Empty participant label in csv, gives ""
+                        participantId = dataRow[indexofParticipantID].toString().trim().replaceAll("\"","");
                         //logger.info(i+ "************dataRow************************"+ dataRow);
 
                         if (participantId != null && participantId.trim().length() > 0) {
@@ -445,9 +447,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         }
         String[] dataRow = this.toArrayWithFullItems(tempDataRowStr, "|");
 
-        if (dataRow.length < headerRow.length) {
-            throw new OpenClinicaSystemException("Error-data file format not match header - less pipe than header", "errorCode.dataRowMissingPipe");
-        } else if (dataRow.length > headerRow.length) {
+        if (dataRow.length < headerRow.length || dataRow.length > headerRow.length) {
             throw new OpenClinicaSystemException("Data file format error - inconsistent number of header columns and data columns", "errorCode.inconsistentHeaderAndDataColumns");
         }
     }
@@ -708,6 +708,24 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         return studyOID;
     }
 
+    public String getStudySubject(File mappingFile, File rawItemDataFile)throws OpenClinicaSystemException, Exception{
+        ResourceBundleProvider.updateLocale(Locale.US);
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(Locale.US);
+        MessageFormat mf = new MessageFormat("");
+
+        String participantLabel = getParticipantID(mappingFile, rawItemDataFile);
+        //Empty participant label in csv, gives ""
+        participantLabel = participantLabel.replaceAll("\"","");
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
+        StudySubjectBean studySubjectBean = studySubjectDAO.findByLabel(participantLabel);
+
+        if(studySubjectBean.getId() == 0){
+            mf.applyPattern(respage.getString("your_subject_label_does_not_reference"));
+            Object[] arguments = { participantLabel };
+            throw new OpenClinicaSystemException("errorCode.ValidationFailed", mf.format(arguments));
+        }
+        return participantLabel;
+    }
     /**
      * FormOID=F_DEMOGRAPHICS
      * FormVersion=1
@@ -1235,6 +1253,8 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
         String[] columnNms = getDataColumnNames(rawItemData);
         HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
+        ResourceBundleProvider.updateLocale(Locale.US);
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(Locale.US);
 
         try {
 
@@ -1284,8 +1304,9 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 
         } catch (Exception e) {
-            String msg = e.toString();
-            throw new OpenClinicaSystemException(msg, "errorCode.noParticipantID");
+
+            String msg = respage.getString("participant_id_header_not_matching_mapping_file");
+            throw new OpenClinicaSystemException("errorCode.participantIdHeaderNotMatchingMappingFile", msg);
         }
 
         return "";

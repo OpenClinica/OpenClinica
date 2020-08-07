@@ -145,6 +145,10 @@
     Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
         return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
     });
+
+    Handlebars.registerHelper('capitalizeFirstLetter', function(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
     <div class="section expanded hide" id="common-event-{{sectionNumber}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
@@ -215,7 +219,7 @@
                                     {{#ifEquals link.[@rel] "lock-open"}}
                                         <span class="icon icon-{{link.[@rel]}}" alt="Unlock" title="Unlock"></span>
                                     {{else}}
-                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title={{capitalizeFirstLetter link.[@rel]}}></span>
                                     {{/ifEquals}}
                                 </a>
                             {{/each}}
@@ -232,7 +236,6 @@
 
 <script>
 $(function() {
-
     function collection() {
         var obj = arguments[0];
         for (var i=1; i<arguments.length; i++) {
@@ -608,7 +611,7 @@ $(function() {
                     function isInactive(data) {
                         var ocstatus = data['@OpenClinica:Status'];
                         return (
-                            data['@OpenClinica:Removed'] === 'Yes' || 
+                            data['@OpenClinica:Removed'] === 'Yes' ||
                             data['@OpenClinica:Archived'] === 'Yes' ||
                             ocstatus === 'removed' || ocstatus === 'auto-removed'
                         );
@@ -621,7 +624,7 @@ $(function() {
                         updatedBy: formData['@OpenClinica:UpdatedBy'],
                         fields: copyObject(form.submissionFields),
                         links: collectLinks(studyEventData, formData),
-                        isSigned: studyEventData['@OpenClinica:Signed'] === 'Yes',
+                        isSigned: (studyEventData['@OpenClinica:Signed'] === 'Yes') && (studyEventData['@OpenClinica:Archived'] !== 'Yes') && (studyEventData['@OpenClinica:Removed'] !== 'Yes') && studyEventData['@OpenClinica:WorkflowStatus'] === 'completed',
                         isLocked: studyEventData['@OpenClinica:Locked'] === 'Yes',
                         isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Status'] === 'auto-removed'
                     };

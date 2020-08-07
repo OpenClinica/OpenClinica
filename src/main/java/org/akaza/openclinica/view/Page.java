@@ -101,9 +101,6 @@ public enum Page {
     LIST_STUDY_SUBJECTS("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
     LIST_STUDY_SUBJECTS_SERVLET("/ListStudySubjects", "List Study Subjects"),
 
-    UPDATE_STUDY_SERVLET_NEW("/UpdateStudyNew", "Update a Study"),
-    UPDATE_STUDY_NEW("/WEB-INF/jsp/managestudy/updateStudyNew.jsp", "Update a Study"),
-
     VIEW_STUDY("/WEB-INF/jsp/admin/viewStudy.jsp", "View study"),
     VIEW_FULL_STUDY("/WEB-INF/jsp/admin/viewFullStudy.jsp", "View full study"),
 
@@ -154,10 +151,6 @@ public enum Page {
      * Page for unlocking definition
      */
     UNLOCK_DEFINITION("/WEB-INF/jsp/managestudy/unlockDefinition.jsp", "Unlock Event Definition"),
-    /**
-     * Page for listing seds
-     */
-    STUDY_EVENT_DEFINITION_LIST("/WEB-INF/jsp/managestudy/studyEventDefinitionList.jsp", "List all CRFs"),
 
     /**
      * Page for view all seds.
@@ -218,7 +211,6 @@ public enum Page {
      * Page for creating rule imports
      */
     IMPORT_RULES("/WEB-INF/jsp/submit/importRules.jsp", "Import Rules"),
-    VIEW_RULE_SETS("/WEB-INF/jsp/submit/listRuleSets.jsp", "List Rule Assignments"),
     VIEW_RULE_SETS2("/WEB-INF/jsp/submit/listRuleSets2.jsp", "List Rule Assignments"),
     VIEW_RULE_SETS_DESIGNER("/WEB-INF/jsp/submit/listRuleSetsDesigner.jsp", "List Rule Assignments"),
     VERIFY_RULES_IMPORT_SERVLET("/VerifyImportedRule", "Verify Imported Rule Servlet"),
@@ -473,10 +465,6 @@ public enum Page {
     //UPLOAD_FILE_SERVLET ("/UploadFile", "Upload File"),
     DOWNLOAD_ATTACHED_FILE("/WEB-INF/jsp/submit/downloadAttachedFile.jsp", "Download Attached File"),
 
-    // MANAGE_STUDY_MODULE = new
-    // Page("pages/studymodule", "Manage study");
-
-
     VIEW_ALL_SITE_DEFAULT_CRF_VERSIONS_PRINT("/WEB-INF/jsp/managestudy/defaultAllSiteCrfVersionPrint.jsp",
             "View default crf versions print"),
     VIEW_DEFAULT_CRF_VERSIONS_PRINT("/WEB-INF/jsp/managestudy/defaultCrfVersionPrint.jsp",
@@ -484,7 +472,6 @@ public enum Page {
     VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp",
             "View default crf versions print"),
 
-     MANAGE_STUDY_MODULE ( "/pages/studymodule",null),
      PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp","Participant Form Servlet"),
      UPLOAD_CRF_DATA_TO_MIRTH ("/WEB-INF/jsp/submit/uploadFileToMirth.jsp", "Upload CRF Data To Mirth"),
      ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp","Enketo Form Servlet");

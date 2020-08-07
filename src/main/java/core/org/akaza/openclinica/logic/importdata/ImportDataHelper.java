@@ -386,7 +386,7 @@ public class ImportDataHelper {
 	    }
 	}
 
-	public void addSummaryAndMappingFileInLog(String logFileName, File mappingFile, HttpServletRequest request){
+	public void addSummaryAndMappingFileInLog(String logFileName, File mappingFile, HttpServletRequest request, int totalDataRowsCount){
 		BufferedWriter bw = null;
 		FileWriter fw = null;
 		String dataFileName = (String) request.getAttribute("dataFileName");
@@ -414,12 +414,16 @@ public class ImportDataHelper {
 								skippedImportCount++;
 							else
 								successfulImportCount++;
-						else
+						else if(currentLine.contains("FAILED"))
 							failedImportCount++;
 					}
 
 				}
-
+				if(failedImportCount != (totalDataRowsCount - successfulImportCount - skippedImportCount))
+				{
+					logger.error("Some logs for data imported is not available");
+					failedImportCount = totalDataRowsCount - successfulImportCount - skippedImportCount;
+				}
 				fw = new FileWriter(logFile.getAbsoluteFile(), true);
 				bw = new BufferedWriter(fw);
 				bw.write("\n");
@@ -427,8 +431,7 @@ public class ImportDataHelper {
 				bw.write("Rows Imported (new records)=" + successfulImportCount+"\n");
 				bw.write("Rows Skipped=" + skippedImportCount+"\n");
 				bw.write("Rows Failed=" + failedImportCount+"\n");
-				int totalImportCount = successfulImportCount + skippedImportCount + failedImportCount;
-				bw.write("Total Rows=" + totalImportCount +"\n\n");
+				bw.write("Total Rows=" + totalDataRowsCount +"\n\n");
 				if(dataFileName != null)
 					bw.write("Import Data File=" + dataFileName+"\n");
 				if(startTimestamp != null)
@@ -438,8 +441,6 @@ public class ImportDataHelper {
 					bw.write(getMappingFileValues(mappingFile));
 				}
 			}
-			bw.close();
-
 		} catch (Exception e) {
 			logger.error("Exception occurred", e);
 		}finally {

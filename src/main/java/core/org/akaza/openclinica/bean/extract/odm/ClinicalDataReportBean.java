@@ -221,12 +221,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
                     }
 
-                    if (BooleanUtils.isTrue(se.getRemoved()))
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
-                    else if (BooleanUtils.isTrue(se.getArchived()))
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
-                    else if (BooleanUtils.isTrue(se.getLocked()))
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("locked"));
+                    if (BooleanUtils.isTrue(se.getLocked()))
+                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("Locked"));
                     else if (BooleanUtils.isTrue(se.getSigned()))
                         xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("signed"));
                     else if (se.getWorkflowStatus() != null)
@@ -421,11 +417,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 xml.append("\" OpenClinica:UpdatedBy=\"" + StringEscapeUtils.escapeXml(updatedBy));
                             }
 
-                            if (BooleanUtils.isTrue(form.getRemoved()))
-                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
-                            else if (BooleanUtils.isTrue(form.getArchived()))
-                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
-                            else if (form.getWorkflowStatus() != null)
+                            if (BooleanUtils.isTrue(form.getRemoved())
+                                    || BooleanUtils.isTrue(form.getArchived())
+                                    || BooleanUtils.isTrue(se.getRemoved())
+                                    || BooleanUtils.isTrue(se.getArchived()))
+                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
+                            else
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
 
 
@@ -543,6 +540,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
                                         && (versions.size() > 1 || otherVersionAvailable)
                                         && studyBean.getStatus().equals(Status.AVAILABLE)
+                                        && !studyEvent.isCurrentlyArchived()
+                                        && !studyEvent.isCurrentlyRemoved()
                                         && !(studyEvent.isCurrentlyLocked() || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED))) {
 
                                     String reassignUrl = "/pages/managestudy/chooseCRFVersion?crfId=" + formLayout.getCrf().getCrfId() + "&crfName="

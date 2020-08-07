@@ -3968,7 +3968,7 @@ public class OdmExtractDAO extends DatasetDAO {
     public String setOriginalEventCrfStatus(String value) {
         switch (value) {
             case "1":
-                return "available";
+                return "Available";
             case "2":
                 return "unavailable";
             case "5":
@@ -4007,9 +4007,9 @@ public class OdmExtractDAO extends DatasetDAO {
     public String setOriginalStudyEventStatus(String value) {
         switch (value) {
             case "1":
-                return StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
-            case "2":
                 return StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
+            case "2":
+                return StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
             case "3":
                 return StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
             case "4":
@@ -4019,7 +4019,7 @@ public class OdmExtractDAO extends DatasetDAO {
             case "6":
                 return StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
             case "7":
-                return "locked";
+                return "Locked";
             case "8":
                 return "signed";
             default:

@@ -28,7 +28,6 @@ public class StudyEvent extends DataMapDomainObject  {
 	private StudyEventDefinition studyEventDefinition;
 	private StudySubject studySubject;
 	//private Status status;
-	private Integer statusId;
 	private String location;
 	private Integer sampleOrdinal;
 	private Date dateStart;
@@ -36,7 +35,6 @@ public class StudyEvent extends DataMapDomainObject  {
 	private Date dateCreated;
 	private Date dateUpdated;
 	private Integer updateId;
-	private Integer subjectEventStatusId;
 	private Boolean startTimeFlag;
 	private Boolean endTimeFlag;
 	private List<DnStudyEventMap> dnStudyEventMaps ;
@@ -61,8 +59,7 @@ public class StudyEvent extends DataMapDomainObject  {
 			StudyEventDefinition studyEventDefinition,
 			StudySubject studySubject, Status status, String location,
 			Integer sampleOrdinal, Date dateStart, Date dateEnd,
-			Date dateCreated, Date dateUpdated, Integer updateId,
-			Integer subjectEventStatusId, Boolean startTimeFlag,
+			Date dateCreated, Date dateUpdated, Integer updateId, Boolean startTimeFlag,
 			Boolean endTimeFlag, List<DnStudyEventMap> dnStudyEventMaps, List<EventCrf> eventCrfs) {
 		this.studyEventId = studyEventId;
 		this.userAccount = userAccount;
@@ -76,7 +73,6 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.dateCreated = dateCreated;
 		this.dateUpdated = dateUpdated;
 		this.updateId = updateId;
-		this.subjectEventStatusId = subjectEventStatusId;
 		this.startTimeFlag = startTimeFlag;
 		this.endTimeFlag = endTimeFlag;
 		this.dnStudyEventMaps = dnStudyEventMaps;
@@ -205,15 +201,6 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.updateId = updateId;
 	}
 
-	@Column(name = "subject_event_status_id")
-	public Integer getSubjectEventStatusId() {
-		return this.subjectEventStatusId;
-	}
-
-	public void setSubjectEventStatusId(Integer subjectEventStatusId) {
-		this.subjectEventStatusId = subjectEventStatusId;
-	}
-
 	@Column(name = "start_time_flag")
 	public Boolean getStartTimeFlag() {
 		return this.startTimeFlag;
@@ -252,27 +239,7 @@ public class StudyEvent extends DataMapDomainObject  {
 	public void setEventCrfs(List<EventCrf> eventCrfs) {
 		this.eventCrfs = eventCrfs;
 	}
-	 @Column(name = "status_id")
-	public Integer getStatusId() {
-		return statusId;
-	}
 
-	public void setStatusId(Integer statusId) {
-		this.statusId = statusId;
-	}
-
-
-
-	/*@Column(name="sed_ordinal",insertable=false,updatable=false,table="study_event_definition")
-	
-	public Integer getSedOrdinal() {
-		return sedOrdinal;
-	}
-
-	public void setSedOrdinal(Integer sedOrdinal) {
-		this.sedOrdinal = sedOrdinal;
-	}
-*/
 	@Column(name = "removed")
 	public Boolean getRemoved() {
 		return removed;
@@ -346,5 +313,8 @@ public class StudyEvent extends DataMapDomainObject  {
 	public boolean isCurrentlySigned() {
 		return BooleanUtils.isTrue(this.getSigned());
 	}
-
+	@Transient
+	public boolean isAvailable(){
+		return (!isCurrentlyRemoved() && !isCurrentlyArchived());
+	}
 }

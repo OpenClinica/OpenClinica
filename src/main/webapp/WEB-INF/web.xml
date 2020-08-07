@@ -458,11 +458,6 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.NoAccessServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>ListEventDefinition</display-name>
-        <servlet-name>ListEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>ViewEventDefinition</display-name>
         <servlet-name>ViewEventDefinitionServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionServlet</servlet-class>
@@ -820,12 +815,6 @@
     </servlet>
 
     <servlet>
-        <display-name>ViewRuleAssignment</display-name>
-        <servlet-name>ViewRuleAssignmentServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.submit.ViewRuleAssignmentServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <display-name>RunRule</display-name>
         <servlet-name>RunRuleServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.RunRuleServlet</servlet-class>
@@ -1012,11 +1001,6 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ViewRuleAssignmentServlet</servlet-name>
-        <url-pattern>/ViewRuleAssignmentNew</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
         <servlet-name>DownloadRuleSetXmlServlet</servlet-name>
         <url-pattern>/DownloadRuleSetXml</url-pattern>
     </servlet-mapping>
@@ -1178,10 +1162,6 @@
     <servlet-mapping>
         <servlet-name>NoAccessServlet</servlet-name>
         <url-pattern>/NoAccess</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListEventDefinitionServlet</servlet-name>
-        <url-pattern>/ListEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminSystemServlet</servlet-name>

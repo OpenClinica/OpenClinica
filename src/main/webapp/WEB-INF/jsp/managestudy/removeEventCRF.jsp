@@ -19,10 +19,10 @@
 
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		<div class="sidebar_tab_content">		
-        
-        <fmt:message key="confirm_removal_of_this_CRF_from_event"  bundle="${resword}"/> <c:out value="${event.studyEventDefinition.name}"/> (<fmt:message key="date"  bundle="${resword}"/> <fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>). <fmt:message key="all_data_associated_with_the_CRF_in_this_event_will_be_removed"  bundle="${resword}"/>
-        
+		<div class="sidebar_tab_content">
+            <fmt:message key="confirm_removal_of_this_CRF_from_event"  bundle="${resword}"/>
+            <br><br>
+            <fmt:message key="if_signed_will_invalidate"  bundle="${resword}"/>
 		</div>
 
 		</td>

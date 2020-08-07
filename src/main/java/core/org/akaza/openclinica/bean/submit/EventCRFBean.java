@@ -628,4 +628,8 @@ public class EventCRFBean extends AuditableEntityBean {
     public boolean isArchived() {
         return BooleanUtils.isTrue(this.getArchived());
     }
+
+    public boolean isAvailable(){
+        return (!isRemoved() && !isArchived());
+    }
 }
