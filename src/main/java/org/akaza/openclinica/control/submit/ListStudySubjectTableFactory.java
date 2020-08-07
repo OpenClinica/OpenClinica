@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.ResponseType;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
@@ -38,6 +39,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -489,75 +491,30 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private Boolean isSignable(int studySubjectId) {
-        boolean atLeastOneValidEventToSign = false;
-        StudySubject studySubject = studySubjectDao.findById(studySubjectId);
-        if (studySubject.getStatus().isSigned() || studySubject.getStudyEvents().size() == 0) {
+        // https://jira.openclinica.com/browse/OC-13185
+        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
+                session.getServletContext()).getBean("studySubjectService");
+        StudySubjectBean studySub = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
+        List<DisplayStudyEventBean> displayStudyEvents = studySubjectService.getDisplayStudyEventsForStudySubject(
+                studySub, currentUser, currentRole, studyBean);
+
+        if (studySub.getStatus().isSigned() || displayStudyEvents.size() == 0)
             return false;
-        }
 
-        for (StudyEvent studyEvent : studySubject.getStudyEvents()) {
+        for(DisplayStudyEventBean displayStudyEvent: displayStudyEvents) {
+            StudyEventBean studyEventBean = displayStudyEvent.getStudyEvent();
 
-            if (!studyEvent.isCurrentlyRemoved()
-                    && !studyEvent.isCurrentlyArchived()
-                    &&
-                    (
-                            (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
-                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
-                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                            )
-                                    || !isAllRequiredCrfsInEventCompleted(studyEvent, studySubject)
-                                    || !isAllFormsInEventCompletedOrNotStarted(studyEvent, studySubject)
+            if (studyEventBean.isRemoved() || studyEventBean.isArchived()
+                    || (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
                     )
-            ) {
+                    || !displayStudyEvent.isSignAble()
+               )
                 return false;
-            }
-            //At least one of the events is in Skipped, Stopped, or Completed status (excluding any events that are Archived = Yes or Removed = Yes)
-            if (!studyEvent.isCurrentlyRemoved()
-                    && !studyEvent.isCurrentlyArchived()
-                    && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))) {
-                atLeastOneValidEventToSign = true;
-            }
         }
 
-        return atLeastOneValidEventToSign ? true : false;
-    }
-
-
-    @SuppressWarnings( "unchecked" )
-    private boolean isAllRequiredCrfsInEventCompleted(StudyEvent studyEvent, StudySubject studySubject) {
-        EventDefinitionCrf edc = null;
-        for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
-            if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
-                edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudyId());
-                if (edc == null) {
-                    edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudy().getStudyId());
-                }
-                if (!edc.getStatusId().equals(Status.DELETED.getId()) && !edc.getStatusId().equals(Status.AUTO_DELETED.getId())
-                        && edc.getRequiredCrf() && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
-                    return false;
-            }
-        }
-        return true;
-    }
-
-
-    private boolean isAllFormsInEventCompletedOrNotStarted(StudyEvent studyEvent, StudySubject studySubject) {
-        EventDefinitionCrf edc = null;
-        for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
-            if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
-                edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudyId());
-                if (edc == null) {
-                    edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudy().getStudyId());
-                }
-                if (!edc.getStatusId().equals(Status.DELETED.getId()) && !edc.getStatusId().equals(Status.AUTO_DELETED.getId())
-                        && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
-                        && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
-                    return false;
-            }
-        }
         return true;
     }
 
