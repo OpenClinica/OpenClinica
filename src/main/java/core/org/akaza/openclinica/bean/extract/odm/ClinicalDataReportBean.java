@@ -30,6 +30,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -434,7 +435,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             }
 
                             if(form.getSdvStatus() != null){
-                                xml.append("\" OpenClinica:SdvStatus=\"" +StringEscapeUtils.escapeXml(form.getSdvStatus().getDisplayValue()));
+                                xml.append("\" OpenClinica:SdvStatus=\"" +StringEscapeUtils.escapeXml(form.getSdvStatus().getDisplayValueForNonSdvPage()));
                             }
                             
                             if (form.getRemoved() != null) {
@@ -774,15 +775,21 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (o.equals("false")) o = "No";
                 if (n.equals("false")) n = "No";
             }
+
             if(audit.getAuditLogEventTypeId() ==32 ){
                 if(StringUtils.isEmpty(o))
                     o = "Null";
-                else if(resterm.getString(o) != null)
-                    o = resterm.getString(o);
+                else {
+                    SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(o);
+                    o = sdvStatus.getDisplayValueForNonSdvPage();
+                }
+
                 if(StringUtils.isEmpty(n))
                     n ="Null";
-                else if(resterm.getString(n) != null)
-                    n = resterm.getString(n);
+                else {
+                    SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(n);
+                    n = sdvStatus.getDisplayValueForNonSdvPage();
+                }
             }
             if (getAuditLogEventTypes().contains(audit.getAuditLogEventTypeId()) && o.length() > 0) {
                 o = StringEscapeUtils.escapeXml("Masked");

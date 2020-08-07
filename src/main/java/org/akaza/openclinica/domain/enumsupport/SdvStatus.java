@@ -17,6 +17,13 @@ public enum SdvStatus {
         return resterm.getString(this.toString());
     }
 
+    public String getDisplayValueForNonSdvPage() {
+        ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+        if(this == SdvStatus.NOT_VERIFIED)
+            return resterm.getString(this.toString()+"_non_sdv_page");
+        return resterm.getString(this.toString());
+    }
+
     public String getEnglishDisplayValue() {
         ResourceBundle resterm = ResourceBundleProvider.getTermsBundle(Locale.ENGLISH);
         return resterm.getString(this.toString());
@@ -28,5 +35,13 @@ public enum SdvStatus {
             sdvObjects.put(theEnum.getDisplayValue(), theEnum);
         }
         return sdvObjects.get(description);
+    }
+
+    public static SdvStatus getBySdvStatusString(String sdvStatusString) {
+        HashMap<String, SdvStatus> sdvObjects = new HashMap<String, SdvStatus>();
+        for (SdvStatus theEnum : SdvStatus.values()) {
+            sdvObjects.put(theEnum.toString(), theEnum);
+        }
+        return sdvObjects.get(sdvStatusString);
     }
 }
