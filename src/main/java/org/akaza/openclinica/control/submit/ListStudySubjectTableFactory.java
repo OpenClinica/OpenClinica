@@ -1249,22 +1249,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L_dis").width("20")
                 .close();
-        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
+        eventDiv.append("<span class=\"icon icon-caret-left gray clickable\" onclick=\"StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20")
-                .style("display: none;").close();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").style("display: none;").close();
-        eventDiv.a().href("javascript:StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
-        eventDiv.img().src("images/arrow_status_back.gif").border("0").close();
-        eventDiv.aEnd();
-        eventDiv.divEnd();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back_dis").close();
-        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
-        eventDiv.divEnd();
-        eventDiv.tdEnd();
 
         for (int i = 0; i < studyEvents.size(); i++) {
             StudyEventBean studyEventBean = studyEvents.get(i);
@@ -1318,22 +1305,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R_dis").width("20")
                 .close();
-        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
+        eventDiv.append("<span class=\"icon icon-caret-right gray clickable\" onclick=\"StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20")
-                .style("display: none;").close();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").close();
-        eventDiv.a().href("javascript:StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
-        eventDiv.img().src("images/arrow_status_next.gif").border("0").close();
-        eventDiv.aEnd();
-        eventDiv.divEnd();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next_dis").style("display: none;").close();
-        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
-        eventDiv.divEnd();
-        eventDiv.tdEnd().trEnd(0);
+        eventDiv.trEnd(0);
 
         eventDiv.tableEnd(0);
         eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();

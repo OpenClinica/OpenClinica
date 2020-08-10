@@ -151,37 +151,19 @@ function DecreaseStatusBoxValue()
 function StatusBoxNext(StatusBoxID,StatusBoxNum)
 	{
 	NextStatusBox = StatusBoxValue+3;
+	if (NextStatusBox > StatusBoxNum) return;
 	leftnavExpand('Event_' + StatusBoxID + '_' + NextStatusBox);
 	leftnavExpand('Event_' + StatusBoxID + '_' + StatusBoxValue);
-	if (NextStatusBox==StatusBoxNum)
-		{
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_next');
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_next_dis');
-		}
-	if (StatusBoxValue==1)
-		{
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_back');
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_back_dis');
-		}
 	StatusBoxValue = StatusBoxValue+1;
 	}
 
 function StatusBoxBack(StatusBoxID,StatusBoxNum)
 	{
-	StatusBoxValue = StatusBoxValue-1;
-	NextStatusBox = StatusBoxValue+3;
+	if (StatusBoxValue === 1) return;
+	StatusBoxValue = StatusBoxValue - 1;
+	NextStatusBox = StatusBoxValue + 3;
 	leftnavExpand('Event_' + StatusBoxID + '_' + NextStatusBox);
 	leftnavExpand('Event_' + StatusBoxID + '_' + StatusBoxValue);
-	if (NextStatusBox==(StatusBoxNum))
-		{
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_next');
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_next_dis');
-		}
-	if (StatusBoxValue==1)
-		{
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_back');
-		leftnavExpand('bt_Scroll_Event_' + StatusBoxID + '_back_dis');
-		}
 	}
 
 function StatusBoxSkip(StatusBoxID,StatusBoxNum,StatusBoxJumpTo)
