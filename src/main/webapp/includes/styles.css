@@ -974,6 +974,6 @@ form#searchByStudySubjectId {
     margin: 0 -7px;
 }
 
-.clickable {
+.clickable, .clickable:before, .clickable:after {
   cursor: 'pointer'
 }
