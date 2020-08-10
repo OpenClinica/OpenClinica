@@ -7,29 +7,13 @@
  */
 package core.org.akaza.openclinica.service.managestudy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-
-import javax.sql.DataSource;
-
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -51,9 +35,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
+import java.util.*;
+
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
- * 
  */
 public class StudySubjectServiceImpl implements StudySubjectService {
 
@@ -68,9 +54,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     @Transactional
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject, UserAccountBean userAccount,
-            StudyUserRoleBean currentRole, Study study) {
+                                                                            StudyUserRoleBean currentRole, Study study) {
 
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
@@ -167,8 +153,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
             de.setMaximumSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, studySub));
 
-            Status status = de.getStudyEvent().getStatus();
-            if (status == Status.AVAILABLE || status == Status.AUTO_DELETED)
+
+            if (!de.getStudyEvent().isRemoved())
                 displayEvents.add(de);
             // event.setEventCRFs(createAllEventCRFs(eventCRFs,
             // eventDefinitionCRFs));
@@ -205,8 +191,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     }
 
     public List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum status,
-            Study study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
-            Integer studyEventDefinitionId, List eventDefinitionCRFs) {
+                                                         Study study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
+                                                         Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<DisplayEventCRFBean>();
 
         for (int i = 0; i < eventCRFs.size(); i++) {
@@ -232,7 +218,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             }
             // below added 092007 tbh
             // rules updated 112007 tbh
-            if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED) || status.equals(SubjectEventStatus.STOPPED) ) {
+            if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED) || status.equals(SubjectEventStatus.STOPPED)) {
                 ecb.setStage(DataEntryStage.LOCKED);
 
                 // we need to set a SED-wide flag here, because other edcs
@@ -247,7 +233,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
             FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
             Iterator edcs = eventDefinitionCRFs.iterator();
-            while(edcs.hasNext()) {
+            while (edcs.hasNext()) {
                 EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.next();
                 ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edcBean.getCrfId());
                 edcBean.setVersions(versions);
@@ -346,7 +332,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     }
 
     private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs, List eventCRFs, StudyEventWorkflowStatusEnum status,
-            Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
+                                                                        Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
         int i;
         HashMap<Integer, Boolean> completed = new HashMap<Integer, Boolean>();
         HashMap<Integer, EventCRFBean> startedButIncompleted = new HashMap<Integer, EventCRFBean>();
@@ -359,10 +345,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
          * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
          * answer; This algorithm is guaranteed to find all the event
          * definitions for which no event CRF exists.
-         * 
+         *
          * The motivation for using this algorithm is reducing the number of
          * database hits.
-         * 
+         *
          * -jun-we have to add more CRFs here: the event CRF which dones't have
          * item data yet
          */
@@ -414,7 +400,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
 
-        for (Object eventDefinitionObj : eventDefinitionCRFs){
+        for (Object eventDefinitionObj : eventDefinitionCRFs) {
             EventDefinitionCRFBean eventDefinitionBean = (EventDefinitionCRFBean) eventDefinitionObj;
             eventDefinitionsHashMap.put(eventDefinitionBean.getCrfId(), eventDefinitionBean);
         }
@@ -427,16 +413,16 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         ArrayList<Integer> listOfCrfVersionsInUse = new ArrayList();
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-        for (EventCRFBean eventCRFBean : listOfActiveEventCRFs){
+        for (EventCRFBean eventCRFBean : listOfActiveEventCRFs) {
             listOfCrfVersionsInUse.add(cvdao.findByPK(eventCRFBean.getCRFVersionId()).getId());
         }
 
         CRFDAO cdao = new CRFDAO(ds);
-        for (Integer crfVersionId : listOfCrfVersionsInUse){
+        for (Integer crfVersionId : listOfCrfVersionsInUse) {
             eventDefinitionsHashMap.remove(cdao.findByVersionId(crfVersionId).getId());
         }
 
-        for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()){
+        for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()) {
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
             dedc.setEdc(eventDefinitionCrfBean);
 
@@ -491,9 +477,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         return answer;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void populateUncompletedCRFsWithCRFAndVersions(ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
-            Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
+                                                          Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
 
         FormLayoutDAO formLayoutDAo = new FormLayoutDAO(dataSource);
 
