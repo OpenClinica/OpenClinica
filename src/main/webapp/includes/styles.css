@@ -975,5 +975,5 @@ form#searchByStudySubjectId {
 }
 
 .clickable, .clickable:before, .clickable:after {
-  cursor: 'pointer'
+  cursor: pointer
 }
