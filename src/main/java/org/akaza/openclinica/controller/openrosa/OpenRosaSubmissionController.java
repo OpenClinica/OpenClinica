@@ -630,11 +630,15 @@ public class OpenRosaSubmissionController {
         if ((allFormsComplete && countOfEventCrfsInEDC == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                if(studyEvent.isCurrentlySigned())
+                    studyEvent.setSigned(false);
                 persistStudyEvent(studyEvent, true);
             }
         } else {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                if(studyEvent.isCurrentlySigned())
+                    studyEvent.setSigned(false);
                 persistStudyEvent(studyEvent, true);
             }
         }

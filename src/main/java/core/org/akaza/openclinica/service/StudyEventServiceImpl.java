@@ -929,6 +929,8 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
     public void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean){
         StudyEventWorkflowStatusEnum workflowStatus=convertOriginalStudyEventStatusToWorkflowSatus(value);
         if (workflowStatus!=null) {
+            if( !studyEventBean.getWorkflowStatus().equals(workflowStatus) && studyEventBean.isSigned())
+                studyEventBean.setSigned(Boolean.FALSE);
             studyEventBean.setWorkflowStatus(workflowStatus);
         }else{
             if (value.equals("7")) {

@@ -670,6 +670,9 @@ public class ImportServiceImpl implements ImportService {
 
 
     public StudyEvent updateStudyEventDatesAndStatus(StudyEvent studyEvent, UserAccount userAccount, String startDate, String endDate, String eventStatus) {
+        StudyEventWorkflowStatusEnum newEventStatus = getWorkflowStatus(eventStatus);
+        if( !studyEvent.getWorkflowStatus().equals(newEventStatus) && studyEvent.isCurrentlySigned())
+            studyEvent.setSigned(Boolean.FALSE);
         studyEvent.setWorkflowStatus(getWorkflowStatus(eventStatus));
         setEventStartAndEndDate(studyEvent, startDate, endDate);
         studyEvent.setDateUpdated(new Date());
@@ -690,7 +693,10 @@ public class ImportServiceImpl implements ImportService {
     }
 
     public StudyEvent updateStudyEvntStatus(StudyEvent studyEvent, UserAccount userAccount, String eventStatus) {
-        studyEvent.setWorkflowStatus(getWorkflowStatus(eventStatus));
+        StudyEventWorkflowStatusEnum newEventStatus = getWorkflowStatus(eventStatus);
+        if( !studyEvent.getWorkflowStatus().equals(newEventStatus) && studyEvent.isCurrentlySigned())
+            studyEvent.setSigned(Boolean.FALSE);
+        studyEvent.setWorkflowStatus(newEventStatus);
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);

@@ -97,6 +97,8 @@ public class DeleteStudyEventServlet extends SecureController{
                 // delete event from study
 
                 event.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
+                if(event.isSigned())
+                    event.setSigned(Boolean.FALSE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
                 studyEventDAO.update(event);

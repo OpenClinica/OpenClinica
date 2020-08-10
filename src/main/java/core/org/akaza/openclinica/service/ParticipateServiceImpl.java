@@ -447,6 +447,8 @@ public class ParticipateServiceImpl implements ParticipateService {
 
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                if(studyEvent.isCurrentlySigned())
+                    studyEvent.setSigned(Boolean.FALSE);
                 statusChanged = true;
             }
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged,false);
