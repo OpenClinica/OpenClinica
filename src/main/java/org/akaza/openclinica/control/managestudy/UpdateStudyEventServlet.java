@@ -300,7 +300,8 @@ public class UpdateStudyEventServlet extends SecureController {
             }else if (newStatus != null && newStatus.equals(UNLOCKED)) {
                 studyEvent.setLocked(false);
                 }
-
+            if(studyEvent.isSigned())
+                studyEvent.setSigned(false);
             // YW 3-12-2008, 2220 fix
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
             String strEndScheduled = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
