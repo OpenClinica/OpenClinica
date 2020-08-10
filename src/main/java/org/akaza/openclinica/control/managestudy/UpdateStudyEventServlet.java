@@ -278,6 +278,13 @@ public class UpdateStudyEventServlet extends SecureController {
             end_date = dteFormat.format(end);
         }
 
+        ssdao = new StudySubjectDAO(sm.getDataSource());
+        StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+
+        Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
+        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("studySubjectService");
+
         if (action.equalsIgnoreCase("submit")) {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
@@ -408,6 +415,7 @@ public class UpdateStudyEventServlet extends SecureController {
             } catch (HttpResponseException e) {
                 logger.error("Authorization:" + e);
             }
+
             if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
                 Date date = new Date();
                 String detail = "The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
@@ -434,19 +442,12 @@ public class UpdateStudyEventServlet extends SecureController {
 
                 request.setAttribute("studyEvent", studyEvent);
                 // -------------------
-                ssdao = new StudySubjectDAO(sm.getDataSource());
-                StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
                 // prepare to figure out what the display should look like
                 ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
-
-                Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
-
-                StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
-                        .getBean("studySubjectService");
 
                 DisplayStudyEventBean dse = null;
                 for (DisplayStudyEventBean dsevent : studySubjectService.getDisplayStudyEventsForStudySubject(ssb, ub, currentRole, study)) {
@@ -566,8 +567,16 @@ public class UpdateStudyEventServlet extends SecureController {
 
             setPresetValues(presetValues);
 
+            DisplayStudyEventBean dse = null;
+            for (DisplayStudyEventBean dsevent : studySubjectService.getDisplayStudyEventsForStudySubject(ssb, ub, currentRole, study)) {
+                if (dsevent.getStudyEvent().getId() == studyEventId) {
+                    dse = dsevent;
+                }
+            }
+
             request.setAttribute("studyEvent", studyEvent);
             request.setAttribute("studySubject", studySubjectBean);
+            request.setAttribute("dse", dse);
 
             discNotes = new FormDiscrepancyNotes();
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
