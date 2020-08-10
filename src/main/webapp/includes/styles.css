@@ -973,3 +973,7 @@ form#searchByStudySubjectId {
 	padding: 0.25em 0;
     margin: 0 -7px;
 }
+
+.clickable {
+  cursor: 'pointer'
+}

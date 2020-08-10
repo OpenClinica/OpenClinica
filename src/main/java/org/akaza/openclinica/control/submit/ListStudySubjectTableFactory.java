@@ -1249,7 +1249,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L_dis").width("20")
                 .close();
-        eventDiv.append("<span class=\"icon icon-caret-left gray\" onclick=\"StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
+        eventDiv.append("<span class=\"icon icon-caret-left gray clickable\" onclick=\"StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
         eventDiv.tdEnd();
         // <td>...</td>
 
@@ -1305,7 +1305,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R_dis").width("20")
                 .close();
-        eventDiv.append("<span class=\"icon icon-caret-right gray\" onclick=\"StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
+        eventDiv.append("<span class=\"icon icon-caret-right gray clickable\" onclick=\"StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
         eventDiv.tdEnd();
         // <td>...</td>
         eventDiv.trEnd(0);
