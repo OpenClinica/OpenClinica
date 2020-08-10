@@ -237,28 +237,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     }
 
                     if (se.getRemoved() != null) {
-                        boolean removed = se.getRemoved();
-                        if (!StringUtils.isEmpty(removed)) {
-                            xml.append("\" OpenClinica:Removed=\"" + StringEscapeUtils.escapeXml((removed ? "Yes" : "No")));
-                        }
+                        appendFlagToStudyEventData("OpenClinica:Removed", se.getRemoved(), xml);
                     }
                     if (se.getArchived() != null) {
-                        boolean archived = se.getArchived();
-                        if (!StringUtils.isEmpty(archived)) {
-                            xml.append("\" OpenClinica:Archived=\"" + StringEscapeUtils.escapeXml((archived ? "Yes" : "No")));
-                        }
+                        appendFlagToStudyEventData("OpenClinica:Archived", se.getArchived(), xml);
                     }
                     if (se.getLocked() != null) {
-                        boolean locked = se.getLocked();
-                        if (!StringUtils.isEmpty(locked)) {
-                            xml.append("\" OpenClinica:Locked=\"" + StringEscapeUtils.escapeXml((locked ? "Yes" : "No")));
-                        }
+                        appendFlagToStudyEventData("OpenClinica:Locked", se.getLocked(), xml);
                     }
                     if (se.getSigned() != null) {
-                        boolean signed = se.getSigned();
-                        if (!StringUtils.isEmpty(signed)) {
-                            xml.append("\" OpenClinica:Signed=\"" + StringEscapeUtils.escapeXml((signed ? "Yes" : "No")));
-                        }
+                        appendFlagToStudyEventData("OpenClinica:Signed", se.getSigned(), xml);
                     }
                     if (se.getAgeAtEvent() != null) {
                         xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
@@ -438,16 +426,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             }
                             
                             if (form.getRemoved() != null) {
-                                boolean removed = form.getRemoved();
-                                if (!StringUtils.isEmpty(removed)) {
-                                    xml.append("\" OpenClinica:Removed=\"" + StringEscapeUtils.escapeXml((removed ? "Yes" : "No")));
-                                }
+                                appendFlagToFormData("OpenClinica:Removed", form.getRemoved(), xml);
                             }
                             if (form.getArchived() != null) {
-                                boolean archived = form.getArchived();
-                                if (!StringUtils.isEmpty(archived)) {
-                                    xml.append("\" OpenClinica:Archived=\"" + StringEscapeUtils.escapeXml((archived ? "Yes" : "No")));
-                                }
+                                appendFlagToFormData("OpenClinica:Archived", form.getArchived(), xml);
+                            }
+                            if (form.getRequired() != null) {
+                                appendFlagToFormData("OpenClinica:Required", form.getRequired(), xml);
+                            }
+                            if (form.getRelevant() != null) {
+                                appendFlagToFormData("OpenClinica:Relevant", form.getRelevant(), xml);
+                            }
+                            if (form.getEditable() != null) {
+                                appendFlagToFormData("OpenClinica:Editable", form.getEditable(), xml);
                             }
                         }
                         xml.append("\">");
@@ -719,6 +710,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         if (footer) {
             xml.append(indent + "</ClinicalData>");
             xml.append(nls);
+        }
+    }
+
+    private void appendFlagToStudyEventData(String flagKey, Boolean flagValue, StringBuffer xml) {
+        if (!StringUtils.isEmpty(flagValue)) {
+            xml.append("\" " + flagKey + "=\"" + StringEscapeUtils.escapeXml((flagValue ? "Yes" : "No")));
+        }
+    }
+
+    private void appendFlagToFormData(String flagKey, Boolean flagValue, StringBuffer xml) {
+        if (!StringUtils.isEmpty(flagValue)) {
+            xml.append("\" " + flagKey + "=\"" + StringEscapeUtils.escapeXml((flagValue ? "Yes" : "No")));
         }
     }
 

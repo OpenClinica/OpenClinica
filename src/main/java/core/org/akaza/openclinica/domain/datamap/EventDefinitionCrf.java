@@ -54,9 +54,11 @@ public class EventDefinitionCrf extends DataMapDomainObject {
     private String selectedVersionIds;
     private Integer parentId;
     private Set datasetCrfVersionMaps = new HashSet(0);
-    private Boolean paricipantForm;
+    private Boolean participantForm;
     private Boolean allowAnonymousSubmission;
     private String submissionUrl;
+    private Boolean relevant;
+    private Boolean editable;
 
     public EventDefinitionCrf() {
     }
@@ -87,7 +89,7 @@ public class EventDefinitionCrf extends DataMapDomainObject {
         this.ordinal = ordinal;
         this.electronicSignature = electronicSignature;
         this.hideCrf = hideCrf;
-        this.paricipantForm = participantForm;
+        this.participantForm = participantForm;
         this.sourceDataVerificationCode = sourceDataVerificationCode;
         this.selectedVersionIds = selectedVersionIds;
         this.parentId = parentId;
@@ -296,12 +298,12 @@ public class EventDefinitionCrf extends DataMapDomainObject {
     }
 
     @Column(name = "participant_form")
-    public Boolean getParicipantForm() {
-        return paricipantForm;
+    public Boolean getParticipantForm() {
+        return participantForm;
     }
 
-    public void setParicipantForm(Boolean paricipantForm) {
-        this.paricipantForm = paricipantForm;
+    public void setParticipantForm(Boolean participantForm) {
+        this.participantForm = participantForm;
     }
 
     @Column(name = "allow_anonymous_submission")
@@ -322,13 +324,12 @@ public class EventDefinitionCrf extends DataMapDomainObject {
         this.submissionUrl = submissionUrl;
     }
 
-    // @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventDefinitionCrf")
-    // public Set getDatasetCrfVersionMaps() {
-    // return this.datasetCrfVersionMaps;
-    // }
-    //
-    // public void setDatasetCrfVersionMaps(Set datasetCrfVersionMaps) {
-    // this.datasetCrfVersionMaps = datasetCrfVersionMaps;
-    // }
+    @Column(name = "relevant")
+    public Boolean getRelevant() { return relevant; }
+    public void setRelevant(Boolean relevant) { this.relevant = relevant; }
+
+    @Column(name = "editable")
+    public Boolean getEditable() { return editable; }
+    public void setEditable(Boolean editable) { this.editable = editable; }
 
 }

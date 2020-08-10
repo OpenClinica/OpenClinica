@@ -3863,6 +3863,9 @@ public class OdmExtractDAO extends DatasetDAO {
         conf.setHiddenCrf(edc.isHideCrf());
         conf.setParticipantForm(edc.isParticipantForm());
         conf.setSubmissionUrl(edc.getSubmissionUrl());
+        conf.setRequired(edc.isRequiredCRF());
+        conf.setRelevant(edc.getRelevant());
+        conf.setEditable(edc.getEditable());
         return conf;
     }
 

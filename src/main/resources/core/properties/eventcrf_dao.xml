@@ -358,6 +358,9 @@
             , WORKFLOW_STATUS=?
             , REMOVED=?
             , ARCHIVED=?
+            , REQUIRED=?
+            , RELEVANT=?
+            , EDITABLE=?
 
             WHERE EVENT_CRF_ID=?
         </sql>

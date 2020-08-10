@@ -330,6 +330,12 @@ public class KafkaService {
         formChangeDTO.setFormRemoved(eventCrfBean.getRemoved().toString());}
         if (eventCrfBean.getArchived() != null){
         formChangeDTO.setFormArchived(eventCrfBean.getArchived().toString());}
+        if (eventCrfBean.getRequired() != null){
+            formChangeDTO.setFormRequired(eventCrfBean.getRequired().toString());}
+        if (eventCrfBean.getRelevant() != null){
+            formChangeDTO.setFormRelevant(eventCrfBean.getRelevant().toString());}
+        if (eventCrfBean.getEditable() != null){
+            formChangeDTO.setFormEditable(eventCrfBean.getEditable().toString());}
 
         return formChangeDTO;
     }
@@ -357,15 +363,22 @@ public class KafkaService {
         formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
 
         formChangeDTO.setFormCreatedBy(eventCrf.getUserAccount().getUserName());
-        formChangeDTO.setFormUpdatedBy(updaterAccount.getUserName());
+        if (updaterAccount != null){
+            formChangeDTO.setFormUpdatedBy(updaterAccount.getUserName());}
 
         formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
         if (eventCrf.getSdvStatus() != null){
-        formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());}
+            formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());}
         if (eventCrf.getRemoved() != null){
-        formChangeDTO.setFormRemoved(eventCrf.getRemoved().toString());}
+            formChangeDTO.setFormRemoved(eventCrf.getRemoved().toString());}
         if (eventCrf.getArchived() != null){
-        formChangeDTO.setFormArchived(eventCrf.getArchived().toString());}
+            formChangeDTO.setFormArchived(eventCrf.getArchived().toString());}
+        if (eventCrf.getRequired() != null){
+            formChangeDTO.setFormRequired(eventCrf.getRequired().toString());}
+        if (eventCrf.getRelevant() != null){
+            formChangeDTO.setFormRelevant(eventCrf.getRelevant().toString());}
+        if (eventCrf.getEditable() != null){
+            formChangeDTO.setFormEditable(eventCrf.getEditable().toString());}
 
         return formChangeDTO;
     }
@@ -394,7 +407,9 @@ public class KafkaService {
         } else {
             formChangeDTO.setFormUpdatedDate(eventCrf.getDateCreated().toString());
         }
-        formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
+        //TODO Fix this
+        // was eventCrf.getWorkflowStatus().getEnglishDisplayValue()
+        formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().name());
 
         return formChangeDTO;
     }

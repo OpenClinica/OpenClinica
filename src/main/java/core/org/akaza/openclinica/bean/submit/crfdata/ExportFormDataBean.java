@@ -35,6 +35,9 @@ public class ExportFormDataBean extends FormDataBean {
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
+    private Boolean required;
+    private Boolean relevant;
+    private Boolean editable;
 
     public ExportFormDataBean() {
         super();
@@ -134,5 +137,29 @@ public class ExportFormDataBean extends FormDataBean {
 
     public void setSdvStatus(SdvStatus sdvStatus) {
         this.sdvStatus = sdvStatus;
+    }
+
+    public Boolean getRequired() {
+        return required;
+    }
+
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    public Boolean getRelevant() {
+        return relevant;
+    }
+
+    public void setRelevant(Boolean relevant) {
+        this.relevant = relevant;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
     }
 }

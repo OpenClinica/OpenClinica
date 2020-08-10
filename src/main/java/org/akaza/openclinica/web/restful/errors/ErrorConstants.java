@@ -42,6 +42,7 @@ public class ErrorConstants {
     public static final String ERR_STUDY_NOT_EXIST = "errorCode.studyNotExist";
     public static final String ERR_STUDY_NOT_AVAILABLE = "errorCode.studyNotAvailable";
     public static final String ERR_SITE_NOT_AVAILABLE = "errorCode.siteNotAvailable";
+    public static final String ERR_SITE_OID_MISSING="errorCode.siteOidMissing";
 
     public static final String ERR_SITE_NOT_EXIST = "errorCode.siteNotExist";
     public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
@@ -105,13 +106,20 @@ public class ErrorConstants {
     public static final String ERR_PARTICIPANT_ID_ALREADY_EXISTS="errorCode.participantIDAlreadyExists";
     public static final String ERR_PARTICIPANT_IDENTIFIERS_MISMATCH = "errorCode.participantIdentiersMismatch";
     public static final String ERR_MISSING_STUDYEVENTOID = "errorCode.missingStudyEventOID";
+    public static final String ERR_FORM_ALREADY_EXISTS = "errorCode.formAlreadyExists";
+    public static final String ERR_FORM_NOT_FOUND = "errorCode.formNotFound";
     public static final String ERR_INVALID_STUDYEVENTOID = "errorCode.invalidStudyEventOID";
     public static final String ERR_MISSING_FORMOID = "errorCode.missingFormOid";
+    public static final String ERR_FORM_REQUIRED_FLAG_NOT_VALID = "errorCode.formRequiredFlagNotValid";
+    public static final String ERR_FORM_RELEVANT_FLAG_NOT_VALID = "errorCode.formRelevantFlagNotValid";
+    public static final String ERR_FORM_EDITABLE_FLAG_NOT_VALID = "errorCode.formEditableFlagNotValid";
     public static final String ERR_FORMOID_NOT_FOUND = "errorCode.formOIDNotFound";
     public static final String ERR_FORMLAYOUTOID_NOT_FOUND = "errorCode.formLayoutOIDNotFound";
     public static final String ERR_FORM_STATUS_NOT_VALID = "errorCode.formStatusNotValid";
     public static final String ERR_FORM_ALREADY_COMPLETE = "errorCode.formAlreadyComplete";
     public static final String ERR_ITEMGROUPOID_NOT_FOUND = "errorCode.itemGroupOIDNotFound";
+    public static final String ERR_NEW_FORM_CANNOT_BE_MARKED_COMPLETE = "errorCode.newFormCannotBeMarkedComplete";
+    public static final String ERR_FORM_WITH_DATA_CANNOT_BE_SET_NOT_STARTED= "errorCode.formWithDataCannotBeSetNotStarted";
     public static final String ERR_MISSING_ITEMGROUPOID = "errorCode.missingItemGroupOID";
     public static final String ERR_ITEMGROUP_REPEATKEY_TOO_LARGE = "errorCode.itemGroupRepeatKeyTooLarge";
     public static final String ERR_ITEMGROUP_REPEATKEY_NOT_VALID = "errorCode.groupRepeatKeyNotValid";
@@ -136,6 +144,7 @@ public class ErrorConstants {
     public static final String ERR_EVENT_REPEAT_KEY_NOT_NULL = "errorCode.eventRepeatKeyNotNull";
 
     public static final String ERR_EVENT_ALREADY_EXISTS_CANT_SCHEDULE = "errorCode.eventAlreadyExistsCan'tSchedule";
+    public static final String ERR_STUDY_EVENT_NOT_FOUND = "errorCode.studyEventNotFound";
     public static final String ERR_EVENT_DOES_NOT_EXISTS_TO_UPDATE = "errorCode.eventDoesNotExistsToUpdate";
 
     public static final String ERR_INVALID_EVENT_STATUS = "errorCode.invalidEventStatus";

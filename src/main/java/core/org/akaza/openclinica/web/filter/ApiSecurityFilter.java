@@ -112,7 +112,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             Study publicStudyBean= (Study) studyDao.findPublicStudyById(ub.getActiveStudyId());
 
                             if (userType.equals(UserType.SYSTEM.getName())){
-                                UserAccountBean systemUser = createSystemUser(userAccountDAO, request);
+                                UserAccountBean systemUser = getOrCreateSystemUser(userAccountDAO, request);
                                 if (systemUser != null) {
                                     ub = systemUser;
                                 }
@@ -240,8 +240,8 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         return map;
     }
 
-    private UserAccountBean createSystemUser(UserAccountDAO userAccountDAO, HttpServletRequest request) {
-        logger.info("Creating system user");
+    private UserAccountBean getOrCreateSystemUser(UserAccountDAO userAccountDAO, HttpServletRequest request) {
+        logger.info("Invoking system user");
 
         UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.SYSTEM_USER);
         if (userAccountBean.getName().isEmpty()){

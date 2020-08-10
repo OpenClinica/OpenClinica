@@ -115,6 +115,9 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         this.setTypeExpected(24, TypeNames.STRING);// workflow
         this.setTypeExpected(25, TypeNames.BOOL);// removed
         this.setTypeExpected(26, TypeNames.BOOL);// archived
+        this.setTypeExpected(27, TypeNames.BOOL);// required
+        this.setTypeExpected(28, TypeNames.BOOL);// relevant
+        this.setTypeExpected(29, TypeNames.BOOL);// editable
 
 
         // if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -197,7 +200,28 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
             variables.put(new Integer(21), ecb.getArchived());
         }
 
-        variables.put(new Integer(22), new Integer( ecb.getId()));
+        if (ecb.getRequired() == null) {
+            nullVars.put(new Integer(22), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(22), null);
+        } else {
+            variables.put(new Integer(22), ecb.getRequired());
+        }
+
+        if (ecb.getRelevant() == null) {
+            nullVars.put(new Integer(23), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(23), null);
+        } else {
+            variables.put(new Integer(23), ecb.getRelevant());
+        }
+
+        if (ecb.getEditable() == null) {
+            nullVars.put(new Integer(24), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(24), null);
+        } else {
+            variables.put(new Integer(24), ecb.getEditable());
+        }
+
+        variables.put(new Integer(25), new Integer( ecb.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
 
         if (isQuerySuccessful()) {
@@ -282,12 +306,12 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         if (!StringUtils.isEmpty(workflow)) {
             eb.setWorkflowStatus((EventCrfWorkflowStatusEnum) EventCrfWorkflowStatusEnum.valueOf(workflow));
         }
-        Boolean removed=  (Boolean) hm.get("removed");
-        Boolean archived=  (Boolean) hm.get("archived");
-        eb.setRemoved(removed);
-        eb.setArchived(archived);
+        eb.setRemoved((Boolean) hm.get("removed"));
+        eb.setArchived((Boolean) hm.get("archived"));
+        eb.setRequired((Boolean) hm.get("required"));
+        eb.setRelevant((Boolean) hm.get("relevant"));
+        eb.setEditable((Boolean) hm.get("editable"));
 
-        // eb.setStatus(Status.get((Integer) hm.get("status_id"))
         return eb;
     }
 

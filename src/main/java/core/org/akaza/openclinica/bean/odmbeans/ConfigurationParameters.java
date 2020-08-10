@@ -5,6 +5,9 @@ public class ConfigurationParameters {
     private boolean participantForm;
     private boolean allowAnynymousSubmission;
     private boolean offline;
+    private boolean required;
+    private boolean relevant;
+    private boolean editable;
     private String submissionUrl;
 
     public boolean isHiddenCrf() {
@@ -46,5 +49,14 @@ public class ConfigurationParameters {
     public void setSubmissionUrl(String submissionUrl) {
         this.submissionUrl = submissionUrl;
     }
+
+    public boolean isRequired() { return required; }
+    public void setRequired(boolean required) { this.required = required; }
+
+    public boolean isRelevant() { return relevant; }
+    public void setRelevant(boolean relevant) { this.relevant = relevant; }
+
+    public boolean isEditable() { return editable; }
+    public void setEditable(boolean editable) { this.editable = editable; }
 
 }

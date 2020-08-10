@@ -1251,4 +1251,25 @@
 		</insert>
 	</changeSet>
 
+	<changeSet author="jmcinerney" id="2020-08-09-OC-13098-01">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="67"/>
+			<column name="name" value="event_crf_required"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jmcinerney" id="2020-08-09-OC-13098-02">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="68"/>
+			<column name="name" value="event_crf_relevant"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jmcinerney" id="2020-08-09-OC-13098-03">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="69"/>
+			<column name="name" value="event_crf_editable"/>
+		</insert>
+	</changeSet>
+
 </databaseChangeLog>

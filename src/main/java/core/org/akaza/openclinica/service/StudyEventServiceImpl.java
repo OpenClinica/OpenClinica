@@ -939,6 +939,20 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
         }
     }
 
+    @Override
+    public StudyEvent validateStudyEventExists(StudySubject studySubject, String studyEventOID, String studyEventRepeatKey, CustomRuntimeException validationErrors) {
+        int ordinalKey = 1;
+        if (studyEventRepeatKey != null) {
+            ordinalKey = Integer.parseInt(studyEventRepeatKey);
+        }
+        StudyEvent studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventOID, ordinalKey, studySubject.getStudySubjectId());
+        if (studyEvent == null){
+            validationErrors.addError(new ErrorObj(FAILED, ErrorConstants.ERR_STUDY_EVENT_NOT_FOUND));
+        }
+
+        return studyEvent;
+    }
+
     public StudyEventWorkflowStatusEnum convertOriginalStudyEventStatusToWorkflowSatus(String value) {
         switch (value) {
             case "1":

@@ -23,6 +23,8 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 import javax.sql.DataSource;
@@ -61,5 +63,7 @@ public interface StudySubjectService {
     ArrayList getUncompletedCRFs(SessionManager sm, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, int studyEventId);
 
     void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs);
+
+    StudySubject validateStudySubjectExists (Study study, String subjectKey, CustomRuntimeException validationErrors);
 
 }

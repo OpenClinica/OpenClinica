@@ -19,6 +19,9 @@ public class FormChangeDTO {
     private String formSdvStatus;
     private String formRemoved;
     private String formArchived;
+    private String formRequired;
+    private String formRelevant;
+    private String formEditable;
 
     public String getCustomerUuid() { return customerUuid; }
     public void setCustomerUuid(String customerUuid) { this.customerUuid = customerUuid; }
@@ -97,4 +100,13 @@ public class FormChangeDTO {
 
     public String getFormArchived() { return formArchived; }
     public void setFormArchived(String formArchived) { this.formArchived = formArchived; }
+
+    public String getFormRequired() { return formRequired; }
+    public void setFormRequired(String formRequired) { this.formRequired = formRequired; }
+
+    public String getFormRelevant() { return formRelevant; }
+    public void setFormRelevant(String formRelevant) { this.formRelevant = formRelevant; }
+
+    public String getFormEditable() { return formEditable; }
+    public void setFormEditable(String formEditable) { this.formEditable = formEditable; }
 }
