@@ -421,7 +421,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             if (BooleanUtils.isTrue(form.getRemoved())
                                     || BooleanUtils.isTrue(form.getArchived())
                                     || BooleanUtils.isTrue(se.getRemoved())
-                                    || BooleanUtils.isTrue(se.getArchived()))
+                                    || BooleanUtils.isTrue(se.getArchived())
+                                    || BooleanUtils.isTrue(studySubject.getStatus().isDeleted())
+                                )
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
                             else
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
