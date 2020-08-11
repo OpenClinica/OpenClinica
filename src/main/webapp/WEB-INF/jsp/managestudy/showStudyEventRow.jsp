@@ -391,7 +391,7 @@
                                                     </td>
                                                 </c:if>
 
-                                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'Removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED' && dec.eventCRF.removed != true && dec.eventCRF.archived != true && dec.eventCRF.workflowStatus != 'NOT_STARTED'}">
+                                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'Removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED' && dec.eventCRF.removed != true && dec.eventCRF.archived != true && dec.eventCRF.workflowStatus != 'NOT_STARTED' && dec.eventCRF.formLayout.status.name != 'Removed'}">
                                             <td>
                                                 <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                                                 onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
