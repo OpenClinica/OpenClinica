@@ -207,7 +207,7 @@ public class EventCrfLayerBuilder {
         Study subjectStudy = studyDao.findByPK(studySubject.getStudyId());
 
 
-        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved()) || studySubject.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
 
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
