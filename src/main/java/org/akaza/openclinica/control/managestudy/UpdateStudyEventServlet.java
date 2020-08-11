@@ -289,7 +289,9 @@ public class UpdateStudyEventServlet extends SecureController {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(EVENT_WORKFLOW_STATUS));
-                studyEvent.setWorkflowStatus(ses);
+            if(ses != null && !studyEvent.getWorkflowStatus().equals(ses) && studyEvent.isSigned())
+                studyEvent.setSigned(false);
+            studyEvent.setWorkflowStatus(ses);
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
 
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
@@ -300,8 +302,7 @@ public class UpdateStudyEventServlet extends SecureController {
             }else if (newStatus != null && newStatus.equals(UNLOCKED)) {
                 studyEvent.setLocked(false);
                 }
-            if(studyEvent.isSigned())
-                studyEvent.setSigned(false);
+
             // YW 3-12-2008, 2220 fix
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
             String strEndScheduled = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
