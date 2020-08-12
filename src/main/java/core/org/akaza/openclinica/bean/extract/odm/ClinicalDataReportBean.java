@@ -284,7 +284,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         if (!studyEvent.isCurrentlyRemoved()
                                 && !studyEvent.isCurrentlyArchived()
                                 && !studyEvent.isCurrentlyLocked()) {
-                            if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) ||studySubject.getStatus().equals(Status.SIGNED))
+                            if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) || studySubject.getStatus().equals(Status.SIGNED))
                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                 String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
                                         + studySubject.getStudySubjectId();
@@ -297,7 +297,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         } else {
                             // ***************** OpenClinica:Link RESTORE EVENT **************
                             // userRole.manageStudy &&
-                            if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) ||studySubject.getStatus().equals(Status.SIGNED))
+                            if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) || studySubject.getStatus().equals(Status.SIGNED))
                                     && studyBean.getStatus().equals(Status.AVAILABLE)
                                     && studyEvent.getStudyEventDefinition().getStatus().equals(Status.AVAILABLE)
                                     && !studyEvent.isCurrentlyLocked()) {
@@ -319,7 +319,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 && studySubject.getStatus().equals(Status.AVAILABLE)
                                 && studyBean.getStatus().equals(Status.AVAILABLE)
                                 && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved()) {
-                                String signUrl = "/UpdateStudyEvent?action=confirm&statusId=signed&ss_id=" + studySubject.getStudySubjectId() + "&event_id=" + studyEvent.getStudyEventId() + "&first_sign=true";
+                            String signUrl = "/UpdateStudyEvent?action=confirm&statusId=signed&ss_id=" + studySubject.getStudySubjectId() + "&event_id=" + studyEvent.getStudyEventId() + "&first_sign=true";
 
                             xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"sign\" href=\""
                                     + StringEscapeUtils.escapeXml(signUrl) + "\"");
@@ -423,7 +423,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     || BooleanUtils.isTrue(se.getRemoved())
                                     || BooleanUtils.isTrue(se.getArchived()))
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
-                            else
+                            else if (form.getWorkflowStatus() != null)
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
 
 
@@ -434,10 +434,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 }
                             }
 
-                            if(form.getSdvStatus() != null){
-                                xml.append("\" OpenClinica:SdvStatus=\"" +StringEscapeUtils.escapeXml(form.getSdvStatus().getDisplayValueForNonSdvPage()));
+                            if (form.getSdvStatus() != null) {
+                                xml.append("\" OpenClinica:SdvStatus=\"" + StringEscapeUtils.escapeXml(form.getSdvStatus().getDisplayValueForNonSdvPage()));
                             }
-                            
+
                             if (form.getRemoved() != null) {
                                 boolean removed = form.getRemoved();
                                 if (!StringUtils.isEmpty(removed)) {
@@ -776,16 +776,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (n.equals("false")) n = "No";
             }
 
-            if(audit.getAuditLogEventTypeId() ==32 ){
-                if(StringUtils.isEmpty(o))
+            if (audit.getAuditLogEventTypeId() == 32) {
+                if (StringUtils.isEmpty(o))
                     o = "Null";
                 else {
                     SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(o);
                     o = sdvStatus.getDisplayValueForNonSdvPage();
                 }
 
-                if(StringUtils.isEmpty(n))
-                    n ="Null";
+                if (StringUtils.isEmpty(n))
+                    n = "Null";
                 else {
                     SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(n);
                     n = sdvStatus.getDisplayValueForNonSdvPage();
