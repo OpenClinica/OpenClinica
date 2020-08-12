@@ -49,6 +49,7 @@ import core.org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import core.org.akaza.openclinica.web.job.ImportSpringJob;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -58,6 +59,7 @@ import org.apache.commons.lang.BooleanUtils;
 public class VerifyImportedCRFDataServlet extends SecureController {
 
     Locale locale;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     /**
@@ -84,7 +86,6 @@ public class VerifyImportedCRFDataServlet extends SecureController {
     @Override
     @SuppressWarnings(value = "unchecked")
     public void processRequest() throws Exception {
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
         itemDataDao.setFormatDates(false);
         CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource(), getStudyDao());

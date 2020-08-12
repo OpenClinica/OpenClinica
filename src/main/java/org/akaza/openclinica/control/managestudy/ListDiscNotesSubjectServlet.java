@@ -8,10 +8,9 @@
 package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -27,6 +26,7 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.List;
@@ -46,14 +46,14 @@ public class ListDiscNotesSubjectServlet extends SecureController {
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
     public static final String FILTER_SUMMARY = "filterSummary";
     Locale locale;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     // < ResourceBundleresexception,respage;
     @Override
     protected void processRequest() throws Exception {
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         String module = request.getParameter("module");
         String moduleStr = "manage";
@@ -185,7 +185,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
             return;
         }
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 

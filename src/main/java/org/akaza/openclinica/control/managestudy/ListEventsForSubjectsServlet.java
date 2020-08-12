@@ -12,12 +12,11 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -33,6 +32,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Krikor Krumlian
@@ -43,11 +43,14 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private static final long serialVersionUID = 1L;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
+    @Autowired
     private StudySubjectDAO studySubjectDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
     private StudyGroupDAO studyGroupDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private CRFDAO crfDAO;
@@ -68,7 +71,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
             return;
         }
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 
@@ -80,8 +83,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         if (fp.getString("showMoreLink").equals("")) {
             showMoreLink = true;
         } else {
@@ -122,7 +123,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         ListEventsForSubjectTableFactory factory = new ListEventsForSubjectTableFactory(showMoreLink);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
-        factory.setStudySubjectDAO(getStudySubjectDAO());
+        factory.setStudySubjectDAO(studySubjectDAO);
         factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
@@ -159,11 +160,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public SubjectDAO getSubjectDAO() {
         subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
         return subjectDAO;
-    }
-
-    public StudySubjectDAO getStudySubjectDAO() {
-        studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-        return studySubjectDAO;
     }
 
     public StudyGroupClassDAO getStudyGroupClassDAO() {

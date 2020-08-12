@@ -41,11 +41,14 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
+    @Autowired
     private StudySubjectDAO studySubjectDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
     private StudyGroupDAO studyGroupDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
@@ -96,8 +99,6 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         // Determine whether to limit the displayed DN's to a certain DN type
         int resolutionStatus = 0;
         try {
@@ -163,7 +164,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
         ListDiscNotesForCRFTableFactory factory = new ListDiscNotesForCRFTableFactory();
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
-        factory.setStudySubjectDAO(getStudySubjectDAO());
+        factory.setStudySubjectDAO(studySubjectDAO);
         factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyDao(getStudyDao());
         factory.setStudyBean(currentStudy);
@@ -198,11 +199,6 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     public SubjectDAO getSubjectDAO() {
         subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
         return subjectDAO;
-    }
-
-    public StudySubjectDAO getStudySubjectDAO() {
-        studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-        return studySubjectDAO;
     }
 
     public StudyGroupClassDAO getStudyGroupClassDAO() {

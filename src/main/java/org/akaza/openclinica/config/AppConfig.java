@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +89,30 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         return multipartResolver;
+    }
+
+    @Bean
+    public SmartInitializingSingleton commandLineRunner(ApplicationContext ctx) {
+        return () -> {
+
+            System.out.println("Let's inspect the beans provided by Spring Boot:");
+            System.out.println("//////////////////////////////////////////////////////////////////////");
+
+            System.out.println(ctx.getApplicationName());
+            System.out.println(ctx.getDisplayName());
+            System.out.println(ctx.getId());
+
+            String[] beanNames = ctx.getBeanDefinitionNames();
+            Arrays.sort(beanNames);
+            for (String beanName : beanNames) {
+                try {
+                    System.out.println(beanName + " : " + ctx.getBean(beanName).getClass().toString());
+                } catch (Exception e) {
+                    System.out.println(beanName + " : " + "no class");
+                }
+            }
+            System.out.println("//////////////////////////////////////////////////////////////////////");
+        };
     }
 
     /***

@@ -27,12 +27,12 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.EventCRFService;
-import core.org.akaza.openclinica.service.JdbcService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 
@@ -42,15 +42,27 @@ import java.util.ArrayList;
  * Processes request of 'restore an event CRF from a event'
  */
 public class RestoreEventCRFServlet extends SecureController {
+
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
-    private EventCRFService eventCRFService;
-    private CRFDAO crfDAO;
-    private CRFVersionDAO crfVersionDAO;
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    private EventDefinitionCRFDAO eventDefinitionCRFDAO;
-    private ItemDataDAO itemDataDAO;
+    @Autowired
     private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    private CRFDAO crfDAO;
+    @Autowired
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
+    private EventDefinitionCRFDAO eventDefinitionCRFDAO;
+    @Autowired
+    private ItemDataDAO itemDataDAO;
+    @Autowired
+    private CRFVersionDAO crfVersionDAO;
+
+    @Autowired
+    private EventCRFService eventCRFService;
+
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -69,15 +81,6 @@ public class RestoreEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = JdbcService.getStudyEventDao(context);
-        eventCRFDAO = JdbcService.getEventCrfDao(context);
-        crfDAO = JdbcService.getCrfDao(context);
-        crfVersionDAO = JdbcService.getCRFVersionDao(context);
-        studyEventDefinitionDAO = JdbcService.getStudyEventDefinitionDao(context);
-        eventDefinitionCRFDAO = JdbcService.getEventDefinitionCRFDao(context);
-        itemDataDAO = JdbcService.getItemDataDao(context);
-        studySubjectDAO = JdbcService.getStudySubjectDao(context);
-        eventCRFService = (EventCRFService) SpringServletAccess.getApplicationContext(context).getBean("EventCRFService");
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));

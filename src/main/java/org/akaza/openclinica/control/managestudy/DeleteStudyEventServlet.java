@@ -25,12 +25,14 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 public class DeleteStudyEventServlet extends SecureController{
 
+    @Autowired
     private StudyEventDAO studyEventDAO;
 
     @Override
@@ -56,7 +58,6 @@ public class DeleteStudyEventServlet extends SecureController{
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 

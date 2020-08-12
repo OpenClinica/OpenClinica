@@ -8,7 +8,7 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -18,7 +18,6 @@ import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.*;
-import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.Component;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -44,29 +43,52 @@ public class ListStudySubjectsServlet extends SecureController {
 
     // Shaoyu Su
     private static final long serialVersionUID = 1L;
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    private SubjectDAO subjectDAO;
+    @Autowired
     private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    private SubjectDAO subjectDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
-    private StudyGroupClassDAO studyGroupClassDAO;
-    private SubjectGroupMapDAO subjectGroupMapDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
-    private EventDefinitionCRFDAO eventDefintionCRFDAO;
+    @Autowired
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
+    private StudyGroupClassDAO studyGroupClassDAO;
+    @Autowired
+    private SubjectGroupMapDAO subjectGroupMapDAO;
+    @Autowired
+    private EventDefinitionCRFDAO eventDefinitionCRFDAO;
+    @Autowired
     private StudyGroupDAO studyGroupDAO;
+    @Autowired
     private StudyParameterValueDAO studyParameterValueDAO;
-    private UserService userService;
+    @Autowired
     private ViewStudySubjectService viewStudySubjectService;
+    @Autowired
     private PermissionService permissionService;
+    @Autowired
     private ItemDao itemDao;
+    @Autowired
     private ItemDataDao itemDataDao;
+    @Autowired
     private ItemFormMetadataDao itemFormMetadataDao;
+    @Autowired
     private EventCrfDao eventCrfDao;
+    @Autowired
     private StudyEventDao studyEventDao;
+    @Autowired
     private CrfDao crfDao;
+    @Autowired
     private CrfVersionDao crfVersionDao;
+    @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
-    private StudyEventDefinitionDao studyEventDefinitionHibDao;
+    @Autowired
+    private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
+    @Autowired
+    private StudySubjectDao studySubjectDao;
 
     Locale locale;
 
@@ -84,7 +106,7 @@ public class ListStudySubjectsServlet extends SecureController {
             return;
         }
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 
@@ -95,10 +117,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
-        WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         boolean showMoreLink;
         if(currentStudy !=null && currentStudy.getStudyId() > 0){
             session.setAttribute("study", currentStudy);
@@ -150,7 +169,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
         request.setAttribute("closeInfoShowIcons", true);
         if (fp.getString("navBar").equals("yes") && fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {
-            List<StudySubjectBean> studySubjectList = getStudySubjectDAO().findAllSubjectsByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
+            List<StudySubjectBean> studySubjectList = studySubjectDAO.findAllSubjectsByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
             if (studySubjectList.size() == 1 ) {
                 request.setAttribute("id", new Integer(studySubjectList.get(0).getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
@@ -166,37 +185,37 @@ public class ListStudySubjectsServlet extends SecureController {
     private void createTable(boolean showMoreLink) {
 
         ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
-        factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
-        factory.setSubjectDAO(getSubjectDAO());
-        factory.setStudySubjectDAO(getStudySubjectDAO());
+        factory.setStudyEventDefinitionDao(studyEventDefinitionDAO);
+        factory.setSubjectDAO(subjectDAO);
+        factory.setStudySubjectDAO(studySubjectDAO);
         factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
-        factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
-        factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
+        factory.setStudyGroupClassDAO(studyGroupClassDAO);
+        factory.setSubjectGroupMapDAO(subjectGroupMapDAO);
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
         factory.setEventCRFDAO(eventCRFDAO);
-        factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
-        factory.setStudyGroupDAO(getStudyGroupDAO());
-        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
+        factory.setEventDefintionCRFDAO(eventDefinitionCRFDAO);
+        factory.setStudyGroupDAO(studyGroupDAO);
+        factory.setStudyParameterValueDAO(studyParameterValueDAO);
         factory.setUserService(getUserService());
         factory.setRequest(request);
-        factory.setViewStudySubjectService(getViewStudySubjectService());
+        factory.setViewStudySubjectService(viewStudySubjectService);
         factory.setPermissionService(getPermissionService());
-        factory.setItemDao(getItemDao());
-        factory.setItemDataDao(getItemDataDao());
-        factory.setCrfDao(getCrfDao());
-        factory.setCrfVersionDao(getCrfVersionDao());
-        factory.setStudyEventDao(getStudyEventDao());
-        factory.setEventCrfDao(getEventCrfDao());
-        factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
-        factory.setItemFormMetadataDao(getItemFormMetadataDao());
-        factory.setPermissionTagDao(getPermissionTagDao());
-        factory.setStudySubjectDao(getStudySubjectDao());
-        factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionHibDao());
+        factory.setItemDao(itemDao);
+        factory.setItemDataDao(itemDataDao);
+        factory.setCrfDao(crfDao);
+        factory.setCrfVersionDao(crfVersionDao);
+        factory.setStudyEventDao(studyEventDao);
+        factory.setEventCrfDao(eventCrfDao);
+        factory.setEventDefinitionCrfDao(eventDefinitionCrfDao);
+        factory.setItemFormMetadataDao(itemFormMetadataDao);
+        factory.setPermissionTagDao(permissionTagDao);
+        factory.setStudySubjectDao(studySubjectDao);
+        factory.setStudyEventDefinitionHibDao(studyEventDefinitionDao);
 
-        List<Component> components = getViewStudySubjectService().getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
+        List<Component> components = viewStudySubjectService.getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
         if (components != null) {
             for (Component component : components) {
                 if (component.getColumns() != null) {
@@ -225,108 +244,5 @@ public class ListStudySubjectsServlet extends SecureController {
     protected String getAdminServlet() {
         return SecureController.ADMIN_SERVLET_CODE;
     }
-    
-    public StudyParameterValueDAO getStudyParameterValueDAO() {
-        studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
-		return studyParameterValueDAO;
-	}
 
-	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
-		this.studyParameterValueDAO = studyParameterValueDAO;
-	}
-
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
-        return studyEventDefinitionDAO;
-    }
-
-    public SubjectDAO getSubjectDAO() {
-        subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-        return subjectDAO;
-    }
-
-    public StudySubjectDAO getStudySubjectDAO() {
-        studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-        return studySubjectDAO;
-    }
-
-    public StudyGroupClassDAO getStudyGroupClassDAO() {
-        studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource()) : studyGroupClassDAO;
-        return studyGroupClassDAO;
-    }
-
-    public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-        subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
-        return subjectGroupMapDAO;
-    }
-
-    public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-        eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource()) : eventDefintionCRFDAO;
-        return eventDefintionCRFDAO;
-    }
-
-    public StudyGroupDAO getStudyGroupDAO() {
-        studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-        return studyGroupDAO;
-    }
-
-    public UserService getUserService() {
-        return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
-    }
-
-    public ViewStudySubjectService getViewStudySubjectService() {
-        return viewStudySubjectService= (ViewStudySubjectService) SpringServletAccess.getApplicationContext(context).getBean("viewStudySubjectService");
-    }
-
-    public ItemDao getItemDao() {
-        return itemDao=(ItemDao) SpringServletAccess.getApplicationContext(context).getBean("itemDao");
-    }
-
-    public ItemDataDao getItemDataDao() {
-        return itemDataDao=(ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
-    }
-
-    public CrfDao getCrfDao() {
-        return crfDao=(CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
-    }
-
-    public CrfVersionDao getCrfVersionDao() {
-        return crfVersionDao=(CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
-    }
-
-    public StudyEventDao getStudyEventDao() {
-        return studyEventDao=(StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
-    }
-
-    public EventCrfDao getEventCrfDao() {
-        return eventCrfDao=(EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
-    }
-
-    public ItemFormMetadataDao getItemFormMetadataDao() {
-        return itemFormMetadataDao=(ItemFormMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("itemFormMetadataDao");
-    }
-
-    public EventDefinitionCrfDao getEventDefinitionCrfDao() {
-        return eventDefinitionCrfDao=(EventDefinitionCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfDao");
-    }
-
-    public EventDefinitionCrfPermissionTagDao getPermissionTagDao() {
-        return permissionTagDao=(EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
-    }
-
-    public PermissionService getPermissionService() {
-        return permissionService= (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
-    }
-
-    public StudyEventDefinitionDao getStudyEventDefinitionHibDao() {
-        return studyEventDefinitionHibDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
-
-    }
-
-    public StudySubjectDao getStudySubjectDao() {
-        return (StudySubjectDao) SpringServletAccess.getApplicationContext(context).getBean("studySubjectDaoDomain");
-    }
-    public StudyDao getStudyDao() {
-        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
-    }
 }

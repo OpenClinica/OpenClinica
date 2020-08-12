@@ -36,13 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 // import javax.servlet.http.*;
@@ -65,57 +62,27 @@ public class AddNewSubjectServlet extends SecureController {
     // Id
 
     public static final String INPUT_DOB = "dob";
-
     public static final String INPUT_YOB = "yob"; // year of birth
-
     public static final String INPUT_GENDER = "gender";
-
     public static final String INPUT_LABEL = "label";
-
     public static final String INPUT_SECONDARY_LABEL = "secondaryLabel";
-
     public static final String INPUT_ENROLLMENT_DATE = "enrollmentDate";
-
     public static final String INPUT_EVENT_START_DATE = "startDate";
-
     public static final String INPUT_GROUP = "group";
-
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
-
-
     public static final String BEAN_GROUPS = "groups";
-
-
     public static final String SUBMIT_EVENT_BUTTON = "submitEvent";
-
     public static final String SUBMIT_ENROLL_BUTTON = "submitEnroll";
-
     public static final String SUBMIT_DONE_BUTTON = "submitDone";
-
     public static final String EDIT_DOB = "editDob";
-
     public static final String EXISTING_SUB_SHOWN = "existingSubShown";
-
-
     public static final String STUDY_EVENT_DEFINITION = "studyEventDefinition";
     public static final String LOCATION = "location";
 
-    // YW <<
-    String DOB = "";
-    String YOB = "";
-    String GENDER = "";
-    public static final String G_WARNING = "gWarning";
-    public static final String D_WARNING = "dWarning";
-    public static final String Y_WARNING = "yWarning";
-    boolean needUpdate;
-    SubjectBean updateSubject = new SubjectBean();
     @Autowired
     private Configuration freemarkerConfiguration;
-
+    @Autowired
     private StudyEventDAO studyEventDAO;
-
-    // YW >>
-
 
     /*
      * (non-Javadoc)
@@ -125,7 +92,6 @@ public class AddNewSubjectServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
 
@@ -135,11 +101,6 @@ public class AddNewSubjectServlet extends SecureController {
         panel.setStudyInfoShown(false);
         FormProcessor fp = new FormProcessor(request);
         FormDiscrepancyNotes discNotes;
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-        // TODO l10n for dates? Note that in some places we hard-code the YOB by
-        // using "01/01/"+yob,
-        // not exactly supporting i18n...tbh
 
         // YW << update study parameters of current study.
         // "collectDob" and "genderRequired" are set as the same as the parent
@@ -401,7 +362,7 @@ public class AddNewSubjectServlet extends SecureController {
         String exceptionName = resexception.getString("no_permission_to_add_new_subject");
         String noAccessMessage = respage.getString("may_not_add_new_subject") + " " + respage.getString("change_study_contact_sysadmin");
 
-        if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+        if (SubmitDataUtil.maySubmitData(ub, currentRole)) {
             return;
         }
 

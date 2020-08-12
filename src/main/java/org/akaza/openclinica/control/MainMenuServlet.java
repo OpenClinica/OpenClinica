@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -51,12 +52,19 @@ public class MainMenuServlet extends SecureController {
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
+    @Autowired
     private StudySubjectDAO studySubjectDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("studyDaoDomain")
+    private StudyDao studyDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
+    @Autowired
+    UserAccountDAO userAccountDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -71,8 +79,6 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
             forwardPage(Page.MENU, false);
@@ -82,11 +88,10 @@ public class MainMenuServlet extends SecureController {
         // a flag tells whether users are required to change pwd upon the first
         // time log in or pwd expired
         // update last visit date to current date
-        UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 
         ub.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
-        udao.update(ub);
+        userAccountDAO.update(ub);
 
         if (!currentRole.isActive()) {
             String paramStr = Utils.getParamsString(request.getParameterMap());
@@ -158,7 +163,7 @@ public class MainMenuServlet extends SecureController {
     private void setupStudySubjectStatusStatisticsTable() {
 
         StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudySubjectDao(studySubjectDAO);
         factory.setCurrentStudy(currentStudy);
 
         String studySubjectStatusStatistics = factory.createTable(request, response).render();
@@ -168,8 +173,8 @@ public class MainMenuServlet extends SecureController {
     private void setupSubjectEventStatusStatisticsTable() {
 
         EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
-        factory.setStudyDao(getStudyDao());
+        factory.setStudySubjectDao(studySubjectDAO);
+        factory.setStudyDao(studyDAO);
         factory.setCurrentStudy(currentStudy);
         factory.setStudyEventDao(studyEventDAO);
         String subjectEventStatusStatistics = factory.createTable(request, response).render();
@@ -179,8 +184,8 @@ public class MainMenuServlet extends SecureController {
     private void setupStudySiteStatisticsTable() {
 
         SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
-        factory.setStudyDao(getStudyDao());
+        factory.setStudySubjectDao(studySubjectDAO);
+        factory.setStudyDao(studyDAO);
         factory.setCurrentStudy(currentStudy);
         String studySiteStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySiteStatistics", studySiteStatistics);
@@ -190,54 +195,12 @@ public class MainMenuServlet extends SecureController {
     private void setupStudyStatisticsTable() {
 
         StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
-        factory.setStudyDao(getStudyDao());
+        factory.setStudySubjectDao(studySubjectDAO);
+        factory.setStudyDao(studyDAO);
         factory.setCurrentStudy(currentPublicStudy);
         String studyStatistics = factory.createTable(request, response).render();
         request.setAttribute("studyStatistics", studyStatistics);
 
     }
 
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
-        return studyEventDefinitionDAO;
-    }
-
-    public SubjectDAO getSubjectDAO() {
-        subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-        return subjectDAO;
-    }
-
-    public StudySubjectDAO getStudySubjectDAO() {
-        studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-        return studySubjectDAO;
-    }
-
-    public StudyGroupClassDAO getStudyGroupClassDAO() {
-        studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource()) : studyGroupClassDAO;
-        return studyGroupClassDAO;
-    }
-
-    public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-        subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
-        return subjectGroupMapDAO;
-    }
-
-    public StudyGroupDAO getStudyGroupDAO() {
-        studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-        return studyGroupDAO;
-    }
-
-    public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
-        discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource()) : discrepancyNoteDAO;
-        return discrepancyNoteDAO;
-    }
-
-    public SDVUtil getSDVUtil() {
-        return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
-    }
-
-    public StudyDao getStudyDao() {
-        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
-    }
 }

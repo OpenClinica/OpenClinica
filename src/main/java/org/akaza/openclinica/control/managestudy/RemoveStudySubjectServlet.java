@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.view.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class RemoveStudySubjectServlet extends SecureController {
 
     DiscrepancyNoteDAO dnDao;
     private StudySubjectService studySubjectService;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     /**
@@ -74,7 +76,6 @@ public class RemoveStudySubjectServlet extends SecureController {
         String subIdString = request.getParameter("subjectId");
         String studyIdString = request.getParameter("studyId");
         studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());

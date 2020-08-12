@@ -11,7 +11,6 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
@@ -36,13 +35,11 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.crfdata.HideCRFManager;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.net.URLEncoder;
@@ -84,8 +81,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
     public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
     public final static String END_DATE_NOTE = "endDateNote";
 
+    @Autowired
     private StudySubjectService studySubjectService;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
 
@@ -125,9 +125,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
     protected void processRequest() throws Exception {
         getEventCrfLocker().unlockAllForUser(ub.getId());
         FormProcessor fp = new FormProcessor(request);
-        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         int eventId = fp.getInt(INPUT_EVENT_ID, true);
         request.setAttribute("eventId", eventId + "");
@@ -357,7 +354,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         String exceptionName = resexception.getString("no_permission_to_submit_data");
         String noAccessMessage = respage.getString("may_not_enter_data_for_this_study");
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 

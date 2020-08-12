@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -25,7 +24,6 @@ import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -58,8 +56,7 @@ public class DiscrepancyNoteUtil {
     @Autowired
     private StudyDao studyDao;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
 
     // These two variables are to arrange the Summary Statistics accordingly
     // Mantis Issue: 7771
@@ -128,7 +125,7 @@ public class DiscrepancyNoteUtil {
         for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
             studyEventBean = dStudyEventBean.getStudyEvent();
             // All EventCRFs for a study event
-            eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
+            eventCRFBeans = eventCRFDAO.findAllByStudyEvent(studyEventBean);
 
             for (EventCRFBean eventCrfBean : eventCRFBeans) {
                 // Find ItemData type notes associated with an event crf

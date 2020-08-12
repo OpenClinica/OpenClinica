@@ -33,22 +33,22 @@ public class SubmitDataServletTest extends TestCase {
 
     	// Positive Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.RESEARCHASSISTANT);
-    	boolean result1 = SubmitDataServlet.mayViewData(ub, studyUserRoleBeanMock);
+    	boolean result1 = SubmitDataUtil.mayViewData(ub, studyUserRoleBeanMock);
         assertEquals(true, result1);
 
         // Positive Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.RESEARCHASSISTANT2);
-    	boolean result2 = SubmitDataServlet.mayViewData(ub, studyUserRoleBeanMock);
+    	boolean result2 = SubmitDataUtil.mayViewData(ub, studyUserRoleBeanMock);
         assertEquals(true, result2);
 
         // Negative Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.ADMIN);
-        boolean result3 = SubmitDataServlet.mayViewData(ub, studyUserRoleBeanMock);
+        boolean result3 = SubmitDataUtil.mayViewData(ub, studyUserRoleBeanMock);
         assertEquals(false, result3);
     
         // Negative Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.INVALID);
-        boolean result4 = SubmitDataServlet.mayViewData(ub, studyUserRoleBeanMock);
+        boolean result4 = SubmitDataUtil.mayViewData(ub, studyUserRoleBeanMock);
         assertEquals(false, result4);
     }
     
@@ -63,22 +63,22 @@ public class SubmitDataServletTest extends TestCase {
 
     	// Positive Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.RESEARCHASSISTANT);
-    	boolean result1 = SubmitDataServlet.maySubmitData(ub, studyUserRoleBeanMock);
+    	boolean result1 = SubmitDataUtil.maySubmitData(ub, studyUserRoleBeanMock);
         assertEquals(true, result1);
 
         // Positive Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.RESEARCHASSISTANT2);
-    	boolean result2 = SubmitDataServlet.maySubmitData(ub, studyUserRoleBeanMock);
+    	boolean result2 = SubmitDataUtil.maySubmitData(ub, studyUserRoleBeanMock);
         assertEquals(true, result2);
 
         // Negative Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.ADMIN);
-        boolean result3 = SubmitDataServlet.maySubmitData(ub, studyUserRoleBeanMock);
+        boolean result3 = SubmitDataUtil.maySubmitData(ub, studyUserRoleBeanMock);
         assertEquals(false, result3);
     
         // Negative Testing
     	when(studyUserRoleBeanMock.getRole()).thenReturn(Role.INVALID);
-        boolean result4 = SubmitDataServlet.maySubmitData(ub, studyUserRoleBeanMock);
+        boolean result4 = SubmitDataUtil.maySubmitData(ub, studyUserRoleBeanMock);
         assertEquals(false, result4);
     }
   

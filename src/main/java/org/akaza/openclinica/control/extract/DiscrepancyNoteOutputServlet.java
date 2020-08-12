@@ -83,7 +83,9 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
     private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     /* Handle the HTTP Get or Post request. */
@@ -91,8 +93,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         // the fileName contains any subject id and study unique protocol id;
         // see: chooseDownloadFormat.jsp
         String fileName = request.getParameter("fileName");

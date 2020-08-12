@@ -321,12 +321,6 @@ public enum Page {
     TECH_ADMIN_SYSTEM("/WEB-INF/jsp/" + "techadmin/index.jsp", "Technical Administrator Menu"),
     VIEW_SCHEDULER("/WEB-INF/jsp/" + "admin/viewScheduler.jsp", "View System Scheduler"),
     ADMIN_SYSTEM_SERVLET("/AdminSystem", "Administer System Servlet"),
-    MANAGE_STUDY_SERVLET("/ManageStudy", "Manage Study Servlet"),
-
-    SUBMIT_DATA("/WEB-INF/jsp/" + "submit/index.jsp", "Submit Data Menu"),
-    // SUBMIT_DATA_SERVLET ("/SubmitData",
-    // "Submit Data Menu"),
-    SUBMIT_DATA_SERVLET("/ListStudySubjectsSubmit", "Submit Data Menu"),
 
     CREATE_NEW_STUDY_EVENT("/WEB-INF/jsp/" + "submit/createNewStudyEvent.jsp", "Create a New Study Event"),
     CREATE_NEW_STUDY_EVENT_SERVLET("/CreateNewStudyEvent", "Create a New Study Event"),
@@ -367,9 +361,6 @@ public enum Page {
 
     VIEW_CRF_VERSION("/WEB-INF/jsp/" + "managestudy/viewCRFVersion.jsp", "View a CRF Version"),
 
-    // TODO do we need both versions here??? tbh
-    LIST_STUDY_SUBJECT("/WEB-INF/jsp/" + "managestudy/listStudySubject.jsp", "list subjects in a study"),
-    LIST_STUDY_SUBJECT_SERVLET("/ListStudySubject", "list subjects in a study"),
     VIEW_STUDY_SUBJECT("/WEB-INF/jsp/" + "managestudy/viewStudySubject.jsp", "View Subject in a study"),
     VIEW_STUDY_SUBJECT_AUDIT("/WEB-INF/jsp/" + "managestudy/viewStudySubjectAudit.jsp", "View Subject in a study Audit"),
     VIEW_STUDY_SUBJECT_SERVLET("/ViewStudySubject", "View Subject in a study Servlet"),

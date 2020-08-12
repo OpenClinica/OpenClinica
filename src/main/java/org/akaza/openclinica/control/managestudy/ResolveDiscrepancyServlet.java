@@ -137,7 +137,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private final String ITEM_ID = "itemId";
     private final String PARENT_ID = "parentId";// parent note id
 
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
     private XformParserHelper xformParserHelper;
 
@@ -378,8 +380,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         xformParserHelper = (XformParserHelper) SpringServletAccess.getApplicationContext(context).getBean("xformParserHelper");
         int noteId = fp.getInt(INPUT_NOTE_ID);
         int itemDataId = fp.getInt("itemDataId");
@@ -414,7 +414,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
         }
         if (!discrepancyNoteBean.isActive()) {
-            throw new InconsistentStateException(Page.MANAGE_STUDY_SERVLET, resexception.getString("you_are_trying_resolve_discrepancy_not_exist"));
+            throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS, resexception.getString("you_are_trying_resolve_discrepancy_not_exist"));
         }
 
         // check that the note has not already been closed

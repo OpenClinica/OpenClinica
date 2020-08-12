@@ -11,18 +11,15 @@ import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.admin.StudyEventAuditBean;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -38,6 +35,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.sql.DataSource;
@@ -81,8 +79,32 @@ public class ViewStudySubjectServlet extends SecureController {
 
     public final static String visitBasedEventItempath=CoreResources.getField("visitBasedEventItem");
 
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
+    @Autowired
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    private SubjectDAO subjectDAO;
+    @Autowired
+    FormLayoutDAO formLayoutDAO;
+    @Autowired
+    private CRFDAO crfDAO;
+    @Autowired
+    private ItemDataDAO itemDataDAO;
+    @Autowired
+    private ItemDAO itemDAO;
+    @Autowired
+    private SubjectGroupMapDAO subjectGroupMapDAO;
+    @Autowired
+    private DiscrepancyNoteDAO discrepancyNoteDAO;
+    @Autowired
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
+    private AuditEventDAO auditEventDAO;
+    @Autowired
+    UserAccountDAO userAccountDAO;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -97,7 +119,7 @@ public class ViewStudySubjectServlet extends SecureController {
             return;
         }
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 
@@ -105,17 +127,9 @@ public class ViewStudySubjectServlet extends SecureController {
         throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_study_director"), "1");
     }
 
+
     @Override
     public void processRequest() throws Exception {
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
-        SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-        StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(sm.getDataSource());
-        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-        ItemDataDAO itemDataDAO = new ItemDataDAO(sm.getDataSource());
-        ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int studySubId = fp.getInt("id", true);// studySubjectId
         String from = fp.getString("from");
@@ -143,7 +157,7 @@ public class ViewStudySubjectServlet extends SecureController {
             } else {
                 request.setAttribute("from", "");
             }
-            StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
+            StudySubjectBean studySub = (StudySubjectBean) studySubjectDAO.findByPK(studySubId);
 
             request.setAttribute("studySub", studySub);
             Study studyRelatedTostudySub = (Study) getStudyDao().findById(studySub.getStudyId());
@@ -181,7 +195,6 @@ public class ViewStudySubjectServlet extends SecureController {
             boolean isParentStudy = !study.isSite();
 
             // Get any disc notes for this subject : studySubId
-            DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
             List<DiscrepancyNoteBean> allNotesforSubject = new ArrayList<DiscrepancyNoteBean>();
 
             // These methods return only parent disc notes
@@ -203,7 +216,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 setRequestAttributesForNotes(allNotesforSubject);
             }
 
-            SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
+            SubjectBean subject = (SubjectBean) subjectDAO.findByPK(subjectId);
             if (currentStudy.getCollectDob().equals("2")) {
                 Date dob = subject.getDateOfBirth();
                 if (dob != null) {
@@ -218,10 +231,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
             request.setAttribute("subject", subject);
 
-            /*
-             * StudyDAO studydao = new StudyDAO(sm.getDataSource()); Study
-             * study = (Study) studydao.findByPK(studyId);
-             */
             if (isParentStudy) {
                 study.setCollectDob(currentStudy.getCollectDob());
             }
@@ -236,12 +245,10 @@ public class ViewStudySubjectServlet extends SecureController {
                 request.setAttribute("parentStudy", new Study());
             }
 
-            ArrayList children = (ArrayList) sdao.findAllChildrenByPK(subjectId);
+            ArrayList children = (ArrayList) subjectDAO.findAllChildrenByPK(subjectId);
             request.setAttribute("children", children);
 
             // find study events
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-
             StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
                     .getBean("studySubjectService");
             List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole, study);
@@ -270,7 +277,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 for (int i = 0; i < displayEvents.size(); i++) {
                     DisplayStudyEventBean decb = displayEvents.get(i);
                     StudyEventBean seBean = decb.getStudyEvent();
-                    StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean.getStudyEventDefinitionId());
+                    StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(seBean.getStudyEventDefinitionId());
 
                    if(itemPathList!=null) {
                        for (String itemPath : itemPathList) {
@@ -286,7 +293,7 @@ public class ViewStudySubjectServlet extends SecureController {
                                List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByStudyEvent(seBean);
                                for (EventCRFBean eventCRFBean : eventCRFBeans) {
                                    FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
-                                   CRFBean crfBean = (CRFBean) crfdao.findByPK(formLayoutBean.getCrfId());
+                                   CRFBean crfBean = (CRFBean) crfDAO.findByPK(formLayoutBean.getCrfId());
 
                                    if (crfBean.getOid().equals(givenFormOid)) {
                                        List<ItemBean> itemBeans = itemDAO.findByOid(givenItemOid);
@@ -336,15 +343,12 @@ public class ViewStudySubjectServlet extends SecureController {
             table.computeDisplayWithFilteringUsingContains();
 
             request.setAttribute("table", table);
-            SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-            ArrayList groupMaps = (ArrayList) sgmdao.findAllByStudySubject(studySubId);
+            ArrayList groupMaps = (ArrayList) subjectGroupMapDAO.findAllByStudySubject(studySubId);
             request.setAttribute("groups", groupMaps);
 
             // find audit log for events
-            AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource(), getStudyDao());
-            ArrayList logs = aedao.findEventStatusLogByStudySubject(studySubId);
+            ArrayList logs = auditEventDAO.findEventStatusLogByStudySubject(studySubId);
             // logger.warning("^^^ retrieved logs");
-            UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
             ArrayList eventLogs = new ArrayList();
             // logger.warning("^^^ starting to iterate");
             for (int i = 0; i < logs.size(); i++) {
@@ -352,7 +356,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 StudyEventAuditBean sea = new StudyEventAuditBean();
                 sea.setAuditEvent(avb);
                 StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(avb.getEntityId());
-                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
+                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(se.getStudyEventDefinitionId());
                 sea.setDefinition(sed);
                 String old = avb.getOldValue().trim();
                 try {
@@ -368,7 +372,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 } catch (NumberFormatException e) {
                     logger.error("Subject event status is not able to be fetched: ",e);
                 }
-                UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
+                UserAccountBean updater = (UserAccountBean) userAccountDAO.findByPK(avb.getUserId());
                 sea.setUpdater(updater);
                 eventLogs.add(sea);
             }
@@ -382,90 +386,6 @@ public class ViewStudySubjectServlet extends SecureController {
             request.setAttribute("subjectStudy" ,subjectStudy);
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
-    }
-
-    /**
-     * Each of the event CRFs with its corresponding CRFBean. Then generates a
-     * list of DisplayEventCRFBeans, one for each event CRF.
-     *
-     * @param eventCRFs
-     *            The list of event CRFs for this study event.
-     * @param eventDefinitionCRFs
-     *            The list of event definition CRFs for this study event.
-     * @return The list of DisplayEventCRFBeans for this study event.
-     */
-    public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
-                                                StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum workflowStatus, Study study) {
-        ArrayList answer = new ArrayList();
-
-        // HashMap definitionsById = new HashMap();
-        int i;
-        /*
-         * for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-         * EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
-         * eventDefinitionCRFs.get(i); definitionsById.put(new
-         * Integer(edc.getStudyEventDefinitionId()), edc); }
-         */
-
-        CRFDAO cdao = new CRFDAO(ds);
-        CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-        FormLayoutDAO fldao = new FormLayoutDAO(ds);
-        ItemDataDAO iddao = new ItemDataDAO(ds);
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-
-        for (i = 0; i < eventCRFs.size(); i++) {
-            EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
-
-            // populate the event CRF with its crf bean
-            int crfVersionId = ecb.getCRFVersionId();
-            int formLayoutId = ecb.getFormLayoutId();
-            CRFBean cb = cdao.findByLayoutId(formLayoutId);
-            ecb.setCrf(cb);
-
-            CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-            ecb.setCrfVersion(cvb);
-            FormLayoutBean flb = (FormLayoutBean) fldao.findByPK(formLayoutId);
-            ecb.setFormLayout(flb);
-
-            // then get the definition so we can call
-            // DisplayEventCRFBean.setFlags
-            int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
-
-            // EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
-            // definitionsById.get(new Integer(
-            // studyEventDefinitionId));
-            // fix problem of the above code(commented out), find the correct
-            // edc, note that on definitionId can be related to multiple
-            // eventdefinitioncrfBeans
-            EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
-            // below added 092007 tbh
-            // above added 092007-102007 tbh
-            // TODO need to refactor since this is similar to other code, tbh
-            if (edc != null) {
-                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
-                edc.setVersions(versions);
-
-                // System.out.println("edc is not null, need to set flags");
-                DisplayEventCRFBean dec = new DisplayEventCRFBean();
-                dec.setEventDefinitionCRF(edc);
-                // System.out.println("edc.isDoubleEntry()" +
-                // edc.isDoubleEntry() + ecb.getId());
-                dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-
-                if (dec.isLocked()) {
-                    // System.out.println("*** found a locked DEC:
-                    // "+edc.getCrfName());
-                }
-                ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
-                if (!idata.isEmpty()) {
-                    // consider an event crf started only if item data get
-                    // created
-                    answer.add(dec);
-                }
-            }
-        }
-        return answer;
     }
 
     @Override

@@ -41,7 +41,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -67,11 +66,9 @@ public class ImportCRFDataService {
     private UserAccountDao userAccountDao;
 
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
 
     @Autowired
     private StudyDao studyDao;
@@ -288,7 +285,7 @@ public class ImportCRFDataService {
 
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
                         ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByCRFId(formLayoutBean.getCrfId());
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
                         CRFVersionBean crfVersionBean = crfVersionBeans.get(0);
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
@@ -309,7 +306,7 @@ public class ImportCRFDataService {
                                    if(isNewStudyEvent) {
                                 		studyEventBean.getEventCRFs().add(newEventCrfBean); 
                                    }else {
-                                	   newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+                                	   newEventCrfBean = (EventCRFBean) eventCRFDAO.create(newEventCrfBean);
                                    }
                                    
                                   
@@ -432,7 +429,7 @@ public class ImportCRFDataService {
         if (!studyEventDefinition.isRepeating()) {
             logger.debug("StudyEventDefinition with Oid {} is Non Repeating", studyEventDefinition.getOid());
             for (StudyEventBean stEvent : studyEvents) {
-                ArrayList<EventCRFBean> eventCRFBeans = eventCrfDAO.findByEventSubjectFormLayout(stEvent, studySubject, formLayoutBean);
+                ArrayList<EventCRFBean> eventCRFBeans = eventCRFDAO.findByEventSubjectFormLayout(stEvent, studySubject, formLayoutBean);
                 if (eventCRFBeans != null && eventCRFBeans.size() > 0) {
                     eventCrf = eventCRFBeans.get(0);
                     eventCrfId = eventCrf.getId();
@@ -758,7 +755,7 @@ public class ImportCRFDataService {
                     ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
@@ -841,7 +838,7 @@ public class ImportCRFDataService {
 
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
 
                         if (eventCrfBeans == null || eventCrfBeans.size() == 0) {
                             String ecbId = studySubjectBean.getId() + "-" + studyEventBean.getId() + "-" + formLayoutBean.getId();
@@ -1701,7 +1698,7 @@ public class ImportCRFDataService {
 
                     ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByFormOid(formDataBean.getFormOID());
                     for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCRFDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
                         for (EventCRFBean ecb : eventCrfBeans) {
                             Integer ecbId = new Integer(ecb.getId());
 
@@ -1854,7 +1851,7 @@ public class ImportCRFDataService {
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
 
-                    EventCRFBean eventCRFBean = eventCrfDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
 
                     if(eventCRFBean == null && studyEvent.getId()==0) {
                     	ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
@@ -2490,7 +2487,7 @@ public class ImportCRFDataService {
 		ArrayList<EventCRFBean> eventCRFBeansCreated = new  ArrayList<>();
 		for(EventCRFBean newEventCrfBean:eventCRFBeans) {
 			if(newEventCrfBean != null) {
-				EventCRFBean newCreatedEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+				EventCRFBean newCreatedEventCrfBean = (EventCRFBean) eventCRFDAO.create(newEventCrfBean);
 				eventCRFBeansCreated.add(newCreatedEventCrfBean);
 			}
 
@@ -2570,7 +2567,7 @@ public class ImportCRFDataService {
 			}
 			CRFVersionBean crfVersion = crfVersionBeans.get(0);
 
-			EventCRFBean eventCRFBean = eventCrfDAO.findByEventCrfVersion(studyEvent, crfVersion);
+			EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
 
 			EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 			EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),

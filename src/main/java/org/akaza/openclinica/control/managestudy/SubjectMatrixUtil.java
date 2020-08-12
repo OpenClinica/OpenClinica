@@ -13,6 +13,9 @@ public class SubjectMatrixUtil {
      * @param pageNumber  A String
      * @return A String representing the entire query string
      */
+
+    public static String SUBJECT_PAGE_NUMBER = "ebl_page";
+
     public String createPaginatingQuery(String pageNumber){
 
         StringBuilder paginatingQuery = new StringBuilder("");
@@ -24,7 +27,7 @@ public class SubjectMatrixUtil {
                 // tempNum is already initialized to 0
             }
             if(tempNum > 0){
-                paginatingQuery = new StringBuilder(ListStudySubjectServlet.SUBJECT_PAGE_NUMBER).
+                paginatingQuery = new StringBuilder(SUBJECT_PAGE_NUMBER).
                   append("=").append(pageNumber);
                 paginatingQuery.append("&ebl_paginated=1");
             }

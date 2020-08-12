@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
@@ -60,6 +61,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -163,6 +165,30 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static final String BIND_OC_EXTERNAL = "bind::oc:external";
     public static final String OC_CONTACTDATA = "oc:contactdata";
     public static final String CONTACTDATA = "contactdata";
+
+
+    @Autowired
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    private StudyEventDAO studyEventDAO;
+    @Autowired
+    private EventCRFDAO eventCRFDAO;
+    @Autowired
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
+    private UserAccountDAO userAccountDAO;
+    @Autowired
+    private StudyGroupClassDAO studyGroupClassDAO;
+    @Autowired
+    private StudyGroupDAO studyGroupDAO;
+    @Autowired
+    private ItemDataDAO itemDataDAO;
+    @Autowired
+    private ItemDAO itemDAO;
+    @Autowired
+    private CRFDAO crfDAO;
+    @Autowired
+    private ArchivedDatasetFileDAO archivedDatasetFileDAO;
 
     protected UserService userService;
     protected StdScheduler scheduler;
@@ -296,78 +322,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-    private void pingJobServer(HttpServletRequest request) {
-        String jobName = (String) request.getSession().getAttribute("jobName");
-        String groupName = (String) request.getSession().getAttribute("groupName");
-        Integer datasetId = (Integer) request.getSession().getAttribute("datasetId");
-        try {
-            if (jobName != null && groupName != null) {
-
-                Trigger.TriggerState triggerState = getScheduler(request).getTriggerState(new TriggerKey(jobName, groupName));
-                org.quartz.JobDetail details = getScheduler(request).getJobDetail(new JobKey(jobName, groupName));
-                List contexts = getScheduler(request).getCurrentlyExecutingJobs();
-                // will we get the above, even if its completed running?
-                // ProcessingResultType message = null;
-                // for (int i = 0; i < contexts.size(); i++) {
-                // org.quartz.JobExecutionContext context = (org.quartz.JobExecutionContext) contexts.get(i);
-                // if (context.getJobDetail().getName().equals(jobName) &&
-                // context.getJobDetail().getGroup().equals(groupName)) {
-                // message = (ProcessingResultType) context.getResult();
-                // System.out.println("found message " + message.getDescription());
-                // }
-                // }
-                // ProcessingResultType message = (ProcessingResultType) details.getResult();
-                org.quartz.JobDataMap dataMap = details.getJobDataMap();
-                String failMessage = dataMap.getString("failMessage");
-                if (triggerState == Trigger.TriggerState.NONE || triggerState == Trigger.TriggerState.COMPLETE) {
-                    // add the message here that your export is done
-                    // TODO make absolute paths in the message, for example a link from /pages/* would break
-                    // TODO i18n
-                    if (failMessage != null) {
-                        // The extract data job failed with the message:
-                        // ERROR: relation "demographics" already exists
-                        // More information may be available in the log files.
-                        addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
-                                + "<br/><br/>More information may be available in the log files.");
-                        request.getSession().removeAttribute("jobName");
-                        request.getSession().removeAttribute("groupName");
-                        request.getSession().removeAttribute("datasetId");
-                    } else {
-                        String successMsg = dataMap.getString("SUCCESS_MESSAGE");
-                        String success = dataMap.getString("successMsg");
-                        if (success != null) {
-
-                            if (successMsg.contains("$linkURL")) {
-                                successMsg = decodeLINKURL(successMsg, datasetId);
-                            }
-
-                            if (successMsg != null && !successMsg.isEmpty()) {
-                                addPageMessage(successMsg);
-                            } else {
-                                addPageMessage("Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId=" + datasetId
-                                        + "'> Here </a>.");
-                            }
-                            request.getSession().removeAttribute("jobName");
-                            request.getSession().removeAttribute("groupName");
-                            request.getSession().removeAttribute("datasetId");
-                        }
-                    }
-
-                } else {
-
-                }
-            }
-        } catch (SchedulerException se) {
-            logger.error("Pinging job server is failing due to ", se);
-        }
-
-    }
-
     private String decodeLINKURL(String successMsg, Integer datasetId) {
 
-        ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
-
-        ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
+        ArrayList<ArchivedDatasetFileBean> fileBeans = archivedDatasetFileDAO.findByDatasetId(datasetId);
 
         successMsg = successMsg.replace("$linkURL",
                 "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">here </a>");
@@ -422,7 +379,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         // If the session already has a value with key PIWIK_URL don't reset
         if (session.getAttribute(PIWIK_URL) == null) {
-            session.setAttribute(PIWIK_URL, CoreResources.getField("piwik.url"));
+            session.setAttribute(PIWIK_URL, CoreResources.getField("ngwik.url"));
         }
 
         ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
@@ -476,8 +433,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
-                    UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
-                    ub = (UserAccountBean) uDAO.findByUserUuid(ocUserUuid);
+                    ub = (UserAccountBean) userAccountDAO.findByUserUuid(ocUserUuid);
                 }
             }
             if (ub == null || StringUtils.isEmpty(ub.getName())) {
@@ -502,12 +458,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
 
             if (currentPublicStudy == null || currentPublicStudy.getStudyId() <= 0) {
-                UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
-                ub = (UserAccountBean) uDAO.findByUserName(ub.getName());
+                ub = (UserAccountBean) userAccountDAO.findByUserName(ub.getName());
                 session.setAttribute(USER_BEAN_NAME, ub);
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     CoreResources.setRequestSchema(request, "public");
-//                    StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
                     currentPublicStudy = getStudyDao().findByPK(ub.getActiveStudyId());
 
 //                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentPublicStudy);
@@ -923,9 +877,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param entityId int
      * @param userName String
      * @param adao AuditableEntityDAO
-     * @param ds javax.sql.DataSource
      */
-    protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
+    protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao) {
         ArrayList<Study> studies = (ArrayList<Study>) getStudyDao().findAllByUserNotRemoved(userName);
         for (int i = 0; i < studies.size(); ++i) {
             Study publicStudy = studies.get(i);
@@ -1011,7 +964,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public ArrayList getEventDefinitionsByCurrentStudy() {
-        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(sm.getDataSource());
         ArrayList<StudyEventDefinitionBean> tempList = new ArrayList();
         ArrayList<StudyEventDefinitionBean> allDefs = new ArrayList();
         if (currentStudy == null)
@@ -1031,8 +983,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public ArrayList getStudyGroupClassesByCurrentStudy() {
-        StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());
-        StudyGroupDAO studyGroupDAO = new StudyGroupDAO(sm.getDataSource());
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         ArrayList studyGroupClasses = new ArrayList();
         if (currentStudy.isSite()) {
@@ -1277,7 +1227,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         boolean capIsOn = isEnrollmentCapEnforced();
 
-        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
         int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
         Study sb = null;
@@ -1370,7 +1319,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
 
         studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), tmpPublicStudy.getStudyId(), studyEnvUuid, false);
-        UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
 
         ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
         ub.setRoles(userRoleBeans);
@@ -1445,8 +1393,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         String participateStatus = getParticipateStatus(parentStudy);
         if (participateStatus.equals(ENABLED) && studySub.getUserId() != 0) {
             studySub.setUserStatus(userStatus);
-            StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-            sdao.update(studySub);
+            studySubjectDAO.update(studySub);
         }
     }
 
@@ -1469,8 +1416,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             subjectCount = studyBean.getSubjectCount();
 
         if (subjectCount == 0) {
-            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-            ArrayList ss = ssdao.findAllBySiteId(studyBean.getStudyId());
+            ArrayList ss = studySubjectDAO.findAllBySiteId(studyBean.getStudyId());
             if (ss != null) {
                 subjectCount = ss.size();
             }
@@ -1527,7 +1473,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             setStudy(currentStudy, session);
             session.setAttribute("publicStudy", currentPublicStudy);
             ub.setActiveStudyId(currentPublicStudy.getStudyId());
-            UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             userAccountDAO.update(ub);
@@ -1560,36 +1505,29 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         if ("itemData".equalsIgnoreCase(note.getEntityType())) {
             int itemDataId = note.getEntityId();
-            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-            ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-            ItemDAO idao = new ItemDAO(sm.getDataSource());
+            ItemDataBean itemData = (ItemDataBean) itemDataDAO.findByPK(itemDataId);
             if (StringUtil.isBlank(note.getEntityName())) {
-                ItemBean item = (ItemBean) idao.findByPK(itemData.getItemId());
+                ItemBean item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
                 note.setEntityName(item.getName());
                 request.setAttribute("item", item);
             }
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
 
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+            EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(itemData.getEventCRFId());
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(ec.getStudyEventId());
 
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(event.getStudyEventDefinitionId());
             note.setEventName(sed.getName());
             if (event.getDateStarted() != null)
                 note.setEventStart(event.getDateStarted());
 
-            CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            CRFBean crf = crfDAO.findByVersionId(ec.getCRFVersionId());
             note.setCrfName(crf.getName());
             note.setEventCRFId(ec.getId());
 
             if (StringUtil.isBlank(note.getSubjectName())) {
-                StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+                StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(ec.getStudySubjectId());
                 note.setSubjectName(ss.getName());
             }
 
@@ -1600,45 +1538,39 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         } else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
             int eventCRFId = note.getEntityId();
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
 
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
-            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+            EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(ec.getStudyEventId());
 
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(event.getStudyEventDefinitionId());
             note.setEventName(sed.getName());
             note.setEventStart(event.getDateStarted());
 
-            CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            CRFBean crf = crfDAO.findByVersionId(ec.getCRFVersionId());
             note.setCrfName(crf.getName());
-            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+            StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(ec.getStudySubjectId());
             note.setSubjectName(ss.getName());
             note.setEventCRFId(ec.getId());
 
         } else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
             int eventId = note.getEntityId();
-            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
-            StudyEventBean event = (StudyEventBean) svdao.findByPK(eventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(eventId);
 
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(event.getStudyEventDefinitionId());
             note.setEventName(sed.getName());
             note.setEventStart(event.getDateStarted());
 
-            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+            StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(event.getStudySubjectId());
             note.setSubjectName(ss.getName());
 
         } else if ("studySub".equalsIgnoreCase(note.getEntityType())) {
             int studySubjectId = note.getEntityId();
-            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+            StudySubjectBean ss = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
             note.setSubjectName(ss.getName());
 
         } else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
             int subjectId = note.getEntityId();
-            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentPublicStudy);
+            StudySubjectBean ss = studySubjectDAO.findBySubjectIdAndStudy(subjectId, currentPublicStudy);
             note.setSubjectName(ss.getName());
         }
 

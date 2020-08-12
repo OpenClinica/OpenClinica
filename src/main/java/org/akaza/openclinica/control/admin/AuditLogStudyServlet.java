@@ -42,7 +42,9 @@ import java.util.Locale;
 public class AuditLogStudyServlet extends SecureController {
 
     Locale locale;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
 
@@ -70,8 +72,6 @@ public class AuditLogStudyServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());

@@ -24,6 +24,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +37,9 @@ import java.util.Date;
  */
 public class RemoveSubjectServlet extends SecureController {
 
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
     /**
      *
@@ -57,8 +60,6 @@ public class RemoveSubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int subjectId = fp.getInt("id");

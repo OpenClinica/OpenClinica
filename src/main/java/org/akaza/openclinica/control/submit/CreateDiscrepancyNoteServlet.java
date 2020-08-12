@@ -34,7 +34,6 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -45,7 +44,6 @@ import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -62,6 +60,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create a discrepancy note for a data entity
@@ -72,6 +71,9 @@ import org.apache.commons.lang.StringUtils;
 public class CreateDiscrepancyNoteServlet extends SecureController {
 
     Locale locale;
+
+    @Autowired
+    private EventCRFDAO eventCRFDAO;
     // < ResourceBundleresexception,respage;
 
     public static final String DIS_TYPES = "discrepancyTypes";
@@ -157,7 +159,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"));
         locale = LocaleResolver.getLocale(request);
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 
@@ -249,8 +251,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 ItemDataBean itemData = (ItemDataBean) new ItemDataDAO(sm.getDataSource()).findByPK(entityId);
                 request.setAttribute("entityValue", itemData.getValue());
                 request.setAttribute("entityName", item.getName());
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+                EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(itemData.getEventCRFId());
                 preUserId = ec.getOwnerId();
             } else if ("studySub".equalsIgnoreCase(entityType)) {
                 StudySubjectBean ssub = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(entityId);
@@ -322,7 +323,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     }
                 }
             } else if ("eventCrf".equalsIgnoreCase(entityType)) {
-                EventCRFBean ec = (EventCRFBean) new EventCRFDAO(sm.getDataSource()).findByPK(entityId);
+                EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(entityId);
                 preUserId = ec.getOwnerId();
                 if (!StringUtils.isBlank(column)) {
                     if ("date_interviewed".equals(column)) {
@@ -555,9 +556,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 logger.debug("assigned owner id: " + parent.getOwnerId());
             } else if (dnb.getEventCRFId() > 0) {
                 logger.debug("found a event crf id: " + dnb.getEventCRFId());
-                EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
                 EventCRFBean eventCrfBean = new EventCRFBean();
-                eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(dnb.getEventCRFId());
+                eventCrfBean = (EventCRFBean) eventCRFDAO.findByPK(dnb.getEventCRFId());
                 request.setAttribute(USER_ACCOUNT_ID,   Integer.valueOf(eventCrfBean.getOwnerId()).toString());
                 logger.debug("assigned owner id: " + eventCrfBean.getOwnerId());
             } else {
@@ -914,10 +914,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             int itemDataId = entityId;
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
             StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+            EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(itemData.getEventCRFId());
             StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
             StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(event.getStudySubjectId());
             if (studySubject.getStatus() != null && studySubject.getStatus().equals(Status.SIGNED)) {
@@ -933,7 +932,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 studySubjectDAO.update(studySubject);
                 ec.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
                 ec.setSdvUpdateId(ub.getId());
-                ecdao.update(ec);
+                eventCRFDAO.update(ec);
             }
 
         }
@@ -966,9 +965,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             int itemDataId = entityId;
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+            EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(itemData.getEventCRFId());
             StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
             if (event.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
                 event.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
@@ -978,10 +976,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
         } else if ("eventCrf".equalsIgnoreCase(entityType)) {
             int eventCRFId = entityId;
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
 
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
             if (event.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
                 event.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
@@ -1101,8 +1098,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     }
 
     private EventCRFBean getEventCrf(int eventCRFId) {
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
+        EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
         return ec;
     }
 

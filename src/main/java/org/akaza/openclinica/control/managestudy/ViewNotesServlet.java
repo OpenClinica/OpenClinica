@@ -7,12 +7,11 @@ import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -22,12 +21,14 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import org.akaza.openclinica.service.Component;
+import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.jmesa.facade.TableFacade;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.*;
@@ -49,21 +50,34 @@ public class ViewNotesServlet extends SecureController {
     private boolean showMoreLink;
     private ViewNotesService viewNotesService;
 
-
-    private ViewStudySubjectService viewStudySubjectService;
-    private PermissionService permissionService;
-    private ItemDao itemDao;
-    private ItemDataDao itemDataDao;
-    private ItemFormMetadataDao itemFormMetadataDao;
-    private EventCrfDao eventCrfDao;
-    private StudyEventDao studyEventDao;
-    private CrfDao crfDao;
-    private CrfVersionDao crfVersionDao;
-    private EventDefinitionCrfDao eventDefinitionCrfDao;
-    private EventDefinitionCrfPermissionTagDao permissionTagDao;
-    private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
-
+    @Autowired
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
+    private ViewStudySubjectService viewStudySubjectService;
+    @Autowired
+    private PermissionService permissionService;
+    @Autowired
+    private ItemDao itemDao;
+    @Autowired
+    private ItemDataDao itemDataDao;
+    @Autowired
+    private ItemFormMetadataDao itemFormMetadataDao;
+    @Autowired
+    private EventCrfDao eventCrfDao;
+    @Autowired
+    private StudyEventDao studyEventDao;
+    @Autowired
+    private CrfDao crfDao;
+    @Autowired
+    private CrfVersionDao crfVersionDao;
+    @Autowired
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
+    @Autowired
+    private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
+    private EventDefinitionCrfPermissionTagDao permissionTagDao;
 
     /*
      * (non-Javadoc)
@@ -72,7 +86,6 @@ public class ViewNotesServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         String module = request.getParameter("module");
         String moduleStr = "manage";
         String study_oid = request.getParameter("study_oid");
@@ -165,7 +178,6 @@ public class ViewNotesServlet extends SecureController {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 
         UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
-        StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO eventDefinitionCRFDao = new EventDefinitionCRFDAO(sm.getDataSource());
 
         ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink, getPermissionTagsList());
@@ -174,10 +186,10 @@ public class ViewNotesServlet extends SecureController {
         factory.setUserAccountDao(uadao);
         factory.setCurrentStudy(currentStudy);
         factory.setDiscrepancyNoteDao(dndao);
-        factory.setCrfDao(getCrfDao());
-        factory.setCrfVersionDao(getCrfVersionDao());
-        factory.setStudyEventDao(getStudyEventDao());
-        factory.setStudyEventDefinitionDao(studyEventDefinitionDao);
+        factory.setCrfDao(crfDao);
+        factory.setCrfVersionDao(crfVersionDao);
+        factory.setStudyEventDao(studyEventDao);
+        factory.setStudyEventDefinitionDao(studyEventDefinitionDAO);
         factory.setEventDefinitionCRFDao(eventDefinitionCRFDao);
         factory.setEventCRFDao(eventCRFDAO);
         factory.setModule(moduleStr);
@@ -185,20 +197,17 @@ public class ViewNotesServlet extends SecureController {
         factory.setResolutionStatus(resolutionStatus);
         factory.setViewNotesService(resolveViewNotesService());
 
-        factory.setViewStudySubjectService(getViewStudySubjectService());
+        factory.setViewStudySubjectService(viewStudySubjectService);
         factory.setPermissionService(getPermissionService());
-        factory.setItemDao(getItemDao());
-        factory.setItemDataDao(getItemDataDao());
-        factory.setCrfDao(getCrfDao());
-        factory.setCrfVersionDao(getCrfVersionDao());
-        factory.setStudyEventDao(getStudyEventDao());
-        factory.setEventCrfDao(getEventCrfDao());
-        factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
-        factory.setItemFormMetadataDao(getItemFormMetadataDao());
-        factory.setPermissionTagDao(getPermissionTagDao());
-        factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionDao());
+        factory.setItemDao(itemDao);
+        factory.setItemDataDao(itemDataDao);
+        factory.setEventCrfDao(eventCrfDao);
+        factory.setEventDefinitionCrfDao(eventDefinitionCrfDao);
+        factory.setItemFormMetadataDao(itemFormMetadataDao);
+        factory.setPermissionTagDao(permissionTagDao);
+        factory.setStudyEventDefinitionHibDao(studyEventDefinitionDao);
 
-        List<Component> components = getViewStudySubjectService().getPageComponents(ListNotesTableFactory.PAGE_NAME);
+        List<Component> components = viewStudySubjectService.getPageComponents(ListNotesTableFactory.PAGE_NAME);
         if (components != null) {
             for (Component component : components) {
                 if (component.getColumns() != null) {
@@ -340,7 +349,7 @@ public class ViewNotesServlet extends SecureController {
          * if (currentRole.getRole().equals(Role.STUDYDIRECTOR) ||
          * currentRole.getRole().equals(Role.COORDINATOR)) { return; }
          */
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 
@@ -354,53 +363,6 @@ public class ViewNotesServlet extends SecureController {
         }
         return viewNotesService;
 
-    }
-    public ViewStudySubjectService getViewStudySubjectService() {
-        return viewStudySubjectService= (ViewStudySubjectService) SpringServletAccess.getApplicationContext(context).getBean("viewStudySubjectService");
-    }
-
-    public ItemDao getItemDao() {
-        return itemDao=(ItemDao) SpringServletAccess.getApplicationContext(context).getBean("itemDao");
-    }
-
-    public ItemDataDao getItemDataDao() {
-        return itemDataDao=(ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
-    }
-
-    public CrfDao getCrfDao() {
-        return crfDao=(CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
-    }
-
-    public CrfVersionDao getCrfVersionDao() {
-        return crfVersionDao=(CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
-    }
-
-    public StudyEventDao getStudyEventDao() {
-        return studyEventDao=(StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
-    }
-
-    public EventCrfDao getEventCrfDao() {
-        return eventCrfDao=(EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
-    }
-
-    public ItemFormMetadataDao getItemFormMetadataDao() {
-        return itemFormMetadataDao=(ItemFormMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("itemFormMetadataDao");
-    }
-
-    public EventDefinitionCrfDao getEventDefinitionCrfDao() {
-        return eventDefinitionCrfDao=(EventDefinitionCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfDao");
-    }
-
-    public EventDefinitionCrfPermissionTagDao getPermissionTagDao() {
-        return permissionTagDao=(EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
-    }
-
-    public PermissionService getPermissionService() {
-        return permissionService= (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
-    }
-
-    public StudyEventDefinitionDao getStudyEventDefinitionDao() {
-        return studyEventDefinitionDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
     }
 
 }

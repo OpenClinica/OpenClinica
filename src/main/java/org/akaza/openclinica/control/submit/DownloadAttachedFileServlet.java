@@ -8,14 +8,12 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.core.Utils;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -54,7 +52,7 @@ public class DownloadAttachedFileServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 

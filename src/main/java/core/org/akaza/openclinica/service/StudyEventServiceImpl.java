@@ -9,24 +9,26 @@ import javax.sql.DataSource;
 
 import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.odmbeans.UserBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -55,7 +57,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service( "StudyEventService" )
+@Service
 public class StudyEventServiceImpl implements StudyEventService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -88,20 +90,22 @@ public class StudyEventServiceImpl implements StudyEventService {
     @Autowired
     private StudyBuildService studyBuildService;
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
-    @Qualifier("studySubjectJDBCDao")
     private StudySubjectDAO studySubjectDAO;
     @Autowired
     private KafkaService kafkaService;
+    @Autowired
+    ItemDataDAO itemDataDAO;
+    @Autowired
+    private EventCRFDAO eventCRFDAO;
 
     @Autowired
-    @Qualifier("crfJDBCDao")
     private CRFDAO crfDAO;
     @Autowired
-    @Qualifier("crfVersionJDBCDao")
     private CRFVersionDAO crfVersionDAO;
+    @Autowired
+    private DiscrepancyNoteDAO discrepancyNoteDAO;
 
     private RestfulServiceHelper restfulServiceHelper;
 
@@ -971,6 +975,66 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
         }
 
         return studyEvent;
+    }
+
+    @Override
+    public void removeStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent, UserAccountBean userAccountBean) {
+        if (studyEvent.isSigned()) {
+            studyEvent.setSigned(Boolean.FALSE);
+        }
+
+        studyEvent.setStatus(Status.DELETED);
+        studyEvent.setRemoved(Boolean.TRUE);
+        studyEvent.setUpdater(userAccountBean);
+        studyEvent.setUpdatedDate(new Date());
+        studyEventDAO.update(studyEvent);
+
+        if(studySubject.getStatus().equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdater(userAccountBean);
+            studySubject.setUpdatedDate(new Date());
+            studySubjectDAO.update(studySubject);
+        }
+
+        ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
+
+        for (int k = 0; k < eventCRFs.size(); k++) {
+            EventCRFBean eventCRF = eventCRFs.get(k);
+            ArrayList<ItemDataBean> itemDatas = itemDataDAO.findAllByEventCRFId(eventCRF.getId());
+            for (int a = 0; a < itemDatas.size(); a++) {
+                ItemDataBean item = itemDatas.get(a);
+                List<DiscrepancyNoteBean> dnNotesOfRemovedItem = discrepancyNoteDAO.findParentNotesOnlyByItemData(item.getId());
+                if (!dnNotesOfRemovedItem.isEmpty()) {
+                    DiscrepancyNoteBean itemParentNote = null;
+                    for (Object obj : dnNotesOfRemovedItem) {
+                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+                            itemParentNote = (DiscrepancyNoteBean) obj;
+                        }
+                    }
+                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                    if (itemParentNote != null) {
+                        dnb.setParentDnId(itemParentNote.getId());
+                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                        dnb.setThreadUuid(itemParentNote.getThreadUuid());
+                    }
+                    dnb.setResolutionStatusId(core.org.akaza.openclinica.bean.core.ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
+                    dnb.setStudyId(studySubject.getStudyId());
+                    dnb.setAssignedUserId(userAccountBean.getId());
+                    dnb.setOwner(userAccountBean);
+                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                    dnb.setEntityId(item.getId());
+                    dnb.setColumn("value");
+                    dnb.setCreatedDate(new Date());
+                    String detailedNotes="The item has been removed, this Query has been Closed.";
+                    dnb.setDetailedNotes(detailedNotes);
+                    discrepancyNoteDAO.create(dnb);
+                    discrepancyNoteDAO.createMapping(dnb);
+                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
+                    itemParentNote.setDetailedNotes(detailedNotes);
+                    discrepancyNoteDAO.update(itemParentNote);
+                }
+            }
+        }
     }
 
     @Override

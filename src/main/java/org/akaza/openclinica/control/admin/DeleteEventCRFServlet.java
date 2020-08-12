@@ -21,22 +21,23 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.core.LockInfo;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.EventCRFService;
-import core.org.akaza.openclinica.service.JdbcService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 
@@ -49,17 +50,29 @@ public class DeleteEventCRFServlet extends SecureController {
     public static String STUDY_SUB_ID = "ssId";
     public static String EVENT_CRF_ID = "eventCrfId";
 
+    @Autowired
     private StudyEventDAO studyEventDAO;
-    private EventCRFDAO eventCRFDAO;
+    @Autowired
     StudySubjectDAO studySubjectDAO;
+    @Autowired
     CRFDAO crfDAO;
+    @Autowired
     FormLayoutDAO formLayoutDAO;
+    @Autowired
     StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
     EventDefinitionCRFDAO eventDefinitionCRFDAO;
+    @Autowired
     ItemDataDAO itemDataDAO;
+    @Autowired
     UserAccountDAO userAccountDAO;
 
+    @Autowired
     private EventCRFService eventCRFService;
+    @Autowired
+    EventCrfDao eventCrfDao;
+    @Autowired
+    private EventCRFDAO eventCRFDAO;
 
     /**
      * 
@@ -78,17 +91,6 @@ public class DeleteEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        eventCRFService = (EventCRFService) SpringServletAccess.getApplicationContext(context).getBean("EventCRFService");
-        studyEventDAO = JdbcService.getStudyEventDao(context);
-        eventCRFDAO = JdbcService.getEventCrfDao(context);
-        studySubjectDAO = JdbcService.getStudySubjectDao(context);
-        crfDAO = JdbcService.getCrfDao(context);
-        formLayoutDAO = JdbcService.getFormLayoutDao(context);
-        studyEventDefinitionDAO = JdbcService.getStudyEventDefinitionDao(context);
-        eventDefinitionCRFDAO = JdbcService.getEventDefinitionCRFDao(context);
-        itemDataDAO = JdbcService.getItemDataDao(context);
-        userAccountDAO = JdbcService.getUserAccountDao(context);
-        EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
 
         int studySubId = fp.getInt(STUDY_SUB_ID, true);
         int eventCRFId = fp.getInt(EVENT_CRF_ID);

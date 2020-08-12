@@ -59,7 +59,9 @@ public class ChangeStudyServlet extends SecureController {
      * Checks whether the user has the correct privilege
      */
     Locale locale;
+    @Autowired
     private StudySubjectDAO studySubjectDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
 
     // < ResourceBundlerestext;
@@ -75,7 +77,6 @@ public class ChangeStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");// action sent by user
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource(), getStudyDao());
         Map<Integer, Study> allStudies = getStudyDao().findAll().stream().collect(Collectors.toMap(s->s.getStudyId(),s-> s));
@@ -208,7 +209,7 @@ public class ChangeStudyServlet extends SecureController {
             String idSetting = newStudy.getSubjectIdGeneration();
             if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
                 request.setAttribute("changeStudySchema", newStudySchema);
-                int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
+                int nextLabel = studySubjectDAO.findTheGreatestLabel() + 1;
                 request.setAttribute("label", new Integer(nextLabel).toString());
                 request.setAttribute("changeStudySchema", null);
             }
@@ -377,7 +378,7 @@ public class ChangeStudyServlet extends SecureController {
     private void setupStudySubjectStatusStatisticsTable() {
 
         StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudySubjectDao(studySubjectDAO);
         factory.setCurrentStudy(currentStudy);
         String studySubjectStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySubjectStatusStatistics", studySubjectStatusStatistics);
@@ -386,7 +387,7 @@ public class ChangeStudyServlet extends SecureController {
     private void setupSubjectEventStatusStatisticsTable() {
 
         EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudySubjectDao(studySubjectDAO);
         factory.setCurrentStudy(currentStudy);
         factory.setStudyEventDao(studyEventDAO);
         factory.setStudyDao(getStudyDao());
@@ -397,7 +398,7 @@ public class ChangeStudyServlet extends SecureController {
     private void setupStudySiteStatisticsTable() {
 
         SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudySubjectDao(studySubjectDAO);
         factory.setCurrentStudy(currentStudy);
         factory.setStudyDao(getStudyDao());
         String studySiteStatistics = factory.createTable(request, response).render();
@@ -407,16 +408,11 @@ public class ChangeStudyServlet extends SecureController {
     private void setupStudyStatisticsTable() {
 
         StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
-        factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudySubjectDao(studySubjectDAO);
         factory.setCurrentStudy(currentStudy);
         factory.setStudyDao(getStudyDao());
         String studyStatistics = factory.createTable(request, response).render();
         request.setAttribute("studyStatistics", studyStatistics);
-    }
-
-    public StudySubjectDAO getStudySubjectDAO() {
-        studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
-        return studySubjectDAO;
     }
 
     public StudyBuildService getStudyBuildService() {

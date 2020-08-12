@@ -26,6 +26,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +39,7 @@ import java.util.Date;
  */
 public class RestoreCRFServlet extends SecureController {
 
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     /**
@@ -60,7 +62,6 @@ public class RestoreCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);

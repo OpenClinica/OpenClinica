@@ -8,7 +8,6 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -17,6 +16,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +51,7 @@ public class FindStudyEventServlet extends SecureController {
     public static final String BEAN_ENTITY_WITH_STUDY_EVENTS = "entityWithStudyEvents";
 
     public static final int NUM_ENTITIES_PER_PAGE = 10;
+    @Autowired
     private StudyEventDAO studyEventDAO;
 
     /*
@@ -61,7 +62,6 @@ public class FindStudyEventServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
 
         String browseBy = fp.getString(INPUT_BROWSEBY);
         int id = fp.getInt(INPUT_ID);
@@ -152,7 +152,7 @@ public class FindStudyEventServlet extends SecureController {
         String exceptionName = resexception.getString("no_permission_to_submit_data");
         String noAccessMessage = respage.getString("you_may_not_submit_data_for_this_study") + respage.getString("change_study_contact_sysadmin");
 
-        if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+        if (SubmitDataUtil.maySubmitData(ub, currentRole)) {
             return;
         }
 

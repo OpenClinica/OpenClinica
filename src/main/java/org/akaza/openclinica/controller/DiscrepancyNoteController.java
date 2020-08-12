@@ -57,7 +57,6 @@ public class DiscrepancyNoteController {
     StudyDao sdao;
     DiscrepancyNoteDAO dnDao;
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
 
     @RequestMapping(value = "/dnote", method = RequestMethod.POST)

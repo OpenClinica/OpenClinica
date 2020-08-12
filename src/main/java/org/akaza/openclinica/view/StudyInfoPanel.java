@@ -402,8 +402,7 @@ public class StudyInfoPanel implements Serializable {
                 this.setSubmitDataModule(false);
                 this.setCreateDataset(false);
 
-            } else if (page.equals(Page.LIST_STUDY_SUBJECT) || page.equals(Page.LIST_STUDY_SUBJECTS) || page.equals(Page.SUBMIT_DATA)
-                || page.equals(Page.SUBMIT_DATA_SERVLET)) {
+            } else if (page.equals(Page.LIST_STUDY_SUBJECTS)) {
                 this.reset();
                 this.setStudyInfoShown(true);
                 this.setOrderedData(true);

@@ -18,17 +18,12 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import com.openclinica.kafka.KafkaService;
-import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -81,11 +76,11 @@ public class CreateNewStudyEventServlet extends SecureController {
     public final static String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
     public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
+    @Autowired
     private StudyEventDAO studyEventDAO;
 
     @Override
     protected void processRequest() throws Exception {
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
 
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         panel.setStudyInfoShown(false);
@@ -622,7 +617,7 @@ public class CreateNewStudyEventServlet extends SecureController {
         String exceptionName = resexception.getString("no_permission_to_add_new_study_event");
         String noAccessMessage = respage.getString("not_create_new_event") + " " + respage.getString("change_study_contact_sysadmin");
 
-        if (SubmitDataServlet.maySubmitData(ub, currentRole)) {
+        if (SubmitDataUtil.maySubmitData(ub, currentRole)) {
             return;
         }
 

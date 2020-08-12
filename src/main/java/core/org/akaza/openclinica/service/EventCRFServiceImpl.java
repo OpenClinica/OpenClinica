@@ -22,7 +22,6 @@ import core.org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.dto.FormRequestDTO;
 import org.akaza.openclinica.controller.dto.FormResponseDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
@@ -32,14 +31,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service("EventCRFService")
+@Service
 public class EventCRFServiceImpl implements EventCRFService {
 
     public static final String FAILED = "Failed";
@@ -63,27 +64,21 @@ public class EventCRFServiceImpl implements EventCRFService {
     @Autowired
     CompletionStatusDao completionStatusDao;
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
-    @Qualifier("studySubjectJDBCDao")
     private StudySubjectDAO studySubjectDAO;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
     @Autowired
     private KafkaService kafkaService;
 
     @Autowired
-    @Qualifier("discrepancyNoteJDBCDao")
     private DiscrepancyNoteDAO discrepancyNoteDAO;
     @Autowired
     private RuleActionRunLogDao ruleActionRunLogDao;
     @Autowired
-    @Qualifier("itemFormMetadataJDBCDao")
     private ItemFormMetadataDAO itemFormMetadataDAO;
     @Autowired
-    @Qualifier("itemDataJDBCDao")
     private ItemDataDAO itemDataDAO;
 
     final String DEFAULT_EVENT_REPEAT_KEY = "1";
@@ -146,7 +141,7 @@ public class EventCRFServiceImpl implements EventCRFService {
         eventCrf.setRemoved(Boolean.FALSE);
         eventCrf.setUpdater(userAccountBean);
         eventCrf.setUpdatedDate(new Date());
-        eventCrfDAO.update(eventCrf);
+        eventCRFDAO.update(eventCrf);
 
         if (studyEvent.isSigned()) {
             studyEvent.setSigned(Boolean.FALSE);
@@ -165,12 +160,70 @@ public class EventCRFServiceImpl implements EventCRFService {
     }
 
     @Override
+    public void removeEventCrf(StudySubjectBean studySubject, StudyEventBean studyEvent, EventCRFBean eventCRFBean, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean) {
+        eventCRFBean.setRemoved(Boolean.TRUE);
+        eventCRFBean.setUpdater(userAccountBean);
+        eventCRFBean.setUpdatedDate(new Date());
+        eventCRFDAO.update(eventCRFBean);
+
+        if (studyEvent.isSigned()) {
+            studyEvent.setSigned(Boolean.FALSE);
+            studyEvent.setUpdater(userAccountBean);
+            studyEvent.setUpdatedDate(new Date());
+            studyEventDAO.update(studyEvent);
+        }
+        if(studySubject.getStatus().equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdater(userAccountBean);
+            studySubject.setUpdatedDate(new Date());
+            studySubjectDAO.update(studySubject);
+        }
+
+        // remove all the item data
+        for (int a = 0; a < itemData.size(); a++) {
+            ItemDataBean item = (ItemDataBean) itemData.get(a);
+
+            List dnNotesOfRemovedItem = discrepancyNoteDAO.findParentNotesOnlyByItemData(item.getId());
+            if (!dnNotesOfRemovedItem.isEmpty()) {
+                DiscrepancyNoteBean itemParentNote = null;
+                for (Object obj : dnNotesOfRemovedItem) {
+                    if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+                        itemParentNote = (DiscrepancyNoteBean) obj;
+                    }
+                }
+                DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                if (itemParentNote != null) {
+                    dnb.setParentDnId(itemParentNote.getId());
+                    dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                    dnb.setThreadUuid(itemParentNote.getThreadUuid());
+                }
+                dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
+                dnb.setStudyId(studySubject.getStudyId());
+                dnb.setAssignedUserId(userAccountBean.getId());
+                dnb.setOwner(userAccountBean);
+                dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                dnb.setEntityId(item.getId());
+                dnb.setColumn("value");
+                dnb.setCreatedDate(new Date());
+                String detailedNotes="The item has been removed, this Query has been Closed.";
+                dnb.setDetailedNotes(detailedNotes);
+                discrepancyNoteDAO.create(dnb);
+                discrepancyNoteDAO.createMapping(dnb);
+                itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
+                itemParentNote.setDetailedNotes(detailedNotes);
+                discrepancyNoteDAO.update(itemParentNote);
+            }
+
+        }
+    }
+
+    @Override
     public void clearEventCrf(StudySubjectBean studySub, StudyEventBean event, EventCRFBean eventCRF, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean) {
         eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
         eventCRF.setUpdater(userAccountBean);
         eventCRF.setDateCompleted(null);
         int crfVersionId = eventCRF.getCRFVersionId();
-        eventCrfDAO.update(eventCRF);
+        eventCRFDAO.update(eventCRF);
 
         Study study = studyDao.findByPK(studySub.getStudyId());
 
@@ -216,7 +269,7 @@ public class EventCRFServiceImpl implements EventCRFService {
         eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
         eventCRF.setUpdater(userAccountBean);
         eventCRF.setDateCompleted(null);
-        eventCrfDAO.update(eventCRF);
+        eventCRFDAO.update(eventCRF);
 
         if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
             event.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);

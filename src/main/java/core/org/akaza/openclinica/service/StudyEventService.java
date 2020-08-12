@@ -40,6 +40,8 @@ public interface StudyEventService {
 
     StudyEvent validateStudyEventExists(StudySubject studySubject, String studyEventOID, String studyEventRepeatKey, CustomRuntimeException validationErrors);
 
+    void removeStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent, UserAccountBean userAccountBean);
+
     void restoreStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent, UserAccountBean userAccountBean);
 
     ArrayList<DisplayEventCRFBean> getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs, StudyUserRoleBean currentRole, UserAccountBean userAccountBean);

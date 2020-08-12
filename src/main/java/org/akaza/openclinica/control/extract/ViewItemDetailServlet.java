@@ -14,7 +14,7 @@ import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
@@ -50,7 +50,7 @@ public class ViewItemDetailServlet extends SecureController {
         // < respage =
         // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
 
-        if (!currentStudy.isSite() && SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (!currentStudy.isSite() && SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));

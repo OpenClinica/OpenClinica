@@ -31,7 +31,6 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
@@ -58,6 +57,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -69,10 +69,14 @@ public class SignStudySubjectServlet extends SecureController {
     private WebApplicationContext ctx = null;
     public static final String ORIGINATING_PAGE = "originatingPage";
 
+    @Autowired
     private EventCRFDAO eventCRFDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private StudySubjectService studySubjectService;
-    DiscrepancyNoteUtil discNoteUtil;
+    @Autowired
+    DiscrepancyNoteUtil discrepancyNoteUtil;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -178,10 +182,6 @@ public class SignStudySubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
-        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
-        discNoteUtil = (DiscrepancyNoteUtil) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("discrepancyNoteUtil");
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
@@ -262,9 +262,9 @@ public class SignStudySubjectServlet extends SecureController {
                     displayEvent.setDisplayEventCRFs(displayEventCRFs);
                 }
 
-                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                discrepancyNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
 
-                Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
+                Map discNoteByEventCRFid = discrepancyNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 String originationUrl = "SignStudySubject?id=" + studySub.getId();
 
                 request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
@@ -329,7 +329,7 @@ public class SignStudySubjectServlet extends SecureController {
 
         // Don't filter for now; disc note beans are returned with eventCRFId
         // set
-        discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+        discrepancyNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
         // All the displaystudyevents for one subject
 
         // Set up a Map for the JSP view, mapping the eventCRFId to another Map:
@@ -338,7 +338,7 @@ public class SignStudySubjectServlet extends SecureController {
         // that
         // eventCRF id, as in New --> 2
 
-        Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
+        Map discNoteByEventCRFid = discrepancyNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
         String originationUrl = "SignStudySubject?id=" + studySub.getId();
 
         request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
@@ -636,7 +636,7 @@ public class SignStudySubjectServlet extends SecureController {
         int studySubId = fp.getInt("id", true);
 
         if (studySubId > 0) {
-            if (!entityIncluded(studySubId, ub.getName(), subdao, sm.getDataSource())) {
+            if (!entityIncluded(studySubId, ub.getName(), subdao)) {
                 addPageMessage(respage.getString("required_study_subject_not_belong"));
                 throw new InsufficientPermissionException(Page.MENU, resexception.getString("entity_not_belong_studies"), "1");
             }

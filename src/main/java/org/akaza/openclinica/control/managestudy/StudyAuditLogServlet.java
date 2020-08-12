@@ -33,9 +33,12 @@ import java.util.Locale;
  */
 public class StudyAuditLogServlet extends SecureController {
 
-    Locale locale;
-
-    // <ResourceBundle resword,resexception,respage;
+    @Autowired
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    private SubjectDAO subjectDAO;
+    @Autowired
+    UserAccountDAO userAccountDAO;
 
     public static String getLink(int userId) {
         return "AuditLogStudy";
@@ -57,18 +60,13 @@ public class StudyAuditLogServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        int studyId = currentStudy.getStudyId();
-
-        StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-        UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
 
         FormProcessor fp = new FormProcessor(request);
 
         StudyAuditLogTableFactory factory = new StudyAuditLogTableFactory();
-        factory.setSubjectDao(sdao);
-        factory.setStudySubjectDao(subdao);
-        factory.setUserAccountDao(uadao);
+        factory.setSubjectDao(subjectDAO);
+        factory.setStudySubjectDao(studySubjectDAO);
+        factory.setUserAccountDao(userAccountDAO);
         factory.setCurrentStudy(currentStudy);
 
         String auditLogsHtml = factory.createTable(request, response).render();

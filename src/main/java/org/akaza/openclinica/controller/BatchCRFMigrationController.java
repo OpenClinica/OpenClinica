@@ -102,11 +102,7 @@ public class BatchCRFMigrationController implements Runnable {
     private HelperObject helperObject;
 
     @Autowired
-    @Qualifier("studyEventJDBCDao")
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -488,7 +484,7 @@ public class BatchCRFMigrationController implements Runnable {
                     + seddBean.getName() + ". " + resterms.getString("Both_CRF_versions_are_not_available_at_the_Site"));
         }
 
-        List<EventCRFBean> eventCrfListToMigrate = eventCrfDAO.findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
+        List<EventCRFBean> eventCrfListToMigrate = eventCRFDAO.findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
                 sitelist);
 
         helperObject.setReportLog(reportLog);

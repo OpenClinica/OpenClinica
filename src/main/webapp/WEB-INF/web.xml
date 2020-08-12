@@ -509,11 +509,6 @@
         <servlet-class>org.akaza.openclinica.control.admin.AdminSystemServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>SubmitData</display-name>
-        <servlet-name>SubmitDataServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.submit.SubmitDataServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>FindStudyEvent</display-name>
         <servlet-name>FindStudyEventServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.FindStudyEventServlet</servlet-class>
@@ -555,16 +550,7 @@
         <servlet-name>ListStudySubjectsServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ListStudySubjectsServlet</servlet-class>
     </servlet>
-    <servlet>
-        <display-name>ListStudySubject</display-name>
-        <servlet-name>ListStudySubjectsManageServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListStudySubjectsManageServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>ListStudySubjectsSubmit</display-name>
-        <servlet-name>ListStudySubjectsSubmitServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.submit.ListStudySubjectsSubmitServlet</servlet-class>
-    </servlet>
+
     <servlet>
         <display-name>ViewStudySubject</display-name>
         <servlet-name>ViewStudySubjectServlet</servlet-name>
@@ -751,93 +737,70 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ResolveDiscrepancyServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>ListEventsForSubject</display-name>
-        <servlet-name>ListEventsForSubjectServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListEventsForSubjectServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>ListEventsForSubjects</display-name>
-        <servlet-name>ListEventsForSubjectsServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListEventsForSubjectsServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>ViewCRFVersionPreview</display-name>
         <servlet-name>ViewCRFVersionPreview</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewCRFVersionPreview</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>ImportData</display-name>
         <servlet-name>ImportDataServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ImportDataServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>ImportCRFData</display-name>
         <servlet-name>ImportCRFDataServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ImportCRFDataServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>uploadCRFData</display-name>
         <servlet-name>uploadCRFDataToHttpServerServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.UploadCRFDataToHttpServerServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>VerifyImportedCRFData</display-name>
         <servlet-name>VerifyImportedCRFDataServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.VerifyImportedCRFDataServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>ImportRule</display-name>
         <servlet-name>ImportRuleServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ImportRuleServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>ViewRuleSet</display-name>
         <servlet-name>ViewRuleSetServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewRuleSetServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>ViewRuleAssignmentNew</display-name>
         <servlet-name>ViewRuleAssignmentNewServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewRuleAssignmentNewServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>DownloadRuleSetXml</display-name>
         <servlet-name>DownloadRuleSetXmlServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.DownloadRuleSetXmlServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>RunRule</display-name>
         <servlet-name>RunRuleServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.RunRuleServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>RunRuleSet</display-name>
         <servlet-name>RunRuleSetServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.RunRuleSetServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>RemoveRuleSet</display-name>
         <servlet-name>RemoveRuleSetServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.RemoveRuleSetServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>RestoreRuleSet</display-name>
         <servlet-name>RestoreRuleSetServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.RestoreRuleSetServlet</servlet-class>
     </servlet>
-
     <servlet>
         <display-name>UpdateRuleSetRule</display-name>
         <servlet-name>UpdateRuleSetRuleServlet</servlet-name>
@@ -1168,10 +1131,6 @@
         <url-pattern>/AdminSystem</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SubmitDataServlet</servlet-name>
-        <url-pattern>/SubmitData</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>FindStudyEventServlet</servlet-name>
         <url-pattern>/FindStudyEvent</url-pattern>
     </servlet-mapping>
@@ -1236,10 +1195,6 @@
         <url-pattern>/ViewSite</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListStudySubjectsManageServlet</servlet-name>
-        <url-pattern>/ListStudySubject</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ListStudySubjectsServlet</servlet-name>
         <url-pattern>/ListStudySubjects</url-pattern>
     </servlet-mapping>
@@ -1290,10 +1245,6 @@
     <servlet-mapping>
         <servlet-name>ReassignStudySubjectServlet</servlet-name>
         <url-pattern>/ReassignStudySubject</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListStudySubjectsSubmitServlet</servlet-name>
-        <url-pattern>/ListStudySubjectsSubmit</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ListSubjectServlet</servlet-name>
@@ -1397,14 +1348,6 @@
     <servlet-mapping>
         <servlet-name>ResolveDiscrepancyServlet</servlet-name>
         <url-pattern>/ResolveDiscrepancy</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListEventsForSubjectServlet</servlet-name>
-        <url-pattern>/ListEventsForSubject</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListEventsForSubjectsServlet</servlet-name>
-        <url-pattern>/ListEventsForSubjects</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MatchPasswordServlet</servlet-name>

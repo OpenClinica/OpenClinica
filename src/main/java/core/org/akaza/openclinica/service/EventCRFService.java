@@ -21,6 +21,8 @@ public interface EventCRFService {
 
     void restoreEventCrf(StudySubjectBean studySubject, StudyEventBean studyEvent, EventCRFBean eventCRFBean, UserAccountBean userAccountBean);
 
+    void removeEventCrf(StudySubjectBean studySubject, StudyEventBean studyEvent, EventCRFBean eventCRFBean, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean);
+
     // Deletes/clears data from a form, previously "delete event CRF".
     void clearEventCrf(StudySubjectBean studySub, StudyEventBean event, EventCRFBean eventCRF, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean);
 }

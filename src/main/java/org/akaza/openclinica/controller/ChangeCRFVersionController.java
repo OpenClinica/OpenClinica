@@ -92,11 +92,9 @@ public class ChangeCRFVersionController {
     @Autowired
     private StudyDao studyDao;
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
 
     @Autowired
     StudyEventService studyEventService;
@@ -167,7 +165,7 @@ public class ChangeCRFVersionController {
         StudyEventDefinitionBean sedb = sfed.findByEventDefinitionCRFId(eventDefinitionCRFId);
         request.setAttribute("eventName", sedb.getName());
 
-        EventCRFBean ecb = (EventCRFBean) eventCrfDAO.findByPK(eventCRFId);
+        EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
         final EventCrf ec = eventCrfDao.findById(eventCRFId);
         if (permissionService.hasFormAccess(ec, formLayoutId, 0, request) != true) {
             redirect(request, response, "/NoAccess?originatingPage="+ originatingPage);
@@ -554,7 +552,7 @@ public class ChangeCRFVersionController {
         try {
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             Study currentPublicStudy = (Study) session.getAttribute("publicStudy");
-            EventCRFBean ecb = (EventCRFBean) eventCrfDAO.findByPK(eventCRFId);
+            EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
             if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
                     + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
@@ -564,7 +562,7 @@ public class ChangeCRFVersionController {
             }
             Connection con = dataSource.getConnection();
             con.setAutoCommit(false);
-            eventCrfDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
+            eventCRFDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
 
             String status_before_update = null;
             Status subjectStatus = null;

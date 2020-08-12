@@ -23,12 +23,11 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
@@ -52,7 +51,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 
 public class ViewStudySubjectAuditLogServlet extends SecureController {
+    @Autowired
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
     private StudyEventDAO studyEventDAO;
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     /**
@@ -65,7 +68,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             return;
         }
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 
@@ -77,9 +80,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao = (EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
-        StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());
 
@@ -103,7 +103,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             addPageMessage(respage.getString("please_choose_a_subject_to_view"));
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
-            StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
+            StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubId);
             Study study = (Study) getStudyDao().findByPK(studySubject.getStudyId());
             // Check if this StudySubject would be accessed from the Current Study
             if (studySubject.getStudyId() != currentStudy.getStudyId()) {

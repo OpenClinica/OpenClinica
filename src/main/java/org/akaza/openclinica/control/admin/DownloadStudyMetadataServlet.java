@@ -12,7 +12,7 @@ import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import core.org.akaza.openclinica.logic.odmExport.AdminDataCollector;
@@ -32,7 +32,7 @@ public class DownloadStudyMetadataServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));

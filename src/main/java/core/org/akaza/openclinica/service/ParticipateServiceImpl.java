@@ -88,8 +88,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Autowired
     private StudyBuildService studyBuildService;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
 
     @Autowired
     private XformParserHelper xformParserHelper;
@@ -180,7 +179,7 @@ public class ParticipateServiceImpl implements ParticipateService {
             if (nextEvent != null) {
                 logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
 
-                List<EventCRFBean> eventCrfs = eventCrfDAO.findAllByStudyEvent(nextEvent);
+                List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
                 Study study = studyDao.findByOcOID(studyOID);
 
 

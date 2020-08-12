@@ -7,39 +7,25 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import com.openclinica.kafka.KafkaService;
-import com.openclinica.kafka.dto.EventAttributeChangeDTO;
-import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.*;
-import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
-import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import core.org.akaza.openclinica.bean.submit.EventCRFBean;
-import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.StudyEventService;
-import core.org.akaza.openclinica.service.auth.TokenService;
-import org.akaza.openclinica.control.SpringServletAccess;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import core.org.akaza.openclinica.core.EmailEngine;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.ArrayList;
 
 /**
  * @author jxu
@@ -49,14 +35,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class RemoveStudyEventServlet extends SecureController {
 
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCRFDAO;
     @Autowired
-    @Qualifier("StudyEventService")
     private StudyEventService studyEventService;
+    @Autowired
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    StudyEventDefinitionDAO studyEventDefinitionDAO;
+    @Autowired
+    EventDefinitionCRFDAO eventDefinitionCRFDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -81,11 +70,6 @@ public class RemoveStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
-/*        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
-        studyEventService = (StudyEventService) SpringServletAccess.getApplicationContext(context).getBean("StudyEventService");*/
-
-        StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
             addPageMessage(respage.getString("please_choose_a_SE_to_remove"));
@@ -93,32 +77,30 @@ public class RemoveStudyEventServlet extends SecureController {
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
-            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
-            event.getStudyEventDefinition().getOid();
+            StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
+            studyEvent.getStudyEventDefinition().getOid();
 
-            StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-            request.setAttribute("studySub", studySub);
+            StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubId);
+            request.setAttribute("studySub", studySubject);
 
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-            event.setStudyEventDefinition(sed);
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEvent.getStudyEventDefinitionId());
+            studyEvent.setStudyEventDefinition(sed);
 
-            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySubject.getStudyId());
 
             request.setAttribute("study", study);
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
 
-                EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
                 // find all crfs in the definition
-                ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
+                ArrayList eventDefinitionCRFs = (ArrayList) eventDefinitionCRFDAO.findAllByEventDefinitionId(study, sed.getId());
 
-                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
 
                 // construct info needed on view study event page
                 DisplayStudyEventBean displayEvent = new DisplayStudyEventBean();
-                displayEvent.setStudyEvent(event);
+                displayEvent.setStudyEvent(studyEvent);
 
                 ArrayList displayEventCrfs = studyEventService.getDisplayEventCRFs(eventCRFs, eventDefinitionCRFs, currentRole, ub);
                 displayEvent.setDisplayEventCRFs(displayEventCrfs);
@@ -130,70 +112,10 @@ public class RemoveStudyEventServlet extends SecureController {
                 logger.info("submit to remove the event from study");
                 // remove event from study
 
-                if (event.isSigned()) {
-                    event.setSigned(Boolean.FALSE);
-                }
+                studyEventService.removeStudyEvent(studySubject, studyEvent, ub);
 
-                event.setStatus(Status.DELETED);
-                event.setRemoved(Boolean.TRUE);
-                event.setUpdater(ub);
-                event.setUpdatedDate(new Date());
-                studyEventDAO.update(event);
-
-                if(studySub.getStatus().equals(Status.SIGNED)){
-                    studySub.setStatus(Status.AVAILABLE);
-                    studySub.setUpdater(ub);
-                    studySub.setUpdatedDate(new Date());
-                    subdao.update(studySub);
-                }
-
-                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
-
-                ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-                for (int k = 0; k < eventCRFs.size(); k++) {
-                    EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                        ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-                        for (int a = 0; a < itemDatas.size(); a++) {
-                            ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
-                                List dnNotesOfRemovedItem = dnDao.findParentNotesOnlyByItemData(item.getId());
-                                if (!dnNotesOfRemovedItem.isEmpty()) {
-                                    DiscrepancyNoteBean itemParentNote = null;
-                                    for (Object obj : dnNotesOfRemovedItem) {
-                                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
-                                            itemParentNote = (DiscrepancyNoteBean) obj;
-                                        }
-                                    }
-                                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-                                    if (itemParentNote != null) {
-                                        dnb.setParentDnId(itemParentNote.getId());
-                                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
-                                        dnb.setThreadUuid(itemParentNote.getThreadUuid());
-                                    }
-                                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
-                                    dnb.setStudyId(currentStudy.getStudyId());
-                                    dnb.setAssignedUserId(ub.getId());
-                                    dnb.setOwner(ub);
-                                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-                                    dnb.setEntityId(item.getId());
-                                    dnb.setColumn("value");
-                                    dnb.setCreatedDate(new Date());
-                                    String detailedNotes="The item has been removed, this Query has been Closed.";
-                                    dnb.setDetailedNotes(detailedNotes);
-                                    dnDao.create(dnb);
-                                    dnDao.createMapping(dnb);
-                                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
-                                    itemParentNote.setDetailedNotes(detailedNotes);
-                                    dnDao.update(itemParentNote);
-                                }
-                            }
-
-
-
-                }
-
-                String alertMessage = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "
-                        + respage.getString("has_been_removed_from_the_subject_record_for") + " " + studySub.getLabel() + " "
+                String alertMessage = respage.getString("the_event") + " " + studyEvent.getStudyEventDefinition().getName() + " "
+                        + respage.getString("has_been_removed_from_the_subject_record_for") + " " + studySubject.getLabel() + " "
                         + respage.getString("in_the_study") + " " + study.getName() + ".";
 
                 addPageMessage(alertMessage);

@@ -1,7 +1,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.control.submit.SubmitDataUtil;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.view.Page;
@@ -15,7 +15,7 @@ public class ViewItemAuditLogServlet extends SecureController {
             return;
         }
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 

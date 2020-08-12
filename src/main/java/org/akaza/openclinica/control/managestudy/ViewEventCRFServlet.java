@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 
@@ -39,6 +40,7 @@ public class ViewEventCRFServlet extends SecureController {
     /**
      *
      */
+    @Autowired
     private EventCRFDAO eventCRFDAO;
 
     @Override
@@ -49,7 +51,6 @@ public class ViewEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         int eventCRFId = fp.getInt("id", true);
         int studySubId = fp.getInt("studySubId", true);
 

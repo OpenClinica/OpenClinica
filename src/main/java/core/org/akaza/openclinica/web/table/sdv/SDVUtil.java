@@ -8,7 +8,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -29,9 +27,7 @@ import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
-import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.controller.dto.SdvDTO;
 import org.akaza.openclinica.controller.dto.SdvItemDTO;
@@ -100,11 +96,9 @@ public class SDVUtil {
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     @Autowired
-    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
-    @Qualifier("eventCRFJDBCDao")
-    private EventCRFDAO eventCrfDAO;
+    private EventCRFDAO eventCRFDAO;
     @Autowired
     private XformParserHelper xformParserHelper;
 
@@ -203,7 +197,7 @@ public class SDVUtil {
     public int getTotalRowCountSubjects(FilterSet filterSet, int studyId, int studySubjectId) {
 
         if (filterSet.getFilters().size() == 0) {
-            return eventCrfDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
+            return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
         }
 
         int count = 0;
@@ -240,7 +234,7 @@ public class SDVUtil {
         }
 
         if (eventNameValue.length() > 0) {
-            return eventCrfDAO.countEventCRFsByEventNameSubjectLabel(eventNameValue, label);
+            return eventCRFDAO.countEventCRFsByEventNameSubjectLabel(eventNameValue, label);
         }
 
         if (eventDateValue.length() > 0) {
@@ -257,7 +251,7 @@ public class SDVUtil {
             // ("complete".equalsIgnoreCase(sdvStatus)));
         }
 
-        return eventCrfDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
+        return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
     }
 
     public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request, String[] permissionTags) {
@@ -312,7 +306,7 @@ public class SDVUtil {
     }
 
     public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId, String[] permissionTags) {
-        Integer count = eventCrfDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter, permissionTags);
+        Integer count = eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter, permissionTags);
         return count != null ? count : 0;
 
     }
@@ -420,7 +414,7 @@ public class SDVUtil {
          *
          * }
          */
-        eventCRFBeans = eventCrfDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd, permissionTags);
+        eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd, permissionTags);
         return getSubjectRows(eventCRFBeans, request);
     }
 
@@ -439,7 +433,7 @@ public class SDVUtil {
         if (filterSet.getFilter("studySubjectId") != null) {
 
             label = filterSet.getFilter("studySubjectId").getValue().trim();
-            eventCRFBeans = eventCrfDAO.getEventCRFsByStudySubjectLabelLimit(label, studyId, studyId, rowEnd - rowStart, rowStart);
+            eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubjectLabelLimit(label, studyId, studyId, rowEnd - rowStart, rowStart);
 
         } else if (filterSet.getFilter("eventName") != null) {
 
@@ -469,7 +463,7 @@ public class SDVUtil {
             // rowEnd-rowStart,rowStart);
 
         } else {
-            eventCRFBeans = eventCrfDAO.getEventCRFsByStudySubjectLimit(studySubjectId, studyId, studyId, rowEnd - rowStart, rowStart);
+            eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubjectLimit(studySubjectId, studyId, studyId, rowEnd - rowStart, rowStart);
 
         }
 
@@ -1298,7 +1292,7 @@ public class SDVUtil {
         List<EventCRFBean> studyEventCRFBeans = new ArrayList<EventCRFBean>();
 
         for (StudyEventBean studyEventBean : studyEventBeans) {
-            eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
+            eventCRFBeans = eventCRFDAO.findAllByStudyEvent(studyEventBean);
             if (eventCRFBeans != null && !eventCRFBeans.isEmpty()) {
                 studyEventCRFBeans.addAll(eventCRFBeans);
             }
