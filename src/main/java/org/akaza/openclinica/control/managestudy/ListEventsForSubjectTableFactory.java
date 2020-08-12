@@ -330,12 +330,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             if ("studySubject.status".equalsIgnoreCase(property)) {
                 value = Status.getByName(value).getId() + "";
             } else if ("event.status".equalsIgnoreCase(property)) {
-                value = StudyEventWorkflowStatusEnum.valueOf(value) + "";
+                value = StudyEventWorkflowStatusEnum.getByI18nDescription(value) + "";
             } else if (property.startsWith("sgc_")) {
                 int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
             } else if (property.startsWith("crf_")) {
-                value = EventCrfWorkflowStatusEnum.valueOf(value) + "";
+                value = EventCrfWorkflowStatusEnum.getByI18nDescription(value) + "";
             }
             listEventsForSubjectFilter.addFilter(property, value);
         }
@@ -603,7 +603,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
             for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
-                options.add(new Option(workflow.toString(), workflow.getDisplayValue()));
+                options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
             return options;
         }
@@ -617,7 +617,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
             for (EventCrfWorkflowStatusEnum workflow : eventWorkflowStatuses) {
                 if (!workflow.name().equals("LOCKED"))
-                    options.add(new Option(workflow.toString(), workflow.getDisplayValue()));
+                    options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
             return options;
         }
