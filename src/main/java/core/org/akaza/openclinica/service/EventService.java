@@ -208,9 +208,11 @@ public class EventService implements EventServiceInterface {
         ResolutionStatus closedModifiedresolutionStatus = new ResolutionStatus(core.org.akaza.openclinica.bean.core.ResolutionStatus.CLOSED_MODIFIED.getId());
         ResolutionStatus closedResolutionStatus = new ResolutionStatus(core.org.akaza.openclinica.bean.core.ResolutionStatus.CLOSED.getId());
         String detailedNotes = "The item has been removed, this Query has been Closed.";
+        DiscrepancyNoteType queryType = new DiscrepancyNoteType(3);
         for (DiscrepancyNote parentDiscrepancyNote : parentDiscrepancyNotes) {
             if (parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != (closedModifiedresolutionStatus.getResolutionStatusId())
-                    && parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != (closedResolutionStatus.getResolutionStatusId())) {
+                    && parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != (closedResolutionStatus.getResolutionStatusId())
+                    && parentDiscrepancyNote.getDiscrepancyNoteType().getDiscrepancyNoteTypeId()==queryType.getDiscrepancyNoteTypeId()) {
 
                 DiscrepancyNote childDiscrepancyNote = new DiscrepancyNote();
                 childDiscrepancyNote.setParentDiscrepancyNote(parentDiscrepancyNote);
