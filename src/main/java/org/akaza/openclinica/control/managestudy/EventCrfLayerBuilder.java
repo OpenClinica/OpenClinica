@@ -135,7 +135,9 @@ public class EventCrfLayerBuilder {
         String statusText = eventCrfWorkflowStatus.getDisplayValue();
         // AC2: If a Form has status Removed = Yes or the event the form is in has status Removed = Yes,
         // then "removed" will be displayed instead of the form workflow status for that form.
-        if (eventCrfBean.isRemoved() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
+        if (eventCrfBean.isRemoved() || (getStudyEvent() != null && getStudyEvent().isRemoved()
+                && ( eventCrfBean.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED
+                || (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED && eventCrfBean.getUpdaterId() > 0)))) {
             statusText = removedText.toLowerCase();
         }
         html.append("Status").append(": ").append(statusText).br();
@@ -153,7 +155,9 @@ public class EventCrfLayerBuilder {
         }
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved()
+                && ( eventCrfBean.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED
+                || (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED && eventCrfBean.getUpdaterId() > 0)))) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
