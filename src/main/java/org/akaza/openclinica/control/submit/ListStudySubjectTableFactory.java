@@ -611,6 +611,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     }
                     value = output != null ? output : value;
                 }
+            }else if(property.startsWith("sed_")){
+                value = StudyEventWorkflowStatusEnum.getByI18nDescription(value)+"";
             }
             auditUserLoginFilter.addFilter(property, value);
         }
@@ -901,7 +903,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
             for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
-                options.add(new Option(workflow.toString(),workflow.getDisplayValue()));
+                options.add(new Option(workflow.getDisplayValue(),workflow.getDisplayValue()));
             }
             return options;
         }
