@@ -626,7 +626,7 @@ $(function() {
                         links: collectLinks(studyEventData, formData),
                         isSigned: (studyEventData['@OpenClinica:Signed'] === 'Yes') && (studyEventData['@OpenClinica:Archived'] !== 'Yes') && (studyEventData['@OpenClinica:Removed'] !== 'Yes') && studyEventData['@OpenClinica:WorkflowStatus'] === 'completed',
                         isLocked: studyEventData['@OpenClinica:Locked'] === 'Yes',
-                        isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Status'] === 'auto-removed'
+                        isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Status'] === 'auto-removed'  || formData['@OpenClinica:Status'] === 'invalid'
                     };
                     foreach(formData.ItemGroupData, function(igd) {
                         foreach(igd.ItemData, function(itemData) {

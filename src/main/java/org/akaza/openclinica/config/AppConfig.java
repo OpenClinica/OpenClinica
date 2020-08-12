@@ -90,7 +90,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         return multipartResolver;
     }
-    
+
     /***
      * Bean to initialize Randomize configuration at RT startup.
      * This callback variant is somewhat similar to ContextRefreshedEvent but doesn't require an implementation of ApplicationListener,

@@ -330,12 +330,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             if ("studySubject.status".equalsIgnoreCase(property)) {
                 value = Status.getByName(value).getId() + "";
             } else if ("event.status".equalsIgnoreCase(property)) {
-                value = StudyEventWorkflowStatusEnum.valueOf(value) + "";
+                value = StudyEventWorkflowStatusEnum.getByI18nDescription(value) + "";
             } else if (property.startsWith("sgc_")) {
                 int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
             } else if (property.startsWith("crf_")) {
-                value = EventCrfWorkflowStatusEnum.valueOf(value) + "";
+                value = EventCrfWorkflowStatusEnum.getByI18nDescription(value) + "";
             }
             listEventsForSubjectFilter.addFilter(property, value);
         }
@@ -603,7 +603,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
             for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
-                options.add(new Option(workflow.toString(), workflow.getDisplayValue()));
+                options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
             return options;
         }
@@ -617,7 +617,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
             for (EventCrfWorkflowStatusEnum workflow : eventWorkflowStatuses) {
                 if (!workflow.name().equals("LOCKED"))
-                    options.add(new Option(workflow.toString(), workflow.getDisplayValue()));
+                    options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
             return options;
         }
@@ -750,7 +750,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
                 eventCrf = (EventCRFBean) display.getProps().get(property + "_eventCrf");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
-                formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCrf.getFormLayoutId());
+                if(eventCrf != null)
+                    formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCrf.getFormLayoutId());
                 studyEvents = new ArrayList<StudyEventBean>();
 
                 if (studyEvent != null) {
@@ -761,7 +762,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                         crfWorkflowStatus, eventCrf, formLayoutBean, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path, studyDao);
 
                 String iconStatus = crfWorkflowStatus.toString();
-                if ((eventCrf != null && eventCrf.isRemoved()) || (studyEvent != null && studyEvent.isRemoved())) {
+                if ((eventCrf != null && eventCrf.isRemoved())
+                        || (studyEvent != null && studyEvent.isRemoved() && eventCrf != null
+                        && ( eventCrf.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED
+                        || (eventCrf.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED && eventCrf.getUpdaterId() > 0)))) {
                     iconStatus = EventCrfStatusEnum.REMOVED.toString();
                 }
                 url.append(eventCrfLayerBuilder.buid());

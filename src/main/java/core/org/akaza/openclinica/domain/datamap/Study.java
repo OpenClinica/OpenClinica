@@ -110,7 +110,7 @@ public class Study extends DataMapDomainObject {
     private int subjectCount;
     private String boardUrl;
     
-    @Column(name = "study_env_uuid", unique = false, nullable = false)
+    @Column(name = "study_env_uuid", unique = false)
     public String getStudyEnvUuid() {
         return studyEnvUuid;
     }

@@ -8,6 +8,7 @@
 
 <jsp:useBean scope="request" id="studyEvent" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <jsp:useBean scope="request" id="studySubject" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
+<jsp:useBean scope="request" id="dse" class="core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean" />
 
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
@@ -172,7 +173,7 @@
     </td>
   </tr>
     </c:if>
-  
+
     <c:if test="${study.eventLocationRequired != 'not_used'}">
     <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
     <td>
@@ -247,6 +248,57 @@
 <td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:myCancel();"/></td>
 </tr>
 </table>
+
+<c:if test="${userRole.manageStudy && study.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && studyEvent.archived != true}">
+    <c:choose>
+        <c:when test="${studyEvent.removed == true && studyEvent.locked == true}">
+            <hr style="width: 75%; float: left; margin: 30px 0 20px;"/>
+            <br><br>
+            <div class="tablebox_center">
+                <b>
+                  <fmt:message key="event_actions" bundle="${resword}"/>
+                </b>
+                <br><br>
+                <fmt:message key="unlock" bundle="${resword}"/> <fmt:message key="event" bundle="${resword}"/>: <a href="UpdateStudyEvent?action=submit&newStatus=UnLocked&statusId=${studyEvent.workflowStatus}&event_id=${studyEvent.id}&ss_id=${ss_id}" onMouseDown="javascript:setImage('bt_Unlock','icon icon-lock-open');" onMouseUp="javascript:setImage('bt_Unlock','icon icon-lock-open');"><span name="bt_Unlock" class="icon icon-lock-open" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <c:if test="${studyEvent.removed != true}">
+                <hr style="width: 75%; float: left; margin: 30px 0 20px;"/>
+                <br><br>
+                <div class="tablebox_center">
+                    <b>
+                      <fmt:message key="event_actions" bundle="${resword}"/>
+                    </b>
+                    <br><br>
+                    <c:choose>
+                        <c:when test="${studyEvent.locked != true}">
+                            <fmt:message key="lock" bundle="${resword}"/> <fmt:message key="event" bundle="${resword}"/>: <a href="UpdateStudyEvent?action=submit&newStatus=Locked&statusId=${studyEvent.workflowStatus}&event_id=${studyEvent.id}&ss_id=${ss_id}" onMouseDown="javascript:setImage('bt_Lock1','icon icon-lock');" onMouseUp="javascript:setImage('bt_Lock1','icon icon-lock');"><span name="bt_lock1" class="icon icon-lock" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </c:when>
+                        <c:otherwise>
+                            <fmt:message key="unlock" bundle="${resword}"/> <fmt:message key="event" bundle="${resword}"/>: <a href="UpdateStudyEvent?action=submit&newStatus=UnLocked&statusId=${studyEvent.workflowStatus}&event_id=${studyEvent.id}&ss_id=${ss_id}" onMouseDown="javascript:setImage('bt_Unlock','icon icon-lock-open');" onMouseUp="javascript:setImage('bt_Unlock','icon icon-lock-open');"><span name="bt_Unlock" class="icon icon-lock-open" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </c:if>
+        </c:otherwise>
+    </c:choose>
+</c:if>
+
+<c:if test="${userRole.isInvestigator() && studyEvent.removed != true && studyEvent.archived != true && (studyEvent.workflowStatus == 'COMPLETED' || studyEvent.workflowStatus == 'STOPPED' || studyEvent.workflowStatus == 'SKIPPED') && dse.isSignAble()}">
+    <hr style="width: 75%; float: left; margin: 30px 0 20px;"/>
+        <br><br>
+        <div class="tablebox_center">
+            <b>
+              <fmt:message key="event_actions" bundle="${resword}"/>
+            </b>
+            <br><br>
+            <fmt:message key="sign" bundle="${resword}"/> <fmt:message key="event" bundle="${resword}"/>: <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="UpdateStudyEvent?action=confirm&statusId=signed&ss_id=${ss_id}&event_id=${studyEvent.id}&first_sign=true"><span hspace="2" border="0" title="sign" alt="Sign" class="icon icon-icon-sign" name="bt_sign"></span></a>
+        </div>
+</c:if>
+
+
+
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 </body>

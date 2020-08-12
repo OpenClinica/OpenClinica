@@ -54,10 +54,9 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
  * first statement. 2. Every method executing a query must call either signalSuccess or signalFailure before returning.
  * <p/>
  * At the time of writing, the only methods which execute queries are select and execute.
- *
- * @author thickerson
  * @param <V>
  * @param <K>
+ * @author thickerson
  */
 public abstract class EntityDAO<K extends String, V extends ArrayList> implements DAOInterface {
     protected DataSource ds;
@@ -120,7 +119,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This is the method added to cache the queries
-     *
      * @param cache
      */
     public void setCache(final EhCacheWrapper cache) {
@@ -133,11 +131,8 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * setTypeExpected, expects to enter the type of object to retrieve from the database
-     *
-     * @param num
-     *            the order the column should be extracted from the database
-     * @param type
-     *            the number that is equal to TypeNames
+     * @param num the order the column should be extracted from the database
+     * @param type the number that is equal to TypeNames
      */
     public void setTypeExpected(int num, int type) {
         setTypes.put(Integer.valueOf(num), Integer.valueOf(type));
@@ -149,12 +144,10 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
-     * <P>
+     * <p>
      * This is the first operation created for the database, so therefore it is the simplest; cull information from the
      * database but not specify any parameters.
-     *
-     * @param query
-     *            a static query of the database.
+     * @param query a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
      */
     public ArrayList select(String query) {
@@ -223,7 +216,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
             ps = con.prepareStatement(query);
 
-            ps = psf.generate(ps,con);// enter variables here!
+            ps = psf.generate(ps, con);// enter variables here!
 
             {
                 rs = ps.executeQuery();
@@ -342,11 +335,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * execute, the static version of executing an update or insert on a table in the database.
-     *
-     * @param query
-     *            a static SQL statement which updates or inserts.
-     *
-     *
+     * @param query a static SQL statement which updates or inserts.
      */
 
     public void execute(String query) {
@@ -500,12 +489,9 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This method inserts one row for an entity table and gets latestPK of this row.
-     *
      * @param query
      * @param variables
      * @param nullVars
-     *
-     * @author ywang 11-26-2007
      */
     public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
         clearSignals();
@@ -596,93 +582,93 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     // logMe("column name: "+column+" type # "+type.intValue()+" row # "+i);
                     if (null != type) {
                         switch (type.intValue()) {
-                        // just putting the top five in here for now, tbh
-                        // put in statements to catch nulls in the db, tbh
-                        // 10-15-2004
-                        case TypeNames.DATE:
-                            // logger.warn("date: "+column);
-                            hm.put(column, rs.getDate(i));
-                            // do we want to put in a fake date if it's null?
-                            /*
-                             * if (rs.wasNull()) { hm.put(column,new
-                             * Date(System.currentTimeMillis())); }
-                             */
-                            break;
-                        case TypeNames.TIMESTAMP:
-                            // logger.warn("timestamp: "+column);
-                            hm.put(column, rs.getTimestamp(i));
-                            break;
-                        case TypeNames.DOUBLE:
-                            // logger.warn("double: "+column);
-                            hm.put(column, new Double(rs.getDouble(i)));
-                            if (rs.wasNull()) {
-                                hm.put(column, new Double(0));
-                            }
-                            break;
-                        case TypeNames.BOOL:
-                            // BADS FLAG
-                            if (CoreResources.getDBName().equals("oracle")) {
-                                hm.put(column, new Boolean(rs.getString(i).equals("1") ? true : false));
+                            // just putting the top five in here for now, tbh
+                            // put in statements to catch nulls in the db, tbh
+                            // 10-15-2004
+                            case TypeNames.DATE:
+                                // logger.warn("date: "+column);
+                                hm.put(column, rs.getDate(i));
+                                // do we want to put in a fake date if it's null?
+                                /*
+                                 * if (rs.wasNull()) { hm.put(column,new
+                                 * Date(System.currentTimeMillis())); }
+                                 */
+                                break;
+                            case TypeNames.TIMESTAMP:
+                                // logger.warn("timestamp: "+column);
+                                hm.put(column, rs.getTimestamp(i));
+                                break;
+                            case TypeNames.DOUBLE:
+                                // logger.warn("double: "+column);
+                                hm.put(column, new Double(rs.getDouble(i)));
                                 if (rs.wasNull()) {
-                                    if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
-                                        hm.put(column, new Boolean(false));
-                                    } else {
-                                        hm.put(column, new Boolean(true));
-                                    }
+                                    hm.put(column, new Double(0));
                                 }
-                            } else {
-                                hm.put(column, new Boolean(rs.getBoolean(i)));
-                                if (rs.wasNull()) {
-                                    // YW 08-17-2007 << Since I didn't
-                                    // investigate
-                                    // what's the impact if changing true to
-                                    // false,
-                                    // I only do change for the columns of
-                                    // "start_time_flag" and "end_time_flag" in
-                                    // the
-                                    // table study_event
-                                    if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
-                                        hm.put(column, new Boolean(false));
-                                    }else  if (column.equalsIgnoreCase("removed") || column.equalsIgnoreCase("archived")
-                                            || column.equalsIgnoreCase("locked") || column.equalsIgnoreCase("signed")
-                                            ||column.equalsIgnoreCase("event_removed") || column.equalsIgnoreCase("event_archived")
-                                            || column.equalsIgnoreCase("event_locked") || column.equalsIgnoreCase("event_signed")
-                                            || column.equalsIgnoreCase("form_removed") || column.equalsIgnoreCase("form_archived")) {
+                                break;
+                            case TypeNames.BOOL:
+                                // BADS FLAG
+                                if (CoreResources.getDBName().equals("oracle")) {
+                                    hm.put(column, new Boolean(rs.getString(i).equals("1") ? true : false));
+                                    if (rs.wasNull()) {
+                                        if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
+                                            hm.put(column, new Boolean(false));
+                                        } else {
+                                            hm.put(column, new Boolean(true));
+                                        }
+                                    }
+                                } else {
+                                    hm.put(column, new Boolean(rs.getBoolean(i)));
+                                    if (rs.wasNull()) {
+                                        // YW 08-17-2007 << Since I didn't
+                                        // investigate
+                                        // what's the impact if changing true to
+                                        // false,
+                                        // I only do change for the columns of
+                                        // "start_time_flag" and "end_time_flag" in
+                                        // the
+                                        // table study_event
+                                        if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
+                                            hm.put(column, new Boolean(false));
+                                        } else if (column.equalsIgnoreCase("removed") || column.equalsIgnoreCase("archived")
+                                                || column.equalsIgnoreCase("locked") || column.equalsIgnoreCase("signed")
+                                                || column.equalsIgnoreCase("event_removed") || column.equalsIgnoreCase("event_archived")
+                                                || column.equalsIgnoreCase("event_locked") || column.equalsIgnoreCase("event_signed")
+                                                || column.equalsIgnoreCase("form_removed") || column.equalsIgnoreCase("form_archived")) {
                                             hm.put(column, null);
-                                    } else {
-                                        hm.put(column, new Boolean(true));
+                                        } else {
+                                            hm.put(column, new Boolean(true));
+                                        }
+                                        // bad idea? what to put, then?
                                     }
-                                    // bad idea? what to put, then?
                                 }
-                            }
-                            break;
-                        case TypeNames.FLOAT:
-                            hm.put(column, new Float(rs.getFloat(i)));
-                            if (rs.wasNull()) {
-                                hm.put(column, new Float(0.0));
-                            }
-                            break;
-                        case TypeNames.INT:
-                            hm.put(column, Integer.valueOf(rs.getInt(i)));
-                            if (rs.wasNull()) {
-                                hm.put(column, Integer.valueOf(0));
-                            }
-                            break;
-                        case TypeNames.STRING:
-                            hm.put(column, rs.getString(i));
-                            if (rs.wasNull()) {
-                                hm.put(column, "");
-                            }
-                            break;
-                        case TypeNames.CHAR:
-                            hm.put(column, rs.getString(i));
-                            if (rs.wasNull()) {
-                                char x = 'x';
-                                hm.put(column, new Character(x));
-                            }
-                            break;
-                        default:
-                            // do nothing?
+                                break;
+                            case TypeNames.FLOAT:
+                                hm.put(column, new Float(rs.getFloat(i)));
+                                if (rs.wasNull()) {
+                                    hm.put(column, new Float(0.0));
+                                }
+                                break;
+                            case TypeNames.INT:
+                                hm.put(column, Integer.valueOf(rs.getInt(i)));
+                                if (rs.wasNull()) {
+                                    hm.put(column, Integer.valueOf(0));
+                                }
+                                break;
+                            case TypeNames.STRING:
+                                hm.put(column, rs.getString(i));
+                                if (rs.wasNull()) {
+                                    hm.put(column, "");
+                                }
+                                break;
+                            case TypeNames.CHAR:
+                                hm.put(column, rs.getString(i));
+                                if (rs.wasNull()) {
+                                    char x = 'x';
+                                    hm.put(column, new Character(x));
+                                }
+                                break;
+                            default:
+                                // do nothing?
                         }// end switch
                     }
                 } // end for loop
@@ -760,14 +746,11 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      * <li>e.g., "WHERE item_id = ?" when selecting from item
      * <li>e.g., "WHERE item_id = ? AND event_crf_id=?" when selecting from item_data
      * </ol>
-     *
+     * <p>
      * Note that queries which join two tables may be included in the definition of "findByPK-style" query, as long as
      * the first criterion is met.
-     *
-     * @param queryName
-     *            The name of the query which should be executed.
-     * @param variables
-     *            The set of variables used to populate the PreparedStatement; should be empty if none are needed.
+     * @param queryName The name of the query which should be executed.
+     * @param variables The set of variables used to populate the PreparedStatement; should be empty if none are needed.
      * @return The EntityBean selected by the query.
      */
     public EntityBean executeFindByPKQuery(String queryName, HashMap variables) {
@@ -794,9 +777,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * Exactly equivalent to calling <code>executeFindByPKQuery(queryName, new HashMap())</code>.
-     *
-     * @param queryName
-     *            The name of the query which should be executed.
+     * @param queryName The name of the query which should be executed.
      * @return The EntityBean selected by the query.
      */
     public EntityBean executeFindByPKQuery(String queryName) {
@@ -897,7 +878,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * getDS, had to add it to allow queries of other daos within the daos
-     *
      * @return Returns the ds.
      */
     public DataSource getDs() {
@@ -911,6 +891,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     // public void setDs(DataSource ds) {
     // this.ds = ds;
     // }
+
     /**
      * Clear the signals which indicate the success or failure of the query. This method should be called at the
      * beginning of every select or execute method.
@@ -930,9 +911,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     /**
      * Signal that the query was unsuccessful. Either this method or signalSuccess should be called by the time a select
      * or execute method returns.
-     *
-     * @param sqle
-     *            The SQLException which was thrown by PreparedStatement.execute/executeUpdate.
+     * @param sqle The SQLException which was thrown by PreparedStatement.execute/executeUpdate.
      */
     protected void signalFailure(SQLException sqle) {
         querySuccessful = false;
@@ -1018,15 +997,15 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      */
     /**
      * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
-     * <P>
+     * <p>
      * This is the first operation created for the database, so therefore it is the simplest; cull information from the
      * database but not specify any parameters.
-     *
-     *            a static query of the database.
+     * <p>
+     * a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
      */
     public ArrayList selectStudySubjects(int studyid, int parentid, String sedin, String it_in, String dateConstraint, String ecStatusConstraint,
-            String itStatusConstraint) {
+                                         String itStatusConstraint) {
         clearSignals();
         String query = getSQLSubjectStudySubjectDataset(studyid, parentid, sedin, it_in, dateConstraint, ecStatusConstraint, itStatusConstraint,
                 CoreResources.getDBName());
@@ -1072,7 +1051,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }//
 
     /**
-     *
      * @param rs
      * @return
      */
@@ -1155,7 +1133,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }
 
     protected String getSQLSubjectStudySubjectDataset(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint,
-            String ecStatusConstraint, String itStatusConstraint, String databaseName) {
+                                                      String ecStatusConstraint, String itStatusConstraint, String databaseName) {
         /**
          *
          * SELECT
@@ -1307,7 +1285,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }// getSQLSubjectStudySubjectDataset
 
     /**
-     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -1368,7 +1345,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * Main function call
-     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -1427,7 +1403,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
-     *
      * @param rs
      * @return
      */
@@ -1621,7 +1596,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
-     *
      * @param rs
      * @return
      */
@@ -1636,7 +1610,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
          * study_event.date_start, study_event.date_end,
          *
          * study_event.start_time_flag study_event.end_time_flag study_event.status_id
-         * study_event.subject_event_status_id
+         * study_event.workflow_status
          *
          *
          * //ids itemid, crfversionid, eventcrfid, studyeventid
@@ -1828,7 +1802,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * There are two base querries for dataset
-     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -1836,7 +1809,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      * @return
      */
     protected String getSQLDatasetBASE_EVENTSIDE(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint, String ecStatusConstraint,
-            String itStatusConstraint) {
+                                                 String itStatusConstraint) {
 
         /**
          * NEEEDS to replace four elements: - item_id IN (...) from dataset sql - study_event_definition_id IN (...)
@@ -1925,7 +1898,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             return " SELECT  " + " itemdataid,  " + " studysubjectid, study_event.sample_ordinal,  " + " study_event.study_event_definition_id,   "
                     + " study_event_definition.name, study_event.location, study_event.date_start, study_event.date_end, "
-                    + " study_event.start_time_flag , study_event.end_time_flag , study_event.status_id, study_event.subject_event_status_id, "
+                    + " study_event.start_time_flag , study_event.end_time_flag, study_event.workflow_status, "
                     + " itemid,  crfversionid,  eventcrfid, studyeventid " + " FROM " + " ( "
                     + " 	SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname, item.description AS itemdesc,  "
                     + " 	item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
@@ -1985,7 +1958,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
              */
             return " SELECT  " + " itemdataid,  " + " studysubjectid, study_event.sample_ordinal,  " + " study_event.study_event_definition_id,   "
                     + " study_event_definition.name, study_event.location, study_event.date_start, study_event.date_end, "
-                    + " study_event.start_time_flag , study_event.end_time_flag , study_event.status_id, study_event.subject_event_status_id, "
+                    + " study_event.start_time_flag , study_event.end_time_flag, study_event.workflow_status, "
                     + " itemid,  crfversionid,  eventcrfid, studyeventid " + " FROM " + " ( "
                     + "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname, item.description AS itemdesc,  "
                     + "   item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
@@ -2044,7 +2017,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This is the second base sql
-     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2052,7 +2024,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      * @return
      */
     protected String getSQLDatasetBASE_ITEMGROUPSIDE(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint,
-            String ecStatusConstraint, String itStatusConstraint) {
+                                                     String ecStatusConstraint, String itStatusConstraint) {
         /**
          * NEEEDS to replace four elements: - item_id IN (...) from dataset sql - study_event_definition_id IN (...)
          * from sql dataset - study_id and
@@ -2278,13 +2250,11 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }// getSQLDatasetBASE_ITEMGROUPSIDE
 
     /**
-     *
      * @param sedin
-
      * @return
      */
     protected String getSQLInKeyDatasetHelper(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint, String ecStatusConstraint,
-            String itStatusConstraint) {
+                                              String itStatusConstraint) {
         /**
          * SELECT DISTINCT study_event.study_event_definition_id, study_event.sample_ordinal, crfv.crf_id, it.item_id,
          * ig.name AS item_group_name FROM event_crf
@@ -2410,14 +2380,13 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }
 
     /**
-     *
      * @param studyid
      * @param parentid
      * @param sedin
      * @return
      */
     public HashMap setHashMapInKeysHelper(int studyid, int parentid, String sedin, String itin, String dateConstraint, String ecStatusConstraint,
-            String itStatusConstraint) {
+                                          String itStatusConstraint) {
         clearSignals();
         // YW, 09-2008, << modified syntax of sql for oracle database
         String query = getSQLInKeyDatasetHelper(studyid, parentid, sedin, itin, dateConstraint, ecStatusConstraint, itStatusConstraint);
@@ -2464,7 +2433,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     /**
      * Return directly the HashMap with the key It shouldn't be NULL !! TODO - throw an error if any of the fields is
      * null!
-     *
      * @param rs
      * @return
      */
@@ -2534,7 +2502,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     /**
      * ******************************************************************************* This returns the final array of
      * strings of event_crf_id
-     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -2585,7 +2552,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This returns an ArrayList of Strings
-     *
      * @param rs
      * @return
      */
@@ -2617,7 +2583,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }
 
     /**
-     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2725,7 +2690,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     /**
      * ******************************************************************************* Returns a list with
      * study_subject_id
-     *
      * @param studyid
      * @param sedin
      * @return
@@ -2773,7 +2737,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This returns an ArrayList of Strings
-     *
      * @param rs
      * @return
      */
@@ -2808,7 +2771,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This returns the SQL with all active study_subject_id.
-     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2923,9 +2885,9 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
 
     public String getECStatusConstraint(int datasetItemStatusId) {
-       String all = " = ec.workflow_status ";
+        String all = " = ec.workflow_status ";
 
-       switch (datasetItemStatusId) {
+        switch (datasetItemStatusId) {
             case 1:
                 return " in ('" + EventCrfWorkflowStatusEnum.COMPLETED.toString() + "')";
             case 2:
@@ -2939,17 +2901,17 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     public String getItemDataStatusConstraint(int datasetItemStatusId) {
         String statusConstraint = "";
         switch (datasetItemStatusId) {
-        default:
-        case 0:
-        case 1:
-            statusConstraint = "in (2,6)";
-            break;
-        case 2:
-            statusConstraint = "not in (6,5,7)"; // 6 is locked.
-            break;
-        case 3:
-            statusConstraint = "not in (5,7)";
-            break;
+            default:
+            case 0:
+            case 1:
+                statusConstraint = "in (2,6)";
+                break;
+            case 2:
+                statusConstraint = "not in (6,5,7)"; // 6 is locked.
+                break;
+            case 3:
+                statusConstraint = "not in (5,7)";
+                break;
         }
         return statusConstraint;
     }

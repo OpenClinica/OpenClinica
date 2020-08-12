@@ -74,6 +74,7 @@ public class EventCrfLayerBuilder {
     String buid() {
         if (eventCrfBean == null) {
             eventCrfBean = new EventCRFBean(EventCrfWorkflowStatusEnum.NOT_STARTED);
+            formLayoutBean = new FormLayoutBean();
         }
 
         buildLock();
@@ -134,7 +135,9 @@ public class EventCrfLayerBuilder {
         String statusText = eventCrfWorkflowStatus.getDisplayValue();
         // AC2: If a Form has status Removed = Yes or the event the form is in has status Removed = Yes,
         // then "removed" will be displayed instead of the form workflow status for that form.
-        if (eventCrfBean.isRemoved() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
+        if (eventCrfBean.isRemoved() || (getStudyEvent() != null && getStudyEvent().isRemoved()
+                && ( eventCrfBean.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED
+                || (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED && eventCrfBean.getUpdaterId() > 0)))) {
             statusText = removedText.toLowerCase();
         }
         html.append("Status").append(": ").append(statusText).br();
@@ -152,7 +155,9 @@ public class EventCrfLayerBuilder {
         }
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved()
+                && ( eventCrfBean.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED
+                || (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED && eventCrfBean.getUpdaterId() > 0)))) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
@@ -206,7 +211,7 @@ public class EventCrfLayerBuilder {
         Study subjectStudy = studyDao.findByPK(studySubject.getStudyId());
 
 
-        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived() || (getStudyEvent() != null && getStudyEvent().isRemoved()) || studySubject.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
 
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -265,7 +270,8 @@ public class EventCrfLayerBuilder {
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()
                     && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED) {
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
+                    && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 clearEventCrf(html, eventCrfBean, studySubject);
@@ -294,8 +300,7 @@ public class EventCrfLayerBuilder {
 
                 if (getStudyEvent() != null && !currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE
                         && !getStudyEvent().isLocked() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
-                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                        && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -338,7 +343,8 @@ public class EventCrfLayerBuilder {
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()
                     && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED) {
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
+                    && !formLayoutBean.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED)) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 clearEventCrf(html, eventCrfBean, studySubject);

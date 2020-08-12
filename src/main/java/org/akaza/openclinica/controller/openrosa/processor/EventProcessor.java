@@ -291,6 +291,8 @@ public class EventProcessor implements Processor {
             boolean statusChanged=false;
             if(!studyEvent.getWorkflowStatus().equals(newStatus)){
                 studyEvent.setWorkflowStatus(newStatus);
+                if(studyEvent.isCurrentlySigned())
+                    studyEvent.setSigned(Boolean.FALSE);
                 statusChanged=true;
             }
 

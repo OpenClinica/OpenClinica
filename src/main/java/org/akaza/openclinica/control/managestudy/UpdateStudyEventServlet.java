@@ -20,7 +20,6 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
@@ -36,6 +35,7 @@ import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -273,11 +273,20 @@ public class UpdateStudyEventServlet extends SecureController {
             end_date = dteFormat.format(end);
         }
 
+        ssdao = new StudySubjectDAO(sm.getDataSource());
+        StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+
+        Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
+        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("studySubjectService");
+
         if (action.equalsIgnoreCase("submit")) {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(EVENT_WORKFLOW_STATUS));
-                studyEvent.setWorkflowStatus(ses);
+            if(ses != null && !studyEvent.getWorkflowStatus().equals(ses) && studyEvent.isSigned())
+                studyEvent.setSigned(false);
+            studyEvent.setWorkflowStatus(ses);
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
 
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
@@ -396,13 +405,14 @@ public class UpdateStudyEventServlet extends SecureController {
             // core.org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             boolean isAuthenticated = false;
-            AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
+            KeycloakClientImpl keycloakClient = ctx.getBean("keycloakClientImpl", KeycloakClientImpl.class);
             try {
-                authzClient.obtainAccessToken(username, password);
+                keycloakClient.getAccessToken(username, password);
                 isAuthenticated = true;
-            } catch (HttpResponseException e) {
-                logger.error("Authorization:" + e);
+            } catch (Exception e) {
+                logger.error("Failed to fetch access token", e);
             }
+
             if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
                 Date date = new Date();
                 String detail = "The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
@@ -429,19 +439,12 @@ public class UpdateStudyEventServlet extends SecureController {
 
                 request.setAttribute("studyEvent", studyEvent);
                 // -------------------
-                ssdao = new StudySubjectDAO(sm.getDataSource());
-                StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
                 // prepare to figure out what the display should look like
                 ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
-
-                Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
-
-                StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
-                        .getBean("studySubjectService");
 
                 DisplayStudyEventBean dse = null;
                 for (DisplayStudyEventBean dsevent : studySubjectService.getDisplayStudyEventsForStudySubject(ssb, ub, currentRole, study)) {
@@ -561,8 +564,16 @@ public class UpdateStudyEventServlet extends SecureController {
 
             setPresetValues(presetValues);
 
+            DisplayStudyEventBean dse = null;
+            for (DisplayStudyEventBean dsevent : studySubjectService.getDisplayStudyEventsForStudySubject(ssb, ub, currentRole, study)) {
+                if (dsevent.getStudyEvent().getId() == studyEventId) {
+                    dse = dsevent;
+                }
+            }
+
             request.setAttribute("studyEvent", studyEvent);
             request.setAttribute("studySubject", studySubjectBean);
+            request.setAttribute("dse", dse);
 
             discNotes = new FormDiscrepancyNotes();
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);

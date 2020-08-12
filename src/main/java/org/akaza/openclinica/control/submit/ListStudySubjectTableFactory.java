@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.ResponseType;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
@@ -38,6 +39,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -489,75 +491,30 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private Boolean isSignable(int studySubjectId) {
-        boolean atLeastOneValidEventToSign = false;
-        StudySubject studySubject = studySubjectDao.findById(studySubjectId);
-        if (studySubject.getStatus().isSigned() || studySubject.getStudyEvents().size() == 0) {
+        // https://jira.openclinica.com/browse/OC-13185
+        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
+                session.getServletContext()).getBean("studySubjectService");
+        StudySubjectBean studySub = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
+        List<DisplayStudyEventBean> displayStudyEvents = studySubjectService.getDisplayStudyEventsForStudySubject(
+                studySub, currentUser, currentRole, studyBean);
+
+        if (studySub.getStatus().isSigned() || displayStudyEvents.size() == 0)
             return false;
-        }
 
-        for (StudyEvent studyEvent : studySubject.getStudyEvents()) {
+        for(DisplayStudyEventBean displayStudyEvent: displayStudyEvents) {
+            StudyEventBean studyEventBean = displayStudyEvent.getStudyEvent();
 
-            if (!studyEvent.isCurrentlyRemoved()
-                    && !studyEvent.isCurrentlyArchived()
-                    &&
-                    (
-                            (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
-                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
-                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                            )
-                                    || !isAllRequiredCrfsInEventCompleted(studyEvent, studySubject)
-                                    || !isAllFormsInEventCompletedOrNotStarted(studyEvent, studySubject)
+            if (studyEventBean.isRemoved() || studyEventBean.isArchived()
+                    || (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
                     )
-            ) {
+                    || !displayStudyEvent.isSignAble()
+               )
                 return false;
-            }
-            //At least one of the events is in Skipped, Stopped, or Completed status (excluding any events that are Archived = Yes or Removed = Yes)
-            if (!studyEvent.isCurrentlyRemoved()
-                    && !studyEvent.isCurrentlyArchived()
-                    && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))) {
-                atLeastOneValidEventToSign = true;
-            }
         }
 
-        return atLeastOneValidEventToSign ? true : false;
-    }
-
-
-    @SuppressWarnings( "unchecked" )
-    private boolean isAllRequiredCrfsInEventCompleted(StudyEvent studyEvent, StudySubject studySubject) {
-        EventDefinitionCrf edc = null;
-        for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
-            if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
-                edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudyId());
-                if (edc == null) {
-                    edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudy().getStudyId());
-                }
-                if (!edc.getStatusId().equals(Status.DELETED.getId()) && !edc.getStatusId().equals(Status.AUTO_DELETED.getId())
-                        && edc.getRequiredCrf() && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
-                    return false;
-            }
-        }
-        return true;
-    }
-
-
-    private boolean isAllFormsInEventCompletedOrNotStarted(StudyEvent studyEvent, StudySubject studySubject) {
-        EventDefinitionCrf edc = null;
-        for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
-            if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
-                edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudyId());
-                if (edc == null) {
-                    edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudy().getStudyId());
-                }
-                if (!edc.getStatusId().equals(Status.DELETED.getId()) && !edc.getStatusId().equals(Status.AUTO_DELETED.getId())
-                        && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
-                        && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
-                    return false;
-            }
-        }
         return true;
     }
 
@@ -654,6 +611,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     }
                     value = output != null ? output : value;
                 }
+            }else if(property.startsWith("sed_")){
+                value = StudyEventWorkflowStatusEnum.getByI18nDescription(value)+"";
             }
             auditUserLoginFilter.addFilter(property, value);
         }
@@ -944,7 +903,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
             for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
-                options.add(new Option(workflow.toString(),workflow.getDisplayValue()));
+                options.add(new Option(workflow.getDisplayValue(),workflow.getDisplayValue()));
             }
             return options;
         }
@@ -1292,22 +1251,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L_dis").width("20")
                 .close();
-        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
+        eventDiv.append("<span class=\"icon icon-caret-left gray clickable\" onclick=\"StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20")
-                .style("display: none;").close();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").style("display: none;").close();
-        eventDiv.a().href("javascript:StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
-        eventDiv.img().src("images/arrow_status_back.gif").border("0").close();
-        eventDiv.aEnd();
-        eventDiv.divEnd();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back_dis").close();
-        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
-        eventDiv.divEnd();
-        eventDiv.tdEnd();
 
         for (int i = 0; i < studyEvents.size(); i++) {
             StudyEventBean studyEventBean = studyEvents.get(i);
@@ -1361,22 +1307,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R_dis").width("20")
                 .close();
-        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
+        eventDiv.append("<span class=\"icon icon-caret-right gray clickable\" onclick=\"StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");\"" + "/>");
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20")
-                .style("display: none;").close();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").close();
-        eventDiv.a().href("javascript:StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
-        eventDiv.img().src("images/arrow_status_next.gif").border("0").close();
-        eventDiv.aEnd();
-        eventDiv.divEnd();
-        // <div>...</div>
-        eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next_dis").style("display: none;").close();
-        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
-        eventDiv.divEnd();
-        eventDiv.tdEnd().trEnd(0);
+        eventDiv.trEnd(0);
 
         eventDiv.tableEnd(0);
         eventDiv.divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd().divEnd();

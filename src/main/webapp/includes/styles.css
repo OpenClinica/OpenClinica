@@ -796,8 +796,6 @@ form[action="ExportExcelStudySubjectAuditLog"] ~ table {
 div#subjectSDV img[alt="Separator"] {
   margin: 0 .75em; }
 
-div#subjectSDV table#sdv {
-  width: 100%; }
   div#subjectSDV table#sdv thead tr.toolbar td {
     padding: .5em 0; }
 
@@ -974,4 +972,8 @@ form#searchByStudySubjectId {
 	background: transparent;
 	padding: 0.25em 0;
     margin: 0 -7px;
+}
+
+.clickable, .clickable:before, .clickable:after {
+  cursor: pointer
 }

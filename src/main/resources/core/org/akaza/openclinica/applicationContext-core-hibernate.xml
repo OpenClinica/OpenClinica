@@ -152,6 +152,8 @@
                 <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop>
                 <prop key ="hibernate.multi_tenant_connection_provider">core.org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl</prop>
                 <prop key="hibernate.tenant_identifier_resolver">core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl</prop>
+                <!-- Temporarily disabling null checks that are automatically turned on by JDK11 upgrade-->
+                <prop key="hibernate.check_nullability">false</prop>
             </props>
         </property>
         <!-- convet aaBb to aa_bb -->
