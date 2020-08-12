@@ -535,24 +535,34 @@
                      </c:choose>
 
                     </td>
-
-                    <c:choose>
-
-                    <c:when test="${studyEvent.locked == true}">
-                        <td class="table_cell" bgcolor="#F5F5F5" align="center">
-                        <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-                        </td>
-                    </c:when>
-
-                    <c:when test="${studySub.status.available }">
-                        <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
-                    </c:when>
-
-                    <c:otherwise>
-                        <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>"></td>
-                    </c:otherwise>
-
-                    </c:choose>
+                    <td class="table_cell" bgcolor="#F5F5F5" align="center">
+                        <table style="width: 100%;">
+                            <tr style="width: inherit;">
+                              <td style="width: 54%; text-align: end;">
+                                <c:choose>
+                                    <c:when test="${studySub.status.name != 'removed'&& studySub.status.name != 'auto-removed'}">
+                                        <c:choose>
+                                            <c:when test="${dedc.eventCRF.id>0}">
+                                                <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                    </c:otherwise>
+                                </c:choose>
+                              </td>
+                              <td>
+                                <c:if test="${studyEvent.locked == true}">
+                                    <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
+                                </c:if>
+                              </td>
+                            </tr>
+                        </table>
+                    </td>
 
                     <td class="table_cell">&nbsp;</td>
 
@@ -596,21 +606,44 @@
                 <td class="table_cell"><c:out value="${ dse.studyEvent.studyEventDefinition.repeating ? repeat :non_repeat }" />&nbsp;</td>
                 <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" />&nbsp;</td>
-                <td class="table_cell"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
+                <td class="table_cell">
+                    <c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;
+                    <c:if test="${dec.eventCRF.formLayout.status.name == 'Removed'}">
+                        <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                    </c:if>
+                </td>
                 <td class="table_cell" bgcolor="#F5F5F5" align="center">
-
-                  <c:choose>
-                 <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
-                           <span class=" icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>">
-                  </c:when>
-                  <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
-                        <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
-                  </c:when>
-
-                   <c:otherwise>
-                     <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
-                   </c:otherwise>
-                  </c:choose>
+                    <table style="width: 100%;">
+                        <tr style="width: inherit;">
+                            <td style="width: 54%; text-align: end;">
+                                <c:choose>
+                                    <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
+                                        <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
+                                    </c:when>
+                                    <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
+                                        <span class=" icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>">
+                                    </c:when>
+                                    <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                        <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <c:if test="${dse.studyEvent.signed == true && !dec.eventCRF.isArchived() && !dec.eventCRF.isRemoved() && dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                    <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"></span>
+                                </c:if>
+                                <c:if test="${dse.studyEvent.locked == true}">
+                                    <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"></span>
+                                </c:if>
+                                <c:if test="${dec.eventCRF.isArchived()}">
+                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"></span>
+                                </c:if>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
 
