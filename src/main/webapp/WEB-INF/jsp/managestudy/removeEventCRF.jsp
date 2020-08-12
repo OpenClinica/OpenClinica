@@ -45,7 +45,7 @@
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
 <h1><span class="title_manage">
-<fmt:message key="remove_CRF_from_event"  bundle="${resword}"/>
+<fmt:message key="remove_form_from_event"  bundle="${resword}"/>
 </span></h1>
 <br>
 <div style="width: 600px">   

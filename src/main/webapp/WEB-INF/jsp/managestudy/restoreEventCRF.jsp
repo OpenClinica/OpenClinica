@@ -45,7 +45,7 @@
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
 <h1><span class="title_manage">
-<fmt:message key="restore_CRF_to_event"  bundle="${resword}"/>
+<fmt:message key="restore_form_to_event"  bundle="${resword}"/>
 </span></h1>
 <p><fmt:message key="confirm_restore_of_this_CRF_to_event"  bundle="${resword}"/><br><br><fmt:message key="if_signed_will_invalidate"  bundle="${resword}"/></p>
 
