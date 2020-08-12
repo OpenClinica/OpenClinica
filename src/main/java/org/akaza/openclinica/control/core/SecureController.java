@@ -69,6 +69,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.mail.MessagingException;
@@ -143,8 +144,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     private final static String STUDY_ENV_UUID = "studyEnvUuid";
     private final static String FORCE_RENEW_AUTH = "forceRenewAuth";
 
-    // protected final Logger logger =
-    // LoggerFactory.getLogger(getClass().getName());
     protected static final Logger logger = LoggerFactory.getLogger(SecureController.class);
     protected String logDir;
     protected String logLevel;
@@ -264,7 +263,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public void init() throws ServletException {
         context = getServletContext();
         eventCrfLocker = SpringServletAccess.getApplicationContext(context).getBean(EventCRFLocker.class);
-
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
     }
 
     /**

@@ -26,6 +26,7 @@ public class KafkaConfig {
   public static final String FORM_ATTRIBUTE_CHANGE_TOPIC = "formAttributeChange";
   public static final String FORM_CHANGE_TOPIC = "formChange";
   public static final String ITEM_DATA_CHANGE_TOPIC = "itemDataChange";
+  public static final String ODM_REFRESH_TOPIC = "odmRefresh";
 
   @Bean
   public ProducerFactory<Integer, String> producerFactory() {
@@ -78,6 +79,11 @@ public class KafkaConfig {
   @Bean
   public NewTopic itemDataChange() {
     return new NewTopic(ITEM_DATA_CHANGE_TOPIC, 1, (short) 1);
+  }
+
+  @Bean
+  public NewTopic odmRefresh() {
+    return new NewTopic(ODM_REFRESH_TOPIC, 1, (short) 1);
   }
 
 }

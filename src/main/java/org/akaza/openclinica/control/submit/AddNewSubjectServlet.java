@@ -116,11 +116,6 @@ public class AddNewSubjectServlet extends SecureController {
 
     // YW >>
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-    }
 
     /*
      * (non-Javadoc)

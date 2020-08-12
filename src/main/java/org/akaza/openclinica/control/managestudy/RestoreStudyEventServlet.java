@@ -7,44 +7,28 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import com.openclinica.kafka.KafkaService;
-import com.openclinica.kafka.dto.EventAttributeChangeDTO;
-import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import core.org.akaza.openclinica.bean.submit.EventCRFBean;
-import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
-import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.service.auth.TokenService;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import core.org.akaza.openclinica.core.EmailEngine;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.view.Page;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.JdbcService;
+import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
+
+import java.util.ArrayList;
 
 /**
  * @author jxu
@@ -55,6 +39,11 @@ public class RestoreStudyEventServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private StudySubjectDAO studySubjectDAO;
+    private StudyEventService studyEventService;
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    private EventDefinitionCRFDAO eventDefinitionCRFDAO;
+
     /**
      *
      */
@@ -79,139 +68,71 @@ public class RestoreStudyEventServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
-        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studyEventDAO = JdbcService.getStudyEventDao(context);
+        eventCRFDAO = JdbcService.getEventCrfDao(context);
+        studySubjectDAO = JdbcService.getStudySubjectDao(context);
+        studyEventDefinitionDAO = JdbcService.getStudyEventDefinitionDao(context);
+        eventDefinitionCRFDAO = JdbcService.getEventDefinitionCRFDao(context);
+        studyEventService = (StudyEventService) SpringServletAccess.getApplicationContext(context).getBean("StudyEventService");
+
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
 
-        StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-
         if (studyEventId == 0) {
             addPageMessage(respage.getString("please_choose_a_SE_to_restore"));
-            request.setAttribute("id", new Integer(studySubId).toString());
+            request.setAttribute("id", Integer.toString(studySubId));
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
-            StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
+            StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubId);
 
-            // YW 11-07-2007, a study event could not be restored if its study
-            // subject has been removed
-            Status s = studySub.getStatus();
-            if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
+            // Study event cannot be restored if the subject has been removed.
+            Status subjectStatus = studySubject.getStatus();
+            if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
                 addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("restored") + "."
                         + respage.getString("study_subject_has_been_deleted"));
-                request.setAttribute("id", new Integer(studySubId).toString());
+                request.setAttribute("id", Integer.toString(studySubId));
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
-            // YW
 
-            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
+            StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
+            request.setAttribute("studySub", studySubject);
 
-            request.setAttribute("studySub", studySub);
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEvent.getStudyEventDefinitionId());
+            studyEvent.setStudyEventDefinition(sed);
 
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-            event.setStudyEventDefinition(sed);
-
-            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
+            Study study = getStudyDao().findByPK(studySubject.getStudyId());
             request.setAttribute("study", study);
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
-
-
-                EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
                 // find all crfs in the definition
-                ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
+                ArrayList eventDefinitionCRFs = (ArrayList) eventDefinitionCRFDAO.findAllByEventDefinitionId(study, sed.getId());
 
-                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
 
                 // construct info needed on view study event page
-                DisplayStudyEventBean de = new DisplayStudyEventBean();
-                de.setStudyEvent(event);
-                de.setDisplayEventCRFs(getDisplayEventCRFs(eventCRFs, eventDefinitionCRFs));
+                DisplayStudyEventBean displayEvent = new DisplayStudyEventBean();
+                displayEvent.setStudyEvent(studyEvent);
+                ArrayList<DisplayEventCRFBean> displayEventCrfs = studyEventService.getDisplayEventCRFs(eventCRFs, eventDefinitionCRFs, currentRole, ub);
+                displayEvent.setDisplayEventCRFs(displayEventCrfs);
 
-                request.setAttribute("displayEvent", de);
+                request.setAttribute("displayEvent", displayEvent);
 
                 forwardPage(Page.RESTORE_STUDY_EVENT);
             } else {
-                logger.info("submit to restore the event to study");
-                // restore event to study
-                if (event.isSigned()) {
-                    event.setSigned(Boolean.FALSE);
-                }
-                event.setRemoved(Boolean.FALSE);
-                event.setUpdater(ub);
-                event.setUpdatedDate(new Date());
-                studyEventDAO.update(event);
+                logger.info("Restoring study event - user confirmed.");
 
-                if(studySub.getStatus().equals(Status.SIGNED)){
-                    studySub.setStatus(Status.AVAILABLE);
-                    studySub.setUpdater(ub);
-                    studySub.setUpdatedDate(new Date());
-                    subdao.update(studySub);
-                }
-                // restore event crfs
+                studyEventService.restoreStudyEvent(studySubject, studyEvent, ub);
 
-
-
-                String emailBody = respage.getString("the_event") + event.getStudyEventDefinition().getName() + " "
+                String alertMessage = respage.getString("the_event") + studyEvent.getStudyEventDefinition().getName() + " "
                         + respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";
 
-                addPageMessage(emailBody);
+                addPageMessage(alertMessage);
 
-                request.setAttribute("id", new Integer(studySubId).toString());
+                request.setAttribute("id", Integer.toString(studySubId));
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
         }
-    }
-
-    /**
-     * Each of the event CRFs with its corresponding CRFBean. Then generates a
-     * list of DisplayEventCRFBeans, one for each event CRF.
-     *
-     * @param eventCRFs
-     *            The list of event CRFs for this study event.
-     * @param eventDefinitionCRFs
-     *            The list of event definition CRFs for this study event.
-     * @return The list of DisplayEventCRFBeans for this study event.
-     */
-    private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs) {
-        ArrayList answer = new ArrayList();
-
-        HashMap definitionsById = new HashMap();
-        int i;
-        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
-        }
-
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-
-        for (i = 0; i < eventCRFs.size(); i++) {
-            EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
-
-            // populate the event CRF with its crf bean
-            int crfVersionId = ecb.getCRFVersionId();
-            CRFBean cb = cdao.findByVersionId(crfVersionId);
-            ecb.setCrf(cb);
-
-            CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-            ecb.setCrfVersion(cvb);
-
-            // then get the definition so we can call
-            // DisplayEventCRFBean.setFlags
-            int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
-
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
-
-            DisplayEventCRFBean dec = new DisplayEventCRFBean();
-            dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-            answer.add(dec);
-        }
-
-        return answer;
     }
 }

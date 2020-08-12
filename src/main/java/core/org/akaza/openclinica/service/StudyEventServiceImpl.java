@@ -2,24 +2,31 @@ package core.org.akaza.openclinica.service;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.openclinica.kafka.KafkaService;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.odmbeans.UserBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -83,6 +90,18 @@ public class StudyEventServiceImpl implements StudyEventService {
     @Autowired
     @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("studySubjectJDBCDao")
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    private KafkaService kafkaService;
+
+    @Autowired
+    @Qualifier("crfJDBCDao")
+    private CRFDAO crfDAO;
+    @Autowired
+    @Qualifier("crfVersionJDBCDao")
+    private CRFVersionDAO crfVersionDAO;
 
     private RestfulServiceHelper restfulServiceHelper;
 
@@ -100,6 +119,7 @@ public class StudyEventServiceImpl implements StudyEventService {
      */
     private StudySubjectDAO msStudySubjectDAO = null;
     private StudyEventDefinitionDAO sedDao = null;
+
     private final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
@@ -951,6 +971,73 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
         }
 
         return studyEvent;
+    }
+
+    @Override
+    public void restoreStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent, UserAccountBean userbean) {
+        if (studyEvent.isSigned()) {
+            studyEvent.setSigned(Boolean.FALSE);
+        }
+        studyEvent.setRemoved(Boolean.FALSE);
+        studyEvent.setUpdater(userbean);
+        studyEvent.setUpdatedDate(new Date());
+        studyEventDAO.update(studyEvent);
+
+        if(studySubject.getStatus().equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdater(userbean);
+            studySubject.setUpdatedDate(new Date());
+            studySubjectDAO.update(studySubject);
+        }
+        kafkaService.sendOdmRefreshMessage(studySubject);
+    }
+
+
+    /**
+     * Each of the event CRFs with its corresponding CRFBean. Then generates a
+     * list of DisplayEventCRFBeans, one for each event CRF.
+     *
+     * @param eventCRFs
+     *            The list of event CRFs for this study event.
+     * @param eventDefinitionCRFs
+     *            The list of event definition CRFs for this study event.
+     * @return The list of DisplayEventCRFBeans for this study event.
+     */
+    @Override
+    public ArrayList<DisplayEventCRFBean> getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs, StudyUserRoleBean currentRole, UserAccountBean userAccountBean) {
+        ArrayList answer = new ArrayList();
+
+        HashMap definitionsById = new HashMap();
+        int i;
+        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
+            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+            definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
+        }
+
+        for (i = 0; i < eventCRFs.size(); i++) {
+            EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+
+            // populate the event CRF with its crf bean
+            int crfVersionId = ecb.getCRFVersionId();
+            CRFBean cb = crfDAO.findByVersionId(crfVersionId);
+            ecb.setCrf(cb);
+
+            CRFVersionBean cvb = (CRFVersionBean) crfVersionDAO.findByPK(crfVersionId);
+            ecb.setCrfVersion(cvb);
+
+            // then get the definition so we can call
+            // DisplayEventCRFBean.setFlags
+            int studyEventId = ecb.getStudyEventId();
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
+
+            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
+
+            DisplayEventCRFBean dec = new DisplayEventCRFBean();
+            dec.setFlags(ecb, userAccountBean, currentRole, edc.isDoubleEntry());
+            answer.add(dec);
+        }
+
+        return answer;
     }
 
     public StudyEventWorkflowStatusEnum convertOriginalStudyEventStatusToWorkflowSatus(String value) {

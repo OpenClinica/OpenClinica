@@ -1,10 +1,8 @@
 package com.openclinica.kafka;
 
-import com.openclinica.kafka.dto.EventAttributeChangeDTO;
-import com.openclinica.kafka.dto.FormChangeDTO;
-import com.openclinica.kafka.dto.ItemDataChangeDTO;
-import com.openclinica.kafka.dto.StudyPublishDTO;
+import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
@@ -132,6 +130,43 @@ public class KafkaService {
 
         Headers headers = buildHeaders("com.openclinica.kafka.dto.StudyPublishDTO");
         ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
+        kafkaTemplate.send(producerRecord);
+    }
+
+    public void sendOdmRefreshMessage(StudySubjectBean studySubjectBean) {
+        ODMRefreshDTO odmRefreshDTO = new ODMRefreshDTO();
+
+        StudySubject studySubject = studySubjectDao.findById(studySubjectBean.getSubjectId());
+        Study study = studySubject.getStudy();
+
+        odmRefreshDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        odmRefreshDTO.setStudyUuid(study.getStudyUuid());
+        odmRefreshDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
+        odmRefreshDTO.setStudyOid(getStudyOid(study));
+        odmRefreshDTO.setSiteOid(getSiteOid(study));
+        odmRefreshDTO.setParticipantId(studySubject.getLabel());
+        odmRefreshDTO.setParticipantOid(studySubject.getOcOid());
+
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.ODMRefreshDTO");
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ODM_REFRESH_TOPIC, null, null, null, odmRefreshDTO, headers);
+        kafkaTemplate.send(producerRecord);
+    }
+
+    public void sendOdmRefreshMessage(StudySubject studySubject) {
+        ODMRefreshDTO odmRefreshDTO = new ODMRefreshDTO();
+
+        Study study = studySubject.getStudy();
+
+        odmRefreshDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        odmRefreshDTO.setStudyUuid(study.getStudyUuid());
+        odmRefreshDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
+        odmRefreshDTO.setStudyOid(getStudyOid(study));
+        odmRefreshDTO.setSiteOid(getSiteOid(study));
+        odmRefreshDTO.setParticipantId(studySubject.getLabel());
+        odmRefreshDTO.setParticipantOid(studySubject.getOcOid());
+
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.ODMRefreshDTO");
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ODM_REFRESH_TOPIC, null, null, null, odmRefreshDTO, headers);
         kafkaTemplate.send(producerRecord);
     }
 

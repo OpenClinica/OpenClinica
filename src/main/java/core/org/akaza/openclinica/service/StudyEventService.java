@@ -1,8 +1,11 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
@@ -13,6 +16,7 @@ import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 
 public interface StudyEventService {
@@ -36,4 +40,7 @@ public interface StudyEventService {
 
     StudyEvent validateStudyEventExists(StudySubject studySubject, String studyEventOID, String studyEventRepeatKey, CustomRuntimeException validationErrors);
 
+    void restoreStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent, UserAccountBean userAccountBean);
+
+    ArrayList<DisplayEventCRFBean> getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs, StudyUserRoleBean currentRole, UserAccountBean userAccountBean);
 }

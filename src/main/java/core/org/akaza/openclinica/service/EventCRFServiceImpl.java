@@ -1,24 +1,41 @@
 package core.org.akaza.openclinica.service;
 
+import com.openclinica.kafka.KafkaService;
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
+import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.dto.FormRequestDTO;
 import org.akaza.openclinica.controller.dto.FormResponseDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +44,7 @@ public class EventCRFServiceImpl implements EventCRFService {
 
     public static final String FAILED = "Failed";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
     @Autowired
     StudySubjectService studySubjectService;
     @Autowired
@@ -37,11 +55,36 @@ public class EventCRFServiceImpl implements EventCRFService {
     EventCrfDao eventCrfDao;
     @Autowired
     UserAccountDao userAccountDao;
+    @Autowired
+    StudyDao studyDao;
 
     @Autowired
     CrfVersionDao crfVersionDao;
     @Autowired
     CompletionStatusDao completionStatusDao;
+    @Autowired
+    @Qualifier("studyEventJDBCDao")
+    private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("studySubjectJDBCDao")
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
+    @Autowired
+    private KafkaService kafkaService;
+
+    @Autowired
+    @Qualifier("discrepancyNoteJDBCDao")
+    private DiscrepancyNoteDAO discrepancyNoteDAO;
+    @Autowired
+    private RuleActionRunLogDao ruleActionRunLogDao;
+    @Autowired
+    @Qualifier("itemFormMetadataJDBCDao")
+    private ItemFormMetadataDAO itemFormMetadataDAO;
+    @Autowired
+    @Qualifier("itemDataJDBCDao")
+    private ItemDataDAO itemDataDAO;
 
     final String DEFAULT_EVENT_REPEAT_KEY = "1";
 
@@ -96,6 +139,132 @@ public class EventCRFServiceImpl implements EventCRFService {
         } else {
             throw validationErrors;
         }
+    }
+
+    @Override
+    public void restoreEventCrf(StudySubjectBean studySubject, StudyEventBean studyEvent, EventCRFBean eventCrf, UserAccountBean userAccountBean) {
+        eventCrf.setRemoved(Boolean.FALSE);
+        eventCrf.setUpdater(userAccountBean);
+        eventCrf.setUpdatedDate(new Date());
+        eventCrfDAO.update(eventCrf);
+
+        if (studyEvent.isSigned()) {
+            studyEvent.setSigned(Boolean.FALSE);
+            studyEvent.setUpdater(userAccountBean);
+            studyEvent.setUpdatedDate(new Date());
+            studyEventDAO.update(studyEvent);
+        }
+
+        if(studySubject.getStatus().equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdater(userAccountBean);
+            studySubject.setUpdatedDate(new Date());
+            studySubjectDAO.update(studySubject);
+        }
+        kafkaService.sendOdmRefreshMessage(studySubject);
+    }
+
+    @Override
+    public void clearEventCrf(StudySubjectBean studySub, StudyEventBean event, EventCRFBean eventCRF, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean) {
+        eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
+        eventCRF.setUpdater(userAccountBean);
+        eventCRF.setDateCompleted(null);
+        int crfVersionId = eventCRF.getCRFVersionId();
+        eventCrfDAO.update(eventCRF);
+
+        Study study = studyDao.findByPK(studySub.getStudyId());
+
+        for (ItemDataBean itemdata : itemData) {
+            // OC-6343 Rule behaviour must be reset if an Event CRF is deleted
+            // delete the records from ruleActionRunLogDao
+
+            List<RuleActionRunLogBean> ruleActionRunLog = ruleActionRunLogDao.findAllItemData(itemdata.getId());
+            if (ruleActionRunLog.size() != 0) {
+                ruleActionRunLogDao.delete(itemdata.getId());
+            }
+            // OC-6344 Notes & Discrepancies must be set to "closed" when event CRF is deleted
+            // parentDiscrepancyNoteList is the list of the parent DNs records only
+            ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = discrepancyNoteDAO.findParentNotesOnlyByItemData(itemdata.getId());
+            for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
+                String description = resword.getString("dn_auto-closed_description");
+                String detailedNotes = resword.getString("dn_auto_closed_detailed_notes");
+                // create new DN record , new DN Map record , also update the parent record
+                createDiscrepancyNoteBean(description, detailedNotes, itemdata.getId(), study, userAccountBean, parentDiscrepancyNote);
+            }
+            ItemDataBean idBean = (ItemDataBean) itemDataDAO.findByPK(itemdata.getId());
+
+            ItemFormMetadataBean ifmBean = itemFormMetadataDAO.findByItemIdAndCRFVersionId(idBean.getItemId(), crfVersionId);
+
+            // Updating Dn_item_data_map actovated column into false for the existing DNs
+            ArrayList<DiscrepancyNoteBean> dnBeans = discrepancyNoteDAO.findExistingNotesForItemData(itemdata.getId());
+            if (dnBeans.size() != 0) {
+                DiscrepancyNoteBean dnBean = new DiscrepancyNoteBean();
+                dnBean.setEntityId(itemdata.getId());
+                dnBean.setActivated(false);
+                discrepancyNoteDAO.updateDnMapActivation(dnBean);
+            }
+
+            // Default Values are not addressed
+
+            itemdata.setValue("");
+            itemdata.setUpdatedDate(new Date());
+            itemdata.setUpdater(userAccountBean);
+            itemDataDAO.update(itemdata);
+
+        }
+        // OC-6291 event_crf status change
+        eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
+        eventCRF.setUpdater(userAccountBean);
+        eventCRF.setDateCompleted(null);
+        eventCrfDAO.update(eventCRF);
+
+        if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
+            event.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+            event.setUpdater(userAccountBean);
+            event.setUpdatedDate(new Date());
+            studyEventDAO.update(event);
+        }
+        if ( event.isSigned()) {
+            event.setSigned(Boolean.FALSE);
+            event.setUpdater(userAccountBean);
+            event.setUpdatedDate(new Date());
+            studyEventDAO.update(event);
+        }
+        if(studySub.getStatus().equals(Status.SIGNED)){
+            studySub.setStatus(Status.AVAILABLE);
+            studySub.setUpdater(userAccountBean);
+            studySub.setUpdatedDate(new Date());
+            studySubjectDAO.update(studySub);
+        }
+    }
+
+    private void createDiscrepancyNoteBean(String description, String detailedNotes, int itemDataId, Study studyBean, UserAccountBean ub,
+                                           DiscrepancyNoteBean parentDiscrepancyNote) {
+        DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+        dnb.setEntityId(itemDataId); // this is needed for DN Map object
+        dnb.setStudyId(studyBean.getStudyId());
+        dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+        dnb.setDescription(description);
+        dnb.setDetailedNotes(detailedNotes);
+        dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
+        dnb.setResolutionStatusId(core.org.akaza.openclinica.bean.core.ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
+        dnb.setColumn("value"); // this is needed for DN Map object
+        dnb.setAssignedUser(null);
+        dnb.setOwner(ub);
+        dnb.setParentDnId(parentDiscrepancyNote.getId());
+        dnb.setActivated(false);
+        dnb.setThreadUuid(parentDiscrepancyNote.getThreadUuid());
+        dnb = (DiscrepancyNoteBean) discrepancyNoteDAO.create(dnb); // create child DN
+        discrepancyNoteDAO.createMapping(dnb); // create DN mapping
+
+        DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) discrepancyNoteDAO.findByPK(dnb.getParentDnId());
+        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
+        itemParentNote.setAssignedUser(null);
+        itemParentNote.setOwner(ub);
+        itemParentNote.setDetailedNotes(detailedNotes);
+        discrepancyNoteDAO.update(itemParentNote); // update parent DN
+        discrepancyNoteDAO.updateAssignedUserToNull(itemParentNote); // update parent DN assigned user
+
     }
 
     private EventCrf validateCreatingEventCrf(FormRequestDTO formRequestDTO, StudyEvent studyEvent, UserAccountBean userAccountBean, CustomRuntimeException validationErrors) {

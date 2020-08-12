@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service;
 
+import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.service.JobService;
@@ -113,6 +114,9 @@ public class ImportServiceImpl implements ImportService {
 
     @Autowired
     QueryService queryService;
+
+    @Autowired
+    KafkaService kafkaService;
 
     @Autowired
     private DiscrepancyNoteDao discrepancyNoteDao;
@@ -392,10 +396,12 @@ public class ImportServiceImpl implements ImportService {
                     .filter(dataImportReport1 -> dataImportReport1.getStatus().equals(FAILED))
                     .findAny()
                     .isPresent();
+            kafkaService.sendOdmRefreshMessage(studySubject);
             return !hasImportFailed;
         } else {
             // For all other imports, mark the job as completed and always return true
             userService.persistJobCompleted(jobDetail, fileName);
+            kafkaService.sendOdmRefreshMessage(studySubject);
             return true;
         }
 

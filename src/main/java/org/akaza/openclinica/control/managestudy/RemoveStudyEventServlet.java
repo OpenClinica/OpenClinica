@@ -25,6 +25,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -38,6 +39,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @author jxu
@@ -45,12 +47,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Removes a study event and all its related event CRFs, items
  */
 public class RemoveStudyEventServlet extends SecureController {
-    /**
-     *
-     */
 
+    @Autowired
+    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCRFDAO;
+    @Autowired
+    @Qualifier("StudyEventService")
+    private StudyEventService studyEventService;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -75,14 +81,15 @@ public class RemoveStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+/*        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studyEventService = (StudyEventService) SpringServletAccess.getApplicationContext(context).getBean("StudyEventService");*/
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
             addPageMessage(respage.getString("please_choose_a_SE_to_remove"));
-            request.setAttribute("id", new Integer(studySubId).toString());
+            request.setAttribute("id", Integer.toString(studySubId));
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
@@ -110,11 +117,13 @@ public class RemoveStudyEventServlet extends SecureController {
                 ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                 // construct info needed on view study event page
-                DisplayStudyEventBean de = new DisplayStudyEventBean();
-                de.setStudyEvent(event);
-                de.setDisplayEventCRFs(getDisplayEventCRFs(eventCRFs, eventDefinitionCRFs));
+                DisplayStudyEventBean displayEvent = new DisplayStudyEventBean();
+                displayEvent.setStudyEvent(event);
 
-                request.setAttribute("displayEvent", de);
+                ArrayList displayEventCrfs = studyEventService.getDisplayEventCRFs(eventCRFs, eventDefinitionCRFs, currentRole, ub);
+                displayEvent.setDisplayEventCRFs(displayEventCrfs);
+
+                request.setAttribute("displayEvent", displayEvent);
 
                 forwardPage(Page.REMOVE_STUDY_EVENT);
             } else {
@@ -183,79 +192,16 @@ public class RemoveStudyEventServlet extends SecureController {
 
                 }
 
-                String emailBody = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "
+                String alertMessage = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "
                         + respage.getString("has_been_removed_from_the_subject_record_for") + " " + studySub.getLabel() + " "
                         + respage.getString("in_the_study") + " " + study.getName() + ".";
 
-                addPageMessage(emailBody);
-                // sendEmail(emailBody);
+                addPageMessage(alertMessage);
 
-                request.setAttribute("id", new Integer(studySubId).toString());
+                request.setAttribute("id", Integer.toString(studySubId));
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
         }
-    }
-
-    /**
-     * Each of the event CRFs with its corresponding CRFBean. Then generates a
-     * list of DisplayEventCRFBeans, one for each event CRF.
-     *
-     * @param eventCRFs
-     *            The list of event CRFs for this study event.
-     * @param eventDefinitionCRFs
-     *            The list of event definition CRFs for this study event.
-     * @return The list of DisplayEventCRFBeans for this study event.
-     */
-    private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs) {
-        ArrayList answer = new ArrayList();
-
-        HashMap definitionsById = new HashMap();
-        int i;
-        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
-        }
-
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-
-        for (i = 0; i < eventCRFs.size(); i++) {
-            EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
-
-            // populate the event CRF with its crf bean
-            int crfVersionId = ecb.getCRFVersionId();
-            CRFBean cb = cdao.findByVersionId(crfVersionId);
-            ecb.setCrf(cb);
-
-            CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-            ecb.setCrfVersion(cvb);
-
-            // then get the definition so we can call
-            // DisplayEventCRFBean.setFlags
-            int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
-
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
-
-            DisplayEventCRFBean dec = new DisplayEventCRFBean();
-            dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-            answer.add(dec);
-        }
-
-        return answer;
-    }
-
-    /**
-     * Send email to director and administrator
-     *
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        // to study director
-        sendEmail(ub.getEmail().trim(), respage.getString("remove_event_from_study"), emailBody, false);
-        sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_from_study"), emailBody, false, false);
-        logger.info("Sending email done..");
     }
 
 }
