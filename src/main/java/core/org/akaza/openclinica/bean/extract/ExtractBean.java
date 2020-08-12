@@ -258,8 +258,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param eventDescriptions
-     *            The eventDescriptions to set.
+     * @param eventDescriptions The eventDescriptions to set.
      */
     public void setEventDescriptions(HashMap<String, String> eventDescriptions) {
         this.eventDescriptions = eventDescriptions;
@@ -514,7 +513,7 @@ public class ExtractBean {
                     int numItems = getNumItems(i, k);
                     for (int l = 1; l <= numItems; l++) {
                         // for (int m = 0; m <= maxItemDataBeanOrdinal; m++) {
-                        for (Iterator iter = groupNames.entrySet().iterator(); iter.hasNext();) {
+                        for (Iterator iter = groupNames.entrySet().iterator(); iter.hasNext(); ) {
                             java.util.Map.Entry groupEntry = (java.util.Map.Entry) iter.next();
                             String groupName = (String) groupEntry.getKey();
 
@@ -748,7 +747,7 @@ public class ExtractBean {
                             // extract data, tbh
                             // for (int m = 0; m <= maxItemDataBeanOrdinal; m++)
                             // {
-                            for (java.util.Iterator iter = groupNames.entrySet().iterator(); iter.hasNext();) {
+                            for (java.util.Iterator iter = groupNames.entrySet().iterator(); iter.hasNext(); ) {
                                 java.util.Map.Entry groupEntry = (java.util.Map.Entry) iter.next();
                                 String groupName = (String) groupEntry.getKey();
                                 if (inKeys(i, j, k, l, groupName)) {
@@ -1056,7 +1055,7 @@ public class ExtractBean {
                 // getStatus
                 // (
                 // )
-        //        event.setWorkflowStatus((StudyEventWorkflowEnum) studyEventWorkflowStatus); // se
+                //        event.setWorkflowStatus((StudyEventWorkflowEnum) studyEventWorkflowStatus); // se
                 // .
                 // getSubjectEventStatus
                 // (
@@ -1137,8 +1136,8 @@ public class ExtractBean {
      */
 
     public void addStudyEventDataOld(Integer studySubjectId, String studyEventDefinitionName, Integer studyEventDefinitionId, Integer sampleOrdinal,
-            String studyEventLocation, Date studyEventStart, Date studyEventEnd, String crfVersionName, Integer crfVersionStatusId, Date dateInterviewed,
-            String interviewerName, Date dateCompleted, Date dateValidateCompleted, Integer completionStatusId) {
+                                     String studyEventLocation, Date studyEventStart, Date studyEventEnd, String crfVersionName, Integer crfVersionStatusId, Date dateInterviewed,
+                                     String interviewerName, Date dateCompleted, Date dateValidateCompleted, Integer completionStatusId) {
         // Integer statusId) {
 
         if (studySubjectId == null || studyEventDefinitionId == null || sampleOrdinal == null || studyEventLocation == null || studyEventStart == null) {
@@ -1237,6 +1236,7 @@ public class ExtractBean {
     // Integer subjectGroupClassId) {
     // // DO NOT USE -- using another method, tbh
     // }
+
     /**
      * debug: takes in a event crf bean and spits out all its data. tbh
      */
@@ -1363,9 +1363,9 @@ public class ExtractBean {
                     // value " + objgrp.itemValue/*itemValue*/);
                     // groups.put(key, itemGroupName);
                     int maxOrdinal = getMaxOrdinal(/*
-                                                    * studyEventDefinitionId.intValue
-                                                    * ()
-                                                    */objev.studyEvenetDefinitionId.intValue());
+                     * studyEventDefinitionId.intValue
+                     * ()
+                     */objev.studyEvenetDefinitionId.intValue());
                     if (maxOrdinal < objev.sampleOrdinal.intValue()) { // /*
                         // sampleOrdinal
                         // .
@@ -1376,20 +1376,20 @@ public class ExtractBean {
 
                     selectedItems.put(objgrp.itemId /* itemId */, Boolean.TRUE);
                     selectedSEDCRFs.put(objev.studyEvenetDefinitionId.intValue() + "_" + objgrp.crfid.intValue()
-                    /*
-                     * studyEventDefinitionId.intValue() + "_" +
-                     * crfId.intValue()
-                     */, Boolean.TRUE);
+                            /*
+                             * studyEventDefinitionId.intValue() + "_" +
+                             * crfId.intValue()
+                             */, Boolean.TRUE);
                     selectedSEDs.put(objev.studyEvenetDefinitionId /* studyEventDefinitionId */, Boolean.TRUE);
 
                     // TODO - see comment above
                     if ( /* itemDataOrdinal.intValue() */objgrp.itemGroupRepeatNumber.intValue() > getMaxItemDataBeanOrdinal()) {
                         setMaxItemDataBeanOrdinal(objgrp.itemGroupRepeatNumber.intValue()/*
-                                                                                          * itemDataOrdinal.
-                                                                                          * intValue
-                                                                                          * (
-                                                                                          * )
-                                                                                          */);
+                         * itemDataOrdinal.
+                         * intValue
+                         * (
+                         * )
+                         */);
                         // logger.info("### just updated max ordinal for
                         // itemdatabean: "+itemDataOrdinal.intValue());
                     }
@@ -1407,17 +1407,17 @@ public class ExtractBean {
      * then put the data in a hashmap with the key.
      */
     public void addItemDataOld(Integer studySubjectId, Integer studyEventDefinitionId, Integer sampleOrdinal, // study
-            // event
-            // sample
-            // ordinal
-            Integer crfId, Integer itemId, String itemValue, Integer itemDataOrdinal, // item
-            // data
-            // ordinal,
-            // having
-            // to
-            // do
-            // specifically with repeating items
-            String groupName) {// item group name, having to do with the group
+                               // event
+                               // sample
+                               // ordinal
+                               Integer crfId, Integer itemId, String itemValue, Integer itemDataOrdinal, // item
+                               // data
+                               // ordinal,
+                               // having
+                               // to
+                               // do
+                               // specifically with repeating items
+                               String groupName) {// item group name, having to do with the group
         // name in the database
         // String itemGroupName) {
         if (studyEventDefinitionId == null || studySubjectId == null || crfId == null || itemId == null || sampleOrdinal == null || itemValue == null) {
@@ -2013,8 +2013,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param study
-     *            The study to set.
+     * @param study The study to set.
      */
     public void setStudy(Study study) {
         this.study = study;
@@ -2028,8 +2027,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param parentStudy
-     *            The parentStudy to set.
+     * @param parentStudy The parentStudy to set.
      */
     public void setParentStudy(Study parentStudy) {
         this.parentStudy = parentStudy;
@@ -2043,8 +2041,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param format
-     *            The format to set.
+     * @param format The format to set.
      */
     public void setFormat(int format) {
         this.format = format;
@@ -2058,8 +2055,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param dataset
-     *            The dataset to set.
+     * @param dataset The dataset to set.
      */
     public void setDataset(DatasetBean dataset) {
         this.dataset = dataset;
@@ -2074,10 +2070,8 @@ public class ExtractBean {
 
     /**
      * The maximum over all ordinals over all study events for the provided SED.
-     *
-     * @param i
-     *            An index into the studyEvents list for the SED whose max
-     *            ordinal we want.
+     * @param i An index into the studyEvents list for the SED whose max
+     * ordinal we want.
      * @return The maximum number of samples for the i-th SED.
      */
     public int getSEDNumSamples(int i) {
@@ -2089,15 +2083,11 @@ public class ExtractBean {
     /**
      * Get the event correspodning to the provided study subject, SED and sample
      * ordinal.
-     *
-     * @param h
-     *            An index into the array of subjects.
-     * @param i
-     *            An index into the array of SEDs.
-     * @param j
-     *            The sample ordinal.
+     * @param h An index into the array of subjects.
+     * @param i An index into the array of SEDs.
+     * @param j The sample ordinal.
      * @return The event correspodning to the provided study subject, SED and
-     *         sample ordinal.
+     * sample ordinal.
      */
     private StudyEventBean getEvent(int h, int i, int j) {
         syncSubjectIndex(h);
@@ -2234,8 +2224,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param dateCreated
-     *            The dateCreated to set.
+     * @param dateCreated The dateCreated to set.
      */
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
@@ -2249,8 +2238,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param itemNames
-     *            The itemNames to set.
+     * @param itemNames The itemNames to set.
      */
     public void setItemNames(ArrayList itemNames) {
         this.itemNames = itemNames;
@@ -2264,8 +2252,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param rowValues
-     *            The rowValues to set.
+     * @param rowValues The rowValues to set.
      */
     public void setRowValues(ArrayList rowValues) {
         this.rowValues = rowValues;
@@ -2279,8 +2266,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param eventHeaders
-     *            The eventHeaders to set.
+     * @param eventHeaders The eventHeaders to set.
      */
     public void setEventHeaders(ArrayList eventHeaders) {
         this.eventHeaders = eventHeaders;
@@ -2318,8 +2304,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param hmInKeys
-     *            the hmInKeys to set
+     * @param hmInKeys the hmInKeys to set
      */
     public void setHmInKeys(HashMap hmInKeys) {
         this.hmInKeys = hmInKeys;
@@ -2356,7 +2341,6 @@ public class ExtractBean {
 
     /**
      * Add n entry
-     *
      * @param itemdataid
      */
     public void addItemDataIdEntry(Integer itemdataid) {
@@ -2365,7 +2349,6 @@ public class ExtractBean {
 
     /**
      * Add an entry
-     *
      * @param pitemDataId
      * @param pitemGroupId
      * @param pitemGroupName
@@ -2386,10 +2369,10 @@ public class ExtractBean {
      * @param pcrfVersionId
      */
     public void addEntryBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName, Integer pitemDatatypeId,
-            String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId,
-            Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted,
-            Integer peventCrfCompletionStatusId, Integer pitemGroupRepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId, Integer pitemId,
-            Integer pcrfVersionId, Integer eventcrfStatusId) {
+                                           String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId,
+                                           Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted,
+                                           Integer peventCrfCompletionStatusId, Integer pitemGroupRepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId, Integer pitemId,
+                                           Integer pcrfVersionId, Integer eventcrfStatusId) {
         extractDataset_ITEMGROUPSIDE obj = new extractDataset_ITEMGROUPSIDE();
 
         obj.setSQLDatasetBASE_ITEMGROUPSIDE(pitemDataId, pitemdataordinal, pitemGroupId, pitemGroupName, pitemDatatypeId, pitemDescription, pitemName,
@@ -2404,7 +2387,6 @@ public class ExtractBean {
 
     /**
      * Add an entry in the HashMap
-     *
      * @param pitemDataId
      * @param pstudySubjectId
      * @param psampleOrdinal
@@ -2423,9 +2405,9 @@ public class ExtractBean {
      * @param pstudyEventId
      */
     public void addEntryBASE_EVENTSIDE(Integer pitemDataId, Integer pstudySubjectId, Integer psampleOrdinal, Integer pstudyEvenetDefinitionId,
-            String pstudyEventDefinitionName, String pstudyEventLoacation, Timestamp pstudyEventDateStart, Timestamp pstudyEventDateEnd,
-            Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, String studyEventWorkflowStatus,
-            Integer pitemId, Integer pcrfVersionId, Integer peventCrfId, Integer pstudyEventId)
+                                       String pstudyEventDefinitionName, String pstudyEventLoacation, Timestamp pstudyEventDateStart, Timestamp pstudyEventDateEnd,
+                                       Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, String studyEventWorkflowStatus,
+                                       Integer pitemId, Integer pcrfVersionId, Integer peventCrfId, Integer pstudyEventId)
 
     {
         extractDataset_EVENTSIDE obj = new extractDataset_EVENTSIDE();
@@ -2441,19 +2423,18 @@ public class ExtractBean {
 
     /**
      * This class captures the data from getSQLDatasetBASE_EVENTSIDE SELECT
-     *
+     * <p>
      * itemdataid, studysubjectid, study_event.sample_ordinal,
      * study_event.study_event_definition_id, study_event_definition.name,
      * study_event.location, study_event.date_start, study_event.date_end,
-     *
+     * <p>
      * study_event.start_time_flag study_event.end_time_flag
-     * study_event.status_id study_event.subject_event_status_id
-     *
+     * study_event.status_id study_event.workflow_status
+     * <p>
      * //ids itemid, crfversionid, eventcrfid, studyeventid
-     *
+     * <p>
      * This is used to merge the two BASE querries and build the eventData for
      * ExtractBean.java
-     *
      */
     public class extractDataset_EVENTSIDE {
         // TODO - could be made private and then get/set
@@ -2484,9 +2465,9 @@ public class ExtractBean {
         }
 
         public void setSQLDatasetBASE_EVENTSIDE(Integer pitemDataId, Integer pstudySubjectId, Integer psampleOrdinal, Integer pstudyEvenetDefinitionId,
-                String pstudyEventDefinitionName, String pstudyEventLoacation, Timestamp pstudyEventDateStart, Timestamp pstudyEventDateEnd,
-                Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, String studyEventWorkflowStatus,
-                Integer pitemId, Integer pcrfVersionId, Integer peventCrfId, Integer pstudyEventId) {
+                                                String pstudyEventDefinitionName, String pstudyEventLoacation, Timestamp pstudyEventDateStart, Timestamp pstudyEventDateEnd,
+                                                Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, String studyEventWorkflowStatus,
+                                                Integer pitemId, Integer pcrfVersionId, Integer peventCrfId, Integer pstudyEventId) {
             // assigns
 
             // "primary key"
@@ -2641,19 +2622,15 @@ public class ExtractBean {
 
     /**
      * The second part of the merge for eventData in ExtractBean
-     *
+     * <p>
      * SELECT itemdataid, item_group_metadata.item_group_id , item_group.name,
      * itemdesc, itemname, itemvalue, itemunits, crfversioname,
      * crfversionstatusid, dateinterviewed, interviewername,
      * eventcrfdatecompleted, eventcrfdatevalidatecompleted,
      * eventcrfcompletionstatusid, repeat_number, crfid,
-     *
+     * <p>
      * //and ids studysubjectid, eventcrfid, itemid, crfversionid
-     *
-     *
-     *
      * @author vbcoman
-     *
      */
     public class extractDataset_ITEMGROUPSIDE {
 
@@ -2693,10 +2670,10 @@ public class ExtractBean {
         }
 
         public void setSQLDatasetBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName,
-                Integer pitemDatatypeId, String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName,
-                Integer pcrfVersionStatusId, Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted,
-                Timestamp peventCrfDateValidateCompleted, Integer peventCrfCompletionStatusId, Integer pitemGroupMetatdatrepeatNumber, Integer pcrfId,
-                Integer pstudySubjectId, Integer peventCrfId, Integer pitemId, Integer pcrfVersionId, Integer eventcrfStatusId) {
+                                                    Integer pitemDatatypeId, String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName,
+                                                    Integer pcrfVersionStatusId, Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted,
+                                                    Timestamp peventCrfDateValidateCompleted, Integer peventCrfCompletionStatusId, Integer pitemGroupMetatdatrepeatNumber, Integer pcrfId,
+                                                    Integer pstudySubjectId, Integer peventCrfId, Integer pitemId, Integer pcrfVersionId, Integer eventcrfStatusId) {
             // assign
             itemDataId = pitemDataId;
             itemGroupId = pitemGroupId;
@@ -2907,8 +2884,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param hbase_eventside
-     *            the hBASE_EVENTSIDE to set
+     * @param hbase_eventside the hBASE_EVENTSIDE to set
      */
     public void setHBASE_EVENTSIDE(ArrayList hbase_eventside) {
         hBASE_EVENTSIDE = hbase_eventside;
@@ -2922,8 +2898,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param hbase_itemgroupside
-     *            the hBASE_ITEMGROUPSIDE to set
+     * @param hbase_itemgroupside the hBASE_ITEMGROUPSIDE to set
      */
     public void setHBASE_ITEMGROUPSIDE(ArrayList hbase_itemgroupside) {
         hBASE_ITEMGROUPSIDE = hbase_itemgroupside;
@@ -2937,8 +2912,7 @@ public class ExtractBean {
     }
 
     /**
-     * @param abase_itemdataid
-     *            the aBASE_ITEMDATAID to set
+     * @param abase_itemdataid the aBASE_ITEMDATAID to set
      */
     public void setABASE_ITEMDATAID(ArrayList abase_itemdataid) {
         aBASE_ITEMDATAID = abase_itemdataid;
@@ -2947,7 +2921,8 @@ public class ExtractBean {
     public StudyDao getStudyDao() {
         return studyDao;
     }
-    public void setStudyDao(StudyDao studyDao){
+
+    public void setStudyDao(StudyDao studyDao) {
         this.studyDao = studyDao;
     }
 }
