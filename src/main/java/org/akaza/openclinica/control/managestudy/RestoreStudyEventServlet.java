@@ -15,10 +15,6 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -26,7 +22,6 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 
@@ -39,14 +34,6 @@ public class RestoreStudyEventServlet extends SecureController {
 
     @Autowired
     private StudyEventService studyEventService;
-    @Autowired
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    private EventCRFDAO eventCRFDAO;
-    @Autowired
-    private StudySubjectDAO studySubjectDAO;
-    @Autowired
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
     @Autowired
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
 

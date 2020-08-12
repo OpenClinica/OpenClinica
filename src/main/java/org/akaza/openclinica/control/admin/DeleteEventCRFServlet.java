@@ -19,16 +19,9 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.core.LockInfo;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.EventCRFService;
@@ -37,7 +30,6 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 
@@ -51,28 +43,13 @@ public class DeleteEventCRFServlet extends SecureController {
     public static String EVENT_CRF_ID = "eventCrfId";
 
     @Autowired
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    StudySubjectDAO studySubjectDAO;
-    @Autowired
-    CRFDAO crfDAO;
-    @Autowired
     FormLayoutDAO formLayoutDAO;
     @Autowired
-    StudyEventDefinitionDAO studyEventDefinitionDAO;
-    @Autowired
     EventDefinitionCRFDAO eventDefinitionCRFDAO;
-    @Autowired
-    ItemDataDAO itemDataDAO;
-    @Autowired
-    UserAccountDAO userAccountDAO;
-
     @Autowired
     private EventCRFService eventCRFService;
     @Autowired
     EventCrfDao eventCrfDao;
-    @Autowired
-    private EventCRFDAO eventCRFDAO;
 
     /**
      * 

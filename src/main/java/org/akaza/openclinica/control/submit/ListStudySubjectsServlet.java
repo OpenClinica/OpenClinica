@@ -44,23 +44,11 @@ public class ListStudySubjectsServlet extends SecureController {
     // Shaoyu Su
     private static final long serialVersionUID = 1L;
     @Autowired
-    private StudySubjectDAO studySubjectDAO;
-    @Autowired
     private SubjectDAO subjectDAO;
-    @Autowired
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    private EventCRFDAO eventCRFDAO;
-    @Autowired
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    @Autowired
-    private StudyGroupClassDAO studyGroupClassDAO;
     @Autowired
     private SubjectGroupMapDAO subjectGroupMapDAO;
     @Autowired
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
-    @Autowired
-    private StudyGroupDAO studyGroupDAO;
     @Autowired
     private StudyParameterValueDAO studyParameterValueDAO;
     @Autowired

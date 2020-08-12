@@ -90,31 +90,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         return multipartResolver;
     }
-
-    @Bean
-    public SmartInitializingSingleton commandLineRunner(ApplicationContext ctx) {
-        return () -> {
-
-            System.out.println("Let's inspect the beans provided by Spring Boot:");
-            System.out.println("//////////////////////////////////////////////////////////////////////");
-
-            System.out.println(ctx.getApplicationName());
-            System.out.println(ctx.getDisplayName());
-            System.out.println(ctx.getId());
-
-            String[] beanNames = ctx.getBeanDefinitionNames();
-            Arrays.sort(beanNames);
-            for (String beanName : beanNames) {
-                try {
-                    System.out.println(beanName + " : " + ctx.getBean(beanName).getClass().toString());
-                } catch (Exception e) {
-                    System.out.println(beanName + " : " + "no class");
-                }
-            }
-            System.out.println("//////////////////////////////////////////////////////////////////////");
-        };
-    }
-
+    
     /***
      * Bean to initialize Randomize configuration at RT startup.
      * This callback variant is somewhat similar to ContextRefreshedEvent but doesn't require an implementation of ApplicationListener,

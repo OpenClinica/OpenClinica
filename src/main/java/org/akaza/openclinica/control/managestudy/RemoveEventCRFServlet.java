@@ -18,16 +18,9 @@ import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.LockInfo;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.EventCRFService;
@@ -48,25 +41,11 @@ import java.util.ArrayList;
 public class RemoveEventCRFServlet extends SecureController {
 
     @Autowired
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    private EventCRFDAO eventCRFDAO;
-    @Autowired
     EventCrfDao eventCrfDao;
-    @Autowired
-    private StudySubjectDAO studySubjectDAO;
-    @Autowired
-    CRFDAO crfDAO;
     @Autowired
     FormLayoutDAO formLayoutDAO;
     @Autowired
-    StudyEventDefinitionDAO studyEventDefinitionDAO;
-    @Autowired
     EventDefinitionCRFDAO eventDefinitionCRFDAO;
-    @Autowired
-    ItemDataDAO itemDataDAO;
-    @Autowired
-    UserAccountDAO userAccountDAO;
     @Autowired
     private EventCRFService eventCRFService;
 

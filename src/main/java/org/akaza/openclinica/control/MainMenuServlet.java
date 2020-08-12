@@ -50,21 +50,10 @@ public class MainMenuServlet extends SecureController {
     private final static String STUDY_ENV_UUID = "studyEnvUuid";
 
     Locale locale;
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    private SubjectDAO subjectDAO;
-    @Autowired
-    private StudySubjectDAO studySubjectDAO;
-    @Autowired
-    private StudyEventDAO studyEventDAO;
+
     @Autowired
     @Qualifier("studyDaoDomain")
     private StudyDao studyDAO;
-    private StudyGroupClassDAO studyGroupClassDAO;
-    private SubjectGroupMapDAO subjectGroupMapDAO;
-    private StudyGroupDAO studyGroupDAO;
-    private DiscrepancyNoteDAO discrepancyNoteDAO;
-    @Autowired
-    UserAccountDAO userAccountDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {

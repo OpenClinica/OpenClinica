@@ -80,31 +80,15 @@ public class ViewStudySubjectServlet extends SecureController {
     public final static String visitBasedEventItempath=CoreResources.getField("visitBasedEventItem");
 
     @Autowired
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    private EventCRFDAO eventCRFDAO;
-    @Autowired
-    private StudySubjectDAO studySubjectDAO;
-    @Autowired
     private SubjectDAO subjectDAO;
     @Autowired
     FormLayoutDAO formLayoutDAO;
-    @Autowired
-    private CRFDAO crfDAO;
-    @Autowired
-    private ItemDataDAO itemDataDAO;
-    @Autowired
-    private ItemDAO itemDAO;
     @Autowired
     private SubjectGroupMapDAO subjectGroupMapDAO;
     @Autowired
     private DiscrepancyNoteDAO discrepancyNoteDAO;
     @Autowired
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    @Autowired
     private AuditEventDAO auditEventDAO;
-    @Autowired
-    UserAccountDAO userAccountDAO;
 
     /**
      * Checks whether the user has the right permission to proceed function

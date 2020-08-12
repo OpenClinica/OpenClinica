@@ -13,10 +13,6 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -35,15 +31,7 @@ import java.util.ArrayList;
 public class RemoveStudyEventServlet extends SecureController {
 
     @Autowired
-    private StudyEventDAO studyEventDAO;
-    @Autowired
-    private EventCRFDAO eventCRFDAO;
-    @Autowired
     private StudyEventService studyEventService;
-    @Autowired
-    private StudySubjectDAO studySubjectDAO;
-    @Autowired
-    StudyEventDefinitionDAO studyEventDefinitionDAO;
     @Autowired
     EventDefinitionCRFDAO eventDefinitionCRFDAO;
 

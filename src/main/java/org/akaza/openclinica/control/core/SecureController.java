@@ -168,27 +168,27 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     @Autowired
-    private StudySubjectDAO studySubjectDAO;
+    protected StudySubjectDAO studySubjectDAO;
     @Autowired
-    private StudyEventDAO studyEventDAO;
+    protected StudyEventDAO studyEventDAO;
     @Autowired
-    private EventCRFDAO eventCRFDAO;
+    protected EventCRFDAO eventCRFDAO;
     @Autowired
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    protected StudyEventDefinitionDAO studyEventDefinitionDAO;
     @Autowired
-    private UserAccountDAO userAccountDAO;
+    protected UserAccountDAO userAccountDAO;
     @Autowired
-    private StudyGroupClassDAO studyGroupClassDAO;
+    protected StudyGroupClassDAO studyGroupClassDAO;
     @Autowired
-    private StudyGroupDAO studyGroupDAO;
+    protected StudyGroupDAO studyGroupDAO;
     @Autowired
-    private ItemDataDAO itemDataDAO;
+    protected ItemDataDAO itemDataDAO;
     @Autowired
-    private ItemDAO itemDAO;
+    protected ItemDAO itemDAO;
     @Autowired
-    private CRFDAO crfDAO;
+    protected CRFDAO crfDAO;
     @Autowired
-    private ArchivedDatasetFileDAO archivedDatasetFileDAO;
+    protected ArchivedDatasetFileDAO archivedDatasetFileDAO;
 
     protected UserService userService;
     protected StdScheduler scheduler;
