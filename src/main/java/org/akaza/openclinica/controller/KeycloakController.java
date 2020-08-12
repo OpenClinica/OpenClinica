@@ -1,22 +1,22 @@
 package org.akaza.openclinica.controller;
 
-import core.org.akaza.openclinica.domain.datamap.Study;
-import net.sf.json.util.JSONUtils;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.CallbackService;
 import core.org.akaza.openclinica.service.KeycloakUser;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
+import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,16 +49,16 @@ public class KeycloakController {
     private DataSource dataSource;
 
     public String buildAuthorizeUrl(HttpServletRequest request) {
-        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
-        String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
+        Configuration keycloakConfiguration = CoreResources.getKeyCloakConfig();
+        String coreAuthUrl = keycloakConfiguration.getAuthServerUrl();
         int port = request.getServerPort();
         String portStr ="";
         if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
         String redirectUri = request.getScheme() + "://" + request.getServerName() + portStr + request.getContextPath() + "/MainMenu";
-        String authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
-                + "/protocol/openid-connect/auth?scope=openid&client_id=" + authzClient.getConfiguration().getResource() +
+        String authUrl = coreAuthUrl + "/realms/" + keycloakConfiguration.getRealm()
+                + "/protocol/openid-connect/auth?scope=openid&client_id=" + keycloakConfiguration.getResource() +
                 "&response_type=code&login=true&redirect_uri=" + redirectUri;
         JSONObject json = null;
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {

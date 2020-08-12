@@ -1,12 +1,12 @@
 package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.config.AppConfig;
 import core.org.akaza.openclinica.core.EventCRFLocker;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.service.LogoutService;
+import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.view.Page;
-import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +69,8 @@ public class LogoutController {
     }
 
     private String getLogoutUri(HttpServletRequest req, boolean callback) {
-        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
-        String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
+        Configuration keycloakConfiguration = CoreResources.getKeyCloakConfig();
+        String coreAuthUrl = keycloakConfiguration.getAuthServerUrl();
         String redirectUri = getRedirectUri(req, callback);
         String authUrl = null;
         String action = null;
@@ -79,7 +79,7 @@ public class LogoutController {
         else
             action = "logout";
         try {
-            authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
+            authUrl = coreAuthUrl + "/realms/" + keycloakConfiguration.getRealm()
                     + "/protocol/openid-connect/" + action + "?redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8");
             if (callback) {
                 authUrl += "&client_id=bridge&response_type=code";

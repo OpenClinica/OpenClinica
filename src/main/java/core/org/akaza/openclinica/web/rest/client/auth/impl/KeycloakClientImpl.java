@@ -4,7 +4,6 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.service.CustomParameterizedException;
 import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.service.UserType;
-import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.rest.client.dto.CustomerDTO;
 import core.org.akaza.openclinica.web.rest.client.impl.CustomerServiceClientImpl;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
@@ -17,7 +16,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -157,9 +156,7 @@ public class KeycloakClientImpl {
         logger.debug("Calling Keycloak to search for AccessCode uniqueness");
         RestTemplate restTemplate = new RestTemplate();
 
-
-        AuthzClient authzClient = AuthzClient.create(core.org.akaza.openclinica.dao.core.CoreResources.getKeyCloakConfig());
-        String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
+        String keycloakBaseUrl = CoreResources.getKeyCloakConfig().getAuthServerUrl();
 
         String usersUrlPath = USERS_PATH.format(new String[]{realm});
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(keycloakBaseUrl)
@@ -196,8 +193,8 @@ public class KeycloakClientImpl {
         logger.debug("Create OC-API System Token");
 
         try {
-            AuthzClient authzClient=AuthzClient.create(CoreResources.getKeyCloakConfig());
-            String realm = authzClient.getConfiguration().getRealm();
+            Configuration keycloakConfiguration = CoreResources.getKeyCloakConfig();
+            String realm = keycloakConfiguration.getRealm();
             logger.debug("Getting access token for realm: {} and client: {}", realm, OC_API_CLIENT_ID);
             ClientsResource clientsResource = keycloak
                     .realm(realm)
@@ -210,7 +207,7 @@ public class KeycloakClientImpl {
                     .getSecret()
                     .getValue();
 
-            String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
+            String keycloakBaseUrl = keycloakConfiguration.getAuthServerUrl();
 
             logger.debug("oc-api client secret for realm: {} is {}", realm, ocApiClientSecret);
             // Get the keycloak instance specific to the given realm
@@ -233,5 +230,26 @@ public class KeycloakClientImpl {
             logger.error("Error retrieving system token from Keycloak.", e);
             return null;
         }
+    }
+
+    public String getAccessToken(String username, String password) {
+        logger.debug("Getting access token for user with username: {}", username);
+        // Get the keycloak instance specific to the given realm
+        Configuration keycloakConfiguration = CoreResources.getKeyCloakConfig();
+        Keycloak keycloakRealmInstance = KeycloakBuilder.builder()
+                .serverUrl(keycloakConfiguration.getAuthServerUrl())
+                .realm(keycloakConfiguration.getRealm())
+                .grantType(OAuth2Constants.PASSWORD)
+                .username(username)
+                .password(password)
+                .clientId(keycloakConfiguration.getResource())
+                .clientSecret((String) keycloakConfiguration.getCredentials().get(CoreResources.CLIENT_SECRET_KEY))
+                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(1).build())
+                .build();
+        String accessToken = keycloakRealmInstance
+                .tokenManager()
+                .getAccessTokenString();
+        logger.debug("Keycloak Access Token: {}", accessToken);
+        return accessToken;
     }
 }
