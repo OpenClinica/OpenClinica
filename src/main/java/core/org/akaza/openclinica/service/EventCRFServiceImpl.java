@@ -218,14 +218,14 @@ public class EventCRFServiceImpl implements EventCRFService {
     }
 
     @Override
-    public void clearEventCrf(StudySubjectBean studySub, StudyEventBean event, EventCRFBean eventCRF, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean) {
+    public void clearEventCrf(StudySubjectBean studySubject, StudyEventBean event, EventCRFBean eventCRF, ArrayList<ItemDataBean> itemData, UserAccountBean userAccountBean) {
         eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
         eventCRF.setUpdater(userAccountBean);
         eventCRF.setDateCompleted(null);
         int crfVersionId = eventCRF.getCRFVersionId();
         eventCRFDAO.update(eventCRF);
 
-        Study study = studyDao.findByPK(studySub.getStudyId());
+        Study study = studyDao.findByPK(studySubject.getStudyId());
 
         for (ItemDataBean itemdata : itemData) {
             // OC-6343 Rule behaviour must be reset if an Event CRF is deleted
@@ -283,12 +283,14 @@ public class EventCRFServiceImpl implements EventCRFService {
             event.setUpdatedDate(new Date());
             studyEventDAO.update(event);
         }
-        if(studySub.getStatus().equals(Status.SIGNED)){
-            studySub.setStatus(Status.AVAILABLE);
-            studySub.setUpdater(userAccountBean);
-            studySub.setUpdatedDate(new Date());
-            studySubjectDAO.update(studySub);
+        if(studySubject.getStatus().equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdater(userAccountBean);
+            studySubject.setUpdatedDate(new Date());
+            studySubjectDAO.update(studySubject);
         }
+
+        kafkaService.sendOdmRefreshMessage(studySubject);
     }
 
     private void createDiscrepancyNoteBean(String description, String detailedNotes, int itemDataId, Study studyBean, UserAccountBean ub,
