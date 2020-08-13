@@ -301,7 +301,7 @@
                                     <tr style="width: inherit;">
                                         <td style="width: 54%; text-align: end;">
                                             <c:choose>
-                                                <c:when test="${ dec.eventCRF.removed == true || currRow.bean.studyEvent.removed ==true}">
+                                                <c:when test="${ dec.eventCRF.removed == true || (currRow.bean.studyEvent.removed ==true && dec.eventCRF.workflowStatus != 'NOT_STARTED')}">
                                                     <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
                                                 </c:when>
                                                 <c:otherwise>
