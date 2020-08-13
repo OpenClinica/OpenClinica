@@ -504,15 +504,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         for(DisplayStudyEventBean displayStudyEvent: displayStudyEvents) {
             StudyEventBean studyEventBean = displayStudyEvent.getStudyEvent();
 
-            if (studyEventBean.isRemoved() || studyEventBean.isArchived()
-                    || (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+            if (!studyEventBean.isRemoved() && !studyEventBean.isArchived()) {
+                if (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                         && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
                         && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                    )
-                    || !displayStudyEvent.isSignAble()
-               )
-                return false;
+                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                    return false;
+                } else {
+                    if (!displayStudyEvent.isSignAble()) {
+                        return false;
+                    }
+                }
+            }
         }
 
         return true;
