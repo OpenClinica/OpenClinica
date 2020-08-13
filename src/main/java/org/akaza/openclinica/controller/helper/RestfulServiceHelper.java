@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.StudyBuildService;
@@ -20,6 +21,7 @@ import org.akaza.openclinica.service.ExcelFileConverterServiceImpl;
 import org.akaza.openclinica.service.SasFileConverterServiceImpl;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -289,7 +291,6 @@ public class RestfulServiceHelper {
 	  */
 	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request,HashMap hm) throws Exception {
 		    String remoteAddress = this.getBasePath(request);
-	  		
 	  		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";
 	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
 	  		ArrayList<File> tempODMFileList = new ArrayList<>();
@@ -306,7 +307,11 @@ public class RestfulServiceHelper {
 	  				mappingFile = file;
 	  				mappingpartNm = "uploadedData"; 
 	  				studyOID = this.getImportDataHelper().getStudyOidFromMappingFile(file);
-	  	 	  		
+	  				Study publicStudy = null;
+	  				if(StringUtils.isEmpty(studyOID))
+	  					publicStudy = studyDao.findPublicStudy(studyOID);
+	  				if(publicStudy != null)
+	  					CoreResources.setRequestSchema(publicStudy.getSchemaName());
 	  	 	  		break;
 	  			}
 	 			
@@ -475,7 +480,11 @@ public class RestfulServiceHelper {
 	  				mappingFile = file;
 	  				mappingpartNm = "uploadedData"; 
 	  				studyOID= this.getImportDataHelper().getStudyOidFromMappingFile(file);
-	  	 	  		
+					Study publicStudy = null;
+					if(!StringUtils.isEmpty(studyOID))
+						publicStudy = studyDao.findPublicStudy(studyOID);
+					if(publicStudy != null)
+						CoreResources.setRequestSchema(publicStudy.getSchemaName());
 	  	 	  		break;
 	  			}
 	 			
