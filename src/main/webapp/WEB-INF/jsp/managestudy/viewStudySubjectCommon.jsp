@@ -581,7 +581,8 @@ $(function() {
 
                     var form = studyEvent.forms[formRef];
                     if (form) {
-                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] !== 'Removed')
+                        var studyStatus = metadata['OpenClinica:StudyDetails']['OpenClinica:StudyDescriptionAndStatus']['OpenClinica:StudySytemStatus'];
+                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] !== 'Removed' && studyStatus === 'AVAILABLE')
                             form.addNew = link['@href'];
                         form.showMe = studyEvent.showMe = true;
                     }
