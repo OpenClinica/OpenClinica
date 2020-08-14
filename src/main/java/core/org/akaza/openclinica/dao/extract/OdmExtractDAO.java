@@ -3141,9 +3141,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 if (dataset.isShowSubjectGender()) {
                     sub.setSubjectGender((String) row.get("gender"));
                 }
-                if (dataset.isShowSubjectStatus()) {
-                    sub.setStatus(Status.get((Integer) row.get("status_id")).getName());
-                }
+
+                sub.setStatus(Status.get((Integer) row.get("status_id")).getName());
+
                 // ------ finish adding openclinica subject attributes
 
                 // ------ add openclinica subject_group
