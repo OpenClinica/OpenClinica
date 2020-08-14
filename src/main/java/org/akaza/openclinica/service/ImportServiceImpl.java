@@ -1558,7 +1558,11 @@ public class ImportServiceImpl implements ImportService {
         if (formDataBean.getWorkflowStatus() == null) {
             formDataBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         }
-
+        if(!formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                && !formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)){
+            return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
+        }
+        
         return formLayout;
     }
 
