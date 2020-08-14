@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -110,7 +111,7 @@ public class OpenClinicaBeanVariableNode extends ExpressionNode {
 
     private Object calculateStatus(){
     	if(number.equals("Scheduled")){
-    		return SubjectEventStatus.SCHEDULED;
+    		return StudyEventWorkflowStatusEnum.SCHEDULED;
     	}
     	return null;
     }

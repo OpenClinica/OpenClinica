@@ -9,6 +9,10 @@ package core.org.akaza.openclinica.logic.expressionTree;
 
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 
+import java.util.List;
+import java.util.Arrays;
+
+
 /**
  * @author Krikor Krumlian
  * 
@@ -82,9 +86,20 @@ public class EqualityOpNode extends ExpressionNode {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
+        List<String> letfItems=null;
+        boolean isLeftEventStatusParamExist = left.getNumber().endsWith(STATUS);
+        List<String> rightItems=null;
+        boolean isRightEventStatusParamExist = right.getNumber().endsWith(STATUS);
 
-        	return calc(x, y);
-
+        if (isValueValidEventWorkflowStatus(x,isRightEventStatusParamExist)) {
+            rightItems = Arrays.asList(y.split("\\s*,\\s*"));
+            return eventCalc(x, rightItems);
+        } else if (isValueValidEventWorkflowStatus(y,isLeftEventStatusParamExist)) {
+            letfItems = Arrays.asList(x.split("\\s*,\\s*"));
+            return eventCalc(y, letfItems);
+        } else {
+            return calc(x, y);
+        }
     }
 
     private String calc(String x, String y) throws OpenClinicaSystemException {
@@ -101,6 +116,20 @@ public class EqualityOpNode extends ExpressionNode {
         }
     }
 
+    private String eventCalc(String x, List items) throws OpenClinicaSystemException {
+        logger.info("Comparing left expression value: {} against the right expression value: {} ",x,items.toString());
+        switch (op) {
+            case EQUAL:
+                return String.valueOf(items.contains(x));
+            case NOT_EQUAL:
+                return String.valueOf(!items.contains(x));
+            case CONTAINS:
+                return String.valueOf(items.contains(x));
+            default:
+                throw new OpenClinicaSystemException("OCRERR_0002", new Object[] { left.value(), right.value(), op.toString() });
+        }
+    }
+
     @Override
     void printStackCommands() {
         // To evalute the expression on a stack machine, first do
@@ -112,4 +141,21 @@ public class EqualityOpNode extends ExpressionNode {
         right.printStackCommands();
         logger.info("  Operator " + op);
     }
+
+    public boolean isValueValidEventWorkflowStatus(String value,boolean isEventStatusParamExist){
+        if( (isEventStatusParamExist)
+                &&
+                (value.equals("not_scheduled")
+                        || value.equals("data_entry_started")
+                        || value.equals("completed")
+                        || value.equals("stopped")
+                        || value.equals("skipped")
+                        || value.equals("locked")
+                        || value.equals("signed")
+                        || value.equals("scheduled"))
+        )
+            return true;
+        return false;
+    }
+
 }
