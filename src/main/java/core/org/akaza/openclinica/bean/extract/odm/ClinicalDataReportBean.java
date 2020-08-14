@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyStatusEnum;
 import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -422,7 +423,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     || BooleanUtils.isTrue(form.getArchived())
                                     || BooleanUtils.isTrue(se.getRemoved())
                                     || BooleanUtils.isTrue(se.getArchived())
-                                    || BooleanUtils.isTrue(studySubject.getStatus().isDeleted())
+                                    || BooleanUtils.isTrue(sub.getStatus().equals(Status.DELETED))
                                 )
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
                             else if (form.getWorkflowStatus() != null)
