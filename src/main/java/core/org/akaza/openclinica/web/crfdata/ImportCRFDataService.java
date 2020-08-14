@@ -332,8 +332,9 @@ public class ImportCRFDataService {
                                          eventCRFBeans.add(ecb);
                                      }
                         	}else {
-                                if ((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
-                                 || (upsert.isDataEntryComplete() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                        || (upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                        || (upsert.isDataEntryComplete() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
@@ -786,7 +787,8 @@ public class ImportCRFDataService {
                                     return false;
                                 }
                         	}else {
-                                if (!(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
+                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
                                         && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete())) {
                                     return false;
                                 }
@@ -1129,7 +1131,8 @@ public class ImportCRFDataService {
                         boolean overwrite = false;
                         // tbh >>
                         // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
-                        if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                        if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
                                 || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)){
                             overwrite = true;
                         }
@@ -2037,7 +2040,8 @@ public class ImportCRFDataService {
                         boolean overwrite = false;
                         // tbh >>
                         // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
-                        if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                        if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
                                 || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                             overwrite = true;
                         }
@@ -2696,7 +2700,8 @@ public class ImportCRFDataService {
 			core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
 			boolean overwrite = false;
 
-            if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+            if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                    || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
                     || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
 				overwrite = true;
 				}
