@@ -764,8 +764,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 String iconStatus = crfWorkflowStatus.toString();
                 if ((eventCrf != null && eventCrf.isRemoved())
                         || (studyEvent != null && studyEvent.isRemoved() && eventCrf != null
-                        && ( eventCrf.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED
-                        || (eventCrf.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED && eventCrf.getUpdaterId() > 0)))) {
+                        && eventCrf.getWorkflowStatus() != EventCrfWorkflowStatusEnum.NOT_STARTED)) {
                     iconStatus = EventCrfStatusEnum.REMOVED.toString();
                 }
                 url.append(eventCrfLayerBuilder.buid());

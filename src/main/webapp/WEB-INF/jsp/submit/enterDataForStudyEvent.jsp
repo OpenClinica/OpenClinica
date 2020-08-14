@@ -460,7 +460,7 @@
                                   <tr style="width: inherit;">
                                     <td style="width: 56%; text-align: end;">
                                       <c:choose>
-                                        <c:when test="${dec.eventCRF.removed == true || studyEvent.removed == true}">
+                                        <c:when test="${dec.eventCRF.removed == true || (studyEvent.removed ==true && dec.eventCRF.workflowStatus != 'NOT_STARTED')}">
                                           <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>"></span>
                                         </c:when>
                                         <c:otherwise>
@@ -519,7 +519,7 @@
                                           <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                           onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                                           onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
-                                          onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                                          onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                                           <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></span></a--></a>
                                         </td>
                                       </c:if>
@@ -528,7 +528,7 @@
                                           <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                           onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                                           onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
-                                          onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                                          onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                                           <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6"></span></a>
                                         </td>
                                       </c:if>
@@ -537,7 +537,7 @@
                                       <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                                       onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                       onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-                                      onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                                      onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                                       <span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></span></a>
                                     </td>
                                     <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.name != 'Removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true  && dec.eventCRF.removed != true && dec.eventCRF.archived != true && dec.eventCRF.workflowStatus != 'NOT_STARTED'}">

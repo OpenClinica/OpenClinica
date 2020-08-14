@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
  * The StudyEventWorkflowEnum enumeration.
  */
 public enum StudyEventWorkflowStatusEnum {
-    NOT_SCHEDULED, SCHEDULED, DATA_ENTRY_STARTED, COMPLETED,STOPPED,SKIPPED;
+    NOT_SCHEDULED, SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED;
     String displayValue;
 
     public String getDisplayValue() {
