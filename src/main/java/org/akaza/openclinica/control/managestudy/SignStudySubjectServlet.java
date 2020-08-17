@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -49,9 +50,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import core.org.akaza.openclinica.service.KeycloakUserService;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import core.org.akaza.openclinica.service.KeycloakUserServiceImpl;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
@@ -217,8 +216,14 @@ public class SignStudySubjectServlet extends SecureController {
             // core.org.akaza.openclinica.core.SecurityManager
             // .getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            KeycloakUserService keycloakUserService = ctx.getBean("keycloakUserService", KeycloakUserServiceImpl.class);
-            boolean isAuthenticated = keycloakUserService.authenticateKeycloakUser(username, password);
+            KeycloakClientImpl keycloakClient = ctx.getBean("keycloakClientImpl", KeycloakClientImpl.class);
+            boolean isAuthenticated = false;
+            try {
+                keycloakClient.getAccessToken(username, password);
+                isAuthenticated = true;
+            } catch (Exception e) {
+                logger.error("Failed to fetch access token", e);
+            }
 
             if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {

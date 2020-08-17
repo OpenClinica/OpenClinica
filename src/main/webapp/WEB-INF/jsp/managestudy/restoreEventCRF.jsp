@@ -45,7 +45,7 @@
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
 <h1><span class="title_manage">
-<fmt:message key="restore_CRF_to_event"  bundle="${resword}"/>
+<fmt:message key="restore_form_to_event"  bundle="${resword}"/>
 </span></h1>
 <p><fmt:message key="confirm_restore_of_this_CRF_to_event"  bundle="${resword}"/><br><br><fmt:message key="if_signed_will_invalidate"  bundle="${resword}"/></p>
 
@@ -60,7 +60,7 @@
     
   <tr valign="top"><td class="table_header_column_top"><fmt:message key="date_started" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/></td></tr>
   <tr valign="top"><td class="table_header_column_top"><fmt:message key="date_ended" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}"/></td></tr>
-  <tr valign="top"><td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${event.status.name}"/>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${event.workflowStatus.getDisplayValue()}"/>
   </td></tr>
 
  </table>
@@ -89,7 +89,7 @@
 		<td class="table_cell"><fmt:formatDate value="${displayEventCRF.eventCRF.dateInterviewed}" pattern="${dteFormat}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.interviewerName}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.owner.name}" /></td>	
-		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.status.name}" /></td>	
+		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.workflowStatus.getDisplayValue()}" /></td>
 	 </tr>
  
  </table>
@@ -108,16 +108,13 @@
     <tr>
 		<td class="table_header_column_top"><fmt:message key="Id" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="value" bundle="${resword}"/></td>
-		<td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>	
-	 </tr>
+	</tr>
 	
   <c:forEach var="item" items="${items}"> 
 	<tr>
 		<td class="table_cell"><c:out value="${item.itemId}" /></td>
-		<td class="table_cell"><c:out value="${item.value}" />&nbsp;</td>		
-		<td class="table_cell"><c:out value="${item.status.name}" /></td>			
-	
-	 </tr>
+		<td class="table_cell"><c:out value="${item.value}" />&nbsp;</td>
+	</tr>
 	</c:forEach> 
  
  </table>

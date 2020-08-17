@@ -53,6 +53,7 @@ public class CoreResources implements InitializingBean {
     private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
     private static final String EXTERNAL_PROPERTY_DIRECTORY = System.getProperty("user.home") + "/runtime-config/";
 
+    public static final String CLIENT_SECRET_KEY = "secret";
     public static final String KAFKA_BROKERS = "kafka.brokers";
     public static final String KAFKA_ENABLED = "kafka.enabled";
 
@@ -99,10 +100,9 @@ public class CoreResources implements InitializingBean {
         KEYCLOAKCONFIG = new KeyCloakConfiguration();
         KEYCLOAKCONFIG.setRealm(DATAINFO.getProperty("keycloak.realm"));
         KEYCLOAKCONFIG.setAuthServerUrl(DATAINFO.getProperty("keycloak.auth-server-url"));
-        String secretKey = "secret";
         String secretValue = DATAINFO.getProperty("keycloak.credentials.secret");
         Map<String, Object> credentials = new TreeMap<String, Object>() {{
-            put(secretKey, secretValue);
+            put(CLIENT_SECRET_KEY, secretValue);
         }};
         KEYCLOAKCONFIG.setCredentials(credentials);
     }

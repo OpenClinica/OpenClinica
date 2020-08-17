@@ -270,7 +270,7 @@
         <tr>
             <td class="table_header_row_left"><fmt:message key="CRF_name" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
-            <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
+            <td class="table_header_row" style="min-width: 100px"><fmt:message key="status" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>

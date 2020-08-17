@@ -386,7 +386,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 
             if (!foundItemData) {
-                throw new OpenClinicaSystemException("Import failed because no matched item data found in data file", "errorCode.NoItemDataFound");
+                throw new OpenClinicaSystemException( "errorCode.NoItemDataFound", "Import failed because no matched item data found in data file");
             }
 
 
@@ -419,7 +419,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
             String msg = e.toString();
 
             if (msg != null && msg.indexOf("ArrayIndexOutOfBoundsException") > -1) {
-                throw new OpenClinicaSystemException("Error-data file format missing pipe", "errorCode.dataRowMissingPipe");
+                throw new OpenClinicaSystemException("errorCode.dataRowMissingPipe", "Error-data file format missing pipe");
             }
 
 
@@ -448,7 +448,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         String[] dataRow = this.toArrayWithFullItems(tempDataRowStr, "|");
 
         if (dataRow.length < headerRow.length || dataRow.length > headerRow.length) {
-            throw new OpenClinicaSystemException("Data file format error - inconsistent number of header columns and data columns", "errorCode.inconsistentHeaderAndDataColumns");
+            throw new OpenClinicaSystemException("errorCode.inconsistentHeaderAndDataColumns", "Data file format error - inconsistent number of header columns and data columns");
         }
     }
 
