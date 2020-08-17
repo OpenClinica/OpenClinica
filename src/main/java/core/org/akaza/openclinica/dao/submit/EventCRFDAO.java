@@ -242,6 +242,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(9), ecb.getValidateString());
         variables.put(new Integer(10), ecb.getValidatorAnnotations());
         variables.put(new Integer(11), new Integer(ecb.getFormLayoutId()));
+        variables.put(new Integer(12), ecb.getWorkflowStatus().toString());
 
         executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
