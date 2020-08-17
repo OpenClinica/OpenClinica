@@ -220,5 +220,19 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         expressionService = this.expressionService != null ? expressionService : new ExpressionService(expressionWrapper);
         return expressionService;
     }
-
+    public boolean isValueValidEventWorkflowStatus(String value,boolean isEventStatusParamExist){
+        if( (isEventStatusParamExist)
+                &&
+                (value.equals("not_scheduled")
+                        || value.equals("data_entry_started")
+                        || value.equals("completed")
+                        || value.equals("stopped")
+                        || value.equals("skipped")
+                        || value.equals("locked")
+                        || value.equals("signed")
+                        || value.equals("scheduled"))
+        )
+            return true;
+        return false;
+    }
 }

@@ -9,6 +9,9 @@ package core.org.akaza.openclinica.logic.expressionTree;
 
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Krikor Krumlian
  * 
@@ -82,7 +85,16 @@ public class EqualityOpNode extends ExpressionNode {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
+        List<String> items = null;
 
+        if (left instanceof OpenClinicaVariableNode && left.getNumber().startsWith("SE_") && left.getNumber().endsWith(".STATUS")) {
+            items = Arrays.asList(x.split("\\s*,\\s*"));
+            return calc(y, items);
+        }
+        if (right instanceof OpenClinicaVariableNode && right.getNumber().startsWith("SE_") && right.getNumber().endsWith(".STATUS")) {
+            items = Arrays.asList(y.split("\\s*,\\s*"));
+            return calc(x, items);
+        }
         	return calc(x, y);
 
     }
@@ -111,5 +123,18 @@ public class EqualityOpNode extends ExpressionNode {
         left.printStackCommands();
         right.printStackCommands();
         logger.info("  Operator " + op);
+    }
+    private String calc(String value, List items) throws OpenClinicaSystemException {
+        logger.info("Comparing left expression value: {} against the right expression value: {} ",value,items.toString());
+        switch (op) {
+            case EQUAL:
+                return String.valueOf(items.contains(value));
+            case NOT_EQUAL:
+                return String.valueOf(!items.contains(value));
+            case CONTAINS:
+                return String.valueOf(items.contains(value));
+            default:
+                throw new OpenClinicaSystemException("OCRERR_0002", new Object[] { left.value(), right.value(), op.toString() });
+        }
     }
 }

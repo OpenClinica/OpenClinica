@@ -47,6 +47,9 @@ public class StudyEvent extends DataMapDomainObject  {
 	private Boolean signed;
 	private String attestation;
 
+	private final String COMMA = ",";
+	private final String LOCKED = "locked";
+	private final String SIGNED = "signed";
 
 	public StudyEvent() {
 	}
@@ -65,7 +68,7 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.userAccount = userAccount;
 		this.studyEventDefinition = studyEventDefinition;
 		this.studySubject = studySubject;
-		
+
 		this.location = location;
 		this.sampleOrdinal = sampleOrdinal;
 		this.dateStart = dateStart;
@@ -143,7 +146,7 @@ public class StudyEvent extends DataMapDomainObject  {
 	}
 
 	@Column(name = "sample_ordinal")
-	
+
 	public Integer getSampleOrdinal() {
 		return this.sampleOrdinal;
 	}
@@ -231,7 +234,7 @@ public class StudyEvent extends DataMapDomainObject  {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studyEvent")
 	@OrderBy("dateUpdated asc")
-	
+
 	public List<EventCrf> getEventCrfs() {
 		return this.eventCrfs;
 	}
@@ -317,4 +320,15 @@ public class StudyEvent extends DataMapDomainObject  {
 	public boolean isAvailable(){
 		return (!isCurrentlyRemoved() && !isCurrentlyArchived());
 	}
+
+	@Transient
+	public String getOriginalWorkflowStatusCombined() {
+		String eventStatusValue = this.getWorkflowStatus().toString().toLowerCase();
+		if (this.isCurrentlyLocked())
+			eventStatusValue = eventStatusValue + COMMA + LOCKED.toLowerCase();
+		if (this.isCurrentlySigned())
+			eventStatusValue = eventStatusValue + COMMA + SIGNED.toLowerCase();
+		return eventStatusValue;
+	}
+
 }

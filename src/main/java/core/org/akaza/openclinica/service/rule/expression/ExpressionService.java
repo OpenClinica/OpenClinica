@@ -386,7 +386,7 @@ public class ExpressionService {
                     studyEvent = getStudyEventFromOID(oid);
                     if (studyEvent != null) {
                         logger.info("Event Status: {} " , studyEvent.getWorkflowStatus());
-                        return studyEvent.getWorkflowStatus().toString().toLowerCase();
+                       return studyEvent.getOriginalWorkflowStatusCombined();
                     } else
                         return "";
                 }
