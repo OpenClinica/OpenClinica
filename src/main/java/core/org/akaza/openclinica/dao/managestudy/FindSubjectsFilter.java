@@ -1,6 +1,6 @@
 package core.org.akaza.openclinica.dao.managestudy;
 
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
                 String itemOid = property.split("\\.")[2];
 
                 criteria+= " INTERSECT " +
-                        " select ss.* , unique_identifier from item_data id JOIN event_crf ec ON id.event_crf_id=ec.event_crf_id\n" +
+                        " select ss.*  from item_data id JOIN event_crf ec ON id.event_crf_id=ec.event_crf_id\n" +
                         "                                          JOIN study_event se ON se.study_event_id=ec.study_event_id\n" +
                         "                                          JOIN crf_version cv ON cv.crf_version_id=ec.crf_version_id\n" +
                         "                                          JOIN crf c ON c.crf_id=cv.crf_id\n" +
@@ -129,7 +129,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
     }
 
     private String mainQuery(){
-        return  " select ss.* , unique_identifier from study_subject ss JOIN study st ON st.study_id=ss.study_id ";
+        return  " select ss.*  from study_subject ss JOIN study st ON st.study_id=ss.study_id ";
     }
 
 }
