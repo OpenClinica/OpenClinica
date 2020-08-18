@@ -6,6 +6,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -17,6 +18,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
@@ -448,14 +450,31 @@ public class CrfBusinessLogicHelper {
 
         StudyEventDAO sedao = new StudyEventDAO(ds);
         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+
+        boolean isStudyEventUpdated = false;
         if (seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
             // change status for study event
+            isStudyEventUpdated = true;
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+        }
+        if(seb.isSigned()){
+            isStudyEventUpdated = true;
+            seb.setSigned(Boolean.FALSE);
+        }
+        if(isStudyEventUpdated) {
             seb.setUpdatedDate(new Date());
             seb.setUpdater(ub);
-            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
             seb = (StudyEventBean) sedao.update(seb,inTransaction);
         }
-
+        StudySubjectDAO ssdao = new StudySubjectDAO(ds);
+        StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
+        if(studySubject.getStatus().equals(Status.SIGNED))
+        {
+            studySubject.setUpdatedDate(new Date());
+            studySubject.setUpdater(ub);
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject = (StudySubjectBean) ssdao.update(studySubject);
+        }
         return true;
     }
     
