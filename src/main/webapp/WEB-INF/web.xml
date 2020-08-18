@@ -543,6 +543,11 @@
         <servlet-name>ViewDiscrepancyNoteServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewDiscrepancyNoteServlet</servlet-class>
     </servlet>
+    <servlet>
+        <display-name>CreateOneDiscrepancyNote</display-name>
+        <servlet-name>CreateOneDiscrepancyNoteServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.submit.CreateOneDiscrepancyNoteServlet</servlet-class>
+    </servlet>
 
     <!-- Export Excel -->
     <servlet>
@@ -1343,6 +1348,10 @@
     <servlet-mapping>
         <servlet-name>ViewDiscrepancyNoteServlet</servlet-name>
         <url-pattern>/ViewDiscrepancyNote</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateOneDiscrepancyNoteServlet</servlet-name>
+        <url-pattern>/CreateOneDiscrepancyNote</url-pattern>
     </servlet-mapping>
 
     <!--  Export Excel -->
