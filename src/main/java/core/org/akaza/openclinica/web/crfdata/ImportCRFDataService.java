@@ -1,7 +1,6 @@
 package core.org.akaza.openclinica.web.crfdata;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.ItemDataType;
 import core.org.akaza.openclinica.bean.core.NullValue;
 import core.org.akaza.openclinica.bean.core.ResponseType;
@@ -128,10 +127,8 @@ public class ImportCRFDataService {
                                 
                 if (!studyEventDefinitionBean.isTypeCommon()) {
                     // @pgawade 16-March-2011 Do not allow the data import
-                    // if event status is one of the - stopped, signed,
-                    // locked
+                    // if event status is one of the - stopped, locked
                     if (studyEventBean.isLocked()
-                            ||studyEventBean.isSigned()
                             || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                         return null;
                     }
@@ -326,14 +323,15 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                        		 if ((upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
-                                         || (ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
+                                if ((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
                         	}else {
-                        		 if ((upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
-                                         || (upsert.isDataEntryComplete() && ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
+                                if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                        || (upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                        || (upsert.isDataEntryComplete() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
@@ -517,12 +515,10 @@ public class ImportCRFDataService {
 
                 if (!studyEventDefinitionBean.isTypeCommon()) {
                     // @pgawade 16-March-2011 Do not allow the data import
-                    // if event status is one of the - stopped, signed,
-                    // locked
-                    if (studyEventBean.isLocked()
-                            || studyEventBean.isSigned()
+                    // if event status is one of the - stopped, locked, removed, archived
+                    if (studyEventBean.isLocked() || studyEventBean.isRemoved() || studyEventBean.isArchived()
                             || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
-                    	errors.add("Do not allow the data import, if scheduled event is one of the status - stopped, signed,locked");
+                    	errors.add("Do not allow the data import, if scheduled event is one of the status (stopped | locked | archived | removed)");
                         return errors;
                     }
                 }
@@ -783,13 +779,14 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                        		if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) )
-                                        && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) )) {
+                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                                     return false;
                                 }
                         	}else {
-                        		if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
-                                        && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete())) {
+                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
+                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete())) {
                                     return false;
                                 }
                         	}
@@ -1127,14 +1124,13 @@ public class ImportCRFDataService {
                                 + subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks "
                                 + hardValidator.size());
                         // check if we need to overwrite
-                        DataEntryStage dataEntryStage = eventCRFBean.getStage();
                         core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
                         boolean overwrite = false;
                         // tbh >>
                         // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
-                        if (// eventCRFStatus.equals(Status.UNAVAILABLE) ||
-                        dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                                || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                        if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                                || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)){
                             overwrite = true;
                         }
                         // << tbh, adding extra statuses to prevent appending, 06/2009
@@ -1659,7 +1655,6 @@ public class ImportCRFDataService {
         newEventCrfBean.setCompletionStatusId(1);// place
         // filler
         newEventCrfBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
-        newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
         newEventCrfBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         return newEventCrfBean;
     }
@@ -2038,14 +2033,13 @@ public class ImportCRFDataService {
                                 + subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks "
                                 + hardValidator.size());
                         // check if we need to overwrite
-                        DataEntryStage dataEntryStage = eventCRFBean.getStage();
                         core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
                         boolean overwrite = false;
                         // tbh >>
                         // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
-                        if (// eventCRFStatus.equals(Status.UNAVAILABLE) ||
-                        dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                                || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                        if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                                || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                             overwrite = true;
                         }
                         // << tbh, adding extra statuses to prevent appending, 06/2009
@@ -2700,12 +2694,12 @@ public class ImportCRFDataService {
 			+ subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks "
 			+ hardValidator.size());
 			// check if we need to overwrite
-			DataEntryStage dataEntryStage = eventCRFBean.getStage();
 			core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
 			boolean overwrite = false;
 
-			if (dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-			|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+            if (eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                    || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                    || eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
 				overwrite = true;
 				}
 

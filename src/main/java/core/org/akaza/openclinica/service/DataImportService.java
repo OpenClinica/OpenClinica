@@ -11,7 +11,6 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Status;
@@ -188,9 +187,9 @@ public class DataImportService {
         logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
         for (EventCRFBean eventCRFBean : eventCRFBeans) {
-            DataEntryStage dataEntryStage = eventCRFBean.getStage();
 
-            logger.debug("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
+
+            logger.debug("Event CRF Bean: id " + eventCRFBean.getId() + ", status "
                     + eventCRFBean.getWorkflowStatus());
              if(!eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
@@ -284,7 +283,7 @@ public class DataImportService {
                     logger.debug("found status here: " + eventCrfBean.getStatus().getName());
                     itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                             .getData().getOrdinal());
-                    if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
+                    if (wrapper.isOverwrite() && itemDataBean.isActive()) {
 
                         if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue()))
                             resetSDV = true;
@@ -332,7 +331,8 @@ public class DataImportService {
                     if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                         String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
 
-                        if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
+                        if ( (eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                || eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                 && eventCrfBean.isAvailable()) {
                         	
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean, true);

@@ -329,8 +329,8 @@
         <sql>INSERT INTO EVENT_CRF (STUDY_EVENT_ID, CRF_VERSION_ID,
             DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID,
             ANNOTATIONS, OWNER_ID,
-            DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS,Form_Layout_Id)
-            VALUES (?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
+            DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS,Form_Layout_Id, workflow_status)
+            VALUES (?,?,?,?,?,?,?,NOW(),?, ?, ?,?,?)</sql>
     </query>
     <query>
         <name>update</name>

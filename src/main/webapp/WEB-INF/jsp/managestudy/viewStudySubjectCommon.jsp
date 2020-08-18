@@ -374,7 +374,7 @@ $(function() {
 
             var eventType = studyEvent['@OpenClinica:EventType'];
             if (eventType === 'Common') {
-                if (studyEvent['@OpenClinica:Status'] !== 'DELETED')
+                if (studyEvent['@OpenClinica:Removed'] !== 'Yes')
                     studyEvent.showMe = true;
                 else {
                     studyEventOid = studyEvent['@OID'];
@@ -399,8 +399,6 @@ $(function() {
                 var studyEventOid = studyEvent['@OID'];
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
-                var formStatus = ref['@OpenClinica:Status'];
-                var formNotArchived = formStatus !== 'DELETED' && formStatus !== 'AUTO_DELETED';
                 var columnTitles = [];
                 var submissionFields = {};
                 var componentOid = studyEventOid + '.' + formOid;
@@ -581,7 +579,8 @@ $(function() {
 
                     var form = studyEvent.forms[formRef];
                     if (form) {
-                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] !== 'Removed')
+                        var studyStatus = "${subjectStudy.status.name}";
+                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] !== 'Removed' && studyStatus === 'AVAILABLE')
                             form.addNew = link['@href'];
                         form.showMe = studyEvent.showMe = true;
                     }
@@ -609,16 +608,14 @@ $(function() {
                         return;
 
                     function isInactive(data) {
-                        var ocstatus = data['@OpenClinica:Status'];
                         return (
                             data['@OpenClinica:Removed'] === 'Yes' ||
-                            data['@OpenClinica:Archived'] === 'Yes' ||
-                            ocstatus === 'removed' || ocstatus === 'auto-removed'
+                            data['@OpenClinica:Archived'] === 'Yes'
                         );
                     }
 
                     var submission = {
-                        studyStatus: studyEventData['@OpenClinica:Removed'] === 'Yes' ? studyEventData['@OpenClinica:Status'] : studyEventData['@OpenClinica:WorkflowStatus'],
+                        studyStatus: studyEventData['@OpenClinica:WorkflowStatus'],
                         hideStatus: isInactive(studyEventData) || isInactive(formData) ? 'oc-status-removed' : 'oc-status-active',
                         updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
                         updatedBy: formData['@OpenClinica:UpdatedBy'],
@@ -626,7 +623,7 @@ $(function() {
                         links: collectLinks(studyEventData, formData),
                         isSigned: (studyEventData['@OpenClinica:Signed'] === 'Yes') && (studyEventData['@OpenClinica:Archived'] !== 'Yes') && (studyEventData['@OpenClinica:Removed'] !== 'Yes') && studyEventData['@OpenClinica:WorkflowStatus'] === 'completed',
                         isLocked: studyEventData['@OpenClinica:Locked'] === 'Yes',
-                        isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Status'] === 'auto-removed'  || formData['@OpenClinica:Status'] === 'invalid'
+                        isArchived: (studyEventData['@OpenClinica:Archived'] === 'Yes') || formData['@OpenClinica:Archived'] === 'Yes'
                     };
                     foreach(formData.ItemGroupData, function(igd) {
                         foreach(igd.ItemData, function(itemData) {

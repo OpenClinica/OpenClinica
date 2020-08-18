@@ -8,8 +8,6 @@
 package org.akaza.openclinica.view;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.extract.FilterBean;
@@ -21,7 +19,7 @@ import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.apache.commons.lang.BooleanUtils;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,9 +30,7 @@ import java.util.*;
 /**
  * To create a flexible panel of information that will change while the user
  * manages his or her session.
- *
  * @author thickerson
- *
  */
 public class StudyInfoPanel implements Serializable {
 
@@ -77,8 +73,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param manageSubject
-     *            The manageSubject to set.
+     * @param manageSubject The manageSubject to set.
      */
     public void setManageSubject(boolean manageSubject) {
         this.manageSubject = manageSubject;
@@ -92,8 +87,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param iconInfoShown
-     *            The iconInfoShown to set.
+     * @param iconInfoShown The iconInfoShown to set.
      */
     public void setIconInfoShown(boolean iconInfoShown) {
         this.iconInfoShown = iconInfoShown;
@@ -107,8 +101,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param extractData
-     *            The extractData to set.
+     * @param extractData The extractData to set.
      */
     public void setExtractData(boolean extractData) {
         this.extractData = extractData;
@@ -122,8 +115,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param submitDataModule
-     *            The submitDataModule to set.
+     * @param submitDataModule The submitDataModule to set.
      */
     public void setSubmitDataModule(boolean submitDataModule) {
         this.submitDataModule = submitDataModule;
@@ -154,8 +146,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param data
-     *            The data to set.
+     * @param data The data to set.
      */
     public void setData(TreeMap data) {
         this.data = data;
@@ -164,7 +155,6 @@ public class StudyInfoPanel implements Serializable {
     /**
      * setData, the external function which creates data for the panel to
      * reflect.
-     *
      * @param page
      * @param session
      * @param request
@@ -191,7 +181,7 @@ public class StudyInfoPanel implements Serializable {
                 this.reset();
                 // this.setData("Number of Steps", "5");
             } else if (page.equals(Page.CREATE_DATASET_2) || page.equals(Page.CREATE_DATASET_EVENT_ATTR) || page.equals(Page.CREATE_DATASET_SUB_ATTR)
-                || page.equals(Page.CREATE_DATASET_CRF_ATTR) || page.equals(Page.CREATE_DATASET_GROUP_ATTR) || page.equals(Page.CREATE_DATASET_VIEW_SELECTED)) {
+                    || page.equals(Page.CREATE_DATASET_CRF_ATTR) || page.equals(Page.CREATE_DATASET_GROUP_ATTR) || page.equals(Page.CREATE_DATASET_VIEW_SELECTED)) {
                 HashMap eventlist = (HashMap) request.getAttribute("eventlist");
                 ArrayList displayData = generateEventTree(eventlist, true);
 
@@ -342,8 +332,8 @@ public class StudyInfoPanel implements Serializable {
                 this.setIconInfoShown(false);
 
             } else if (page.equals(Page.INTERVIEWER) || page.equals(Page.TABLE_OF_CONTENTS) || page.equals(Page.TABLE_OF_CONTENTS_SERVLET)
-                || page.equals(Page.INITIAL_DATA_ENTRY) || page.equals(Page.INITIAL_DATA_ENTRY_SERVLET) || page.equals(Page.DOUBLE_DATA_ENTRY)
-                || page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET) || page.equals(Page.ADMIN_EDIT) || page.equals(Page.ADMIN_EDIT_SERVLET)) {
+                    || page.equals(Page.INITIAL_DATA_ENTRY) || page.equals(Page.INITIAL_DATA_ENTRY_SERVLET) || page.equals(Page.DOUBLE_DATA_ENTRY)
+                    || page.equals(Page.DOUBLE_DATA_ENTRY_SERVLET) || page.equals(Page.ADMIN_EDIT) || page.equals(Page.ADMIN_EDIT_SERVLET)) {
                 /*
                  * pages designed to also follow the above format; check to see
                  * if they are in the session already, and does not refresh.
@@ -424,7 +414,7 @@ public class StudyInfoPanel implements Serializable {
                 this.setCreateDataset(false);
                 this.setIconInfoShown(true);
                 this.setManageSubject(false);
-            }  else if (page.equals(Page.VIEW_RULE_SETS2)) {
+            } else if (page.equals(Page.VIEW_RULE_SETS2)) {
                 HashMap eventlist = (HashMap) request.getAttribute("eventlist");
                 ArrayList displayData = generateEventTree(eventlist, false);
 
@@ -460,8 +450,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param studyInfoShown
-     *            The studyInfoShown to set.
+     * @param studyInfoShown The studyInfoShown to set.
      */
     public void setStudyInfoShown(boolean studyInfoShown) {
         this.studyInfoShown = studyInfoShown;
@@ -475,8 +464,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param orderedData
-     *            The orderedData to set.
+     * @param orderedData The orderedData to set.
      */
     public void setOrderedData(boolean orderedData) {
         this.orderedData = orderedData;
@@ -490,8 +478,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param userOrderedData
-     *            The userOrderedData to set.
+     * @param userOrderedData The userOrderedData to set.
      */
     public void setUserOrderedData(ArrayList userOrderedData) {
         this.userOrderedData = userOrderedData;
@@ -501,31 +488,27 @@ public class StudyInfoPanel implements Serializable {
      * note that this has to change if the texts change, so this might be
      * something different in the future.
      */
-    public String getStageImageText(DataEntryStage stage) {
+    public String getStatusImageText(EventCrfWorkflowStatusEnum status) {
+        //NOT_STARTED ,INITIAL_DATA_ENTRY, COMPLETED ,LOCKED;
         String answer = "";
-        if (stage.isInitialDE()) {
+        if (status == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
             answer = "<span class='icon icon-pencil-squared orange' alt='Initial Data Entry'>";
-        } else if (stage.isInitialDE_Complete()) {
-            answer = "<span class='icon icon-ok' alt='Initial Data Entry Complete'>";
-        } else if (stage.isDoubleDE()) {
-            answer = "<span class='icon icon-icon-squared orange' alt='Double Data Entry'>";
-        } else if (stage.isDoubleDE_Complete()) {
-            answer = "<span class='icon icon-ok' alt='Data Entry Complete'>";
-        } else if (stage.isAdmin_Editing()) {
-            answer = "<span class='icon icon-pencil' alt='Administrative Editing'>";
-        } else if (stage.isLocked()) {
+        } else if (status == EventCrfWorkflowStatusEnum.COMPLETED) {
+            answer = "<span class='icon icon-ok' alt='Completed'>";
+        } else if (status == EventCrfWorkflowStatusEnum.NOT_STARTED) {
+            answer = "<span class='icon icon-doc' alt='Not Started'>";
+        } else if (status == EventCrfWorkflowStatusEnum.LOCKED) {
             answer = "<span class='icon icon-lock' alt='Locked'>";
         } else {
             answer = "<span class='icon icon-file-excel red' alt='Invalid'>";
         }
-
         return answer;
     }
 
     public String getTOCLink(DisplayEventCRFBean dec) {
         String answer = "";
         if (
-                 !dec.getEventCRF().isRemoved()
+                !dec.getEventCRF().isRemoved()
                         &&
                         !dec.getEventCRF().isArchived()) {
             if (dec.isContinueInitialDataEntryPermitted()) {
@@ -587,7 +570,6 @@ public class StudyInfoPanel implements Serializable {
 
     /**
      * Generates a tree view in sdie info panel for submitting data page
-     *
      * @param rows
      * @param displayData
      * @param studySubject
@@ -612,12 +594,13 @@ public class StudyInfoPanel implements Serializable {
             }
 
             displayData.add(new StudyInfoPanelLine("<b>Status: </b>", "<a href='EnterDataForStudyEvent?eventId=" + seBean.getId() + "'>"
-                + seBean.getWorkflowStatus() + "</a>", false, false, false));
+                    + seBean.getWorkflowStatus() + "</a>", false, false, false));
             ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
             int count = 0;
             Iterator displayIt = displayCRFs.iterator();
             while (displayIt.hasNext()) {
                 DisplayEventCRFBean dec = (DisplayEventCRFBean) displayIt.next();
+                dec.getEventCRF().getWorkflowStatus();
                 if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
                     // last event CRF for this event
                     // it's the current crf
@@ -626,20 +609,20 @@ public class StudyInfoPanel implements Serializable {
                         // getName(),
                         // tbh
 
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<span class='alert'>"
-                            + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                                + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), " "
-                            + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, true, false));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), " "
+                                + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, true, false));
                     }
 
                 } else {
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<span class='alert'>"
-                            + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                                + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), " "
-                            + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, false, false));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), " "
+                                + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, false, false));
                     }
                 }
                 count++;
@@ -654,7 +637,7 @@ public class StudyInfoPanel implements Serializable {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
-                            + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
+                                + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>",
                                 "<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, true, false));
@@ -665,7 +648,7 @@ public class StudyInfoPanel implements Serializable {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
-                            + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
+                                + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>",
                                 "<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, false, false));
@@ -681,7 +664,6 @@ public class StudyInfoPanel implements Serializable {
 
     /**
      * Generates a tree view in sdie info panel for submitting data page
-     *
      * @param rows
      * @param displayData
      * @param studySubject
@@ -714,20 +696,20 @@ public class StudyInfoPanel implements Serializable {
                     // last event CRF for this event
                     // it's the current crf
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<span class='alert'>"
-                            + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                                + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), dec.getEventCRF().getCrf().getName() + " "
-                            + dec.getEventCRF().getCrfVersion().getName(), false, true, false));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), dec.getEventCRF().getCrf().getName() + " "
+                                + dec.getEventCRF().getCrfVersion().getName(), false, true, false));
                     }
 
                 } else {
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<span class='alert'>"
-                            + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                                + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), dec.getEventCRF().getCrf().getName() + " "
-                            + dec.getEventCRF().getCrfVersion().getName(), false, false, false));
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), dec.getEventCRF().getCrf().getName() + " "
+                                + dec.getEventCRF().getCrfVersion().getName(), false, false, false));
                     }
                 }
                 count++;
@@ -742,7 +724,7 @@ public class StudyInfoPanel implements Serializable {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
-                            + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
+                                + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", dedc.getEdc().getCrf().getName(),
                                 false, true, false));
@@ -753,7 +735,7 @@ public class StudyInfoPanel implements Serializable {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
-                            + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
+                                + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc'alt='Not Started'/>", dedc.getEdc().getCrf().getName(),
                                 false, false, false));
@@ -806,7 +788,7 @@ public class StudyInfoPanel implements Serializable {
         // logger.info("how many events =" + eventlist.size());
 
         int count = 0;
-        for (Iterator keyIt = eventlist.keySet().iterator(); keyIt.hasNext();) {
+        for (Iterator keyIt = eventlist.keySet().iterator(); keyIt.hasNext(); ) {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) keyIt.next();
             displayData.add(new StudyInfoPanelLine("Definition", sed.getName(), true, false));
             ArrayList crfs = (ArrayList) eventlist.get(sed);
@@ -816,18 +798,18 @@ public class StudyInfoPanel implements Serializable {
                 if (ordinal_crf < crfs.size()) {
                     if (isExtractData) {
                         displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId() + "&defId=" + sed.getId() + "'>"
-                            + crf.getName() + "</a>", false, false));
+                                + crf.getName() + "</a>", false, false));
                     } else {
                         displayData.add(new StudyInfoPanelLine("CRF", "<a href='ViewRuleAssignment?ruleAssignments_f_crfName=" + crf.getName() + "'>"
-                            + crf.getName() + "</a>", false, false));
+                                + crf.getName() + "</a>", false, false));
                     }
                 } else {
                     if (isExtractData) {
                         displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId() + "&defId=" + sed.getId() + "'>"
-                            + crf.getName() + "</a>", false, true));
+                                + crf.getName() + "</a>", false, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("CRF", "<a href='ViewRuleAssignment?ruleAssignments_f_studyEventDefinitionName=" + sed.getName()
-                            + "&ruleAssignments_f_crfName=" + crf.getName() + "'>" + crf.getName() + "</a>", false, true));
+                                + "&ruleAssignments_f_crfName=" + crf.getName() + "'>" + crf.getName() + "</a>", false, true));
                     }
 
                 }
@@ -848,8 +830,7 @@ public class StudyInfoPanel implements Serializable {
     }
 
     /**
-     * @param createDataset
-     *            The createDataset to set.
+     * @param createDataset The createDataset to set.
      */
     public void setCreateDataset(boolean createDataset) {
         this.createDataset = createDataset;

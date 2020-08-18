@@ -85,13 +85,7 @@
     <query>
         <name>getCountWithFilter</name>
         <sql>
-			SELECT COUNT( DISTINCT  SS.study_subject_id)
-			FROM study_subject ss LEFT JOIN study_event se ON ss.study_subject_id = se.study_subject_id,STUDY ST,SUBJECT S
-			where
-			SS.SUBJECT_ID=S.SUBJECT_ID
-			AND SS.study_id = ST.study_id
-			AND (ST.study_id=? or ST.parent_study_id=?)
-
+			select count(Distinct ss.*)  from study_subject ss JOIN study st ON st.study_id=ss.study_id and (ST.study_id=? or ST.parent_study_id=?)
 		</sql>
     </query>
     <query>
@@ -105,18 +99,9 @@
     <query>
         <name>getWithFilterAndSort</name>
         <sql>
-			select ss.* ,unique_identifier  from study_subject ss JOIN study st ON st.study_id=ss.study_id and (ST.study_id=? or ST.parent_study_id=?)
+			select Distinct ss.*  from study_subject ss JOIN study st ON st.study_id=ss.study_id and (ST.study_id=? or ST.parent_study_id=?)
 		</sql>
     </query>
-		<query>
-			<name>getWithFilterAndSortForSingleEvent</name>
-			<sql>
-				select Distinct ss.* ,unique_identifier  from study_subject ss
-				JOIN study st ON st.study_id=ss.study_id
-				JOIN study_event se ON ss.study_subject_id = se.study_subject_id
-				and (ST.study_id=? or ST.parent_study_id=?)
-			</sql>
-		</query>
 
     <query>
         <name>getCountWithFilterListDiscNotes</name>

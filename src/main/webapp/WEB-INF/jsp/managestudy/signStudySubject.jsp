@@ -447,7 +447,7 @@
             <td class="table_header_row"><fmt:message key="start_date" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="CRF_name" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
-            <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
+            <td class="table_header_row" style="min-width: 100px"><fmt:message key="status" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></td>
             <td class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
@@ -540,7 +540,7 @@
                             <tr style="width: inherit;">
                               <td style="width: 54%; text-align: end;">
                                 <c:choose>
-                                    <c:when test="${studySub.status.name != 'removed'&& studySub.status.name != 'auto-removed'}">
+                                    <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
                                         <c:choose>
                                             <c:when test="${dedc.eventCRF.id>0}">
                                                 <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
@@ -617,6 +617,9 @@
                         <tr style="width: inherit;">
                             <td style="width: 54%; text-align: end;">
                                 <c:choose>
+                                    <c:when test="${ (dec.eventCRF.workflowStatus != 'NOT_STARTED' && dse.studyEvent.isRemoved()) || dec.eventCRF.isRemoved() }">
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                    </c:when>
                                     <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
                                         <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
                                     </c:when>
