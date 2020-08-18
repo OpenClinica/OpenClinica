@@ -90,6 +90,7 @@ public class RandomizationServiceImpl implements RandomizationService {
     public boolean refreshConfigurations(String accessToken, Map<String, String> results) {
         boolean isSuccess = true;
         List<RandomizationConfiguration> randomizationConfigurations = new ArrayList<>();
+        CoreResources.setRequestSchemaToPublic();
         ArrayList<Study> studies = studyDao.findAll();
         studies.stream().filter(study->study.getStatus() == Status.AVAILABLE
                 && StringUtils.isNotEmpty(study.getStudyEnvUuid()))
@@ -264,16 +265,18 @@ public class RandomizationServiceImpl implements RandomizationService {
                         + x.getItemData().getItem().getOcOid())
                 .collect(Collectors.toList());
 
-        long count = IntStream.range(0, questions.length)
-                .mapToObj(i -> populateStratFactors(stratFactorValueList.get(i), i, StringUtils.substringAfter(questions[i], STRATIFICATION_FACTOR + "."), databaseValues,
-                        randomizeQueryResult, stratFactors)).count();
+        for (int a = 0; a < questions.length; a++){
+            stratFactors = populateStratFactors(stratFactorValueList.get(a), a, StringUtils.substringAfter(questions[a], STRATIFICATION_FACTOR + "."), databaseValues,
+                    randomizeQueryResult, stratFactors);
+        }
+
         randomizationDTO.setStratificationFactors(stratFactors);
-        log.debug("Questions processed:" + count);
+        log.info("Questions processed:" + questions.length);
         sendStratificationFactors(randomizationDTO, accessToken);
     }
 
-    private Map<String, String>  populateStratFactors(String stratFactorValue, int index, String question,  List<String> databaseValues,
-                                                      List<RandomizeQueryResult> randomizeQueryResult, Map<String, String> stratFactors) {
+    private Map<String, String> populateStratFactors(String stratFactorValue, int index, String question, List<String> databaseValues,
+                                                                         List<RandomizeQueryResult> randomizeQueryResult, Map<String, String> stratFactors) {
         if (randomizeQueryResult.size() <= index) {
             log.error("Index out of bound:" + index);
             return null;
@@ -288,7 +291,6 @@ public class RandomizationServiceImpl implements RandomizationService {
         }
 
         return stratFactors;
-
     }
 
     public void processRandomization(Study parentPublicStudy, String accessToken, String studySubjectOID, ItemData... optionalItemData) {

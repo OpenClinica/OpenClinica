@@ -256,7 +256,7 @@ public class RestfulServiceHelper {
     	        }
 
 			String schema = CoreResources.getRequestSchema();
-			CoreResources.setRequestSchema("public");
+			CoreResources.setRequestSchemaToPublic();
     	        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
     	        userBean = (UserAccountBean) userAccountDAO.findByUserName(username);
 			CoreResources.setRequestSchema(schema);
