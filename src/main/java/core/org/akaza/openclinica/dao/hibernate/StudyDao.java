@@ -156,7 +156,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         String schema = CoreResources.getRequestSchema();
         if (StringUtils.isEmpty(schema))
             return null;
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         getSessionFactory().getStatistics().logSummary();
         String query = " from Study do  where do.oc_oid = :ocId";
         Query q = getCurrentSession().createQuery(query);
@@ -170,7 +170,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         String schema = CoreResources.getRequestSchema();
         if (StringUtils.isEmpty(schema))
             return null;
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         getSessionFactory().getStatistics().logSummary();
         String query = " from Study do  where do.studyId = :studyId";
         Query q = getCurrentSession().createQuery(query);
@@ -474,7 +474,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         String schema = CoreResources.getRequestSchema();
         if (StringUtils.isEmpty(schema))
             return null;
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         getSessionFactory().getStatistics().logSummary();
         this.saveOrUpdate(study);
         CoreResources.setRequestSchema(schema);
@@ -491,7 +491,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         String schema = null;
         if (request == null) {
             schema = CoreResources.getRequestSchema();
-            CoreResources.setRequestSchema("public");
+            CoreResources.setRequestSchemaToPublic();
         } else {
                 schema = (String) request.getAttribute("requestSchema");
                 request.setAttribute("requestSchema", "public");

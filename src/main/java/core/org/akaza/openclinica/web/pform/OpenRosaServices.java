@@ -937,7 +937,7 @@ public class OpenRosaServices {
         if (ssBean != null) {
             Study publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
             Study parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
-            CoreResources.setRequestSchema("public");
+            CoreResources.setRequestSchemaToPublic();
             UserAccount currentUser = userAccountDao.findByUserId(userAccountID);
             users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getStudyId(), parentPublicStudy.getStudyId());
             CoreResources.setRequestSchema(publicStudy.getSchemaName());
@@ -1017,7 +1017,7 @@ public class OpenRosaServices {
 
     private Study getPublicStudy(String studyOid) {
         String schema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         Study studyBean = (Study) studyDao.findByOcOID(studyOid);
         CoreResources.setRequestSchema(schema);
         return studyBean;
@@ -1026,7 +1026,7 @@ public class OpenRosaServices {
     private Study getParentPublicStudy(String studyOid) {
         Study resultBean = null;
         String schema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         Study study = getStudy(studyOid);
         if (!study.isSite()) {
             resultBean = study;

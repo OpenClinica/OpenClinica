@@ -146,7 +146,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
     @Override
     public EntityBean update(EntityBean eb) {
         String requestSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
@@ -306,7 +306,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
     @Override
     public EntityBean create(EntityBean eb) {
         String requestSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
 
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();

@@ -39,7 +39,7 @@ public class FieldSubmissionUtil {
         createdUser.setStatus(Status.AVAILABLE);
         // need to change schema here before saving, as user_id_seq is not available in the tenant schema
         String currentSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         createdUser = userAccountDao.saveOrUpdate(createdUser);
         CoreResources.setRequestSchema(currentSchema);
         return createdUser;
