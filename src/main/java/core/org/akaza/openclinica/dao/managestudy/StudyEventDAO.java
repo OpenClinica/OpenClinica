@@ -644,7 +644,10 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             if (oldStudyEventBean.getDateStarted() != null && sb.getDateStarted() != null)
                 if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
                     changeDetails.setStartDateChanged(true);
-            if (!oldStudyEventBean.getWorkflowStatus().equals(sb.getWorkflowStatus()))
+            if (!oldStudyEventBean.getWorkflowStatus().equals(sb.getWorkflowStatus())
+                    || oldStudyEventBean.isLocked() != sb.isLocked()
+                    || oldStudyEventBean.isSigned() != sb.isSigned()
+            )
                 changeDetails.setStatusChanged(true);
             changeDetails.setRunningInTransaction(isTransaction);
             StudyEventBeanContainer container = new StudyEventBeanContainer(sb, changeDetails);

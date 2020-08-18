@@ -1123,7 +1123,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         HashMap variables = new HashMap();
         variables.put(new Integer(1), currentStudy.getStudyId());
         variables.put(new Integer(2), currentStudy.getStudyId());
-        String sql = digester.getQuery("getWithFilterAndSortForSingleEvent");
+        String sql = digester.getQuery("getWithFilterAndSort");
 
         sql = sql + filter.execute("");
 
