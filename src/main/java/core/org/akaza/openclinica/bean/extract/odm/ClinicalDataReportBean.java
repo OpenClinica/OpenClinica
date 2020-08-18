@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyStatusEnum;
 import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -318,7 +319,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))
                                 && studySubject.getStatus().equals(Status.AVAILABLE)
                                 && studyBean.getStatus().equals(Status.AVAILABLE)
-                                && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved()) {
+                                && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved()
+                                && !studyEvent.isCurrentlySigned()) {
                             String signUrl = "/UpdateStudyEvent?action=confirm&statusId=signed&ss_id=" + studySubject.getStudySubjectId() + "&event_id=" + studyEvent.getStudyEventId() + "&first_sign=true";
 
                             xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"sign\" href=\""
@@ -422,7 +424,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     || BooleanUtils.isTrue(form.getArchived())
                                     || BooleanUtils.isTrue(se.getRemoved())
                                     || BooleanUtils.isTrue(se.getArchived())
-                                    || BooleanUtils.isTrue(studySubject.getStatus().isDeleted())
+                                    || BooleanUtils.isTrue(sub.getStatus().toLowerCase().equals(Status.DELETED.getDescription()))
                                 )
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
                             else if (form.getWorkflowStatus() != null)

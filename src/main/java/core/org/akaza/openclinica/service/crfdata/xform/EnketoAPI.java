@@ -436,6 +436,8 @@ public class EnketoAPI {
                     || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
                     || eventCrf.isCurrentlyRemoved()
                     || eventCrf.isCurrentlyArchived()
+                    || (!eventCrf.getStudySubject().getStatus().equals(Status.AVAILABLE)
+                        && !eventCrf.getStudySubject().getStatus().equals(Status.SIGNED))
                     ) {
 
 
