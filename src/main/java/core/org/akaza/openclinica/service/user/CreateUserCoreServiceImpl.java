@@ -165,7 +165,7 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
         createdUserAccountBean.addUserType(userType);
 
         String requestSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
         if (StringUtils.isNotEmpty(requestSchema))
             CoreResources.setRequestSchema(requestSchema);
