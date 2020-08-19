@@ -83,7 +83,7 @@ public class ExportDatasetServlet extends SecureController {
 
     public Study getPublicStudy(String uniqueId) {
         String studySchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         Study study = getStudyDao().findByUniqueId(uniqueId);
         CoreResources.setRequestSchema(studySchema);
         return study;

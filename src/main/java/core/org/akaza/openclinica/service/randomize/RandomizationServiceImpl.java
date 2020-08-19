@@ -234,61 +234,33 @@ public class RandomizationServiceImpl implements RandomizationService {
         log.debug("Response status:" + response.getStatusCode());
     }
 
-    private void setStratFactors(List<List<String>> stratGroups, Study publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
+    private void setStratFactors(Study publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
                                 List<RandomizeQueryResult> randomizeQueryResult, String accessToken) {
 
         RandomizationDTO randomizationDTO = new RandomizationDTO();
         randomizationDTO.setStudyUuid(publicStudy.getStudyUuid());
         randomizationDTO.setStudyEnvironmentUuid(publicStudy.getStudyEnvUuid());
         randomizationDTO.setSubjectOid(studySubjectOID);
-        Map<String, String> stratFactors = new LinkedHashMap<>();
+
+        Map<String, String> databaseValues = randomizeQueryResult.stream()
+                .collect(Collectors.toMap(entry -> (entry.getStudyEvent().getStudyEventDefinition().getOc_oid() + "."
+                                + entry.getEventCrf().getFormLayout().getCrf().getOcOid() + "."
+                                + entry.getItemGroup().getOcOid() + "."
+                                + entry.getItemData().getItem().getOcOid()),
+                        entry -> entry.getItemData().getValue(), (existing, replacement) -> existing));
+
+        Map<String, String> stratFactors = studyConfig.getStratificationFactors().entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> StringUtils.substringAfter(entry.getKey(), STRATIFICATION_FACTOR + "."),
+                        entry -> databaseValues.get(entry.getValue())));
+
         StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
         stratFactors.put("studyOid",         studySubject.getStudy().getOc_oid());
         stratFactors.put("siteId", studySubject.getStudy().getUniqueIdentifier());
         stratFactors.put("siteName", studySubject.getStudy().getName());
-        String[] questions = studyConfig.getStratificationFactors().keySet().toArray(new String[0]);
-        List<String> stratFactorValueList = new ArrayList<>();
 
-        // database query results are coming back in different order.
-        // Build a list of strings with event, form, itemGroup and item oids concatenated and compare them with the list received from the database to find the matching entry
-        for (int stratIndex = 0; stratIndex < stratGroups.get(0).size(); stratIndex++) {
-            stratFactorValueList.add(stratGroups.get(0).get(stratIndex)
-                    + stratGroups.get(1).get(stratIndex)
-                    + stratGroups.get(2).get(stratIndex)
-                    + stratGroups.get(3).get(stratIndex));
-        }
-        List<String> databaseValues = randomizeQueryResult.stream()
-                .map(x -> x.getStudyEvent().getStudyEventDefinition().getOc_oid()
-                        + x.getEventCrf().getFormLayout().getCrf().getOcOid()
-                        + x.getItemGroup().getOcOid()
-                        + x.getItemData().getItem().getOcOid())
-                .collect(Collectors.toList());
-
-        long count = IntStream.range(0, questions.length)
-                .mapToObj(i -> populateStratFactors(stratFactorValueList.get(i), i, StringUtils.substringAfter(questions[i], STRATIFICATION_FACTOR + "."), databaseValues,
-                        randomizeQueryResult, stratFactors)).count();
         randomizationDTO.setStratificationFactors(stratFactors);
-        log.debug("Questions processed:" + count);
         sendStratificationFactors(randomizationDTO, accessToken);
-    }
-
-    private Map<String, String>  populateStratFactors(String stratFactorValue, int index, String question,  List<String> databaseValues,
-                                                      List<RandomizeQueryResult> randomizeQueryResult, Map<String, String> stratFactors) {
-        if (randomizeQueryResult.size() <= index) {
-            log.error("Index out of bound:" + index);
-            return null;
-        }
-        OptionalInt first = IntStream.range(0, databaseValues.size())
-                .filter(i -> stratFactorValue.equals(databaseValues.get(i)))
-                .findFirst();
-
-        if (first.isPresent()) {
-            int itemDataIndex = first.getAsInt();
-            stratFactors.put(question, randomizeQueryResult.get(itemDataIndex).getItemData().getValue());
-        }
-
-        return stratFactors;
-
     }
 
     public void processRandomization(Study parentPublicStudy, String accessToken, String studySubjectOID, ItemData... optionalItemData) {
@@ -348,7 +320,7 @@ public class RandomizationServiceImpl implements RandomizationService {
             // check values in all strat factors to be not null
             if ((newRandomizeQueryResult = stratFactorValuesAvailable(stratGroups, studyConfig, studySubjectOID)) != null) {
                 // send these values over
-                setStratFactors(stratGroups, parentPublicStudy, studyConfig, studySubjectOID, newRandomizeQueryResult, accessToken);
+                setStratFactors(parentPublicStudy, studyConfig, studySubjectOID, newRandomizeQueryResult, accessToken);
             }
         }
     }

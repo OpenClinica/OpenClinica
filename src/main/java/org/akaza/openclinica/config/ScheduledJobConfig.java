@@ -45,6 +45,7 @@ public class ScheduledJobConfig {
                 schedulerUtilService.createSchedulerFactoryBean(applicationContext, schema);
             }
         }
+        CoreResources.setRequestSchemaToPublic();
     }
 
     public void setStudyDao(StudyDao studyDao) {

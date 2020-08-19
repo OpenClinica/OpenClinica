@@ -534,7 +534,7 @@ public class UserServiceImpl implements UserService {
         StudyUserRole studyUserRole = buildStudyUserRole(username, publicStudy, ownerUserAccount.getUserId());
 
         String studySchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        CoreResources.setRequestSchemaToPublic();
         studyUserRole = studyUserRoleDao.saveOrUpdate(studyUserRole);
         userAccount = userAccountDao.saveOrUpdate(userAccount);
         CoreResources.setRequestSchema(studySchema);

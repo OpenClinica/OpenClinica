@@ -534,7 +534,7 @@ public class DataController {
     private String convertToErrorString(List<String> errorMessages) {
         StringBuilder result = new StringBuilder();
         for (String str : errorMessages) {
-            result.append(str + " \n");
+            result.append(str);
         }
 
         return result.toString();

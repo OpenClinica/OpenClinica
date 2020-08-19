@@ -48,6 +48,7 @@ public class CoreResources implements InitializingBean {
     private static Properties EXTRACTINFO;
     private static KeyCloakConfiguration KEYCLOAKCONFIG;
     private static MasterKeycloakConfig MASTER_KEYCLOAK_CONFIG;
+    private static String PUBLIC_SCHEMA = "public";
 
     private static final String DATA_INFO_FILE_NAME = "datainfo.properties";
     private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
@@ -428,6 +429,11 @@ public class CoreResources implements InitializingBean {
             CoreResources.tenantSchema.set(schema);
         }
 
+        return false;
+    }
+
+    public static boolean setRequestSchemaToPublic(){
+        setRequestSchema(PUBLIC_SCHEMA);
         return false;
     }
 
