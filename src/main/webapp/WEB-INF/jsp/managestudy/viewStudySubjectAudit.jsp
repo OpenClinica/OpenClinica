@@ -405,7 +405,7 @@
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                         <c:choose>
-                                        <c:when test="${eventCRFAudit.oldValue == null or eventCRFAudit.oldValue eq ''}">Null</c:when>
+                                        <c:when test="${eventCRFAudit.oldValue == null or eventCRFAudit.oldValue eq ''}"></c:when>
                                         <c:when test="${ eventCRFAudit.oldValue eq 'NOT_VERIFIED'}"><fmt:message key="NOT_VERIFIED_non_sdv_page" bundle="${resterm}"></fmt:message></c:when>
                                         <c:otherwise><fmt:message key="${eventCRFAudit.oldValue}" bundle="${resterm}"></fmt:message></c:otherwise>
                                         </c:choose>
@@ -448,7 +448,7 @@
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                         <c:choose>
-                                            <c:when test="${eventCRFAudit.newValue == null or eventCRFAudit.newValue eq ''}">Null</c:when>
+                                            <c:when test="${eventCRFAudit.newValue == null or eventCRFAudit.newValue eq ''}"></c:when>
                                             <c:when test="${ eventCRFAudit.newValue eq 'NOT_VERIFIED'}"><fmt:message key="NOT_VERIFIED_non_sdv_page" bundle="${resterm}"></fmt:message></c:when>
                                             <c:otherwise><fmt:message key="${eventCRFAudit.newValue}" bundle="${resterm}"></fmt:message></c:otherwise>
                                         </c:choose>
