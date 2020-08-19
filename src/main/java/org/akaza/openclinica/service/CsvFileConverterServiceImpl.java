@@ -48,8 +48,10 @@ public class CsvFileConverterServiceImpl implements FileConverterService {
       for (CSVRecord csvRecord : parser.getRecords()) {
         Iterable<String> iterableCsvRecord = StreamSupport.stream(csvRecord.spliterator(), true)
                 .map(cellValue -> {
-                  // Replace any return characters with blank string
-                  return cellValue.replaceAll("\n", "");
+                  // Replace any return characters with blank string and non-printable characters from Unicode
+                  cellValue = cellValue.replaceAll("\\p{C}", "");
+                  cellValue = cellValue.replaceAll("\n", "");
+                  return cellValue;
                 })
                 .collect(Collectors.toList());
 
