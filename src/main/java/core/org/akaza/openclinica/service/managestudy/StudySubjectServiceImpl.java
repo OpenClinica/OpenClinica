@@ -153,7 +153,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
             de.setMaximumSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, studySub));
 
-            if (de.getStudyEvent().isAvailable())
+            if (de.getStudyEvent().isAvailable() || (de.getStudyEvent().isArchived() && !de.getStudyEvent().isRemoved()))
                 displayEvents.add(de);
         }
 
