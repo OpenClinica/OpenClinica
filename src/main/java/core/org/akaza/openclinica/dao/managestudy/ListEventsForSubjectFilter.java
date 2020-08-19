@@ -50,7 +50,19 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                     criteria +=   "  JOIN study_event se  ON  se.study_subject_id=ss.study_subject_id ";
                     criteria += " and ";
                     criteria += " ( se.study_event_definition_id = " + studyEventDefinitionId;
-                    criteria += " and se.workflow_status = '" + value + "' )";
+
+                    if (value.equals(resterm.getString(LOCKED.toLowerCase()))) {
+                        criteria += " and se.locked = 'true' )";
+                    } else if (value.equals(resterm.getString(NOT_LOCKED.toLowerCase()))) {
+                        criteria += " and (se.locked = 'false' or se.locked isNull) )";
+                    } else if (value.equals(resterm.getString(SIGNED.toLowerCase()))) {
+                        criteria += " and se.signed = 'true' )";
+                    } else if (value.equals(resterm.getString(NOT_SIGNED.toLowerCase()))) {
+                        criteria += " and (se.signed = 'false' or se.signed isNull) )";
+                    } else {
+                        criteria += " and se.workflow_status = '" + value + "' )";
+                    }
+
                 } else {
                     criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + studyEventDefinitionId;
                     criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";

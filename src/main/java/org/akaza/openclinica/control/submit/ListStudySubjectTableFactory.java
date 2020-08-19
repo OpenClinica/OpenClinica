@@ -615,7 +615,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     value = output != null ? output : value;
                 }
             }else if(property.startsWith("sed_")){
-                value = StudyEventWorkflowStatusEnum.getByI18nDescription(value)+"";
+                if (StudyEventWorkflowStatusEnum.getByI18nDescription(value) != null)
+                    value = StudyEventWorkflowStatusEnum.getByI18nDescription(value) + "";
             }
             auditUserLoginFilter.addFilter(property, value);
         }
@@ -906,8 +907,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
             for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
-                options.add(new Option(workflow.getDisplayValue(),workflow.getDisplayValue()));
+                if (!workflow.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
+                    options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
+            options.add(new Option(resterms.getString(LOCKED.toLowerCase()),resterms.getString(LOCKED.toLowerCase())));
+            options.add(new Option(resterms.getString(NOT_LOCKED.toLowerCase()),resterms.getString(NOT_LOCKED.toLowerCase())));
+            options.add(new Option(resterms.getString(SIGNED.toLowerCase()),resterms.getString(SIGNED.toLowerCase())));
+            options.add(new Option(resterms.getString(NOT_SIGNED.toLowerCase()),resterms.getString(NOT_SIGNED.toLowerCase())));
             return options;
         }
     }

@@ -330,7 +330,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             if ("studySubject.status".equalsIgnoreCase(property)) {
                 value = Status.getByName(value).getId() + "";
             } else if ("event.status".equalsIgnoreCase(property)) {
-                value = StudyEventWorkflowStatusEnum.getByI18nDescription(value) + "";
+                if (StudyEventWorkflowStatusEnum.getByI18nDescription(value) != null)
+                    value = StudyEventWorkflowStatusEnum.getByI18nDescription(value) + "";
             } else if (property.startsWith("sgc_")) {
                 int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
@@ -603,8 +604,13 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
             for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
-                options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
+                if (!workflow.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
+                    options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
+            options.add(new Option(resterm.getString(LOCKED.toLowerCase()),resterm.getString(LOCKED.toLowerCase())));
+            options.add(new Option(resterm.getString(NOT_LOCKED.toLowerCase()),resterm.getString(NOT_LOCKED.toLowerCase())));
+            options.add(new Option(resterm.getString(SIGNED.toLowerCase()),resterm.getString(SIGNED.toLowerCase())));
+            options.add(new Option(resterm.getString(NOT_SIGNED.toLowerCase()),resterm.getString(NOT_SIGNED.toLowerCase())));
             return options;
         }
     }

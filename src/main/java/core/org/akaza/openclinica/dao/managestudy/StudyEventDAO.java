@@ -209,6 +209,14 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         if (!StringUtils.isEmpty(workflow)) {
             eb.setWorkflowStatus((StudyEventWorkflowStatusEnum) StudyEventWorkflowStatusEnum.valueOf(workflow));
         }
+        Boolean removed = (Boolean) hm.get("removed");
+        Boolean archived = (Boolean) hm.get("archived");
+        Boolean locked = (Boolean) hm.get("locked");
+        Boolean signed = (Boolean) hm.get("signed");
+        eb.setRemoved(removed);
+        eb.setArchived(archived);
+        eb.setLocked(locked);
+        eb.setSigned(signed);
 
         // YW 08-17-2007
         eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
