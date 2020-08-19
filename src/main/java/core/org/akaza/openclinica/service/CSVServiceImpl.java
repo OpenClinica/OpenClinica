@@ -41,6 +41,7 @@ public class CSVServiceImpl implements CSVService {
     private static final String START_DATE = "StartDate";
     private static final String END_DATE = "EndDate";
     private static final String STUDY_EVENT_STATUS = "StudyEventStatus";
+    private static final String NON_PRINTABLE_CHAR_REGEX = "\\p{C}";
 
 
 
@@ -177,6 +178,8 @@ public class CSVServiceImpl implements CSVService {
                 if (rowNumber == 1) {
                     for (int i = 0; i < lineVal.length; i++) {
                         String currentHeader = lineVal[i].trim();
+                        // removes non-printable characters from Unicode
+                        currentHeader = currentHeader.replaceAll(NON_PRINTABLE_CHAR_REGEX, "");
                         if (currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
                             participantID_index = i;
                         } else if (currentHeader.equalsIgnoreCase(FIRST_NAME)) {
@@ -192,6 +195,10 @@ public class CSVServiceImpl implements CSVService {
                         }
                     }
                 } else {
+                    // removes non-printable characters from first column
+                    if(lineVal.length > 0){
+                        lineVal[0] = lineVal[0].replaceAll(NON_PRINTABLE_CHAR_REGEX, "");
+                    }
                     AddParticipantRequestDTO addParticipantRequestDTO = new AddParticipantRequestDTO();
 
                     if (participantID_index != -1 && lineVal[participantID_index] != null && lineVal[participantID_index].trim().length() > 0) {
@@ -438,6 +445,8 @@ public class CSVServiceImpl implements CSVService {
             String[] lineVal = line.split(",", 0);
             for (int i = 0; i < lineVal.length; i++) {
                 String currentHeader = lineVal[i].trim();
+                // removes non-printable characters from Unicode
+                currentHeader = currentHeader.replaceAll(NON_PRINTABLE_CHAR_REGEX, "");
                 if (currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
                     if (participantID_index == -1) {
                         participantID_index = i;
