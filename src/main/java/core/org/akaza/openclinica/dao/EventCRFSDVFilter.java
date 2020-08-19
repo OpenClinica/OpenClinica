@@ -128,7 +128,17 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     }
                 }
             } else if (property.equals("subjectEventStatus")){
-                    criteria += " and ( " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' ) ";
+                if (value.equals(resterm.getString(LOCKED.toLowerCase()))) {
+                    criteria += " and se.locked = 'true' ";
+                } else if (value.equals(resterm.getString(NOT_LOCKED.toLowerCase()))) {
+                    criteria += " and (se.locked = 'false' or se.locked isNull) ";
+                } else if (value.equals(resterm.getString(SIGNED.toLowerCase()))) {
+                    criteria += " and se.signed = 'true' ";
+                } else if (value.equals(resterm.getString(NOT_SIGNED.toLowerCase()))) {
+                    criteria += " and (se.signed = 'false' or se.signed isNull) ";
+                } else {
+                    criteria += " and se.workflow_status = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "'  ";
+                }
 
             }else if(property.equals("openQueries")){
                 String openQueriesQuery ="(select count(*) from discrepancy_note dn " +

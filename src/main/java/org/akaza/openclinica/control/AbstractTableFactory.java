@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -25,6 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTableFactory {
+    protected final String LOCKED ="LOCKED";
+    protected final String NOT_LOCKED ="NOT_LOCKED";
+    protected final String SIGNED ="SIGNED";
+    protected final String NOT_SIGNED ="NOT_SIGNED";
+    protected final ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
 
     protected Locale locale;
 

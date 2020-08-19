@@ -142,7 +142,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected SessionManager sm;
     private final static String STUDY_ENV_UUID = "studyEnvUuid";
     private final static String FORCE_RENEW_AUTH = "forceRenewAuth";
-
+    protected final String LOCKED ="LOCKED";
+    protected final String NOT_LOCKED ="NOT_LOCKED";
+    protected final String SIGNED ="SIGNED";
+    protected final String NOT_SIGNED ="NOT_SIGNED";
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
     protected static final Logger logger = LoggerFactory.getLogger(SecureController.class);
