@@ -626,6 +626,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
             if (dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA)) {
                 builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
+            } else {
+                String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
+                builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             }
             builder.close();
             builder.append("<span title='" + resword.getString("View_Query_Only") + "' border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
