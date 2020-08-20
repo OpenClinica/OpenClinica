@@ -8,7 +8,8 @@
 <jsp:include page="../include/admin-header.jsp" />
 
 
-<jsp:include page="../include/sidebar.jsp" />
+<jsp:include page="../include/sideAlert.jsp"/>
+<jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="request" id="displayEventCRF" class="core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean" />
 <jsp:useBean scope="request" id="event" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />

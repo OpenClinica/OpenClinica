@@ -163,6 +163,7 @@ public class DeleteEventCRFServlet extends SecureController {
                     return;
                 } else {
                     request.setAttribute("displayEventCRF", dec);
+                    request.setAttribute("iconInfoShown", true);
                     forwardPage(Page.DELETE_EVENT_CRF);
                 }
             }
