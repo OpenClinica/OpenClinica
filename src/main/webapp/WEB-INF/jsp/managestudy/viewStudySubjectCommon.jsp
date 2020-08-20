@@ -615,7 +615,7 @@ $(function() {
                     }
 
                     var submission = {
-                        studyStatus: studyEventData['@OpenClinica:WorkflowStatus'],
+                        studyStatus: studyEventData['@OpenClinica:Removed'] === 'Yes' ? 'removed' : studyEventData['@OpenClinica:WorkflowStatus'],
                         hideStatus: isInactive(studyEventData) || isInactive(formData) ? 'oc-status-removed' : 'oc-status-active',
                         updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
                         updatedBy: formData['@OpenClinica:UpdatedBy'],

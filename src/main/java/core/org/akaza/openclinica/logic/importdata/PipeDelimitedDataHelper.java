@@ -527,7 +527,8 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         for (int j = 0; j < rawMappingStrRows.length; j++) {
 
             String rawMappingStrRowsStr = rawMappingStrRows[j];
-
+            if(rawMappingStrRowsStr.startsWith("#"))
+                continue;
             keyValueStr = rawMappingStrRowsStr.split("=");
             //logger.info("++keyValueStr======================+" +keyValueStr);
 
@@ -547,7 +548,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                 } else if (key.equals("FormVersion") || key.substring(1).equals("FormVersion")) {
                     mappedValues.put("FormVersion", val);
                     //SkipMatchCriteria
-                } else if (key.equals("SkipMatchCriteria") || (!(key.startsWith("#")) && key.substring(1).equals("SkipMatchCriteria"))) {
+                } else if (key.equals("SkipMatchCriteria") || key.substring(1).equals("SkipMatchCriteria")) {
                     mappedValues.put("SkipMatchCriteria", val);
                 } else if (key != null && (key.trim().startsWith(PARTICIPANT_ID_HEADER_PROPERTY) || key.trim().indexOf(PARTICIPANT_ID_HEADER_PROPERTY) == 1)) {
                     mappedValues.put(PARTICIPANT_ID_HEADER_PROPERTY, val);
@@ -559,7 +560,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                     boolean isCorrectFormat = true;
                     if (isCorrectFormat) {
                         String tempKeyValStr = key + val;
-                        if (tempKeyValStr != null && tempKeyValStr.trim().length() > 0 && !(key.startsWith("#"))) {
+                        if (tempKeyValStr != null && tempKeyValStr.trim().length() > 0 ) {
 
                             String[] itemMappingvalue = toArray(val, ".");
                             // logger.info("===********************itemMappingvalue:" + itemMappingvalue);

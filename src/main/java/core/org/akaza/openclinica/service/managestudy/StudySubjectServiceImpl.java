@@ -34,6 +34,7 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.service.CustomRuntimeException;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ import java.util.*;
 public class StudySubjectServiceImpl implements StudySubjectService {
 
     private DataSource dataSource;
+
+    public static final String FAILED = "Failed";
 
     @Autowired
     private StudyEventDAO studyEventDAO;
@@ -67,7 +70,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
         CRFDAO crfDao = new CRFDAO(dataSource);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
-
+        //TODO: fix event.workflowStatus to COMPLETED?
         ArrayList events = studyEventDAO.findAllByStudySubject(studySubject);
 
         Map<Integer, StudyEventDefinitionBean> eventDefinitionByEvent = studyEventDefinitionDao.findByStudySubject(studySubject.getId());
@@ -112,15 +115,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                     formLayoutById, crfById);
             populateUncompletedCRFsWithCRFAndVersions(al, formLayoutById, crfById);
             de.setUncompletedCRFs(al);
-
-            // de.setMaximumSampleOrdinal(studyEventDao.getMaxSampleOrdinal(sed,
-            // studySubject));
             de.setMaximumSampleOrdinal(maxOrdinalByStudyEvent.get(event.getStudyEventDefinitionId()));
 
             displayEvents.add(de);
-            // event.setEventCRFs(createAllEventCRFs(eventCRFs,
-            // eventDefinitionCRFs));
-
         }
 
         return displayEvents;
@@ -158,7 +155,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
             de.setMaximumSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, studySub));
 
-            if (de.getStudyEvent().isAvailable())
+            if (de.getStudyEvent().isAvailable() || (de.getStudyEvent().isArchived() && !de.getStudyEvent().isRemoved()))
                 displayEvents.add(de);
         }
 
@@ -194,7 +191,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     public List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum status,
                                                          Study study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
                                                          Integer studyEventDefinitionId, List eventDefinitionCRFs) {
-        ArrayList<DisplayEventCRFBean> answer = new ArrayList<DisplayEventCRFBean>();
+        ArrayList<DisplayEventCRFBean> answer = new ArrayList<>();
 
         for (int i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
@@ -250,13 +247,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 // edc.isDoubleEntry() + ecb.getId());
                 dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
 
-                if (dec.isLocked()) {
-                    // System.out.println("*** found a locked DEC:
-                    // "+edc.getCrfName());
-                }
                 // OC-11019 Form status does not update to complete when a form contains ONLY the participant contact info
-                // this crf has data already or determined completed by subjectEventStatus(COMPLETED)
-                if (nonEmptyEventCrf.contains(ecb.getId()) || status.equals(SubjectEventStatus.COMPLETED)) {
+                // this crf has data already or determined completed by StudyEventWorkflowStatusEnum(COMPLETED)
+                if (nonEmptyEventCrf.contains(ecb.getId()) || status.equals(StudyEventWorkflowStatusEnum.COMPLETED)
+                        && dec.getEventCRF().getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                     // consider an event crf started only if item data get
                     // created
                     answer.add(dec);
@@ -283,7 +277,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         CRFDAO cdao = new CRFDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
         FormLayoutDAO fldao = new FormLayoutDAO(ds);
-        ItemDataDAO iddao = new ItemDataDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
 
         for (i = 0; i < eventCRFs.size(); i++) {
@@ -335,9 +328,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs, List eventCRFs, StudyEventWorkflowStatusEnum status,
                                                                         Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
         int i;
-        HashMap<Integer, Boolean> completed = new HashMap<Integer, Boolean>();
-        HashMap<Integer, EventCRFBean> startedButIncompleted = new HashMap<Integer, EventCRFBean>();
-        ArrayList<DisplayEventDefinitionCRFBean> answer = new ArrayList<DisplayEventDefinitionCRFBean>();
+        HashMap<Integer, Boolean> completed = new HashMap<>();
+        HashMap<Integer, EventCRFBean> startedButIncompleted = new HashMap<>();
+        ArrayList<DisplayEventDefinitionCRFBean> answer = new ArrayList<>();
 
         /**
          * A somewhat non-standard algorithm is used here: let answer = empty;
@@ -364,8 +357,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
             int crfId = formLayoutById.get(ecrf.getFormLayoutId()).getCrfId();
             // OC-11019 Form status does not update to complete when a form contains ONLY the participant contact info
-            // this crf has data already or determined completed by subjectEventStatus(COMPLETED)
-            if (nonEmptyEventCrf.contains(ecrf.getId()) || status.equals(SubjectEventStatus.COMPLETED)) {
+            // this crf has data already or determined completed by StudyEventWorkflowStatusEnum(COMPLETED)
+            if (nonEmptyEventCrf.contains(ecrf.getId()) || status.equals(StudyEventWorkflowStatusEnum.COMPLETED)
+                    && ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
                 startedButIncompleted.put(new Integer(crfId), ecrf);
@@ -426,8 +420,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()) {
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
             dedc.setEdc(eventDefinitionCrfBean);
-
-
             dedc.setEventCRF(new EventCRFBean());
             answer.add(dedc);
         }
@@ -548,7 +540,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         }
     }
 
-    public static final String FAILED = "Failed";
     @Override
     public StudySubject validateStudySubjectExists(Study study, String subjectKey, CustomRuntimeException validationErrors) {
 

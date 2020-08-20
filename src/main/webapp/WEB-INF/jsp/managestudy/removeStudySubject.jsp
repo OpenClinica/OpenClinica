@@ -142,7 +142,7 @@
         <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" pattern="${dteFormat}"/></td>
         <td class="table_cell"><c:out value="${displayEvents.studyEvent.location}"/></td>
         <td class="table_cell"><c:out value="${displayEvents.studyEvent.updater.name}"/></td>
-        <td class="table_cell"><c:out value="${displayEvents.studyEvent.status.name}"/></td>
+        <td class="table_cell"><c:out value="${displayEvents.studyEvent.workflowStatus.displayValue}"/></td>
      </tr>
      </c:forEach>
     

@@ -339,7 +339,8 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setTypeExpected(34, TypeNames.DATE);// date_interviewed
             this.setTypeExpected(35, TypeNames.STRING);// interviewer_name
             this.setTypeExpected(36, TypeNames.INT);// validator_id
-            this.setTypeExpected(37, TypeNames.STRING);// definition_name;
+            this.setTypeExpected(37, TypeNames.STRING);// sdv_status;
+            this.setTypeExpected(38, TypeNames.STRING);// definition_name;
         }
     }
 

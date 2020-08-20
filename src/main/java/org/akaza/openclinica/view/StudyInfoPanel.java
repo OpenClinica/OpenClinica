@@ -594,7 +594,7 @@ public class StudyInfoPanel implements Serializable {
             }
 
             displayData.add(new StudyInfoPanelLine("<b>Status: </b>", "<a href='EnterDataForStudyEvent?eventId=" + seBean.getId() + "'>"
-                    + seBean.getWorkflowStatus() + "</a>", false, false, false));
+                    + seBean.getWorkflowStatus().getDisplayValue() + "</a>", false, false, false));
             ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
             int count = 0;
             Iterator displayIt = displayCRFs.iterator();
