@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -30,6 +31,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     @Autowired
     @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCrfDAO;
+    @Autowired
+    @Qualifier("studySubjectJDBCDAO")
+    private StudySubjectDAO studySubjectDAO;
+
+    @Autowired
+    private StudySubjectDao studySubjectDao;
 
     @Transactional
     @Override
@@ -532,6 +540,21 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         }
     }
 
+    public void updateStudySubject(StudySubject studySubject, int userBeanId, Boolean unsignIfSigned){
+        if ( unsignIfSigned && studySubject.getStatus().isSigned())
+            studySubject.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
+        studySubject.setUpdateId(userBeanId);
+        studySubject.setDateUpdated(new Date());
+        studySubjectDao.saveOrUpdate(studySubject);
+    }
+
+    public void updateStudySubject(StudySubjectBean studySubject, UserAccountBean userBean, Boolean unsignIfSigned){
+        if ( unsignIfSigned && studySubject.getStatus().isSigned())
+            studySubject.setStatus(Status.AVAILABLE);
+        studySubject.setUpdater(userBean);
+        studySubject.setUpdatedDate(new Date());
+        studySubjectDAO.update(studySubject);
+    }
     public DataSource getDataSource() {
         return dataSource;
     }

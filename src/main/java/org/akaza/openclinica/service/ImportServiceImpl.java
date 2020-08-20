@@ -4,6 +4,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.service.JobService;
 import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
@@ -117,6 +118,9 @@ public class ImportServiceImpl implements ImportService {
 
     @Autowired
     private DiscrepancyNoteDao discrepancyNoteDao;
+
+    @Autowired
+    private StudySubjectService studySubjectService;
 
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
@@ -1408,12 +1412,14 @@ public class ImportServiceImpl implements ImportService {
                     }
                 }
                 itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), userAccount.getUserId(), false);
                 itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 return new DataImportReport(null, null, null, null, null, null, null, null, UPDATED, sdf_logFile.format(new Date()), null);
             }
         } else {
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            studySubjectService.updateStudySubject(eventCrf.getStudySubject(), userAccount.getUserId(), false);
             if (isEventCrfCompleted(eventCrf)) {
                 ErrorObj eb = createQuery(userAccount, study, studySubject, itemData, reasonForChange);
                 if (eb != null) {

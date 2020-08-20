@@ -64,6 +64,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="studySubjectJDBCDAO" class="core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="studyEventJDBCDao" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDAO">
        <constructor-arg ref="dataSource"/>
     </bean>

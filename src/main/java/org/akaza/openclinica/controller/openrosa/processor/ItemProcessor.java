@@ -13,21 +13,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.openclinica.kafka.KafkaService;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import core.org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import core.org.akaza.openclinica.domain.datamap.CrfVersion;
-import core.org.akaza.openclinica.domain.datamap.Item;
-import core.org.akaza.openclinica.domain.datamap.ItemData;
-import core.org.akaza.openclinica.domain.datamap.ItemFormMetadata;
-import core.org.akaza.openclinica.domain.datamap.ItemGroup;
-import core.org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import core.org.akaza.openclinica.domain.datamap.ItemMetadata;
 import org.akaza.openclinica.service.DataSaveServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +53,9 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private StudySubjectService studySubjectService;
 
     @Autowired
     DataSaveServiceImpl dataSaveService;
@@ -190,6 +184,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     newItemData.setInstanceId(container.getInstanceId());
                     dataSaveService.saveOrUpdate(newItemData);
                     itemDataDao.saveOrUpdate(newItemData);
+                    studySubjectService.updateStudySubject(container.getSubject(), container.getUser().getUserId(), false);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
                     // Existing item. Value unchanged. Do nothing.
@@ -199,8 +194,10 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
                     dataSaveService.saveOrUpdate(existingItemData);
+                    studySubjectService.updateStudySubject(container.getSubject(), container.getUser().getUserId(), false);
                 }
             }
+
         }
     }
 
@@ -263,5 +260,4 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
             }
         }
     }
-
 }

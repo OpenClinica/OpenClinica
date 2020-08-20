@@ -38,6 +38,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import core.org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import core.org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import core.org.akaza.openclinica.web.job.TriggerService;
@@ -76,6 +77,8 @@ public class DataImportService {
     }
 
     Locale locales;
+    @Autowired
+    private StudySubjectService studySubjectService;
 
     @Autowired
     private StudyDao studyDao;
@@ -258,6 +261,7 @@ public class DataImportService {
         ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
         itemDataDao.setFormatDates(false);
         EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 
         StringBuffer auditMsg = new StringBuffer();
         int eventCrfBeanId = -1;
@@ -268,6 +272,7 @@ public class DataImportService {
         CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao);
         for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
             boolean resetSDV = false;
+            boolean updateParticipantLastUpdatedDetails = false;
 
             logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
             if (wrapper.isSavable()) {
@@ -285,8 +290,10 @@ public class DataImportService {
                             .getData().getOrdinal());
                     if (wrapper.isOverwrite() && itemDataBean.isActive()) {
 
-                        if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue()))
+                        if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue())) {
                             resetSDV = true;
+                            updateParticipantLastUpdatedDetails = true;
+                        }
 
                         logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
                         itemDataBean.setUpdatedDate(new Date());
@@ -300,6 +307,7 @@ public class DataImportService {
                         displayItemBean.getData().setId(itemDataBean.getId());
                     } else {
                         resetSDV = true;
+                        updateParticipantLastUpdatedDetails = true;
                         itemDataDao.create(displayItemBean.getData());
                         logger.debug("created: " + displayItemBean.getData().getItemId());
                         itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
@@ -347,6 +355,10 @@ public class DataImportService {
                 if (eventCrfBean != null && resetSDV  && eventCrfBean.getSdvStatus() != null &&
                         eventCrfBean.getSdvStatus() == SdvStatus.VERIFIED)
                     eventCrfDao.setSDVStatus(SdvStatus.CHANGED_SINCE_VERIFIED, userBean.getId(), eventCrfBean.getId());
+                if(updateParticipantLastUpdatedDetails && eventCrfBean.isActive() && eventCrfBean.getStudySubjectId() > 0){
+                    StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCrfBean.getStudySubjectId());
+                    studySubjectService.updateStudySubject(studySubjectBean, userBean, false);
+                }
             }
         }
         if (!discNotesGenerated) {
