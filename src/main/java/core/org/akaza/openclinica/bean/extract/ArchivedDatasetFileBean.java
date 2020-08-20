@@ -19,7 +19,6 @@ import java.util.Date;
  * average run time?
  * other comments
  * @author thickerson
- *
  * TODO sync up fields with the table, eventually
  */
 public class ArchivedDatasetFileBean extends EntityBean {
@@ -39,9 +38,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private String status;
     private String jobUuid;
     private String jobType;
-
     private String jobExecutionUuid;
-
 
     public int getId() {
         return id;
@@ -50,7 +47,6 @@ public class ArchivedDatasetFileBean extends EntityBean {
     public void setId(int id) {
         this.id = id;
     }
-
 
     /**
      * @return Returns the datasetId.
