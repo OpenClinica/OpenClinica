@@ -11,7 +11,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -138,9 +137,15 @@ public class ViewStudyEventsServlet extends SecureController {
 
         ArrayList statuses = new ArrayList();
 
-        for(StudyEventWorkflowStatusEnum statusEnum :StudyEventWorkflowStatusEnum.values())
-            if(!statusEnum.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
+        for(StudyEventWorkflowStatusEnum statusEnum :StudyEventWorkflowStatusEnum.values()) {
+            if (!statusEnum.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)) {
                 statuses.add(statusEnum.getDisplayValue());
+            }
+        }
+        statuses.add(resterm.getString(LOCKED.toLowerCase()));
+        statuses.add(resterm.getString(NOT_LOCKED.toLowerCase()));
+        statuses.add(resterm.getString(SIGNED.toLowerCase()));
+        statuses.add(resterm.getString(NOT_SIGNED.toLowerCase()));
 
         request.setAttribute(STATUS_MAP, statuses);
 
@@ -457,8 +462,14 @@ public class ViewStudyEventsServlet extends SecureController {
         if (!statusDisplayValue.isEmpty()) {
             for (int i = 0; i < a.size(); i++) {
                 StudyEventBean se = (StudyEventBean) a.get(i);
-                if(se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.getByI18nDescription(statusDisplayValue)))
+
+                if ((statusDisplayValue.equals(resterm.getString(LOCKED.toLowerCase())) && se.isLocked())
+                        || (statusDisplayValue.equals(resterm.getString(NOT_LOCKED.toLowerCase())) && !se.isLocked())
+                        || (statusDisplayValue.equals(resterm.getString(SIGNED.toLowerCase())) && se.isSigned())
+                        || (statusDisplayValue.equals(resterm.getString(NOT_SIGNED.toLowerCase())) && !se.isSigned())
+                        || (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.getByI18nDescription(statusDisplayValue)))) {
                     b.add(se);
+                }
             }
             return b;
         }

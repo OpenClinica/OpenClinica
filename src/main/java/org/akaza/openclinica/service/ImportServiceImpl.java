@@ -923,26 +923,9 @@ public class ImportServiceImpl implements ImportService {
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
                     return studyEvent;
                 } else {
-                	// Repeat Key, if found in xml file, then use it
-                	if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   
-                		eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
-                        if (eventObject instanceof ErrorObj) return eventObject;                                      		              	
-                	}else {
-                		studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));  
-                	}
-                    
-                	//check blank event                	 
-                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
 
-                     ErrorObj errorObj = checkEventAvailable(studyEvent);
-                     if (errorObj != null) {
-                         return errorObj;
-                     }
-                     
-                     if(studyEvent !=null){
-                    	 return studyEvent;
-                     }
-                	
+                		studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
+
                     studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     return studyEvent;
                 }
