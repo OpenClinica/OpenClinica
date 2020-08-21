@@ -36,7 +36,7 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1223,7 +1223,7 @@ public class ImportCRFDataService {
                     String dateValue = displayItemBean.getData().getValue();
                     try {
                         // Check if the given date format matches any of the allowed formats
-                        Date originalDate = DateUtils.parseDate(dateValue, ALLOWED_DATE_FORMATS);
+                        Date originalDate = DateUtils.parseDateStrictly(dateValue, ALLOWED_DATE_FORMATS);
                         SimpleDateFormat sdf_sqldate = new SimpleDateFormat(DB_DATE_FORMAT);
                         sdf_sqldate.setLenient(false);
                         // Convert the given date into the date format used in the database
