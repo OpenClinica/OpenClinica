@@ -560,7 +560,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
                                 } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
                                     if (StringUtils.isEmpty(oldValue))
-                                        oldValue = "Null";
+                                        oldValue = "";
                                     else if (resterm.getString(oldValue) != null) {
                                         SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(oldValue);
                                         oldValue = sdvStatus.getDisplayValueForNonSdvPage();
@@ -600,7 +600,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
                                 } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
                                     if (StringUtils.isEmpty(newValue))
-                                        newValue = "Null";
+                                        newValue = "";
                                     else if (resterm.getString(newValue) != null) {
                                         SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(newValue);
                                         newValue = sdvStatus.getDisplayValueForNonSdvPage();
