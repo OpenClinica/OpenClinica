@@ -211,12 +211,11 @@
     <form
       action='DeleteEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>'
       method="POST">
-      <input type="submit" name="submit" value="<fmt:message key=" clear_event_CRF" bundle="${resword}" />"
+      <input type="submit" name="submit" value="<fmt:message key="clear_event_CRF" bundle="${resword}" />"
       class="button_xlong" onClick='return confirm("
       <fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}" />");'>
       &nbsp;
-      <input type="button" onclick="confirmCancel(window.originatingPage);" name="cancel" value="   <fmt:message key="
-        cancel" bundle="${resword}" /> " class="button_medium"/>
+      <input type="button" onclick="confirmCancel(window.originatingPage);" name="cancel" value="<fmt:message key="cancel" bundle="${resword}" /> " class="button_medium"/>
     </form>
   </c:when>
   <c:otherwise>
