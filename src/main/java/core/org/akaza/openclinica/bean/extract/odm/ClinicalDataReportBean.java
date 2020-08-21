@@ -786,14 +786,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
             if (audit.getAuditLogEventTypeId() == 32) {
                 if (StringUtils.isEmpty(o))
-                    o = "Null";
+                    o = "";
                 else {
                     SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(o);
                     o = sdvStatus.getDisplayValueForNonSdvPage();
                 }
 
                 if (StringUtils.isEmpty(n))
-                    n = "Null";
+                    n = "";
                 else {
                     SdvStatus sdvStatus = SdvStatus.getBySdvStatusString(n);
                     n = sdvStatus.getDisplayValueForNonSdvPage();

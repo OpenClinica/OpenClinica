@@ -77,13 +77,14 @@ public class ImportCRFDataService {
 
     private static final String[] ALLOWED_DATE_FORMATS = new String[]{"yyyy-MM-dd", "ddMMMyyyy", "dd/MM/yyyy"};
     private static final String DB_DATE_FORMAT = "yyyy-MM-dd";
-    private  ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+    private ResourceBundle resword;
 
     /*
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
     public synchronized HashMap fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
+        resword = ResourceBundleProvider.getWordsBundle();
     	HashMap fetchEventCRFBeansResult = new HashMap();
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         //StudyEventBean List to hold new common event
@@ -191,9 +192,9 @@ public class ImportCRFDataService {
 		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
 		                	}
 		                	String msg;
-		                	msg = recordNum + "," + studySubjectBean.getOid() + ",SUCCESS," + resword.getString("Skip");
+		                	msg = recordNum + "," + studySubjectBean.getOid() + ",SUCCESS," + resword.getString("skip");
 
-		    	    		throw new OpenClinicaException(msg, "");
+		    	    		throw new OpenClinicaException("", msg);
 		                }else {
 		                	if(studyEventDefinitionBean.isRepeating()) {
 		                		/**

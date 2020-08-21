@@ -29,7 +29,6 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.job.*;
 import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.SQLInitServlet;
