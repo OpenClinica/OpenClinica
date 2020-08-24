@@ -327,15 +327,16 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                                if ((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
-                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                if (((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))) && !ecb.isArchived() && !ecb.isRemoved())
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
                         	}else {
-                                if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                if ((ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                         || (upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                         || (upsert.isDataEntryComplete() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                        && !ecb.isArchived() && !ecb.isRemoved())
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
@@ -783,14 +784,16 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
-                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                                if ((!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                                        || ecb.isRemoved() || ecb.isArchived()) {
                                     return false;
                                 }
                         	}else {
-                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                if ((!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                         && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
-                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete())) {
+                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete()))
+                                        || ecb.isRemoved() || ecb.isArchived()) {
                                     return false;
                                 }
                         	}
