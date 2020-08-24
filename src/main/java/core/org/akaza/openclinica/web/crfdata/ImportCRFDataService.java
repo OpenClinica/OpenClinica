@@ -195,9 +195,9 @@ public class ImportCRFDataService {
 		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
 		                	}
 		                	String msg;
-		                	msg = recordNum + "," + studySubjectBean.getOid() + ",SUCCESS," + resword.getString("skip");
+		                	msg = recordNum + "," + studySubjectBean.getLabel() + ",SUCCESS," + resword.getString("skip");
 
-		    	    		throw new OpenClinicaException("", msg);
+		    	    		throw new OpenClinicaException(msg,"");
 		                }else {
 		                	if(studyEventDefinitionBean.isRepeating()) {
 		                		/**
