@@ -123,7 +123,7 @@
     <td class="table_cell"><c:out value="${event.location}"/>&nbsp;</td>
     <td class="table_cell"><fmt:formatDate value="${event.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><c:out value="${event.owner.name}"/></td>
-    <td class="table_cell"><c:out value="${event.workflowStatus.displayValue}"/></td>
+    <td class="table_cell"><c:out value="${event.status.name}"/></td>
     </tr>
  </c:forEach>
 </table>
