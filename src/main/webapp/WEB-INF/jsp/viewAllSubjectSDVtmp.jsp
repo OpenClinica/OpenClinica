@@ -561,6 +561,10 @@
                 clearFilter();
         });
 
+        $('#sdv-close-popup').click(function (){
+            $('#sdv-show-type').off('change');
+        });
+        
         var verifyButton = $(this).siblings('[name=sdvVerify]');
         $('#sdvVerify').off('click').click(function () {
             $(verifyButton).click();
