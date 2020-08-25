@@ -425,8 +425,14 @@ public class DataController {
                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
-                	// for skip err_msg:1,SS_SITE_SB1,SUCCESS,Skip
-                	String msg = recordNum + "," + participantId + ",FAILED," + err_msg;
+                	// for skip err_msg:1,participantLabel,SUCCESS,Skip
+                    String msg = null;
+                    String skipMessage = "SUCCESS," + resWords.getString("skip");
+                    if(err_msg.indexOf(skipMessage) > -1) {
+                        msg = err_msg;
+                    }else {
+                	    msg = recordNum + "," + participantId + ",FAILED," + err_msg;
+                    }
                 	
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);    	    		    	    		
                     return errorMsgs;

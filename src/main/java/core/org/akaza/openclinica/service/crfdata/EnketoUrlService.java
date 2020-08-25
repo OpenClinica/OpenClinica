@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.*;
 
 import javax.servlet.ServletContext;
@@ -20,15 +21,18 @@ import core.org.akaza.openclinica.core.form.xform.QueryBean;
 import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.crfdata.xform.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -335,7 +339,7 @@ public class EnketoUrlService {
             throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
-
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
         List<ItemGroup> igs = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
 
         for (ItemGroup ig : igs) {
@@ -474,6 +478,14 @@ public class EnketoUrlService {
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
         if (studyEvent.isCurrentlySigned()) {
             String signature = studyEvent.getAttestation();
+            if(eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()){
+                String removedOrArchivedKeyword = eventCrf.isCurrentlyRemoved() ? "removed" : "archived";
+                MessageFormat mf = new MessageFormat("");
+                mf.applyPattern(resword.getString("form_signature_for_removed_or_archived"));
+                Object[] arguments = { removedOrArchivedKeyword };
+                signature = mf.format(arguments);
+            }
+
             instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
                     + instance.substring(instance.indexOf("</meta>"));
         }

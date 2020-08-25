@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -17,8 +16,8 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.apache.commons.lang.BooleanUtils;
 
 public class ParticipantEventService {
 
@@ -36,17 +35,18 @@ public class ParticipantEventService {
     
     public StudyEventBean getNextParticipantEvent(StudySubjectBean studySubject) {
         List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>)getStudyEventDAO().findAllBySubjectIdOrdered(studySubject.getId());
-        
         for (StudyEventBean studyEvent:studyEvents) {
+            List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
+            boolean isAllParticipateFormsValids = isAllParticipateFormsCompleted(studySubject, studyEvent, eventDefCrfs);
             // Skip to next event if study event is not in the right status
             if (
                     (studyEvent.isRemoved() || studyEvent.isArchived()) || studyEvent.isLocked() ||
                     (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
-                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)))
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))
+                    || (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) && isAllParticipateFormsValids)) {
                 continue;
-            
-            List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
-            
+            }
+
             for (EventDefinitionCRFBean eventDefCrf:eventDefCrfs) {
                 boolean participantForm = eventDefCrf.isParticipantForm();
                 
@@ -95,6 +95,7 @@ public class ParticipantEventService {
 
         return versions;
     }
+
     public List<EventDefinitionCRFBean> getEventDefCrfsForStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent) {
         Integer studyId = studySubject.getStudyId();
         Study studyBean = (Study) studyDao.findByPK(studyId);
@@ -123,6 +124,20 @@ public class ParticipantEventService {
         }
 
         return netEventDefinitionCrfs;
+    }
+
+    private boolean isAllParticipateFormsCompleted(StudySubjectBean studySubject, StudyEventBean nextEvent,
+                                                   List<EventDefinitionCRFBean> eventDefCrfs) {
+        for (EventDefinitionCRFBean eventDefCrf:eventDefCrfs) {
+            EventCRFBean eventCRFBean = getExistingEventCRF(studySubject, nextEvent, eventDefCrf);
+            if (eventDefCrf.isParticipantForm()) {
+                if (eventCRFBean == null || (eventCRFBean != null
+                        && !eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                    return false;
+
+            }
+        }
+        return true;
     }
 
     /**

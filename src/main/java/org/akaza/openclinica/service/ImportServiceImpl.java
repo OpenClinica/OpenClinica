@@ -590,6 +590,10 @@ public class ImportServiceImpl implements ImportService {
     private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
         // only created new event crf once
         if (eventCrf.getEventCrfId() == 0) {
+            if(eventCrf.getStudyEvent().getStudyEventId() == 0)
+            {
+                eventCrf.setStudyEvent(studyEventDao.saveOrUpdate(eventCrf.getStudyEvent()));
+            }
             eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
             updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);
         }
@@ -654,9 +658,8 @@ public class ImportServiceImpl implements ImportService {
         return eventCrf;
     }
 
-
-    private StudyEvent createStudyEvent(StudySubject studySubject, StudyEventDefinition studyEventDefinition, int ordinal,
-                                        UserAccount userAccount, String startDate, String endDate) {
+    public StudyEvent buildStudyEvent(StudySubject studySubject, StudyEventDefinition studyEventDefinition, int ordinal,
+                                       UserAccount userAccount, String startDate, String endDate) {
 
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
@@ -670,7 +673,6 @@ public class ImportServiceImpl implements ImportService {
 
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         logger.debug("Creating new Study Event");
         return studyEvent;
     }
@@ -932,7 +934,7 @@ public class ImportServiceImpl implements ImportService {
 
                 		studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
 
-                    studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
+                    studyEvent = scheduleEventForImport(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     return studyEvent;
                 }
             }
@@ -1072,7 +1074,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     public StudyEvent scheduleEvent(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount) {
-        StudyEvent studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
+        StudyEvent studyEvent = buildStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
+        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         logger.debug("Scheduling new Visit Base  Event ID {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -1576,5 +1579,12 @@ public class ImportServiceImpl implements ImportService {
             studySubject.setDateUpdated(new Date());
             studySubjectDao.saveOrUpdate(studySubject);
         }
+    }
+
+    public StudyEvent scheduleEventForImport(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount) {
+        //StudyEvent is actually inserted in db inside createItemData() function
+        StudyEvent studyEvent = buildStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
+        logger.debug("Scheduling new Visit Base  Event ID {}", studyEvent.getStudyEventId());
+        return studyEvent;
     }
 }
