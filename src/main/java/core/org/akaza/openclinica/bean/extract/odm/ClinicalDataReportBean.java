@@ -317,7 +317,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))
-                                && studySubject.getStatus().equals(Status.AVAILABLE)
+                                && (studySubject.getStatus().equals(Status.AVAILABLE) || studySubject.getStatus().equals(Status.SIGNED))
                                 && studyBean.getStatus().equals(Status.AVAILABLE)
                                 && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved()) {
                             String signUrl = "/UpdateStudyEvent?action=confirm&statusId=signed&ss_id=" + studySubject.getStudySubjectId() + "&event_id=" + studyEvent.getStudyEventId() + "&first_sign=true";
@@ -424,7 +424,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     || BooleanUtils.isTrue(se.getRemoved())
                                     || BooleanUtils.isTrue(se.getArchived())
                                     || BooleanUtils.isTrue(sub.getStatus().toLowerCase().equals(Status.DELETED.getDescription()))
-                                )
+                                    )
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("invalid"));
                             else if (form.getWorkflowStatus() != null)
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
