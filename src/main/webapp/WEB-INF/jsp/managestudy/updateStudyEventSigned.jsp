@@ -364,18 +364,14 @@
                         <tr style="width: inherit;">
                           <td style="width: 54%; text-align: end;">
                             <c:choose>
-                                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
-                                    <c:choose>
-                                        <c:when test="${dedc.eventCRF.id>0}">
-                                            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
-                                        </c:otherwise>
-                                    </c:choose>
+                                <c:when test="${dedc.status.name=='locked'}">
+                                    <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"></span>
+                                </c:when>
+                                <c:when test="${dedc.eventCRF.id>0}">
+                                    <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                    <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
                                 </c:otherwise>
                             </c:choose>
                           </td>
