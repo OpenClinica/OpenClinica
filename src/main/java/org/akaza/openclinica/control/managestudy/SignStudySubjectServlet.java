@@ -133,6 +133,9 @@ public class SignStudySubjectServlet extends SecureController {
     public boolean permitSign(StudySubjectBean studySub) {
         boolean sign = true;
         ArrayList studyEvents = studyEventDAO.findAllByStudySubject(studySub);
+        if ("removed".equalsIgnoreCase(studySub.getStatus().getName()) || "auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
+            return false;
+        }
         for (int l = 0; l < studyEvents.size(); l++) {
             StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
             sign = permitStudyEventSign(studyEvent);

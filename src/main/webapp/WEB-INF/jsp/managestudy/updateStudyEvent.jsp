@@ -249,7 +249,7 @@
 </tr>
 </table>
 
-<c:if test="${userRole.manageStudy && study.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && studyEvent.archived != true}">
+<c:if test="${userRole.manageStudy && study.status.available && studySub.status.name != 'Removed' && studySub.status.name != 'auto-removed' && studyEvent.archived != true}">
     <c:choose>
         <c:when test="${studyEvent.removed == true && studyEvent.locked == true}">
             <hr style="width: 75%; float: left; margin: 30px 0 20px;"/>
