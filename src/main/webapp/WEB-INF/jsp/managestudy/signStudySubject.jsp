@@ -556,7 +556,7 @@
                                 </c:choose>
                               </td>
                               <td>
-                                <c:if test="${studyEvent.locked == true}">
+                                <c:if test="${dse.studyEvent.locked}">
                                     <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
                                 </c:if>
                               </td>
