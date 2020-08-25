@@ -63,7 +63,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
         CRFDAO crfDao = new CRFDAO(dataSource);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
-        //TODO: fix event.workflowStatus to COMPLETED?
         ArrayList events = studyEventDAO.findAllByStudySubject(studySubject);
 
         Map<Integer, StudyEventDefinitionBean> eventDefinitionByEvent = studyEventDefinitionDao.findByStudySubject(studySubject.getId());
@@ -243,7 +242,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 // OC-11019 Form status does not update to complete when a form contains ONLY the participant contact info
                 // this crf has data already or determined completed by StudyEventWorkflowStatusEnum(COMPLETED)
                 if (nonEmptyEventCrf.contains(ecb.getId()) || status.equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                        && dec.getEventCRF().getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                        || dec.getEventCRF().getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                     // consider an event crf started only if item data get
                     // created
                     answer.add(dec);
@@ -352,7 +351,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             // OC-11019 Form status does not update to complete when a form contains ONLY the participant contact info
             // this crf has data already or determined completed by StudyEventWorkflowStatusEnum(COMPLETED)
             if (nonEmptyEventCrf.contains(ecrf.getId()) || status.equals(StudyEventWorkflowStatusEnum.COMPLETED)
-                    && ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                    || ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
                 startedButIncompleted.put(new Integer(crfId), ecrf);
