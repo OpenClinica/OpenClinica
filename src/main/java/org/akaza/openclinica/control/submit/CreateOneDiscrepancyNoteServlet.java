@@ -85,7 +85,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
         String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
 
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        if (SubmitDataUtil.mayViewData(ub, currentRole)) {
             return;
         }
 

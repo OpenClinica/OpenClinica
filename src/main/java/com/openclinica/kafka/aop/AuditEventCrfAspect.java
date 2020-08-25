@@ -84,19 +84,19 @@ public class AuditEventCrfAspect {
         if (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived())){
             return false;}
         if (eventCrf.getRemoved() != null){
-            if ((existingEventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())) || existingEventCrf.getRemoved() == null){
+            if (existingEventCrf.getRemoved() == null || !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())){
                 return false;}}
         if (eventCrf.getEditable() != null){
-            if ((existingEventCrf.getEditable() != null && !existingEventCrf.getEditable().equals(eventCrf.getEditable())) || existingEventCrf.getEditable() == null){
+            if (existingEventCrf.getEditable() == null || !existingEventCrf.getEditable().equals(eventCrf.getEditable())){
                 return false;}}
         if (eventCrf.getRequired() != null){
-            if ((existingEventCrf.getRequired() != null && !existingEventCrf.getRequired().equals(eventCrf.getRequired())) || existingEventCrf.getRequired() == null){
+            if (existingEventCrf.getRequired() == null || !existingEventCrf.getRequired().equals(eventCrf.getRequired())){
                 return false;}}
         if (eventCrf.getRelevant() != null){
-            if ((existingEventCrf.getRelevant() != null && !existingEventCrf.getRelevant().equals(eventCrf.getRelevant())) || existingEventCrf.getRelevant() == null){
+            if (existingEventCrf.getRelevant() == null || !existingEventCrf.getRelevant().equals(eventCrf.getRelevant())){
                 return false;}}
         if (eventCrf.getEditable() != null){
-            if ((existingEventCrf.getEditable() != null && !existingEventCrf.getEditable().equals(eventCrf.getEditable())) || existingEventCrf.getEditable() == null){
+            if (existingEventCrf.getEditable() == null || !existingEventCrf.getEditable().equals(eventCrf.getEditable())){
                 return false;}}
 
         return true;
