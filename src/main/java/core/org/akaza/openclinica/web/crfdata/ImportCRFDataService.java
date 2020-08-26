@@ -1201,6 +1201,16 @@ public class ImportCRFDataService {
         itemDataBean.setEventCRFId(eventCrfBean.getId());
         itemDataBean.setOrdinal(ordinal);
         itemDataBean.setOwner(ub);
+      if (itemBean.getDataType().equals(ItemDataType.DATE)) {
+        // pass it if it is blank, tbh
+        if (StringUtils.isNotBlank(value)) {
+          try {
+            value = transformDateString(value);
+          } catch (ParseException e) {
+            logger.error("Error parsing date string", e);
+          }
+        }
+      }
         itemDataBean.setValue(value);
 
         return itemDataBean;
@@ -1225,12 +1235,8 @@ public class ImportCRFDataService {
                 if (!"".equals(displayItemBean.getData().getValue())) {
                     String dateValue = displayItemBean.getData().getValue();
                     try {
-                        // Check if the given date format matches any of the allowed formats
-                        Date originalDate = DateUtils.parseDateStrictly(dateValue, ALLOWED_DATE_FORMATS);
-                        SimpleDateFormat sdf_sqldate = new SimpleDateFormat(DB_DATE_FORMAT);
-                        sdf_sqldate.setLenient(false);
-                        // Convert the given date into the date format used in the database
-                        displayItemBean.getData().setValue(sdf_sqldate.format(originalDate));
+                        dateValue = transformDateString(dateValue);
+                        displayItemBean.getData().setValue(dateValue);
                     } catch (ParseException pe1) {
 
                         // next version; fail if it does not pass iso 8601
@@ -2735,6 +2741,21 @@ public class ImportCRFDataService {
        return studySubjectDAO.findByLabelAndStudy(subjectDataBean.getStudySubjectID(), studyBean);
     }
     return null;
+  }
+
+  /**
+   * Transform the given date string into the format that the database supports.
+   * @param dateString the date string to be converted
+   * @return the transformed date string
+   * @throws ParseException if there is an error parsing the date string.
+   */
+  private String transformDateString(String dateString) throws ParseException {
+    // Check if the given date format matches any of the allowed formats
+    Date originalDate = DateUtils.parseDateStrictly(dateString, ALLOWED_DATE_FORMATS);
+    SimpleDateFormat databaseDateFormat = new SimpleDateFormat(DB_DATE_FORMAT);
+    databaseDateFormat.setLenient(false);
+    // Convert the given date into the date format used in the database
+    return databaseDateFormat.format(originalDate);
   }
 
 }
