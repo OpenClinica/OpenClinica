@@ -149,7 +149,7 @@ public class SignStudySubjectServlet extends SecureController {
         for (int i = 0; i < eventCrfs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
 
-            if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
+            if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && !ecrf.isRemoved() && !ecrf.isArchived() && !studyEvent.isRemoved() && !studyEvent.isArchived()){
                 sign = false;
                 break;
             }
