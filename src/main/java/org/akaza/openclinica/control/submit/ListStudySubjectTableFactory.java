@@ -910,10 +910,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 if (!workflow.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
                     options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
-            options.add(new Option(resterms.getString(LOCKED.toLowerCase()),resterms.getString(LOCKED.toLowerCase())));
-            options.add(new Option(resterms.getString(NOT_LOCKED.toLowerCase()),resterms.getString(NOT_LOCKED.toLowerCase())));
-            options.add(new Option(resterms.getString(SIGNED.toLowerCase()),resterms.getString(SIGNED.toLowerCase())));
-            options.add(new Option(resterms.getString(NOT_SIGNED.toLowerCase()),resterms.getString(NOT_SIGNED.toLowerCase())));
+            options.add(new Option(resterms.getString(SIGNED.toLowerCase()).toLowerCase(),resterms.getString(SIGNED.toLowerCase()).toLowerCase()));
+            options.add(new Option(resterms.getString(LOCKED.toLowerCase()).toLowerCase(),resterms.getString(LOCKED.toLowerCase()).toLowerCase()));
+            options.add(new Option(resterms.getString(NOT_SIGNED.toLowerCase()).toLowerCase(),resterms.getString(NOT_SIGNED.toLowerCase()).toLowerCase()));
+            options.add(new Option(resterms.getString(NOT_LOCKED.toLowerCase()).toLowerCase(),resterms.getString(NOT_LOCKED.toLowerCase()).toLowerCase()));
             return options;
         }
     }
