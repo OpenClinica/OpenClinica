@@ -180,7 +180,7 @@ public class StudyEventController {
 
 		try {
 			String accessToken = (String) request.getSession().getAttribute("accessToken");
-			participateService.completeData(studyEvent, eventDefCrfs, eventCrfs, accessToken, studyOid, subjectOid);
+			participateService.completeData(studyEvent, eventDefCrfs, eventCrfs, accessToken, studyOid, subjectOid, ub);
 		} catch (Exception e) {
 			// Transaction has been rolled back due to an exception.
 			logger.error("Error encountered while completing Study Event: " + e.getMessage());
