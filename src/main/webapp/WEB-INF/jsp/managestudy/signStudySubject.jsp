@@ -603,7 +603,7 @@
                 <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" />&nbsp;</td>
                 <td class="table_cell">
-                    <c:out value="${dec.eventCRF.formLayout.name}" />&nbsp;
+                    <c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;
                     <c:if test="${dec.eventCRF.formLayout.status.name == 'Removed'}">
                         <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
                     </c:if>
