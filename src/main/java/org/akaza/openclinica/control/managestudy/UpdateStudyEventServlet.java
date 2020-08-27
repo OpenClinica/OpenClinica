@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -28,6 +29,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.AuditLogEventService;
@@ -88,6 +90,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String NEW_STATUS = "newStatus";
 
     private StudyEventDAO studyEventDAO;
+    private StudySubjectDao studySubjectDao;
     private EventCRFDAO eventCRFDAO;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
 
@@ -107,6 +110,7 @@ public class UpdateStudyEventServlet extends SecureController {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
 
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        studySubjectDao = (StudySubjectDao) SpringServletAccess.getApplicationContext(context).getBean("studySubjectDaoDomain");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         studyEventDefinitionDAO = (StudyEventDefinitionDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefinitionJDBCDao");
 
@@ -281,9 +285,17 @@ public class UpdateStudyEventServlet extends SecureController {
         if (action.equalsIgnoreCase("submit")) {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+            StudySubject studySubject = studySubjectDao.findByPK(studyEvent.getStudySubjectId());
+            boolean isStudySubjectUpdated = false;
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(EVENT_WORKFLOW_STATUS));
-            if(ses != null && !studyEvent.getWorkflowStatus().equals(ses) && studyEvent.isSigned())
-                studyEvent.setSigned(false);
+            if(ses != null && !studyEvent.getWorkflowStatus().equals(ses)){
+                if(studyEvent.isSigned())
+                    studyEvent.setSigned(false);
+                if(studySubject.getStatus().isSigned()) {
+                    studySubject.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
+                    isStudySubjectUpdated = true;
+                }
+            }
             studyEvent.setWorkflowStatus(ses);
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
 
@@ -374,6 +386,11 @@ public class UpdateStudyEventServlet extends SecureController {
                 updateClosedQueriesForUpdatedStudySubjectFields(studyEvent);
                 StudyEventBean updatedStudyEvent = (StudyEventBean) studyEventDAO.update(studyEvent);
 
+                if(isStudySubjectUpdated) {
+                    studySubject.setDateUpdated(new Date());
+                    studySubject.setUpdateId(ub.getId());
+                    studySubject = studySubjectDao.saveOrUpdate(studySubject);
+                }
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());

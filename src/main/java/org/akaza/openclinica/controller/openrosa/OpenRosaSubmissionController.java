@@ -627,9 +627,11 @@ public class OpenRosaSubmissionController {
                 break;
             }
         }
+        Boolean isEventWorkflowStatusUpDated = false;
         if ((allFormsComplete && countOfEventCrfsInEDC == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                isEventWorkflowStatusUpDated = true;
                 if(studyEvent.isCurrentlySigned())
                     studyEvent.setSigned(false);
                 persistStudyEvent(studyEvent, true);
@@ -637,10 +639,17 @@ public class OpenRosaSubmissionController {
         } else {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                isEventWorkflowStatusUpDated = true;
                 if(studyEvent.isCurrentlySigned())
                     studyEvent.setSigned(false);
                 persistStudyEvent(studyEvent, true);
             }
+        }
+        if(isEventWorkflowStatusUpDated && studySubject.getStatus().isSigned()){
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setDateUpdated(new Date());
+            studySubject.setUpdateId(userAccount.getUserId());
+            studySubjectDao.saveOrUpdate(studySubject);
         }
     }
 
