@@ -122,7 +122,7 @@ public class SignStudySubjectServlet extends SecureController {
             DisplayStudyEventBean de = new DisplayStudyEventBean();
             de.setStudyEvent(event);
             de.setDisplayEventCRFs(getDisplayEventCRFs(study, ds, eventCRFs, ub, currentRole, event.getWorkflowStatus()));
-            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus());
+            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus(), sed);
             populateUncompletedCRFsWithCRFAndVersions(ds, al);
             de.setUncompletedCRFs(al);
 
@@ -138,6 +138,9 @@ public class SignStudySubjectServlet extends SecureController {
     public boolean permitSign(StudySubjectBean studySub) {
         boolean sign = true;
         ArrayList studyEvents = studyEventDAO.findAllByStudySubject(studySub);
+        if ("removed".equalsIgnoreCase(studySub.getStatus().getName()) || "auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
+            return false;
+        }
         for (int l = 0; l < studyEvents.size(); l++) {
             StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
             sign = permitStudyEventSign(studyEvent);
@@ -151,7 +154,7 @@ public class SignStudySubjectServlet extends SecureController {
         for (int i = 0; i < eventCrfs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
 
-            if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
+            if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && !ecrf.isRemoved() && !ecrf.isArchived() && !studyEvent.isRemoved() && !studyEvent.isArchived()){
                 sign = false;
                 break;
             }
@@ -501,7 +504,7 @@ public class SignStudySubjectServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowStatusEnum status) {
+    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowStatusEnum status, StudyEventDefinitionBean sed) {
         int i;
         HashMap completed = new HashMap();
         HashMap startedButIncompleted = new HashMap();
@@ -558,7 +561,8 @@ public class SignStudySubjectServlet extends SecureController {
             }
             Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
             EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-            if (b == null || !b.booleanValue()) {
+            //Removing unwanted notStarted forms from commonEvents
+            if ((b == null || !b.booleanValue() ) && (!sed.isTypeCommon() || ev.getId() > 0)) {
 
                 // System.out.println("entered boolean loop with ev
                 // "+ev.getId()+" crf version id "+

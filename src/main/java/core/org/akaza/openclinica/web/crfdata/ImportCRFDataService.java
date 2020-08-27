@@ -324,15 +324,16 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                                if ((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
-                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                if (((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))) && !ecb.isArchived() && !ecb.isRemoved())
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
                         	}else {
-                                if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                if ((ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                         || (upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                         || (upsert.isDataEntryComplete() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                        && !ecb.isArchived() && !ecb.isRemoved())
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
@@ -780,14 +781,16 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
-                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                                if ((!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                                        || ecb.isRemoved() || ecb.isArchived()) {
                                     return false;
                                 }
                         	}else {
-                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                if ((!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                         && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
-                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete())) {
+                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete()))
+                                        || ecb.isRemoved() || ecb.isArchived()) {
                                     return false;
                                 }
                         	}
@@ -1195,6 +1198,16 @@ public class ImportCRFDataService {
         itemDataBean.setEventCRFId(eventCrfBean.getId());
         itemDataBean.setOrdinal(ordinal);
         itemDataBean.setOwner(ub);
+      if (itemBean.getDataType().equals(ItemDataType.DATE)) {
+        // pass it if it is blank, tbh
+        if (StringUtils.isNotBlank(value)) {
+          try {
+            value = transformDateString(value);
+          } catch (ParseException e) {
+            logger.error("Error parsing date string", e);
+          }
+        }
+      }
         itemDataBean.setValue(value);
 
         return itemDataBean;
@@ -1219,12 +1232,8 @@ public class ImportCRFDataService {
                 if (!"".equals(displayItemBean.getData().getValue())) {
                     String dateValue = displayItemBean.getData().getValue();
                     try {
-                        // Check if the given date format matches any of the allowed formats
-                        Date originalDate = DateUtils.parseDateStrictly(dateValue, ALLOWED_DATE_FORMATS);
-                        SimpleDateFormat sdf_sqldate = new SimpleDateFormat(DB_DATE_FORMAT);
-                        sdf_sqldate.setLenient(false);
-                        // Convert the given date into the date format used in the database
-                        displayItemBean.getData().setValue(sdf_sqldate.format(originalDate));
+                        dateValue = transformDateString(dateValue);
+                        displayItemBean.getData().setValue(dateValue);
                     } catch (ParseException pe1) {
 
                         // next version; fail if it does not pass iso 8601
@@ -2729,6 +2738,21 @@ public class ImportCRFDataService {
        return studySubjectDAO.findByLabelAndStudy(subjectDataBean.getStudySubjectID(), studyBean);
     }
     return null;
+  }
+
+  /**
+   * Transform the given date string into the format that the database supports.
+   * @param dateString the date string to be converted
+   * @return the transformed date string
+   * @throws ParseException if there is an error parsing the date string.
+   */
+  private String transformDateString(String dateString) throws ParseException {
+    // Check if the given date format matches any of the allowed formats
+    Date originalDate = DateUtils.parseDateStrictly(dateString, ALLOWED_DATE_FORMATS);
+    SimpleDateFormat databaseDateFormat = new SimpleDateFormat(DB_DATE_FORMAT);
+    databaseDateFormat.setLenient(false);
+    // Convert the given date into the date format used in the database
+    return databaseDateFormat.format(originalDate);
   }
 
 }
