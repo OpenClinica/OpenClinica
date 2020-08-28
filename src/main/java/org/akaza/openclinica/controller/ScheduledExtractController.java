@@ -1,11 +1,14 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.util.ErrorConstants;
@@ -14,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.controller.dto.JobDetailDTO;
 import org.akaza.openclinica.controller.dto.ScheduledExtractJobDetailDTO;
+import org.akaza.openclinica.service.ValidateServiceImpl;
 import org.apache.http.entity.ContentType;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -60,10 +64,25 @@ public class ScheduledExtractController {
     public ResponseEntity<List<ScheduledExtractJobDetailDTO>> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("jobUuid") String jobUuid,
                                                                                                               HttpServletRequest request,
                                                                                                               HttpServletResponse response) throws SchedulerException {
+
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
-                    "User must be type admin.")).body(null);
+                    "Insufficient privileges")).body(null);
+        }
+
+        String studyOID = (String) request.getSession().getAttribute("studyOid");
+        ValidateServiceImpl vsl = new ValidateServiceImpl();
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        
+        if (!vsl.isUserHasAccessToStudy(userRoles, studyOID) || vsl.isUserHasAccessToSite(userRoles, studyOID)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+                    "Insufficient privileges")).body(null);
+        }
+
+        Study publicStudy = studyDao.findPublicStudy(studyOID);
+        if (publicStudy == null) {
+
         }
 
         ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid.trim());
