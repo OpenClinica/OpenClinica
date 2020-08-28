@@ -68,20 +68,20 @@
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="study_subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.id}"/></td></tr> --%>
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr> --%>
   <c:choose>
-    <c:when test='${study.study != null && study.study.studyId > 0}'>
+    <c:when test='${subjectStudy.study != null && subjectStudy.study.studyId > 0}'>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
-        <td class="table_cell"><c:out value="${study.study.name}"/></td>
+        <td class="table_cell"><c:out value="${subjectStudy.study.name}"/></td>
       </tr>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
-        <td class="table_cell"><c:out value="${study.name}"/></td>
+        <td class="table_cell"><c:out value="${subjectStudy.name}"/></td>
       </tr>
     </c:when>
     <c:otherwise>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
-        <td class="table_cell"><c:out value="${study.name}"/></td>
+        <td class="table_cell"><c:out value="${subjectStudy.name}"/></td>
       </tr>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
