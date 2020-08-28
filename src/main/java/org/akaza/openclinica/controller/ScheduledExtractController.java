@@ -92,7 +92,7 @@ public class ScheduledExtractController {
                                                HttpServletResponse response) throws Exception {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
-            String errorMessage = errorHelper("User must be type admin.", response);
+            String errorMessage = errorHelper("Insufficient privileges.", response);
             return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
