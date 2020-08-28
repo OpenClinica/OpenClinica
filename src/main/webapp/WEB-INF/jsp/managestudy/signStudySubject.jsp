@@ -614,7 +614,7 @@
                             <td style="width: 54%; text-align: end;">
                                 <c:choose>
                                     <c:when test="${ (dec.eventCRF.workflowStatus != 'NOT_STARTED' && dse.studyEvent.isRemoved()) || dec.eventCRF.isRemoved() }">
-                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="removed" bundle="${resword}"/>">
                                     </c:when>
                                     <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
                                         <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
@@ -626,7 +626,7 @@
                                         <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="removed" bundle="${resword}"/>">
                                     </c:otherwise>
                                 </c:choose>
                             </td>
