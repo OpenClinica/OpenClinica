@@ -85,11 +85,7 @@
       </tr>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
-        <td class="table_cell">
-          <c:if test="${subjectStudy != study}">
-            <c:out value="${subjectStudy.name}"/>
-          </c:if>
-        </td>
+        <td class="table_cell"><c:out value="${subjectStudy.name}"/></td>
       </tr>
     </c:otherwise>
   </c:choose>
