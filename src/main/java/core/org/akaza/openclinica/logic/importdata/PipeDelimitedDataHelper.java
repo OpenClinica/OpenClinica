@@ -896,7 +896,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
     /**
      * Height Units=IG_VITAL_GROUP1.HeightUnitsOID
-     * @param itemStr
+     * @param keyValueStr
      * @return
      */
     private String validateItemFormat(String[] keyValueStr) {
@@ -938,7 +938,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
     /**
      * Height Units=IG_VITAL_GROUP1.HeightUnitsOID
-     * @param itemStr
+     * @param keyValueStr
      * @return
      */
     private ImportItemGroupDTO convertToImportItemGroupDTO(String[] keyValueStr) {
