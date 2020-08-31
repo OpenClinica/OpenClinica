@@ -1267,7 +1267,7 @@ public class ImportCRFDataService {
                 } catch (Exception e) {// should be a sub class
                     // pass if blank, tbh 07/2010
                     if (!"".equals(displayItemBean.getData().getValue())) {
-                        hardv.put(itemOid, "Non-integer value in integer item. Please ensure value types match field types correctly..");
+                        hardv.put(itemOid, "Non-integer value in integer item. Please ensure value types match field types correctly.");
                     }
                 }
             }
