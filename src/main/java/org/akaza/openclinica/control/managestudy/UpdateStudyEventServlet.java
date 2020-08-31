@@ -245,7 +245,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 boolean crfIsRequired = edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao());
                 boolean crfIsCompleted = existingBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED);
                 boolean crfIsRemoved = existingBean.isRemoved();
-                if (crfIsRequired && (!crfIsCompleted || crfIsRemoved)) {
+                if (crfIsRequired && !existingBean.isArchived() && (!crfIsCompleted || crfIsRemoved)) {
 
                     logger.debug("found that " + existingBean.getCrfVersion().getName() + " is required...");
                     // that is, it's not completed but required to complete
