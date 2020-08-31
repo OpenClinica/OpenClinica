@@ -804,7 +804,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                         } else if (keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") || keyWord.trim().indexOf("SkipMatchCriteria") == 1)) {
                             //check SkipMatchCriteria format
                             if (value != null && value.trim().length() > 0) {
-                                errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
+                                errorMsg = this.validateSkipMatchCriteriaFormat(currentLine);
 
                                 if (errorMsg != null) {
                                     errorMsgs.add(errorMsg);
@@ -1004,15 +1004,15 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         return importItemGroupDTOs;
     }
 
-    private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
-
+    private String validateSkipMatchCriteriaFormat(String currentLine) {
+        String[] keyValueStr = currentLine.split("=");
         String errorMsg = null;
         String key;
         String skipMatchCriteriaStr;
         String[] skipMatchCriteriaVal;
 
         if (keyValueStr.length != 2) {
-            errorMsg = "Invalid format for SkipMatchCriteria. Only one '=' can be included in this line.";
+            errorMsg = "Invalid SkipMatchCriteria parameter " + currentLine + ". Each parameter must be in the format  ItemGroupOID.ItemOID with additional parameters separated by commas.";
             return errorMsg;
         } else {
             key = keyValueStr[0].trim();

@@ -1531,7 +1531,7 @@ public class ImportCRFDataService {
 	                               if (studyEvent == null || studyEvent.getId() == 0) {
 	                            	    if(studyEventDefintionBean.isRepeating()) {
 	                            	    	mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-		                                    Object[] arguments = { sedOid, oid };
+		                                    Object[] arguments = { sedOid, studySubjectBean.getLabel() };
 		                                    errors.add(mf.format(arguments));
 		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
 	                            	    }else {
@@ -1545,7 +1545,7 @@ public class ImportCRFDataService {
                             	}
                             } else if (studyEventDefintionBean == null) {
                                 mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-                                Object[] arguments = { sedOid, oid };
+                                Object[] arguments = { sedOid, studySubjectBean.getLabel() };
                                 errors.add(mf.format(arguments));
                                 logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
                             }
