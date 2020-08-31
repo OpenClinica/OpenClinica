@@ -220,7 +220,7 @@ public class UpdateStudyEventServlet extends SecureController {
         // may not be populated, only entered crfs seem to ping the list
         for (int u = 0; u < getAllECRFs.size(); u++) {
             EventDefinitionCRFBean ecrfBean = (EventDefinitionCRFBean) getAllECRFs.get(u);
-
+            boolean isEventCrfCreated = false;
             //
             logger.debug("found number of existing ecrfs: " + getECRFs.size());
             if (getECRFs.size() == 0) {
@@ -254,6 +254,15 @@ public class UpdateStudyEventServlet extends SecureController {
                     // per new rule above 11-16-2007
                 }
                 // }
+                EventDefinitionCRFBean tempEventDefnCRFBean = edefcrfdao.findForStudyByStudyEventIdAndCRFVersionId(studyEvent.getId(), existingBean.getCRFVersionId());
+                if(tempEventDefnCRFBean.getId() == ecrfBean.getId())
+                    isEventCrfCreated = true;
+            }
+            //This condition is created to check the removed the completed workflow status
+            // if the eventDefnCrf is required and eventCrf is not created in db i.e. Not started
+            if(ecrfBean.isRequiredCRF() && !isEventCrfCreated)
+            {
+                eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.COMPLETED);
             }
         }
 
