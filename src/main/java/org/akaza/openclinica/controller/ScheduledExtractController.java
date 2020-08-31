@@ -5,24 +5,25 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.util.ErrorConstants;
 import core.org.akaza.openclinica.web.util.HeaderUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.akaza.openclinica.controller.dto.JobDetailDTO;
 import org.akaza.openclinica.controller.dto.ScheduledExtractJobDetailDTO;
 import org.apache.http.entity.ContentType;
-import org.quartz.*;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,6 +61,7 @@ public class ScheduledExtractController {
     public ResponseEntity<List<ScheduledExtractJobDetailDTO>> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("jobUuid") String jobUuid,
                                                                                                               HttpServletRequest request,
                                                                                                               HttpServletResponse response) throws SchedulerException {
+
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
