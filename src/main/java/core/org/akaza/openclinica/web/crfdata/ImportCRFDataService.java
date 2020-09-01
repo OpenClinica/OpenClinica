@@ -1249,7 +1249,7 @@ public class ImportCRFDataService {
             } else if (displayItemBean.getItem().getDataType().equals(ItemDataType.ST)) {
                 int width = Validator.parseWidth(widthDecimal);
                 if (width > 0 && displayItemBean.getData().getValue().length() > width) {
-                    hardv.put(itemOid, "This value exceeds required width=" + width);
+                    hardv.put(itemOid, "Value exceeds maximum length=" + width + ". Please ensure values do not exceed maximum width.");
                 }
             }
             // what if it's a number? should be only numbers
@@ -1258,13 +1258,13 @@ public class ImportCRFDataService {
                     Integer testInt = new Integer(displayItemBean.getData().getValue());
                     int width = Validator.parseWidth(widthDecimal);
                     if (width > 0 && displayItemBean.getData().getValue().length() > width) {
-                        hardv.put(itemOid, "This value exceeds required width=" + width);
+                        hardv.put(itemOid, "Value exceeds maximum length=" + width + ". Please ensure values do not exceed maximum width.");
                     }
                     // now, didn't check decimal for testInt.
                 } catch (Exception e) {// should be a sub class
                     // pass if blank, tbh 07/2010
                     if (!"".equals(displayItemBean.getData().getValue())) {
-                        hardv.put(itemOid, "This value is not an integer.");
+                        hardv.put(itemOid, "Non-integer value in integer item. Please ensure value types match field types correctly.");
                     }
                 }
             }
@@ -1274,16 +1274,16 @@ public class ImportCRFDataService {
                     Float testFloat = new Float(displayItemBean.getData().getValue());
                     int width = Validator.parseWidth(widthDecimal);
                     if (width > 0 && displayItemBean.getData().getValue().length() > width) {
-                        hardv.put(itemOid, "This value exceeds required width=" + width);
+                        hardv.put(itemOid, "Value exceeds maximum length=" + width + ". Please ensure values do not exceed maximum width.");
                     }
                     int decimal = Validator.parseDecimal(widthDecimal);
                     if (decimal > 0 && BigDecimal.valueOf(new Double(displayItemBean.getData().getValue()).doubleValue()).scale() > decimal) {
-                        hardv.put(itemOid, "This value exceeds required decimal=" + decimal);
+                        hardv.put(itemOid, "Value exceeds maximum number of decimal digits=" + decimal + ". Please ensure values do not exceed maximum decimal digits.");
                     }
                 } catch (Exception ee) {
                     // pass if blank, tbh
                     if (!"".equals(displayItemBean.getData().getValue())) {
-                        hardv.put(itemOid, "This value is not a real number.");
+                        hardv.put(itemOid, "Non-numeric value in numeric item. Please ensure numeric items only contain numbers.");
                     }
                 }
             }
@@ -1302,11 +1302,11 @@ public class ImportCRFDataService {
                     try {
                         Double d = new Double(displayItemBean.getData().getValue());
                         if (BigDecimal.valueOf(d).scale() > decimal) {
-                            hardv.put(itemOid, "This value exceeds required decimal=" + decimal);
+                            hardv.put(itemOid, "Value exceeds maximum number of decimal digits=" + decimal + ". Please ensure values do not exceed maximum decimal digits.");
                         }
                     } catch (Exception e) {
                         if (!"".equals(displayItemBean.getData().getValue())) {
-                            hardv.put(itemOid, "This value is not a real number.");
+                            hardv.put(itemOid, "Non-numeric value in numeric item. Please ensure numeric items only contain numbers.");
                         }
                     }
                 }
@@ -1327,7 +1327,7 @@ public class ImportCRFDataService {
                 if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                     // fail it here
                     logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
-                    hardv.put(itemOid, "This is not in the correct response set.");
+                    hardv.put(itemOid, "Value is not in the response set used by an item. Please ensure responses are included in the set referenced by an item.");
                     // throw new OpenClinicaException("One of your items did not
                     // have the correct response set. Please review Item OID "
                     // + displayItemBean.getItem().getOid() + " repeat key " +
@@ -1345,7 +1345,7 @@ public class ImportCRFDataService {
                 if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                     // fail it here? found an 0,1 in the place of a NULL
                     // logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
-                    hardv.put(itemOid, "This is not in the correct response set.");
+                    hardv.put(itemOid, "Value is not in the response set used by an item. Please ensure responses are included in the set referenced by an item.");
                 }
                 displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
                 // errors = v.validate();
@@ -1528,7 +1528,7 @@ public class ImportCRFDataService {
 	                               if (studyEvent == null || studyEvent.getId() == 0) {
 	                            	    if(studyEventDefintionBean.isRepeating()) {
 	                            	    	mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-		                                    Object[] arguments = { sedOid, oid };
+		                                    Object[] arguments = { sedOid, studySubjectBean.getLabel() };
 		                                    errors.add(mf.format(arguments));
 		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
 	                            	    }else {
@@ -1542,7 +1542,7 @@ public class ImportCRFDataService {
                             	}
                             } else if (studyEventDefintionBean == null) {
                                 mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-                                Object[] arguments = { sedOid, oid };
+                                Object[] arguments = { sedOid, studySubjectBean.getLabel() };
                                 errors.add(mf.format(arguments));
                                 logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
                             }

@@ -607,10 +607,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 if (!workflow.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED))
                     options.add(new Option(workflow.getDisplayValue(), workflow.getDisplayValue()));
             }
-            options.add(new Option(resterm.getString(LOCKED.toLowerCase()),resterm.getString(LOCKED.toLowerCase())));
-            options.add(new Option(resterm.getString(NOT_LOCKED.toLowerCase()),resterm.getString(NOT_LOCKED.toLowerCase())));
-            options.add(new Option(resterm.getString(SIGNED.toLowerCase()),resterm.getString(SIGNED.toLowerCase())));
-            options.add(new Option(resterm.getString(NOT_SIGNED.toLowerCase()),resterm.getString(NOT_SIGNED.toLowerCase())));
+            options.add(new Option(resterm.getString(SIGNED.toLowerCase()).toLowerCase(),resterm.getString(SIGNED.toLowerCase()).toLowerCase()));
+            options.add(new Option(resterm.getString(LOCKED.toLowerCase()).toLowerCase(),resterm.getString(LOCKED.toLowerCase()).toLowerCase()));
+            options.add(new Option(resterm.getString(NOT_SIGNED.toLowerCase()).toLowerCase(),resterm.getString(NOT_SIGNED.toLowerCase()).toLowerCase()));
+            options.add(new Option(resterm.getString(NOT_LOCKED.toLowerCase()).toLowerCase(),resterm.getString(NOT_LOCKED.toLowerCase()).toLowerCase()));
             return options;
         }
     }
@@ -984,10 +984,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
                     eventDiv.tdEnd().trEnd(0);
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                    eventDiv.tdEnd().trEnd(0);
+                    if (!studyEvents.get(0).isLocked()){
+                        eventDiv.tr(0).valign("top").close();
+                        eventDiv.td(0).styleClass("table_cell_left").close();
+                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                        eventDiv.tdEnd().trEnd(0);
+                    }
                 }
             } else if (studyEvents.get(0).isLocked()) {
                 eventDiv.tdEnd().trEnd(0);
@@ -996,12 +998,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                     eventDiv.tdEnd().trEnd(0);
-                    if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell_left").close();
-                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                        eventDiv.tdEnd().trEnd(0);
-                    }
                 }
             } else {
                 eventDiv.tr(0).valign("top").close();
@@ -1021,10 +1017,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                         eventDiv.td(0).styleClass("table_cell_left").close();
                         updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
                         eventDiv.tdEnd().trEnd(0);
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell_left").close();
-                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                        eventDiv.tdEnd().trEnd(0);
+                        if (!studyEvents.get(0).isLocked()) {
+                            eventDiv.tr(0).valign("top").close();
+                            eventDiv.td(0).styleClass("table_cell_left").close();
+                            removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                            eventDiv.tdEnd().trEnd(0);
+                        }
                     }
                 }
             }

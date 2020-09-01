@@ -53,14 +53,15 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
                     criteria += " and ";
                     criteria += " ( se.study_event_definition_id = " + property.substring(4);
-
-                    if (value.equals(resterm.getString(LOCKED.toLowerCase()))) {
+                    String status = value.toString();
+                    if (status.equalsIgnoreCase(resterm.getString(LOCKED.toLowerCase()))) {
                     criteria += " and se.locked = 'true' )";
-                } else if (value.equals(resterm.getString(NOT_LOCKED.toLowerCase()))) {
+                } else if (status.equalsIgnoreCase(resterm.getString(NOT_LOCKED.toLowerCase()))) {
                     criteria += " and (se.locked = 'false' or se.locked isNull) )";
-                } else if (value.equals(resterm.getString(SIGNED.toLowerCase()))) {
+                } else if (status.equalsIgnoreCase(resterm.getString(SIGNED.toLowerCase()))) {
+                    //Signed in UI is shown as Signed but the term.properties is signed
                     criteria += " and se.signed = 'true' )";
-                } else if (value.equals(resterm.getString(NOT_SIGNED.toLowerCase()))) {
+                } else if (status.equalsIgnoreCase(resterm.getString(NOT_SIGNED.toLowerCase()))) {
                     criteria += " and (se.signed = 'false' or se.signed isNull) )";
                 } else {
                     criteria += " and se.workflow_status = '" + value + "' )";

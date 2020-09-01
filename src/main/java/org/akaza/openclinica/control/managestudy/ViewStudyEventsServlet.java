@@ -142,10 +142,10 @@ public class ViewStudyEventsServlet extends SecureController {
                 statuses.add(statusEnum.getDisplayValue());
             }
         }
-        statuses.add(resterm.getString(LOCKED.toLowerCase()));
-        statuses.add(resterm.getString(NOT_LOCKED.toLowerCase()));
-        statuses.add(resterm.getString(SIGNED.toLowerCase()));
-        statuses.add(resterm.getString(NOT_SIGNED.toLowerCase()));
+        statuses.add(resterm.getString(SIGNED.toLowerCase()).toLowerCase());
+        statuses.add(resterm.getString(LOCKED.toLowerCase()).toLowerCase());
+        statuses.add(resterm.getString(NOT_SIGNED.toLowerCase()).toLowerCase());
+        statuses.add(resterm.getString(NOT_LOCKED.toLowerCase()).toLowerCase());
 
         request.setAttribute(STATUS_MAP, statuses);
 
@@ -463,10 +463,10 @@ public class ViewStudyEventsServlet extends SecureController {
             for (int i = 0; i < a.size(); i++) {
                 StudyEventBean se = (StudyEventBean) a.get(i);
 
-                if ((statusDisplayValue.equals(resterm.getString(LOCKED.toLowerCase())) && se.isLocked())
-                        || (statusDisplayValue.equals(resterm.getString(NOT_LOCKED.toLowerCase())) && !se.isLocked())
-                        || (statusDisplayValue.equals(resterm.getString(SIGNED.toLowerCase())) && se.isSigned())
-                        || (statusDisplayValue.equals(resterm.getString(NOT_SIGNED.toLowerCase())) && !se.isSigned())
+                if ((statusDisplayValue.equalsIgnoreCase(resterm.getString(LOCKED.toLowerCase())) && se.isLocked())
+                        || (statusDisplayValue.equalsIgnoreCase(resterm.getString(NOT_LOCKED.toLowerCase())) && !se.isLocked())
+                        || (statusDisplayValue.equalsIgnoreCase(resterm.getString(SIGNED.toLowerCase())) && se.isSigned())
+                        || (statusDisplayValue.equalsIgnoreCase(resterm.getString(NOT_SIGNED.toLowerCase())) && !se.isSigned())
                         || (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.getByI18nDescription(statusDisplayValue)))) {
                     b.add(se);
                 }
