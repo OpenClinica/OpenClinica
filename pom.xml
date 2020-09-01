@@ -997,8 +997,7 @@
         </testResources>
     </build>
     <scm>
-        <connection>scm:git:${git.url}</connection>
-        <developerConnection>scm:git:${git.url}</developerConnection>
+        <developerConnection>scm:git:https://github.com/OpenClinica/OpenClinica.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
