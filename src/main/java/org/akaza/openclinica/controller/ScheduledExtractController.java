@@ -1,10 +1,13 @@
 package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.util.ErrorConstants;
@@ -12,6 +15,8 @@ import core.org.akaza.openclinica.web.util.HeaderUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.controller.dto.ScheduledExtractJobDetailDTO;
+import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.service.ValidateServiceImpl;
 import org.apache.http.entity.ContentType;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.util.ArrayList;
@@ -44,6 +50,9 @@ public class ScheduledExtractController {
     private UtilService utilService;
 
     @Autowired
+    private ValidateService validateService;
+
+    @Autowired
     private StudyDao studyDao;
 
     @Autowired
@@ -57,15 +66,28 @@ public class ScheduledExtractController {
                     "Returns a list of job execution UUIDs and creation times for the job specified by the job UUID. " +
                     "A job execution UUID can be used to retrieve the file resulting from that job execution. Job UUIDs " +
                     "can be found on the “View Job” page in your OpenClinica. The job can be configured to keep up to 10 execution files. ")
-    @RequestMapping(value = "/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
-    public ResponseEntity<List<ScheduledExtractJobDetailDTO>> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("jobUuid") String jobUuid,
-                                                                                                              HttpServletRequest request,
-                                                                                                              HttpServletResponse response) throws SchedulerException {
-
+    @RequestMapping(value = "/studies/{studyOid}/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
+    public ResponseEntity<List<ScheduledExtractJobDetailDTO>> getScheduledExtractJobDatasetIdsAndCreationTime(
+            @PathVariable("studyOid") String studyOid,
+            @PathVariable("jobUuid") String jobUuid,
+            HttpServletRequest request,
+            HttpServletResponse response) throws SchedulerException {
+        utilService.setSchemaFromStudyOid(studyOid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
-                    "User must be type admin.")).body(null);
+                    "Insufficient privileges.")).body(null);
+        }
+
+        Study study = studyDao.findPublicStudy(studyOid);
+        if(study == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID,
+                    "No study found for StudyOId:" + studyOid + ".")).body(null);
+        }
+        List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+                    "Insufficient privileges.")).body(null);
         }
 
         ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid.trim());
@@ -77,7 +99,7 @@ public class ScheduledExtractController {
 
         List<ScheduledExtractJobDetailDTO> scheduledExtractJobDetailDTOList = new ArrayList<>();
         for (ArchivedDatasetFileBean adfb : archivedDatasetFileBeans) {
-            if (adfb.getStatus().equals(JobStatus.COMPLETED.name()) && !adfb.getFileReference().isEmpty())
+            if (adfb.getStatus().equals(JobStatus.COMPLETED.name()) && !adfb.getFileReference().isEmpty() && validateService.hasArchivedDatasetFileAccessPermission(studyOid, adfb, request))
                 scheduledExtractJobDetailDTOList.add(convertEntityToDTO(adfb));
         }
 
@@ -87,14 +109,30 @@ public class ScheduledExtractController {
 
     @ApiOperation(value = "To get extract file for a given job execution UUID", notes = "Requires authentication and permission to access the dataset " +
             "extracted by the job. Retrieves the dataset file produced by the job execution determined by UUID.")
-    @RequestMapping(value = "/extractJobs/jobExecutions/{jobExecutionUuid}/dataset", method = RequestMethod.GET)
+    @RequestMapping(value = "studies/{studyOid}/extractJobs/jobExecutions/{jobExecutionUuid}/dataset", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<Object> getScheduledExtract(@PathVariable("jobExecutionUuid") String jobExecutionUuid,
-                                               HttpServletRequest request,
-                                               HttpServletResponse response) throws Exception {
+    ResponseEntity<Object> getScheduledExtract(
+            @PathVariable("studyOid") String studyOid,
+            @PathVariable("jobExecutionUuid") String jobExecutionUuid,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        utilService.setSchemaFromStudyOid(studyOid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
-            String errorMessage = errorHelper("User must be type admin.", response);
+            String errorMessage = errorHelper("Insufficient privileges.", response);
+            return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
+        }
+
+
+        Study study = studyDao.findPublicStudy(studyOid);
+        if(study == null){
+            String errorMessage = errorHelper("No study found for StudyOId:" +  studyOid + ".", response);
+            return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+        }
+
+        List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
+            String errorMessage = errorHelper("Insufficient privileges.", response);
             return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
@@ -102,6 +140,11 @@ public class ScheduledExtractController {
         if (extract.getId() == 0) {
             String errorMessage = errorHelper("Job execution id " + jobExecutionUuid + " is invalid.", response);
             return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+        }
+
+        if (!validateService.hasArchivedDatasetFileAccessPermission(studyOid, extract, request)) {
+            String errorMessage = errorHelper("Insufficient privileges.", response);
+            return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
         String filePath = extract.getFileReference();
@@ -134,5 +177,5 @@ public class ScheduledExtractController {
         scheduledExtractJobDetailDTO.setJobExecutionUuid(archivedDatasetFileBean.getJobExecutionUuid());
         return scheduledExtractJobDetailDTO;
     }
-
 }
+
