@@ -1,8 +1,10 @@
 package core.org.akaza.openclinica.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import core.org.akaza.openclinica.service.modules.ModuleProcessor;
+import core.org.akaza.openclinica.service.modules.ParticipateService;
+import core.org.akaza.openclinica.service.modules.StudyCalendarService;
 import net.sf.json.util.JSONUtils;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -24,7 +26,6 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyUserRole;
 import core.org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
@@ -49,9 +50,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * Created by yogi on 11/10/16.
@@ -79,9 +79,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Autowired
     private RandomizationService randomizationService;
-
     @Autowired
     private ParticipateService participateService;
+    @Autowired
+    private StudyCalendarService studyCalendarService;
 
     @Autowired
     private RestfulServiceHelper serviceHelper;
@@ -450,9 +451,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }
 
-    private void processSingleModule(Study study, List<ModuleConfigDTO> moduleConfigDTOs, ModuleProcessor.Modules module, String accessToken) {
-        String moduleEnabled = isModuleEnabled(moduleConfigDTOs, study, module);
+    public void processSingleModule(Study study, List<ModuleConfigDTO> moduleConfigDTOs, ModuleProcessor.Modules module) {
         ModuleProcessor moduleProcessor = null;
+        logger.info("Processing single module: " + module.name());
+        for (ModuleConfigDTO mod : moduleConfigDTOs){
+            logger.info("modConfig: " + mod.toString());
+        }
         switch(module) {
             case PARTICIPATE:
                 moduleProcessor = participateService;
@@ -460,43 +464,42 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             case RANDOMIZE:
                 moduleProcessor = randomizationService;
                 break;
+            case STUDY_CALENDAR:
+                moduleProcessor = studyCalendarService;
+                break;
             default:
                 break;
         }
         if (moduleProcessor != null)
-            moduleProcessor.processModule(study, moduleEnabled, accessToken);
+            moduleProcessor.processModuleConfig(moduleConfigDTOs, study);
     }
 
-    public void processModule(String accessToken, Study study, ModuleProcessor.Modules module) {
-        study =getModuleStudy(study.getOc_oid());
-        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
-        processSingleModule(study, moduleConfigDTOs, module, accessToken);
+    public void processModules(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
+        logger.info("Processing: " + study.getName() + " : " + study.getStudyUuid() + " : " + study.getStudyEnvUuid() + " : " + study.getSchemaName());
+        study = getModuleStudy(study.getOc_oid());
+        logger.info("Processing: " + study.getName() + " : " + study.getStudyUuid() + " : " + study.getStudyEnvUuid() + " : " + study.getSchemaName());
+        logger.info("Request schema is currently: " + CoreResources.getRequestSchema());
+
+        logger.info("Processing modules... ");
+        for (ModuleConfigDTO mod : moduleConfigDTOs){
+            logger.info("modConfig: " + mod.toString());
+        }
+        for (ModuleProcessor.Modules module : ModuleProcessor.Modules.values()){
+            logger.info("module.name(): " + module.name());
+            List<ModuleConfigDTO> specificModuleConfigDTOs = moduleConfigDTOs.stream().
+                    filter(moduleType -> moduleType.getModuleName().equalsIgnoreCase(module.name())).
+                    collect(Collectors.toList());
+            processSingleModule(study, specificModuleConfigDTOs, module);
+        }
     }
 
     private Study getModuleStudy(String studyOid) {
-        utilService.setSchemaFromStudyOid(studyOid);
+        logger.info("Request schema is currently: " + CoreResources.getRequestSchema());
         Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() != null)
             study = study.getStudy();
         return study;
     }
-
-    public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
-        if(moduleConfigDTOs!= null) {
-            for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
-                if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(module.name())) {
-                    core.org.akaza.openclinica.domain.enumsupport.ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
-                    if (moduleStatus.name().equalsIgnoreCase(ModuleProcessor.ModuleStatus.ACTIVE.name())) {
-                        logger.info("Module Status is Enabled");
-                        return ModuleProcessor.ModuleStatus.ENABLED.getValue();
-                    }
-                }
-            }
-        }
-        logger.info("Module Status is Disabled");
-        return ModuleProcessor.ModuleStatus.DISABLED.getValue();
-    }
-
 
     public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
         if(moduleConfigDTOs != null) {
@@ -579,6 +582,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
+        logger.info("URL: " + uri);
+        logger.info("Token: " + accessToken);
         ResponseEntity<StudyEnvironmentDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentDTO.class);
         return response.getBody();
     }
@@ -733,7 +738,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
 
-        logger.info("GET " + uri);
         ResponseEntity<StudyBuildDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyBuildDTO.class);
 
         return response.getBody().getCurrentBoardUrl();

@@ -97,10 +97,12 @@ public class ModuleConfigDTO extends AbstractAuditingDTO implements Serializable
     @Override
     public String toString() {
         return "ModuleConfigDTO{" +
-                ", uuid='" + uuid + "'" +
-                ", status='" + status + "'" +
-                ", studyUuid='" + studyUuid + "'" +
-                ", moduleUuid='" + moduleUuid + "'" +
+                "uuid='" + uuid + '\'' +
+                ", status=" + status +
+                ", studyUuid='" + studyUuid + '\'' +
+                ", moduleUuid='" + moduleUuid + '\'' +
+                ", moduleName='" + moduleName + '\'' +
+                ", attributes=" + attributes +
                 '}';
     }
 }

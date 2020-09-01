@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.CustomRuntimeException;
@@ -16,6 +17,7 @@ import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -146,8 +148,8 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isParticipateActive(Study tenantStudy) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        String participateFormStatus = spvdao.findByHandleAndStudy(tenantStudy.getStudy() != null ? tenantStudy.getStudy().getStudyId() : tenantStudy.getStudyId(), "participantPortal").getValue();
-        if (participateFormStatus.equals(ENABLED))
+        String participateFormStatus = spvdao.findByHandleAndStudy(tenantStudy.getStudy() != null ? tenantStudy.getStudy().getStudyId() : tenantStudy.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
+        if (ModuleStatus.isActive(participateFormStatus))
             return true;
         return false;
     }

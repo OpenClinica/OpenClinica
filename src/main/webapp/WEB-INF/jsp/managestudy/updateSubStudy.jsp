@@ -264,7 +264,7 @@ function updateThis(multiSelEle, count) {
 		</tr>
 
    <c:choose>
-    <c:when test="${participateFormStatus == 'enabled' && edc.participantForm == true}">
+    <c:when test="${participateFormStatus == 'ACTIVE' && edc.participantForm == true}">
 
 				<tr valign="top">		
         <td class="table_cell" colspan="2">
@@ -281,7 +281,7 @@ function updateThis(multiSelEle, count) {
          </c:when>  
  </c:choose>
    <c:choose>
-    <c:when test="${participateFormStatus == 'enabled' && edc.participantForm == true && edc.allowAnonymousSubmission == true}">
+    <c:when test="${participateFormStatus == 'ACTIVE' && edc.participantForm == true && edc.allowAnonymousSubmission == true}">
     
         <td class="table_cell" colspan="2">
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:

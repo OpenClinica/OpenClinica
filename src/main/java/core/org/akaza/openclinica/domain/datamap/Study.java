@@ -19,6 +19,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.config.StudyParamNames;
 import org.hibernate.annotations.GenericGenerator;
@@ -1246,12 +1247,12 @@ public class Study extends DataMapDomainObject {
     }
 
     @Transient
-    public String getParticipantPortal() {
-        return getIndividualStudyParameterValueOutput(StudyParamNames.PARTICIPANT_PORTAL);
+    public String getParticipateStatus() {
+        return getIndividualStudyParameterValueOutput(StudyParamNames.PARTICIPATE);
     }
 
-    public void setParticipantPortal(String participantPortal) {
-        setIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_PORTAL, participantPortal);
+    public void setParticipateStatus(ModuleStatus moduleStatus) {
+        setIndividualStudyParameterValue(StudyParamNames.PARTICIPATE, moduleStatus.name());
 
     }
 

@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.admin;
 
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataUtil;
@@ -62,7 +63,7 @@ public class ViewStudyServlet extends SecureController {
             }
 
             String viewFullRecords = fp.getString("viewFull");
-            study.setParticipantPortal("enabled");
+            study.setParticipateStatus(ModuleStatus.ACTIVE);
 
             request.setAttribute("studyToView", study);
             if ("yes".equalsIgnoreCase(viewFullRecords)) {

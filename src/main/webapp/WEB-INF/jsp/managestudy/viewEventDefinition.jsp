@@ -111,7 +111,7 @@
      <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>     
    
     <c:choose>
-    <c:when test="${participateFormStatus == 'enabled'}">
+    <c:when test="${participateFormStatus == 'ACTIVE'}">
      <td valign="top" class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>     
      <td valign="top" class="table_header_row"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/></td>     
      <td valign="top" class="table_header_row"><fmt:message key="submission_url" bundle="${resword}"/></td>     
@@ -199,7 +199,7 @@
    </td>
 
   <c:choose>
-    <c:when test="${participateFormStatus == 'enabled'}">
+    <c:when test="${participateFormStatus == 'ACTIVE'}">
       <td class="table_cell">
         <c:choose>
           <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>

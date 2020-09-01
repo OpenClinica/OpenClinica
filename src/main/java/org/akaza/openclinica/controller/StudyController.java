@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.service.modules.ModuleProcessor;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -34,10 +35,7 @@ import core.org.akaza.openclinica.bean.login.UserRole;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.controller.dto.ParticipantIdModel;
-import org.akaza.openclinica.controller.dto.ParticipantIdVariable;
-import org.akaza.openclinica.controller.dto.SiteStatusDTO;
-import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
+import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
@@ -292,7 +290,23 @@ public class StudyController {
             studyEnvStatusDTO.getSiteStatuses().add(siteStatusDTO);
         }
 
-        return  new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
+        return new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{studyUuid}/moduleConfig", method = RequestMethod.PUT)
+    public ResponseEntity<Object> updateStudyParameterValue(
+            @RequestBody List<ModuleConfigDTO> moduleConfigDTOs,
+            @PathVariable("studyUuid") String studyUuid,
+            HttpServletRequest request) {
+
+        String moduleName = moduleConfigDTOs.stream().findFirst().get().getModuleName();
+        // We need to update the values for both the test and prod schema.
+        List<Study> studies = studyDao.findAllByStudyUuid(studyUuid);
+        for (Study study : studies){
+            studyBuildService.processSingleModule(study, moduleConfigDTOs, ModuleProcessor.Modules.valueOf(moduleName));
+        }
+
+        return null;
     }
 
     private List<StudyParameterValue> processStudyParameterValues(StudyBuildDTO dto, ArrayList<ErrorObj> errorObjects , String templateID) {
@@ -383,7 +397,7 @@ public class StudyController {
         StudyParameter parameter = studyParameterDao.findByHandle(handle);
         spv.setStudyParameter(parameter);
         spv.setValue(parameterValue);
-        return  spv;
+        return spv;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)

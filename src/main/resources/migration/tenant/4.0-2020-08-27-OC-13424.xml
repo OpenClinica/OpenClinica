@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="jmcinerney" id="2020-08-27-OC-13424-01">
+        <comment>Updating the participantPortal record in the study parameter and study parameter value table.</comment>
+        <sql>
+            ALTER TABLE study_parameter_value DROP CONSTRAINT study_param_value_param_fkey;
+
+            update study_parameter set handle = 'participate' where study_parameter_id = 17;
+            update study_parameter set name = 'participate' where study_parameter_id = 17;
+            update study_parameter set description = 'Tracks status of the Participate module status.' where study_parameter_id = 17;
+            update study_parameter set default_value = 'INACTIVE' where study_parameter_id = 17;
+
+            update study_parameter_value set parameter = 'participate' where parameter = 'participantPortal';
+            update study_parameter_value set value = 'ACTIVE' where parameter = 'participate' and value = 'enabled';
+            update study_parameter_value set value = 'INACTIVE' where parameter = 'participate' and value = 'disabled';
+
+            ALTER TABLE study_parameter_value ADD CONSTRAINT study_param_value_param_fkey FOREIGN KEY (parameter) REFERENCES study_parameter (handle) ON UPDATE RESTRICT ON DELETE RESTRICT;
+        </sql>
+    </changeSet>
+
+    <changeSet author="jmcinerney" id="2020-08-27-OC-13424-02">
+        <comment>Updating the randomization record in the study parameter and study parameter value table.</comment>
+        <sql>
+            ALTER TABLE study_parameter_value DROP CONSTRAINT study_param_value_param_fkey;
+
+            update study_parameter set handle = 'randomize' where study_parameter_id = 18;
+            update study_parameter set name = 'randomize' where study_parameter_id = 18;
+            update study_parameter set description = 'Tracks status of the Randomize module status.' where study_parameter_id = 18;
+            update study_parameter set default_value = 'INACTIVE' where study_parameter_id = 18;
+
+            update study_parameter_value set parameter = 'randomize' where parameter = 'randomization';
+            update study_parameter_value set value = 'ACTIVE' where parameter = 'randomize' and value = 'enabled';
+            update study_parameter_value set value = 'INACTIVE' where parameter = 'randomize' and value = 'disabled';
+
+            ALTER TABLE study_parameter_value ADD CONSTRAINT study_param_value_param_fkey FOREIGN KEY (parameter) REFERENCES study_parameter (handle) ON UPDATE RESTRICT ON DELETE RESTRICT;
+        </sql>
+    </changeSet>
+
+    <changeSet author="jmcinerney" id="2020-08-27-OC-13424-03">
+        <comment>Insert the Participate access link as a row in the study parameter table.</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="22"/>
+            <column name="handle" value="participateAccessLink"/>
+            <column name="name" value="participateAccessLink"/>
+            <column name="description" value="Access link URL for Participate."/>
+            <column name="default_value" value=""/>
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="jmcinerney" id="2020-08-27-OC-13424-04">
+        <comment>Insert the study calendar module status as a row in the study parameter table.</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="23"/>
+            <column name="handle" value="studyCalendar"/>
+            <column name="name" value="studyCalendar"/>
+            <column name="description" value="Tracks status of the Study Calendar module status."/>
+            <column name="default_value" value="INACTIVE"/>
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="jmcinerney" id="2020-08-27-OC-13424-05">
+        <comment>Insert the insight module status as a row in the study parameter table.</comment>
+        <insert tableName="study_parameter">
+            <column name="study_parameter_id" valueNumeric="24"/>
+            <column name="handle" value="insight"/>
+            <column name="name" value="insight"/>
+            <column name="description" value="Tracks status of the Insight module status."/>
+            <column name="default_value" value="INACTIVE"/>
+            <column name="inheritable" valueBoolean="true"/>
+            <column name="overridable" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

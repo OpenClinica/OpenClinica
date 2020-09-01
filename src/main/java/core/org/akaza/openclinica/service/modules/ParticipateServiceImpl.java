@@ -1,4 +1,4 @@
-package core.org.akaza.openclinica.service;
+package core.org.akaza.openclinica.service.modules;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -16,15 +16,20 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
+import core.org.akaza.openclinica.service.ParticipantEventService;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
-import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.config.StudyParamNames;
+import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
+import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -46,6 +51,8 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.*;
+
+import static org.akaza.openclinica.service.UserServiceImpl.ACCESS_LINK;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -89,6 +96,10 @@ public class ParticipateServiceImpl implements ParticipateService {
     private StudyBuildService studyBuildService;
     @Autowired
     private EventCRFDAO eventCRFDAO;
+    @Autowired
+    StudyParameterValueDAO studyParameterValueDAO;
+    @Autowired
+    StudyParameterValueDao studyParameterValueDao;
 
     @Autowired
     private XformParserHelper xformParserHelper;
@@ -385,19 +396,15 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     }
 
-
-
-
     public boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
         Study study = getStudy(studyOid);
         Study pStudy = getParentStudy(studyOid);
 
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(pStudy.getStudyId(), "participantPortal");
-        String participateStatus = pStatus.getValue().toString();
+        StudyParameterValueBean participateStatusParameter = studyParameterValueDAO.findByHandleAndStudy(pStudy.getStudyId(), StudyParamNames.PARTICIPATE);
+        String participateStatus = participateStatusParameter.getValue();
 
-        if( participateStatus.equals(ModuleProcessor.ModuleStatus.ENABLED.getValue()) && study.getStatus().isAvailable()){
+        if(participateStatus.equals(ModuleStatus.ACTIVE.name()) && study.getStatus().isAvailable()){
             accessPermission = true;
         }
         return accessPermission;
@@ -452,23 +459,62 @@ public class ParticipateServiceImpl implements ParticipateService {
             studyEventDao.saveOrUpdateTransactional(container);
         }
 
-
     }
 
     @Override
-    public void processModule(Study study, String isModuleEnabled, String accessToken) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        String statusValue = isModuleEnabled;
-        if (!spv.isActive()) {
-            spv = new StudyParameterValueBean();
-            spv.setStudyId(study.getStudyId());
-            spv.setParameter("participantPortal");
-            spv.setValue(statusValue);
-            spvdao.create(spv);
-        } else if (spv.isActive() && !spv.getValue().equals(statusValue)) {
-            spv.setValue(statusValue);
-            spvdao.update(spv);
+    public void processModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
+        Optional<ModuleConfigDTO> participateModuleConfig = moduleConfigDTOs.stream().findFirst();
+        logger.info("Request schema is currently: " + CoreResources.getRequestSchema());
+        //CoreResources.setRequestSchema(study.getSchemaName());
+        logger.info("Request schema is currently: " + CoreResources.getRequestSchema() + " : was set to : " + study.getSchemaName());
+
+        if (participateModuleConfig.isPresent()){
+            updateParticipateStatus(participateModuleConfig.get(), study);
+            updateParticipateAccessLink(participateModuleConfig.get(), study);
         }
+    }
+
+    private void updateParticipateStatus(ModuleConfigDTO participateModuleConfig, Study study) {
+
+        StudyParameterValueBean participateStudyParameterValue = studyParameterValueDAO.findByHandleAndStudy(study.getStudyId(), StudyParamNames.PARTICIPATE);
+        String moduleStatus = participateModuleConfig.getStatus().name();
+
+        if (!participateStudyParameterValue.isActive()) {
+            participateStudyParameterValue = new StudyParameterValueBean();
+            participateStudyParameterValue.setStudyId(study.getStudyId());
+            participateStudyParameterValue.setParameter(StudyParamNames.PARTICIPATE);
+            participateStudyParameterValue.setValue(moduleStatus);
+            studyParameterValueDAO.create(participateStudyParameterValue);
+        } else if (participateStudyParameterValue.isActive() && !participateStudyParameterValue.getValue().equals(moduleStatus)) {
+            participateStudyParameterValue.setValue(moduleStatus);
+            studyParameterValueDAO.update(participateStudyParameterValue);
+        }
+    }
+
+    private void updateParticipateAccessLink(ModuleConfigDTO participateModuleConfig, Study study) {
+        StudyParameterValueBean accessLinkParameterValue = studyParameterValueDAO.findByHandleAndStudy(study.getStudyId(), StudyParamNames.PARTICIPATE_ACCESS_LINK);
+        String accessLink = getAccessLinkFromModuleConfigAttribute(participateModuleConfig.getAttributes(), study.getStudyEnvUuid());
+
+        if (!accessLinkParameterValue.isActive()) {
+            accessLinkParameterValue = new StudyParameterValueBean();
+            accessLinkParameterValue.setStudyId(study.getStudyId());
+            accessLinkParameterValue.setParameter(StudyParamNames.PARTICIPATE_ACCESS_LINK);
+            accessLinkParameterValue.setValue(accessLink);
+            studyParameterValueDAO.create(accessLinkParameterValue);
+        } else if (accessLinkParameterValue.isActive() && !accessLinkParameterValue.getValue().equals(accessLink)) {
+            accessLinkParameterValue.setValue(accessLink);
+            studyParameterValueDAO.update(accessLinkParameterValue);
+        }
+    }
+
+    public String getAccessLinkFromModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, String studyEnvUuid) {
+        for (ModuleConfigAttributeDTO moduleConfigAttributeDTO : moduleConfigAttributeDTOs) {
+            if (moduleConfigAttributeDTO.getStudyEnvironmentUuid().equals(studyEnvUuid) && moduleConfigAttributeDTO.getKey().equals(ACCESS_LINK)) {
+                logger.info("ModuleConfigAttributeDTO  is :" + moduleConfigAttributeDTO);
+                return moduleConfigAttributeDTO.getValue();
+            }
+        }
+        logger.info("ModuleConfigAttributeDTO  is null");
+        return null;
     }
 }

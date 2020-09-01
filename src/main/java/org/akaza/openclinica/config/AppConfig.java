@@ -54,8 +54,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Autowired
     private KeycloakClientImpl keycloakClient;
-    @Autowired
-    private RandomizationService randomizationService;
+
     @Autowired
     private CoreUtilServiceImpl coreUtilService;
     @Autowired
@@ -70,14 +69,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
     }
-/*
-    @Override
-    protected AuthenticationEntryPoint authenticationEntryPoint() throws Exception {
-        KeycloakAuthenticationEntryPoint authenticationEntryPoint = new KeycloakAuthenticationEntryPoint(this.adapterDeploymentContext());
-        authenticationEntryPoint.setLoginUri("/pages/ocLogin");
-        return authenticationEntryPoint;
-    }
-*/
 
     @Bean
     @Override
@@ -89,35 +80,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         return multipartResolver;
-    }
-
-    /***
-     * Bean to initialize Randomize configuration at RT startup.
-     * This callback variant is somewhat similar to ContextRefreshedEvent but doesn't require an implementation of ApplicationListener,
-     * with no need to filter context references across a context hierarchy etc.
-     * It also implies a more minimal dependency on just the beans package and is being honored by standalone ListableBeanFactory implementations,
-     * not just in an ApplicationContext environment.
-     * @return
-     */
-    @Bean
-    public SmartInitializingSingleton loadRandomizeConfigurations() {
-        return () -> {
-            logger.info("Calling Randomize service to initialize configuration.");
-            Map<String, String> configMap = new HashMap<>();
-            String accessToken = keycloakClient.getSystemToken();
-            boolean isSuccess = false;
-            try {
-                isSuccess = randomizationService.refreshConfigurations(accessToken, configMap);
-            } catch (Exception e) {
-                // Since this run at the startup, we need to catch the exception and log it. If we don't do this, it will prevent RT from starting
-                logger.error("Refresh configuration failed:" + e);
-            }
-            if (isSuccess || configMap.size() > 0)
-                logger.info("Initialized Randomize configuration with " + configMap.size() + " entries.");
-            else {
-                logger.error("No studies configured or Randomize  startup configuration failed.");
-            }
-        };
     }
 
     @Bean

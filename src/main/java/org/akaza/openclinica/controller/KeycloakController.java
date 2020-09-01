@@ -7,7 +7,6 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.CallbackService;
 import core.org.akaza.openclinica.service.KeycloakUser;
 import core.org.akaza.openclinica.service.StudyBuildService;
-import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
@@ -161,11 +160,6 @@ public class KeycloakController {
                 if(studyEnvUuid != null)
                     publicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
             }
-            if(publicStudy != null) {
-                String accessToken = (String) req.getSession().getAttribute("accessToken");
-                studyBuildService.processModule(accessToken, publicStudy, ModuleProcessor.Modules.PARTICIPATE);
-            }
-
         } else {
             logger.error("UserAccountBean ub is null");
 

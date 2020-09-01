@@ -17,6 +17,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.form.StringUtil;
@@ -103,12 +105,12 @@ public class ViewSiteServlet extends SecureController {
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-            request.setAttribute("participateFormStatus", participateFormStatus);
-            if (participateFormStatus.equals("enabled"))
-                baseUrl();
 
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
             request.setAttribute("participateFormStatus", participateFormStatus);
+            if (ModuleStatus.isActive(participateFormStatus)) {
+                baseUrl();
+            }
 
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId,

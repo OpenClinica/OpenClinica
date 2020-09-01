@@ -45,6 +45,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.pmanage.Authorization;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1118,56 +1119,16 @@ public class SystemController {
 		return sBeans;
 	}
 
-	public StudyParameterValueBean getParticipateMod(Study studyBean, String value) {
+	public String getParticipateStatus(Study studyBean) {
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getStudyId(), value);
-		return pStatus;
-	}
-
-	public void getRandomizeMod() {
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-
+		return spvdao.findByHandleAndStudy(studyBean.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
 	}
 
 	@Deprecated
 	public HashMap<String, Object> getParticipateModule(Study studyBean) {
-		String portalURL = CoreResources.getField("portalURL");
-		StudyParameterValueBean spvBean = getParticipateMod(studyBean, "participantPortal");
-		String ocParticipateStatus = "";
-		if (spvBean.isActive()) {
-			ocParticipateStatus = spvBean.getValue().toString(); // enabled , disabled
-		}
-		String ocuiParticipateStatus = "";
-		ParticipantPortalRegistrar participantPortalRegistrar = new ParticipantPortalRegistrar();
-		if (ocParticipateStatus.equals("enabled")) {
-			try {
-				ocuiParticipateStatus = participantPortalRegistrar.getRegistrationStatus(studyBean.getOc_oid());
-			} catch (Exception e) {
-				logger.error("Error while accessing participant portal resigtrar: ",e);
-			}
-		}
-
-		HashMap<String, String> mapMetadata = new HashMap<>();
-
-		String url = "";
-		URL pManageUrl = null;
-		try {
-			pManageUrl = new URL(portalURL);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			logger.error("Portal Url is not correct: ",e);
-		}
-		Authorization pManageAuthorization = participantPortalRegistrar.getAuthorization(studyBean.getOc_oid());
-		if (pManageAuthorization != null) {
-			url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-					+ ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-			mapMetadata.put("Participate Url", url);
-		}
 
 		HashMap<String, Object> mapParticipate = new HashMap<>();
-		mapParticipate.put("enabled", ocParticipateStatus.equals("enabled") ? "True" : "False");
-		mapParticipate.put("status", ocuiParticipateStatus.equals("") ? "INACTIVE" : ocuiParticipateStatus);
-		mapParticipate.put("metadata", mapMetadata);
+		mapParticipate.put("status", "INACTIVE");
 
 		HashMap<String, Object> mapModule = new HashMap<>();
 		mapModule.put("Participate", mapParticipate);

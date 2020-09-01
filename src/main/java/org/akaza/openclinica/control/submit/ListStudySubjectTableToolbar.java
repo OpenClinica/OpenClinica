@@ -26,7 +26,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final boolean addSubjectLinkShow;
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
-    private String participateModuleStatus;
+    private boolean participateIsEnabled;
     private final String ENABLED = "enabled";
     private ViewStudySubjectService viewStudySubjectService;
     private PermissionService permissionService;
@@ -34,17 +34,17 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
     private HttpServletRequest request;
 
     public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
-                                        boolean addSubjectLinkShow, boolean showMoreLink , String participateModuleStatus, ViewStudySubjectService viewStudySubjectService, PermissionService permissionService, Study studyBean, HttpServletRequest request) {
+                                        boolean addSubjectLinkShow, boolean showMoreLink , boolean participateIsEnabled, ViewStudySubjectService viewStudySubjectService, PermissionService permissionService, Study studyBean, HttpServletRequest request) {
         super();
         this.studyEventDefinitions = studyEventDefinitions;
         this.studyGroupClasses = studyGroupClasses;
         this.addSubjectLinkShow = addSubjectLinkShow;
         this.showMoreLink = showMoreLink;
-        this.participateModuleStatus=participateModuleStatus;
-        this.viewStudySubjectService=viewStudySubjectService;
-        this.permissionService=permissionService;
-        this.studyBean=studyBean;
-        this.request=request;
+        this.participateIsEnabled = participateIsEnabled;
+        this.viewStudySubjectService = viewStudySubjectService;
+        this.permissionService = permissionService;
+        this.studyBean = studyBean;
+        this.request = request;
     }
 
     @Override
@@ -129,7 +129,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
             }
 
             String result = String.valueOf(1) + "," + String.valueOf(itemsColumnCount+2)+ "," + String.valueOf(itemsColumnCount+3);
-            if (participateModuleStatus.equals(ENABLED))
+            if (participateIsEnabled)
                 result = result + "," + String.valueOf(itemsColumnCount+4);
 
             return result;

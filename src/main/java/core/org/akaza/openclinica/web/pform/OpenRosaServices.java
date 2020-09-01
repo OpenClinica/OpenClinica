@@ -962,26 +962,6 @@ public class OpenRosaServices {
         return writer;
     }
 
-    private boolean mayProceedSubmission(String studyOid, StudySubjectBean ssBean) throws Exception {
-        boolean accessPermission = false;
-        Study study = getParentPublicStudy(studyOid);
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
-        // PENDING ,
-        // INACTIVE
-        String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-        String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
-        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
-                + "  studySubjectStatus: " + ssBean.getStatus().getName());
-        if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")
-                && ssBean.getStatus() == Status.AVAILABLE) {
-            accessPermission = true;
-        }
-        return accessPermission;
-    }
-
     private boolean mayProceedPreview(HttpServletRequest request, String studyOid) throws Exception {
         boolean accessPermission = false;
         Study study = getParentPublicStudy(studyOid);

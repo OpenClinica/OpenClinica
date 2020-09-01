@@ -22,8 +22,10 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -133,16 +135,16 @@ public class InitUpdateSubStudyServlet extends SecureController {
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         seds = sedDao.findAllByStudy(parentStudy);
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
-            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-            if (participateFormStatus.equals("enabled"))
+            String participateStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
+            if (ModuleStatus.isActive(participateStatus)){
                 baseUrl();
-            request.setAttribute("participateFormStatus", participateFormStatus);
+            }
+            request.setAttribute("participateFormStatus", participateStatus);
 
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId,

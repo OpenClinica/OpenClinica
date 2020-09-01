@@ -1,7 +1,7 @@
 /**
  * 
  */
-package core.org.akaza.openclinica.service;
+package core.org.akaza.openclinica.service.modules;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -9,7 +9,7 @@ import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
-import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
+import core.org.akaza.openclinica.service.modules.ModuleProcessor;
 import org.cdisc.ns.odm.v130.ODM;
 
 import java.util.List;

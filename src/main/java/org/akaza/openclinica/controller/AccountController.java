@@ -10,6 +10,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import core.org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
@@ -903,14 +905,14 @@ public class AccountController {
 		Study siteStudy = getStudy(studyOid);
 		Study study = getParentStudy(studyOid);
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+		StudyParameterValueBean participateStatus = spvdao.findByHandleAndStudy(study.getStudyId(), StudyParamNames.PARTICIPATE);
 		participantPortalRegistrar = new ParticipantPortalRegistrar();
 		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOc_oid()).toString(); // ACTIVE , PENDING , INACTIVE
-		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		String participateStatusString = participateStatus.getValue().toString(); // enabled , disabled
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
 		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
 		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
-		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+		if (ModuleStatus.isActive(participateStatusString) && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
 			accessPermission = true;
 		}
 

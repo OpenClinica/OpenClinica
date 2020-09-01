@@ -20,11 +20,17 @@ public class StudyParamNames {
     public static final String EVENT_LOCATION_REQUIRED = "eventLocationRequired";
     public static final String SECONDARY_LABEL_VIEWABLE = "secondaryLabelViewable";
     public static final String ADMIN_FORCED_REASON_FOR_CHANGE = "adminForcedReasonForChange";
-    public static final String PARTICIPANT_PORTAL = "participantPortal";
-    public static final String RANDOMIZATION = "randomization";
     public static final String ENFORCE_ENROLLMENT_CAP = "enforceEnrollmentCap";
     public static final String PARTICIPANT_ID_TEMPLATE = "participantIdTemplate";
     public static final String CONTACTS_MODULE = "contactsModule";
+    public static final String STUDY_CALENDAR = "studyCalendar";
+    // The Randomize parameter was formerly "randomization".
+    public static final String RANDOMIZATION = "randomize";
+    // The Participate parameter was formerly "participantPortal".
+    public static final String PARTICIPATE = "participate";
+    public static final String PARTICIPATE_ACCESS_LINK = "participateAccessLink";
+    // 2020-08, currently we do not read the Insight parameter, adding for potential future use.
+    public static final String INSIGHT = "insight";
 
     private static final Map<String, String> defaultValuesMap = new HashMap<String, String>();
     static {
@@ -44,10 +50,12 @@ public class StudyParamNames {
         defaultValuesMap.put(EVENT_LOCATION_REQUIRED, "not_used");
         defaultValuesMap.put(SECONDARY_LABEL_VIEWABLE, "false");
         defaultValuesMap.put(ADMIN_FORCED_REASON_FOR_CHANGE, "true");
-        defaultValuesMap.put(PARTICIPANT_PORTAL, "disabled");
-        defaultValuesMap.put(RANDOMIZATION, "disabled");
         defaultValuesMap.put(ENFORCE_ENROLLMENT_CAP, "false");
         defaultValuesMap.put(PARTICIPANT_ID_TEMPLATE, "");
+        defaultValuesMap.put(STUDY_CALENDAR, "disabled");
+        defaultValuesMap.put(RANDOMIZATION, "disabled");
+        defaultValuesMap.put(PARTICIPATE, "disabled");
+        defaultValuesMap.put(INSIGHT, "disabled");
     }
 
     public static String getDefaultValues(String name){

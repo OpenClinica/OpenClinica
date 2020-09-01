@@ -31,7 +31,6 @@ import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
@@ -54,10 +53,6 @@ import org.akaza.openclinica.view.StudyInfoPanelLine;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.quartz.JobKey;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +80,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
@@ -1382,22 +1376,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected String getParticipateStatus(Study parentStudy) {
 
-        String participateStatus = parentStudy.getParticipantPortal();
+        String participateStatus = parentStudy.getParticipateStatus();
         return participateStatus;
     }
 
     protected UserService getUserService() {
         return userService = (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
-    }
-
-    protected void changeParticipantAccountStatus(Study study, StudySubjectBean studySub, UserStatus userStatus) {
-        // check if particiate module enabled
-        Study parentStudy = (study.isSite()) ? study.getStudy() : study;
-        String participateStatus = getParticipateStatus(parentStudy);
-        if (participateStatus.equals(ENABLED) && studySub.getUserId() != 0) {
-            studySub.setUserStatus(userStatus);
-            studySubjectDAO.update(studySub);
-        }
     }
 
     public static void refreshUserRole(HttpServletRequest req, UserAccountBean ub, Study currentPublicStudy) {
@@ -1487,7 +1471,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected void getCurrentBoardUrl(Study study, HttpSession session) {
-        String boardUrl = study.getBoardUrl();
+        String boardUrl = study.isSite() ? study.getStudy().getBoardUrl() : study.getBoardUrl();
         if (boardUrl == null) {
             String accessToken = (String) session.getAttribute("accessToken");
             if (accessToken != null) {

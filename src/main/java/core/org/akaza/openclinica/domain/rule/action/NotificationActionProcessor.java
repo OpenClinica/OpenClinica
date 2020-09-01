@@ -7,7 +7,6 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -218,7 +217,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		String[] listOfEmails = emailList.split(",");
 		OCUserDTO userDTO=null;
 
-		String participateStatus = currentStudy.getParticipantPortal(); // enabled , disabled
+		String participateStatus = currentStudy.getParticipateStatus(); // ACTIVE, INACTIVE
 		String accessToken = keycloakClientImpl.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {

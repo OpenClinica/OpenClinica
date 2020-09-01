@@ -377,7 +377,7 @@
               studySub.status.name!='Removed' &&
               (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
-              <c:if test="${participateStatus=='enabled'}">
+              <c:if test="${participateStatus=='ACTIVE'}">
                 <a href="javascript:;" id="contactInformation">
                   <fmt:message key="party_invite" bundle="${resword}"/>
                 </a>
@@ -388,7 +388,7 @@
                   </a>
                 </span>
               </c:if>
-              <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
+              <c:if test="${participateStatus!='ACTIVE' && advsearchStatus=='enabled'}">
                 <a href="javascript:;" id="partid-edit">
                   <fmt:message key="edit" bundle="${resword}"/>
                 </a>
@@ -483,7 +483,7 @@
                                 studySub.status.name!='Removed' &&
                                 (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
                               }">
-                                <c:if test="${participateStatus=='enabled'}">
+                                <c:if test="${participateStatus=='ACTIVE'}">
                                   <!-- Table Contents -->
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
@@ -540,7 +540,7 @@
                                   </table>
                                   <!-- End Table Contents -->
                                 </c:if>
-                                <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
+                                <c:if test="${participateStatus!='ACTIVE' && advsearchStatus=='enabled'}">
                                   <!-- Table Contents -->
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
@@ -1196,7 +1196,7 @@
       <td class="formlabel" align="left">
         <h3>
           <c:choose>
-            <c:when test="${participateStatus=='enabled'}">
+            <c:when test="${participateStatus=='ACTIVE'}">
               <fmt:message key="update_and_invite" bundle="${resword}"/>
             </c:when>
             <c:when test="${!userRole.monitor}">
@@ -1253,7 +1253,7 @@
             </c:choose>
             
             <c:choose>
-              <c:when test="${participateStatus=='enabled'}">
+              <c:when test="${participateStatus=='ACTIVE'}">
                 <tr valign="top">
                   <td class="formlabel" align="left">
                     <span><fmt:message key="email" bundle="${resword}"/></span>

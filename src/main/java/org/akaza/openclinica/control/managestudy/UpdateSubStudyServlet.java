@@ -23,6 +23,7 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.core.SecureController;
@@ -135,7 +136,7 @@ public class UpdateSubStudyServlet extends SecureController {
             Study studyCheck = (Study) session.getAttribute("newStudy");
             parentStudy = (Study) getStudyDao().findByPK(studyCheck.checkAndGetParentStudyId());
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            String participateFormStatus = spvdao.findByHandleAndStudy(parentStudy.getStudyId(), "participantPortal").getValue();
+            String participateFormStatus = spvdao.findByHandleAndStudy(parentStudy.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
             request.setAttribute("participateFormStatus", participateFormStatus);
 
             logger.info("has validation errors");
@@ -243,10 +244,11 @@ public class UpdateSubStudyServlet extends SecureController {
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        String participateFormStatus = spvdao.findByHandleAndStudy(parentStudyBean.getStudyId(), "participantPortal").getValue();
-        if (participateFormStatus.equals("enabled"))
+        String participateStatus = spvdao.findByHandleAndStudy(parentStudyBean.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
+        if (ModuleStatus.isActive(participateStatus)) {
             baseUrl();
-        request.setAttribute("participateFormStatus", participateFormStatus);
+        }
+        request.setAttribute("participateFormStatus", participateStatus);
 
         for (StudyEventDefinitionBean sed : seds) {
 

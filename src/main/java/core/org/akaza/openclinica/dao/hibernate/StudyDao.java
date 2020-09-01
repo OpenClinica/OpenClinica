@@ -152,6 +152,13 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return (Study) q.uniqueResult();
     }
     @Transactional
+    public List<Study> findAllByStudyUuid(String studyUuid) {
+        String query = " from Study do where do.studyUuid = :studyUuid";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyUuid", studyUuid);
+        return q.list();
+    }
+    @Transactional
     public Study findPublicStudy(String ocId) {
         String schema = CoreResources.getRequestSchema();
         if (StringUtils.isEmpty(schema))

@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.*;
+import core.org.akaza.openclinica.service.modules.ParticipateService;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.springframework.http.HttpHeaders;

@@ -8,7 +8,9 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.ResponseType;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
@@ -225,7 +227,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-        if (getParticipateModuleStatus().equals(ENABLED)) {
+        if (isParticipateModuleEnabled()) {
             configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, new ParticipateStatusDroplistFilterEditor());
             ++index;
         }
@@ -262,7 +264,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
         boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
-        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink, getParticipateModuleStatus(), viewStudySubjectService, permissionService, studyBean, request));
+        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink, isParticipateModuleEnabled(), viewStudySubjectService, permissionService, studyBean, request));
     }
 
     private boolean isEnrollmentCapEnforced() {
@@ -426,7 +428,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 
             theItem.put("studySubject.oid", studySubjectBean.getOid());
-            if (getParticipateModuleStatus().equals(ENABLED))
+            if (isParticipateModuleEnabled())
                 theItem.put("participate.status", (studySubjectBean.getUserStatus() == null ? "" : studySubjectBean.getUserStatus().getValue()));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
@@ -527,7 +529,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("oid");
-        if (getParticipateModuleStatus().equals(ENABLED))
+        if (isParticipateModuleEnabled())
             columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
@@ -558,7 +560,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         columnNamesList.add("studySubject.status");
         columnNamesList.add("studySubject.oid");
-        if(getParticipateModuleStatus().equals(ENABLED))
+        if(isParticipateModuleEnabled())
             columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
@@ -1082,17 +1084,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     }
 
-    private String participateStatus(StudySubjectBean studySubjectBean) {
-        Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
-        Study pStudy = getParentStudy(study.getOc_oid());
-        String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
-        return participateFormStatus;
-    }
-
-    private String getParticipateModuleStatus() {
+    private boolean isParticipateModuleEnabled() {
         Study pStudy = getParentStudy(studyBean.getOc_oid());
-        String participatModuleStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
-        return participatModuleStatus;
+        String participateModuleStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), StudyParamNames.PARTICIPATE).getValue();
+        return ModuleStatus.isActive(participateModuleStatus);
     }
 
     private Study getParentStudy(String studyOid) {

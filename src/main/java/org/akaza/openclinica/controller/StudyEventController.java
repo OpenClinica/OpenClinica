@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 
 import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.modules.ParticipateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
