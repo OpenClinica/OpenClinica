@@ -1543,7 +1543,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected void getCurrentBoardUrl(Study study, HttpSession session) {
-        String boardUrl = study.getBoardUrl();
+        String boardUrl = study.isSite() ? study.getStudy().getBoardUrl() : study.getBoardUrl();
         if (boardUrl == null) {
             String accessToken = (String) session.getAttribute("accessToken");
             if (accessToken != null) {
