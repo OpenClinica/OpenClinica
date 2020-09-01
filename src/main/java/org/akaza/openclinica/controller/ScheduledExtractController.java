@@ -79,8 +79,13 @@ public class ScheduledExtractController {
                     "Insufficient privileges.")).body(null);
         }
 
+        Study study = studyDao.findPublicStudy(studyOid);
+        if(study == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID,
+                    "No study found for StudyOId:" + studyOid + ".")).body(null);
+        }
         List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-        if (!userHasAccessToStudyOrSite(userRoles, studyOid)) {
+        if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
                     "Insufficient privileges.")).body(null);
         }
@@ -94,7 +99,7 @@ public class ScheduledExtractController {
 
         List<ScheduledExtractJobDetailDTO> scheduledExtractJobDetailDTOList = new ArrayList<>();
         for (ArchivedDatasetFileBean adfb : archivedDatasetFileBeans) {
-            if (adfb.getStatus().equals(JobStatus.COMPLETED.name()) && !adfb.getFileReference().isEmpty())
+            if (adfb.getStatus().equals(JobStatus.COMPLETED.name()) && !adfb.getFileReference().isEmpty() && validateService.hasArchivedDatasetFileAccessPermission(studyOid, adfb, request))
                 scheduledExtractJobDetailDTOList.add(convertEntityToDTO(adfb));
         }
 
@@ -118,8 +123,15 @@ public class ScheduledExtractController {
             return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
+
+        Study study = studyDao.findPublicStudy(studyOid);
+        if(study == null){
+            String errorMessage = errorHelper("No study found for StudyOId:" +  studyOid + ".", response);
+            return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+        }
+
         List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-        if (!userHasAccessToStudyOrSite(userRoles, studyOid)) {
+        if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
             String errorMessage = errorHelper("Insufficient privileges.", response);
             return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
@@ -128,6 +140,11 @@ public class ScheduledExtractController {
         if (extract.getId() == 0) {
             String errorMessage = errorHelper("Job execution id " + jobExecutionUuid + " is invalid.", response);
             return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+        }
+
+        if (!validateService.hasArchivedDatasetFileAccessPermission(studyOid, extract, request)) {
+            String errorMessage = errorHelper("Insufficient privileges.", response);
+            return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
         String filePath = extract.getFileReference();
@@ -159,16 +176,6 @@ public class ScheduledExtractController {
         scheduledExtractJobDetailDTO.setDateCreated(archivedDatasetFileBean.getDateCreated());
         scheduledExtractJobDetailDTO.setJobExecutionUuid(archivedDatasetFileBean.getJobExecutionUuid());
         return scheduledExtractJobDetailDTO;
-    }
-
-    private boolean userHasAccessToStudyOrSite(List<StudyUserRoleBean> userRoles, String studyOid) {
-        Study studyLevel = studyDao.findPublicStudy(studyOid);
-        studyOid = studyOid.trim().toUpperCase();
-        if (studyLevel != null) {
-            return validateService.isUserHasAccessToStudy(userRoles, studyOid);
-        } else {
-            return validateService.isUserHasAccessToSite(userRoles, studyOid);
-        }
     }
 }
 
