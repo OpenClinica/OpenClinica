@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.UserType;
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
@@ -18,6 +19,7 @@ import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.config.StudyParamNames;
+import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -75,6 +77,9 @@ public class ValidateServiceImpl implements ValidateService {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private ArchivedDatasetFilePermissionTagDao archivedDatasetFilePermissionTagDao;
 
 
     public boolean isStudyOidValid(String studyOid) {
@@ -255,6 +260,35 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
+
+    public boolean isUserHasAccessToStudyOrSiteForStudy(List<StudyUserRoleBean> userRoles, String studyOid){
+        Study study = studyDao.findPublicStudy(studyOid);
+        Study tempPublicStudy = null;
+        for (StudyUserRoleBean userRole : userRoles) {
+            tempPublicStudy = null;
+            if(Role.siteRoleMap.containsKey(userRole.getRole().getId()))
+                tempPublicStudy = studyDao.getPublicStudy(userRole.getStudyId());
+            if (study.getStudyId() == userRole.getStudyId() ||
+                    (tempPublicStudy != null && tempPublicStudy.isSite() && study.getStudyId() == tempPublicStudy.getStudy().getStudyId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasArchivedDatasetFileAccessPermission(String studyOid, ArchivedDatasetFileBean adfBean, HttpServletRequest request){
+        Study study = studyDao.findPublicStudy(studyOid);
+        List<ArchivedDatasetFilePermissionTag> adfTags = archivedDatasetFilePermissionTagDao.findAllByArchivedDatasetFileId(adfBean.getId());
+        List<String> permissionTagsList = permissionService.getPermissionTagsList(study, request);
+
+        for (ArchivedDatasetFilePermissionTag adfTag : adfTags) {
+            if (!permissionTagsList.contains(adfTag.getPermissionTagId())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid) {
