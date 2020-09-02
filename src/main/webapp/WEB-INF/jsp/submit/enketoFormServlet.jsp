@@ -58,11 +58,11 @@
 
         window.addEventListener("message", receiveMessage, false);
         function receiveMessage(event) {
+            console.log(event.data);
             var postMessage = JSON.parse(event.data);
 
             if (postMessage.enketoEvent === 'close') {
-                var url = new URL(iframe.src);
-                var ecid = url.searchParams.get("ecid");
+                var ecid = /ecid=([^&]+)/.exec(iframe.src)[1];
                 jQuery.get(myContextPath + '/pages/closeForm?ecid=' + ecid);
             }
 
