@@ -1038,17 +1038,4 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <distributionManagement>
-        <repository>
-            <id>openclinica-artifactory</id>
-            <name>dev.openclinica.com-releases</name>
-            <url>http://dev.openclinica.com/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>openclinica-artifactory</id>
-            <name>dev.openclinica.com-snapshots</name>
-            <url>http://dev.openclinica.com/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>
