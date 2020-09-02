@@ -37,7 +37,7 @@ public class FormCacheServiceImpl {
                 asyncExpirationListener(formListener).
                 maxSize(256).
                 expirationPolicy(ExpirationPolicy.ACCESSED).
-                expiration(3600, TimeUnit.SECONDS).
+                expiration(5, TimeUnit.SECONDS).
                 build();
     }
 
@@ -76,10 +76,10 @@ public class FormCacheServiceImpl {
     }
 
     public void reportContentsOfMap(){
-        logger.info("Reporting contents of map...");
+/*        logger.info("Reporting contents of map...");
         for (ExpiringMap.Entry<String, FormChangeListener> entry : expiringMap.entrySet()){
             logger.info("Entry: " + entry.getKey() + " : " + expiringMap.getExpectedExpiration(entry.getKey()));
-        }
+        }*/
     }
 
 }
