@@ -56,7 +56,6 @@ public class CoreResources implements InitializingBean {
 
     public static final String CLIENT_SECRET_KEY = "secret";
     public static final String KAFKA_BROKERS = "kafka.brokers";
-    public static final String KAFKA_ENABLED = "kafka.enabled";
 
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("core.org.akaza.openclinica.dao.core.CoreResources");
@@ -990,11 +989,6 @@ public class CoreResources implements InitializingBean {
     public static String getKafkaBrokers() {
         String value = getField(KAFKA_BROKERS);
         return value;
-    }
-
-    public static boolean isKafkaEnabled() {
-        String value = getField(KAFKA_ENABLED);
-        return Boolean.parseBoolean(value);
     }
 
     // TODO internationalize
