@@ -256,7 +256,7 @@
             <br><br>
             <div class="tablebox_center">
                 <b>
-                  <fmt:message key="event_actions" bundle="${resword}"/>
+                  <fmt:message key="other_actions" bundle="${resword}"/>
                 </b>
                 <br><br>
                 <fmt:message key="unlock" bundle="${resword}"/> <fmt:message key="event" bundle="${resword}"/>: <a href="UpdateStudyEvent?action=submit&newStatus=UnLocked&statusId=${studyEvent.workflowStatus}&event_id=${studyEvent.id}&ss_id=${ss_id}" onMouseDown="javascript:setImage('bt_Unlock','icon icon-lock-open');" onMouseUp="javascript:setImage('bt_Unlock','icon icon-lock-open');"><span name="bt_Unlock" class="icon icon-lock-open" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -268,7 +268,7 @@
                 <br><br>
                 <div class="tablebox_center">
                     <b>
-                      <fmt:message key="event_actions" bundle="${resword}"/>
+                      <fmt:message key="other_actions" bundle="${resword}"/>
                     </b>
                     <br><br>
                     <c:choose>
@@ -290,7 +290,7 @@
         <br><br>
         <div class="tablebox_center">
             <b>
-              <fmt:message key="event_actions" bundle="${resword}"/>
+              <fmt:message key="other_actions" bundle="${resword}"/>
             </b>
             <br><br>
             <fmt:message key="sign" bundle="${resword}"/> <fmt:message key="event" bundle="${resword}"/>: <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="UpdateStudyEvent?action=confirm&statusId=signed&ss_id=${ss_id}&event_id=${studyEvent.id}&first_sign=true"><span hspace="2" border="0" title="sign" alt="Sign" class="icon icon-icon-sign" name="bt_sign"></span></a>
