@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,8 @@ public class EventService implements EventServiceInterface {
     FormLayoutDao formLayoutDao;
     @Autowired
     EventDefinitionCrfDao eventDefinitionCrfDao;
+    @Autowired
+    StudySubjectService studySubjectService;
 
     @SuppressWarnings( {"unchecked", "rawtypes"} )
     public void archiveEventDefinition(StudyEventDefinition sed, UserAccount userAccount, Study study) {
@@ -53,6 +56,8 @@ public class EventService implements EventServiceInterface {
         List<StudyEvent> studyEvents = studyEventDao.findAllByEventDefinition(sed.getOc_oid());
         for (StudyEvent studyEvent : studyEvents) {
             unSignStudyEvent(studyEvent, userAccount);
+            if(!studyEvent.isCurrentlyArchived())
+                studySubjectService.updateStudySubject(studyEvent.getStudySubject(), userAccount.getUserId(), true);
 
             archiveStudyEvent(studyEvent, userAccount);
             List<EventCrf> eventCrfs = eventCrfDao.findAllByStudyEvent(studyEvent.getStudyEventId());
@@ -69,6 +74,8 @@ public class EventService implements EventServiceInterface {
         List<StudyEvent> studyEvents = studyEventDao.findAllByEventDefinition(sed.getOc_oid());
         for (StudyEvent studyEvent : studyEvents) {
             unSignStudyEvent(studyEvent, userAccount);
+            if(studyEvent.isCurrentlyArchived())
+                studySubjectService.updateStudySubject(studyEvent.getStudySubject(), userAccount.getUserId(), true);
             unArchiveStudyEvent(studyEvent, userAccount);
         }
     }
@@ -81,7 +88,8 @@ public class EventService implements EventServiceInterface {
         for (EventCrf eventCrf : eventCrfs) {
             if (isUnsigningStudyEventConditionMetWhenArchivingEventForm(eventCrf))
                 unSignStudyEvent(eventCrf.getStudyEvent(), userAccount);
-
+            if(!eventCrf.isCurrentlyArchived())
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), userAccount.getUserId(), isUnsigningStudyEventConditionMetWhenArchivingEventForm(eventCrf));
             archiveEventCrf(eventCrf, userAccount);
             closeDnsByEventCrf(eventCrf, userAccount, study);
         }
@@ -96,7 +104,8 @@ public class EventService implements EventServiceInterface {
         for (EventCrf eventCrf : eventCrfs) {
             if (isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(eventCrf))
                 unSignStudyEvent(eventCrf.getStudyEvent(), userAccount);
-
+            if(eventCrf.isCurrentlyArchived())
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), userAccount.getUserId(), isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(eventCrf));
             unArchiveEventCrf(eventCrf, userAccount);
         }
     }
@@ -257,17 +266,6 @@ public class EventService implements EventServiceInterface {
             studyEvent.setDateUpdated(new Date());
             studyEventDao.saveOrUpdate(studyEvent);
         }
-            unSignStudySubject(studyEvent.getStudySubject(), userAccount);
-
-    }
-
-    public void unSignStudySubject(StudySubject studySubject, UserAccount userAccount) {
-       if(studySubject.getStatus().isSigned()) {
-           studySubject.setStatus(Status.AVAILABLE);
-           studySubject.setUpdateId(userAccount.getUserId());
-           studySubject.setDateUpdated(new Date());
-           studySubjectDao.saveOrUpdate(studySubject);
-       }
     }
 
     public boolean isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(EventCrf eventCrf) {

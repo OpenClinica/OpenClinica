@@ -204,6 +204,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             studySubjectBean.setOwner(userAccountBean);
             Date now = new Date();
             studySubjectBean.setCreatedDate(now);
+            studySubjectBean.setUpdatedDate(now);
+            studySubjectBean.setUpdater(userAccountBean);
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
         }
 

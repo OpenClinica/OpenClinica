@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -45,6 +46,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jxu
@@ -55,6 +57,7 @@ public class RestoreStudyEventServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private StudySubjectService studySubjectService;
     /**
      *
      */
@@ -81,6 +84,8 @@ public class RestoreStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("studySubjectService");
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
 
@@ -145,12 +150,7 @@ public class RestoreStudyEventServlet extends SecureController {
                 event.setUpdatedDate(new Date());
                 studyEventDAO.update(event);
 
-                if(studySub.getStatus().equals(Status.SIGNED)){
-                    studySub.setStatus(Status.AVAILABLE);
-                    studySub.setUpdater(ub);
-                    studySub.setUpdatedDate(new Date());
-                    subdao.update(studySub);
-                }
+                studySubjectService.updateStudySubject(studySub, ub, true);
                 // restore event crfs
 
 

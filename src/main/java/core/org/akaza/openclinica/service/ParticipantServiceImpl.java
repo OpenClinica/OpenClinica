@@ -151,6 +151,8 @@ public class ParticipantServiceImpl implements ParticipantService {
             studySubjectBean.setOwner(subjectTransfer.getOwner());
             Date now = new Date();
             studySubjectBean.setCreatedDate(now);
+            studySubjectBean.setUpdater(subjectTransfer.getOwner());
+            studySubjectBean.setUpdatedDate(now);
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
 
         }

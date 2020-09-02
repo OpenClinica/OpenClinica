@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller.openrosa.processor;
 import java.util.Date;
 import java.util.List;
 
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import core.org.akaza.openclinica.dao.hibernate.CompletionStatusDao;
@@ -66,6 +67,9 @@ public class EventProcessor implements Processor {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    StudySubjectService studySubjectService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String COMMON = "common";
@@ -214,6 +218,7 @@ public class EventProcessor implements Processor {
 
         StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
         studyEventDao.saveOrUpdateTransactional(container);
+        studySubjectService.updateStudySubject(studySubject, user.getUserId(), false);
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(), ordinal, studySubject.getStudySubjectId());
         return studyEvent;
     }
@@ -241,6 +246,7 @@ public class EventProcessor implements Processor {
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        studySubjectService.updateStudySubject(studySubject, user.getUserId(), false);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }
@@ -299,6 +305,7 @@ public class EventProcessor implements Processor {
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged, false);
             StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
             studyEvent = studyEventDao.saveOrUpdateTransactional(container);
+            studySubjectService.updateStudySubject(studySubject, user.getUserId(), false);
             logger.debug("*********UPDATED STUDY EVENT ");
         }
         return studyEvent;
@@ -309,14 +316,20 @@ public class EventProcessor implements Processor {
      *
      */
     private EventCrf updateEventCrf(EventCrf eventCrf, Study study, StudySubject studySubject, UserAccount user, boolean isAnonymous) {
-        if(eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
+        boolean isEventCrfUpdated = false;
+        if(eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)) {
             eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
+            isEventCrfUpdated = true;
+        }
         eventCrf.setUpdateId(user.getUserId());
         eventCrf.setDateUpdated(new Date());
-        if (isAnonymous) {
+        if (isAnonymous && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+            isEventCrfUpdated = true;
             eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
         }
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        if(isEventCrfUpdated)
+            studySubjectService.updateStudySubject(studySubject, user.getUserId(), false);
         logger.debug("*********UPDATED EVENT CRF");
         return eventCrf;
     }

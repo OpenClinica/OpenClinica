@@ -24,6 +24,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -43,6 +44,7 @@ import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.BooleanUtils;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jxu
@@ -60,6 +62,7 @@ public class DeleteEventCRFServlet extends SecureController {
     ItemFormMetadataDAO ifmdao;
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private StudySubjectService studySubjectService;
 
     /**
      * 
@@ -85,6 +88,8 @@ public class DeleteEventCRFServlet extends SecureController {
 
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("studySubjectService");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
@@ -243,12 +248,7 @@ public class DeleteEventCRFServlet extends SecureController {
                     event.setUpdatedDate(new Date());
                     studyEventDAO.update(event);
                 }
-                if(studySub.getStatus().equals(Status.SIGNED)){
-                    studySub.setStatus(Status.AVAILABLE);
-                    studySub.setUpdater(ub);
-                    studySub.setUpdatedDate(new Date());
-                    subdao.update(studySub);
-                }
+                studySubjectService.updateStudySubject(studySub, ub, true);
 
                 String emailBody = respage.getString("the_event_CRF") + cb.getName() + respage.getString("has_been_deleted_from_the_event")
                         + event.getStudyEventDefinition().getName() + ". " + respage.getString("has_been_deleted_from_the_event_cont");

@@ -30,7 +30,9 @@ import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.service.ParticipateService;
 import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -51,6 +53,7 @@ import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Component;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
@@ -85,11 +88,13 @@ public class CreateNewStudyEventServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private StudySubjectDao studySubjectDao;
+    private StudySubjectService studySubjectService;
 
     @Override
     protected void processRequest() throws Exception {
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         studySubjectDao = (StudySubjectDao) SpringServletAccess.getApplicationContext(context).getBean("studySubjectDaoDomain");
+        studySubjectService = (StudySubjectService) SpringServletAccess.getApplicationContext(context).getBean("studySubjectService");
 
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         panel.setStudyInfoShown(false);
@@ -512,8 +517,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 if (!studyEvent.isActive()) {
                     throw new OpenClinicaException(restext.getString("event_not_created_in_database"), "2");
                 }
-
-                unsignStudySubjectIfSigned(studyEvent.getStudySubjectId(), ub);
+                updateStudySubject(studyEvent.getStudySubjectId(), ub);
                 addPageMessage(restext.getString("X_event_wiht_definition") + definition.getName() + restext.getString("X_and_subject") + studySubject.getName()
                         + respage.getString("X_was_created_succesfully"));
 
@@ -576,7 +580,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 if (!studyEventScheduled.isActive()) {
                                     throw new OpenClinicaException(restext.getString("scheduled_event_not_created_in_database"), "2");
                                 }
-                                unsignStudySubjectIfSigned(studyEvent.getStudySubjectId(), ub);
+                                updateStudySubject(studyEvent.getStudySubjectId(), ub);
                                 AddNewSubjectServlet.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn, dndao, studyEventScheduled.getId(), "studyEvent",
                                         currentStudy);
                                 // YW 3-12-2008, 2220 fix <<
@@ -612,14 +616,9 @@ public class CreateNewStudyEventServlet extends SecureController {
         }
     }
 
-    private void unsignStudySubjectIfSigned(int studySubjectId, UserAccountBean ub) {
+    private void updateStudySubject(int studySubjectId, UserAccountBean ub) {
         StudySubject studySubHib = studySubjectDao.findById(studySubjectId);
-        if(studySubHib.getStatus().isSigned()){
-            studySubHib.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
-            studySubHib.setUpdateId(ub.getId());
-            studySubHib.setDateUpdated(new Date());
-            studySubjectDao.saveOrUpdate(studySubHib);
-        }
+        studySubjectService.updateStudySubject(studySubHib, ub.getId(), true);
     }
 
     @Override

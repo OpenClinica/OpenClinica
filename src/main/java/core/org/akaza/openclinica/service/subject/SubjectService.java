@@ -76,7 +76,7 @@ public class SubjectService implements SubjectServiceInterface {
         studySubject.setSubjectId(subject.getId());
         studySubject.setStudyId(studyBean.getStudyId());
         studySubject.setStatus(Status.AVAILABLE);
-        
+        studySubject.setUpdater(getUserAccount());
         int handleStudyId = studyBean.isSite() ? studyBean.getStudy().getStudyId() : studyBean.getStudyId();
         StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
         String idSetting = subjectIdGenerationParameter.getValue();

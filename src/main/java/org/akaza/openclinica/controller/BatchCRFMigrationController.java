@@ -358,6 +358,7 @@ public class BatchCRFMigrationController implements Runnable {
                 studySubject.setStatus(status);
             }
             studySubject.setUpdateId(helperObject.getUserAccountBean().getId());
+            studySubject.setDateUpdated(new Date());
             session.saveOrUpdate(studySubject);
 
         }

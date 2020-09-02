@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.StudyEventService;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.EventCRFLocker;
 import core.org.akaza.openclinica.core.LockInfo;
@@ -100,6 +101,9 @@ public class ChangeCRFVersionController {
 
     @Autowired
     StudyEventService studyEventService;
+
+    @Autowired
+    StudySubjectService studySubjectService;
 
     private DiscrepancyNoteDAO dnDao;
 
@@ -590,10 +594,10 @@ public class ChangeCRFVersionController {
                studyEventService.convertStudyEventBeanStatus(status_before_update,seb);
             }
             studyEventDAO.update(seb, con);
-
             con.commit();
             con.setAutoCommit(true);
             con.close();
+            studySubjectService.updateStudySubject(studySubBean, getCurrentUser(request), false);
             pageMessages.add(resword.getString("confirm_crf_version_ms"));
             String msg = resword.getString("confirm_crf_version_ms");
 

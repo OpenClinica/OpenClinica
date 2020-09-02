@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import com.openclinica.kafka.KafkaService;
@@ -117,6 +118,9 @@ public class OpenRosaSubmissionController {
     private UtilService utilService;
     @Autowired
     TokenService tokenService;
+
+    @Autowired
+    private StudySubjectService studySubjectService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -254,7 +258,7 @@ public class OpenRosaSubmissionController {
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
-
+            studySubjectService.updateStudySubject(eventCrf.getStudySubject(), userAccount.getUserId(), false);
             if (!formCacheService.expireAndRemoveForm(ecid)){
                 FormChangeDTO formChangeDTO = kafkaService.constructFormChangeDTO(eventCrf);
                 formChangeDTO.setFormWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue());
@@ -627,29 +631,22 @@ public class OpenRosaSubmissionController {
                 break;
             }
         }
-        Boolean isEventWorkflowStatusUpDated = false;
         if ((allFormsComplete && countOfEventCrfsInEDC == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
-                isEventWorkflowStatusUpDated = true;
                 if(studyEvent.isCurrentlySigned())
                     studyEvent.setSigned(false);
                 persistStudyEvent(studyEvent, true);
+                studySubjectService.updateStudySubject(studySubject, userAccount.getUserId(), true);
             }
         } else {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
-                isEventWorkflowStatusUpDated = true;
                 if(studyEvent.isCurrentlySigned())
                     studyEvent.setSigned(false);
                 persistStudyEvent(studyEvent, true);
+                studySubjectService.updateStudySubject(studySubject, userAccount.getUserId(), true);
             }
-        }
-        if(isEventWorkflowStatusUpDated && studySubject.getStatus().isSigned()){
-            studySubject.setStatus(Status.AVAILABLE);
-            studySubject.setDateUpdated(new Date());
-            studySubject.setUpdateId(userAccount.getUserId());
-            studySubjectDao.saveOrUpdate(studySubject);
         }
     }
 

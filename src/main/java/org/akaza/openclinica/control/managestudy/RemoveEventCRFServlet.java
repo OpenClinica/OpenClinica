@@ -24,6 +24,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -44,6 +45,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Removes an Event CRF
@@ -55,6 +57,7 @@ public class RemoveEventCRFServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private StudySubjectService studySubjectService;
     /**
      * 
      */
@@ -87,6 +90,8 @@ public class RemoveEventCRFServlet extends SecureController {
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("studySubjectService");
 
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_remove"));
@@ -182,12 +187,7 @@ public class RemoveEventCRFServlet extends SecureController {
                     event.setUpdatedDate(new Date());
                     studyEventDAO.update(event);
                 }
-                if(studySub.getStatus().equals(Status.SIGNED)){
-                    studySub.setStatus(Status.AVAILABLE);
-                    studySub.setUpdater(ub);
-                    studySub.setUpdatedDate(new Date());
-                    subdao.update(studySub);
-                }
+                studySubjectService.updateStudySubject(studySub, ub, true);
 
                 // remove all the item data
                 for (int a = 0; a < itemData.size(); a++) {

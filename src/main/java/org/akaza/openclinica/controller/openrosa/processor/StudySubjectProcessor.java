@@ -138,6 +138,8 @@ public class StudySubjectProcessor implements Processor {
         studySubject.setDateCreated(currentDate);
         studySubject.setSecondaryLabel("");
         studySubject.setLabel(label);
+        studySubject.setDateUpdated(currentDate);
+        studySubject.setUpdateId(rootUser.getUserId());
         if (secondaryLabel != null && !secondaryLabel.equals(""))
             studySubject.setSecondaryLabel(secondaryLabel);
         String studySubjectOid = studySubjectDao.getValidOid(studySubject, new ArrayList<String>());

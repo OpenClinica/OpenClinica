@@ -299,15 +299,12 @@ public class UpdateStudyEventServlet extends SecureController {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             StudySubject studySubject = studySubjectDao.findByPK(studyEvent.getStudySubjectId());
-            boolean isStudySubjectUpdated = false;
+            boolean unSignStudySubjectIfSigned = false;
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(EVENT_WORKFLOW_STATUS));
             if(ses != null && !studyEvent.getWorkflowStatus().equals(ses)){
                 if(studyEvent.isSigned())
                     studyEvent.setSigned(false);
-                if(studySubject.getStatus().isSigned()) {
-                    studySubject.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
-                    isStudySubjectUpdated = true;
-                }
+                unSignStudySubjectIfSigned = true;
             }
             studyEvent.setWorkflowStatus(ses);
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
@@ -399,11 +396,8 @@ public class UpdateStudyEventServlet extends SecureController {
                 updateClosedQueriesForUpdatedStudySubjectFields(studyEvent);
                 StudyEventBean updatedStudyEvent = (StudyEventBean) studyEventDAO.update(studyEvent);
 
-                if(isStudySubjectUpdated) {
-                    studySubject.setDateUpdated(new Date());
-                    studySubject.setUpdateId(ub.getId());
-                    studySubject = studySubjectDao.saveOrUpdate(studySubject);
-                }
+                studySubjectService.updateStudySubject(studySubject, ub.getId(), unSignStudySubjectIfSigned);
+
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -451,6 +445,8 @@ public class UpdateStudyEventServlet extends SecureController {
                 studyEvent.setSigned(true);
                 studyEventDAO.update(studyEvent);
 
+                StudySubject studySubject = studySubjectDao.findByPK(studyEvent.getStudySubjectId());
+                studySubjectService.updateStudySubject(studySubject, ub.getId(), false);
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());

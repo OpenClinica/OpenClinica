@@ -23,8 +23,10 @@ import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
+import core.org.akaza.openclinica.service.subject.SubjectService;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
@@ -93,6 +95,9 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Autowired
     @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCrfDAO;
+
+    @Autowired
+    private StudySubjectService studySubjectService;
 
     @Autowired
     private XformParserHelper xformParserHelper;
@@ -455,13 +460,8 @@ public class ParticipateServiceImpl implements ParticipateService {
             StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
             studyEventDao.saveOrUpdateTransactional(container);
             StudySubject studySubject = studyEvent.getStudySubject();
-            if (statusChanged && studySubject.getStatus().isSigned())
-            {
-                studySubject.setStatus(Status.AVAILABLE);
-                studySubject.setUpdateId(ub.getId());
-                studySubject.setDateUpdated(new Date());
-                studySubjectDao.saveOrUpdate(studySubject);
-            }
+            if (statusChanged )
+                studySubjectService.updateStudySubject(studySubject, ub.getId(), true);
         }
 
 

@@ -685,6 +685,7 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studySubjectService.updateStudySubject(studyEvent.getStudySubject(), userAccount.getUserId(), false);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -695,6 +696,7 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studySubjectService.updateStudySubject(studyEvent.getStudySubject(), userAccount.getUserId(), false);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -707,6 +709,7 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studySubjectService.updateStudySubject(studyEvent.getStudySubject(), userAccount.getUserId(), false);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -1074,6 +1077,7 @@ public class ImportServiceImpl implements ImportService {
     public StudyEvent scheduleEvent(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount) {
         StudyEvent studyEvent = buildStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studySubjectService.updateStudySubject(studySubject, userAccount.getUserId(), false);
         logger.debug("Scheduling new Visit Base  Event ID {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
