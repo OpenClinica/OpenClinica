@@ -376,7 +376,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         // If the session already has a value with key PIWIK_URL don't reset
         if (session.getAttribute(PIWIK_URL) == null) {
-            session.setAttribute(PIWIK_URL, CoreResources.getField("ngwik.url"));
+            session.setAttribute(PIWIK_URL, CoreResources.getField("piwik.url"));
         }
 
         ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
