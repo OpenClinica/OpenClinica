@@ -255,7 +255,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 }
                 // }
                 EventDefinitionCRFBean tempEventDefnCRFBean = edefcrfdao.findForStudyByStudyEventIdAndCRFVersionId(studyEvent.getId(), existingBean.getCRFVersionId());
-                if(tempEventDefnCRFBean.getId() == ecrfBean.getId())
+                if(tempEventDefnCRFBean.getId() == ecrfBean.getId() || (ecrfBean.getParentId() != 0 &&  tempEventDefnCRFBean.getId() == ecrfBean.getParentId()) )
                     isEventCrfCreated = true;
             }
             //This condition is created to check the removed the completed workflow status
