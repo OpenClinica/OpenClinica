@@ -385,8 +385,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             for (EventDefinitionCRFBean eventDefinitionCrf : (List<EventDefinitionCRFBean>) getEventDefintionCRFDAO()
                     .findAllActiveByEventDefinitionId(eventDefinition.getId())) {
                 CRFBean crfBean = (CRFBean) getCrfDAO().findByPK(eventDefinitionCrf.getCrfId());
-                ArrayList<CRFVersionBean> crfVersions = (ArrayList<CRFVersionBean>) getCrfVersionDAO().findAllByCRFId(eventDefinitionCrf.getCrfId());
-                crfBean.setVersions(crfVersions);
+                ArrayList<FormLayoutBean> formLayouts = (ArrayList<FormLayoutBean>) getFormLayoutDAO().findAllByCRFId(eventDefinitionCrf.getCrfId());
+                crfBean.setVersions(formLayouts);
                 if (eventDefinitionCrf.getParentId() == 0) {
                     crfBeans.add(crfBean);
                     eventDefinitionCrfs.add(eventDefinitionCrf);
@@ -991,7 +991,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                         eventDiv.tdEnd().trEnd(0);
                     }
                 }
-            } else if (studyEvents.get(0).isLocked()) {
+            } else if (studyEvents.size() !=0 && studyEvents.get(0).isLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
