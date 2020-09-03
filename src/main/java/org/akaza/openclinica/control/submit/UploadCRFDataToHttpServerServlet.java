@@ -125,7 +125,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
             String dir = SQLInitServlet.getField("filePath");
             if (!new File(dir).exists()) {
                 logger.info("The filePath in datainfo.properties is invalid " + dir);
-                addPageMessage(respage.getString("filepath_you_defined_not_seem_valid"));
+                addPageMessage(respage.getString("system_configuration_filepath_not_valid"));
                 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
             }
             // All the uploaded files will be saved in filePath/crf/original/
@@ -165,7 +165,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                }
          	 
          	  if(files.size() < 2) {
-         		 String message = "errorCode.notCorrectFileNumber - When upload files, please select at least one data text files and one mapping file named like *.properties"; 
+         		 String message = "errorCode.notCorrectFileNumber: Please upload one data file and one mapping file with .properties file extension.";
          		 this.addPageMessage(message);
          		 removeFiles(files);
          		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
@@ -173,7 +173,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
          	  }
          	  
          	  if (!foundMappingFile) {            		         		
-         		 String message = "errorCode.noMappingfileFound - When upload files, please include one correct mapping file and named it like *.properties "; 
+         		 String message = "errorCode.noMappingfileFound: Please upload one data file and one mapping file with .properties file extension.";
          		 this.addPageMessage(message);
          		 removeFiles(files);
          		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);

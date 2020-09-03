@@ -1,10 +1,9 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.openclinica</groupId>
     <artifactId>OpenClinica-web</artifactId>
     <packaging>war</packaging>
-    <version>4.11.0-SNAPSHOT</version>
+    <version>4.11.3-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
@@ -103,7 +102,7 @@
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore></ignore>
+                                                <ignore />
                                             </action>
                                         </pluginExecution>
                                     </pluginExecutions>
@@ -997,8 +996,7 @@
         </testResources>
     </build>
     <scm>
-        <connection>scm:git:${git.url}</connection>
-        <developerConnection>scm:git:${git.url}</developerConnection>
+        <developerConnection>scm:git:https://github.com/OpenClinica/OpenClinica.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -1039,18 +1037,5 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-    <distributionManagement>
-        <repository>
-            <id>openclinica-artifactory</id>
-            <name>dev.openclinica.com-releases</name>
-            <url>http://dev.openclinica.com/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>openclinica-artifactory</id>
-            <name>dev.openclinica.com-snapshots</name>
-            <url>http://dev.openclinica.com/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>

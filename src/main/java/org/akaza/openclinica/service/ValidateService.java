@@ -3,6 +3,7 @@
  */
 package org.akaza.openclinica.service;
 
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -42,6 +43,10 @@ public interface ValidateService {
     boolean isParticipateActive(Study tenantStudy);
 
     boolean isAdvanceSearchEnabled(Study tenantStudy);
+
+    boolean isUserHasAccessToStudyOrSiteForStudy(List<StudyUserRoleBean> userRoles, String studyOid);
+
+    boolean hasArchivedDatasetFileAccessPermission(String studyOid, ArchivedDatasetFileBean adfBean, HttpServletRequest request);
 
     boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
