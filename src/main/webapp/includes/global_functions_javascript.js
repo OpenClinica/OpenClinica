@@ -1604,9 +1604,9 @@ function hideObjects( obj ) {
         if ( prevObject == null ) {
             prevObject = obj;
         } else {
-            getObject( prevObject ).querySelector( 'a' ).click();
-            const menuOn = getObject(obj.replace('Lock', 'Menu_on').replace('Event', 'Menu_on'));
-            menuOn.style.display =  "block";
+                getObject( prevObject ).querySelector( 'a' ).click();
+                    const menuOn = getObject(obj.replace('Lock', 'Menu_on').replace('Event', 'Menu_on'));
+                        menuOn.style.display =  "";
             prevObject = obj;
         }
 }
