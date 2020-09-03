@@ -105,6 +105,7 @@ public class SignStudySubjectServlet extends SecureController {
         for (int i = 0; i < events.size(); i++) {
             StudyEventBean event = (StudyEventBean) events.get(i);
 
+          if(!event.isRemoved() && !event.isArchived()){
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
@@ -125,6 +126,7 @@ public class SignStudySubjectServlet extends SecureController {
             de.setMaximumSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, studySubject));
 
             displayEvents.add(de);
+         }
         }
 
         return displayEvents;
@@ -138,7 +140,9 @@ public class SignStudySubjectServlet extends SecureController {
         }
         for (int l = 0; l < studyEvents.size(); l++) {
             StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
-            sign = permitStudyEventSign(studyEvent);
+            if(!studyEvent.isRemoved() && !studyEvent.isArchived()) {
+                sign = permitStudyEventSign(studyEvent);
+            }
         }
         return sign;
     }
@@ -163,13 +167,15 @@ public class SignStudySubjectServlet extends SecureController {
         for (int l = 0; l < studyEvents.size(); l++) {
             try {
                 StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
-                studyEvent.setUpdater(ub);
-                Date date = new Date();
-                studyEvent.setUpdatedDate(date);
-                studyEvent.setSigned(Boolean.TRUE);
-                studyEvent.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
-                        + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
-                studyEventDAO.update(studyEvent);
+                if(!studyEvent.isRemoved() && !studyEvent.isArchived()) {
+                    studyEvent.setUpdater(ub);
+                    Date date = new Date();
+                    studyEvent.setUpdatedDate(date);
+                    studyEvent.setSigned(Boolean.TRUE);
+                    studyEvent.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
+                            + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
+                    studyEventDAO.update(studyEvent);
+                }
             } catch (Exception ex) {
                 updated = false;
             }
