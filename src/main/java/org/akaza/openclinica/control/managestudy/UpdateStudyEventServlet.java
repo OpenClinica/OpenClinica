@@ -260,7 +260,7 @@ public class UpdateStudyEventServlet extends SecureController {
             }
             //This condition is created to check the removed the completed workflow status
             // if the eventDefnCrf is required and eventCrf is not created in db i.e. Not started
-            if(ecrfBean.isRequiredCRF() && !isEventCrfCreated)
+            if(!ecrfBean.getStatus().equals(Status.DELETED) && ecrfBean.isRequiredCRF() && !isEventCrfCreated)
             {
                 eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.COMPLETED);
             }
