@@ -242,7 +242,9 @@ public class UpdateStudyEventServlet extends SecureController {
                 // only case that this will screw up is if there are no crfs
                 // whatsoever
                 // this is addressed in the if-clause above
-                boolean crfIsRequired = edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao());
+                FormLayoutDAO formLayoutDAO = new FormLayoutDAO(sm.getDataSource());
+                FormLayoutBean formLayoutBean= (FormLayoutBean) formLayoutDAO.findByPK(existingBean.getFormLayoutId());
+                boolean crfIsRequired = edefcrfdao.isRequiredInDefinition(formLayoutBean.getCrfId() , studyEvent, getStudyDao());
                 boolean crfIsCompleted = existingBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED);
                 boolean crfIsRemoved = existingBean.isRemoved();
                 boolean crfIsArchived = existingBean.isArchived();

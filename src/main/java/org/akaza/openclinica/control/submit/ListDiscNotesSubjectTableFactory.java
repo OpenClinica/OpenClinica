@@ -23,8 +23,10 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
@@ -84,6 +86,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
     private Integer discNoteType;
     private Boolean studyHasDiscNotes;
     private Set<Integer> resolutionStatusIds;
+    private FormLayoutDAO formLayoutDAO;
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
     final HashMap<Integer, String> discNoteIconPaths = new HashMap<Integer, String>(8);
@@ -291,7 +294,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         // method false.
         for (EventCRFBean crfBean : eventCrfBeans) {
             if (crfBean != null && crfBean.getCompletionStatusId() == 0) {
-                if (getEventDefintionCRFDAO().isRequiredInDefinition(crfBean.getCRFVersionId(), studyEventBean, getStudyDao())) {
+                FormLayoutBean formLayoutBean = (FormLayoutBean) getFormLayoutDAO().findByPK(crfBean.getFormLayoutId());
+                if (getEventDefintionCRFDAO().isRequiredInDefinition(formLayoutBean.getCrfId(), studyEventBean, getStudyDao())) {
                     return true;
                 }
             }
@@ -1279,5 +1283,13 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     public void setStudyDao(StudyDao studyDao) {
         this.studyDao = studyDao;
+    }
+
+    public FormLayoutDAO getFormLayoutDAO() {
+        return formLayoutDAO;
+    }
+
+    public void setFormLayoutDAO(FormLayoutDAO formLayoutDAO) {
+        this.formLayoutDAO = formLayoutDAO;
     }
 }
