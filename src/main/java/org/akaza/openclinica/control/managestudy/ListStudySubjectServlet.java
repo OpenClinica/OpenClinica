@@ -16,7 +16,10 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.domain.datamap.FormLayout;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -376,6 +379,8 @@ public abstract class ListStudySubjectServlet extends SecureController {
             return false;
 
         EventDefinitionCRFDAO eventDefinitionDAO = new EventDefinitionCRFDAO(sm.getDataSource());
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(sm.getDataSource());
+
         List<EventCRFBean> crfBeans = new ArrayList<EventCRFBean>();
 
         crfBeans.addAll(eventCRFDAO.findAllByStudyEvent(studyEvent));
@@ -385,7 +390,8 @@ public abstract class ListStudySubjectServlet extends SecureController {
         // out whether it's required. If so, then return from the method false.
         for (EventCRFBean crfBean : crfBeans) {
             if (crfBean != null && crfBean.getCompletionStatusId() == 0) {
-                if (eventDefinitionDAO.isRequiredInDefinition(crfBean.getCRFVersionId(), studyEvent, getStudyDao())) {
+                FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(crfBean.getFormLayoutId());
+                if (eventDefinitionDAO.isRequiredInDefinition(formLayoutBean.getCrfId(), studyEvent, getStudyDao())) {
                     return true;
                 }
             }
