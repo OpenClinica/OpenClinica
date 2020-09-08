@@ -263,7 +263,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
 
     @Transactional
-    public Collection<Study> findAllParents() {
+    public Collection findAllParents() {
         CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<Study> cq = cb.createQuery(Study.class);
         Root<Study> study = cq.from(Study.class);
