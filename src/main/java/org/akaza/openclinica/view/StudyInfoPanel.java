@@ -489,19 +489,19 @@ public class StudyInfoPanel implements Serializable {
      * note that this has to change if the texts change, so this might be
      * something different in the future.
      */
-    public String getStatusImageText(EventCrfWorkflowStatusEnum status) {
+    public String getStatusImageText(EventCRFBean ecb) {
         //NOT_STARTED ,INITIAL_DATA_ENTRY, COMPLETED ,LOCKED;
         String answer = "";
-        if (status == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
-            answer = "<span class='icon icon-pencil-squared orange' alt='Initial Data Entry'>";
-        } else if (status == EventCrfWorkflowStatusEnum.COMPLETED) {
-            answer = "<span class='icon icon-ok' alt='Completed'>";
-        } else if (status == EventCrfWorkflowStatusEnum.NOT_STARTED) {
-            answer = "<span class='icon icon-doc' alt='Not Started'>";
-        } else if (status == EventCrfWorkflowStatusEnum.LOCKED) {
-            answer = "<span class='icon icon-lock' alt='Locked'>";
-        } else {
+        if (ecb.isRemoved()) {
             answer = "<span class='icon icon-file-excel red' alt='Invalid'>";
+        } else if (ecb.getWorkflowStatus() == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
+            answer = "<span class='icon icon-pencil-squared orange' alt='Initial Data Entry'>";
+        } else if (ecb.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
+            answer = "<span class='icon icon-ok' alt='Completed'>";
+        } else if (ecb.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
+            answer = "<span class='icon icon-doc' alt='Not Started'>";
+        } else if (ecb.getWorkflowStatus() == EventCrfWorkflowStatusEnum.LOCKED) {
+            answer = "<span class='icon icon-lock' alt='Locked'>";
         }
         return answer;
     }
@@ -601,28 +601,24 @@ public class StudyInfoPanel implements Serializable {
             Iterator displayIt = displayCRFs.iterator();
             while (displayIt.hasNext()) {
                 DisplayEventCRFBean dec = (DisplayEventCRFBean) displayIt.next();
-                dec.getEventCRF().getWorkflowStatus();
                 if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
                     // last event CRF for this event
                     // it's the current crf
                     //JN:Removing the linkx, since the links are being shown in the tree without access, Mantis:9964
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {// was
-                        // getName(),
-                        // tbh
-
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), "<span class='alert'>"
                                 + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), " "
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), " "
                                 + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, true, false));
                     }
 
                 } else {
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), "<span class='alert'>"
                                 + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), " "
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), " "
                                 + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, false, false));
                     }
                 }
@@ -697,19 +693,19 @@ public class StudyInfoPanel implements Serializable {
                     // last event CRF for this event
                     // it's the current crf
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), "<span class='alert'>"
                                 + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), dec.getEventCRF().getCrf().getName() + " "
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), dec.getEventCRF().getCrf().getName() + " "
                                 + dec.getEventCRF().getCrfVersion().getName(), false, true, false));
                     }
 
                 } else {
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), "<span class='alert'>"
                                 + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF().getWorkflowStatus()), dec.getEventCRF().getCrf().getName() + " "
+                        displayData.add(new StudyInfoPanelLine("" + getStatusImageText(dec.getEventCRF()), dec.getEventCRF().getCrf().getName() + " "
                                 + dec.getEventCRF().getCrfVersion().getName(), false, false, false));
                     }
                 }

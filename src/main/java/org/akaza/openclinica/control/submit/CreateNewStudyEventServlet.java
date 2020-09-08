@@ -22,12 +22,14 @@ import com.openclinica.kafka.KafkaService;
 import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -82,10 +84,12 @@ public class CreateNewStudyEventServlet extends SecureController {
     public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
     private StudyEventDAO studyEventDAO;
+    private StudySubjectDao studySubjectDao;
 
     @Override
     protected void processRequest() throws Exception {
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        studySubjectDao = (StudySubjectDao) SpringServletAccess.getApplicationContext(context).getBean("studySubjectDaoDomain");
 
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         panel.setStudyInfoShown(false);
@@ -508,6 +512,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                 if (!studyEvent.isActive()) {
                     throw new OpenClinicaException(restext.getString("event_not_created_in_database"), "2");
                 }
+
+                unsignStudySubjectIfSigned(studyEvent.getStudySubjectId(), ub);
                 addPageMessage(restext.getString("X_event_wiht_definition") + definition.getName() + restext.getString("X_and_subject") + studySubject.getName()
                         + respage.getString("X_was_created_succesfully"));
 
@@ -570,7 +576,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 if (!studyEventScheduled.isActive()) {
                                     throw new OpenClinicaException(restext.getString("scheduled_event_not_created_in_database"), "2");
                                 }
-
+                                unsignStudySubjectIfSigned(studyEvent.getStudySubjectId(), ub);
                                 AddNewSubjectServlet.saveFieldNotes(INPUT_SCHEDULED_LOCATION[i], fdn, dndao, studyEventScheduled.getId(), "studyEvent",
                                         currentStudy);
                                 // YW 3-12-2008, 2220 fix <<
@@ -603,6 +609,16 @@ public class CreateNewStudyEventServlet extends SecureController {
                 // + studyEvent.getId()));
                 return;
             }
+        }
+    }
+
+    private void unsignStudySubjectIfSigned(int studySubjectId, UserAccountBean ub) {
+        StudySubject studySubHib = studySubjectDao.findById(studySubjectId);
+        if(studySubHib.getStatus().isSigned()){
+            studySubHib.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
+            studySubHib.setUpdateId(ub.getId());
+            studySubHib.setDateUpdated(new Date());
+            studySubjectDao.saveOrUpdate(studySubHib);
         }
     }
 

@@ -36,7 +36,7 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,9 +195,9 @@ public class ImportCRFDataService {
 		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
 		                	}
 		                	String msg;
-		                	msg = recordNum + "," + studySubjectBean.getOid() + ",SUCCESS," + resword.getString("skip");
+		                	msg = recordNum + "," + studySubjectBean.getLabel() + ",SUCCESS," + resword.getString("skip");
 
-		    	    		throw new OpenClinicaException("", msg);
+		    	    		throw new OpenClinicaException(msg,"");
 		                }else {
 		                	if(studyEventDefinitionBean.isRepeating()) {
 		                		/**
@@ -327,15 +327,16 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                                if ((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
-                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                if (((upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
+                                 || (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))) && !ecb.isArchived() && !ecb.isRemoved())
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
                         	}else {
-                                if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                if ((ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                         || (upsert.isDataEntryStarted() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                         || (upsert.isDataEntryComplete() && ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)))
+                                        && !ecb.isArchived() && !ecb.isRemoved())
                                      if (!eventCRFBeans.contains(ecb)) {
                                          eventCRFBeans.add(ecb);
                                      }
@@ -783,14 +784,16 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                         	//new requirments:common events has nothing related to upsert setting
                         	if(studyEventDefinitionBean.isTypeCommon()) {
-                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
-                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                                if ((!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                                        && !ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                                        || ecb.isRemoved() || ecb.isArchived()) {
                                     return false;
                                 }
                         	}else {
-                                if (!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                                if ((!ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                         && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
-                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete())) {
+                                        && !(ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && upsert.isDataEntryComplete()))
+                                        || ecb.isRemoved() || ecb.isArchived()) {
                                     return false;
                                 }
                         	}
@@ -1198,6 +1201,16 @@ public class ImportCRFDataService {
         itemDataBean.setEventCRFId(eventCrfBean.getId());
         itemDataBean.setOrdinal(ordinal);
         itemDataBean.setOwner(ub);
+      if (itemBean.getDataType().equals(ItemDataType.DATE)) {
+        // pass it if it is blank, tbh
+        if (StringUtils.isNotBlank(value)) {
+          try {
+            value = transformDateString(value);
+          } catch (ParseException e) {
+            logger.error("Error parsing date string", e);
+          }
+        }
+      }
         itemDataBean.setValue(value);
 
         return itemDataBean;
@@ -1222,12 +1235,8 @@ public class ImportCRFDataService {
                 if (!"".equals(displayItemBean.getData().getValue())) {
                     String dateValue = displayItemBean.getData().getValue();
                     try {
-                        // Check if the given date format matches any of the allowed formats
-                        Date originalDate = DateUtils.parseDate(dateValue, ALLOWED_DATE_FORMATS);
-                        SimpleDateFormat sdf_sqldate = new SimpleDateFormat(DB_DATE_FORMAT);
-                        sdf_sqldate.setLenient(false);
-                        // Convert the given date into the date format used in the database
-                        displayItemBean.getData().setValue(sdf_sqldate.format(originalDate));
+                        dateValue = transformDateString(dateValue);
+                        displayItemBean.getData().setValue(dateValue);
                     } catch (ParseException pe1) {
 
                         // next version; fail if it does not pass iso 8601
@@ -1243,7 +1252,7 @@ public class ImportCRFDataService {
             } else if (displayItemBean.getItem().getDataType().equals(ItemDataType.ST)) {
                 int width = Validator.parseWidth(widthDecimal);
                 if (width > 0 && displayItemBean.getData().getValue().length() > width) {
-                    hardv.put(itemOid, "This value exceeds required width=" + width);
+                    hardv.put(itemOid, "Value exceeds maximum length=" + width + ". Please ensure values do not exceed maximum width.");
                 }
             }
             // what if it's a number? should be only numbers
@@ -1252,13 +1261,13 @@ public class ImportCRFDataService {
                     Integer testInt = new Integer(displayItemBean.getData().getValue());
                     int width = Validator.parseWidth(widthDecimal);
                     if (width > 0 && displayItemBean.getData().getValue().length() > width) {
-                        hardv.put(itemOid, "This value exceeds required width=" + width);
+                        hardv.put(itemOid, "Value exceeds maximum length=" + width + ". Please ensure values do not exceed maximum width.");
                     }
                     // now, didn't check decimal for testInt.
                 } catch (Exception e) {// should be a sub class
                     // pass if blank, tbh 07/2010
                     if (!"".equals(displayItemBean.getData().getValue())) {
-                        hardv.put(itemOid, "This value is not an integer.");
+                        hardv.put(itemOid, "Non-integer value in integer item. Please ensure value types match field types correctly.");
                     }
                 }
             }
@@ -1268,16 +1277,16 @@ public class ImportCRFDataService {
                     Float testFloat = new Float(displayItemBean.getData().getValue());
                     int width = Validator.parseWidth(widthDecimal);
                     if (width > 0 && displayItemBean.getData().getValue().length() > width) {
-                        hardv.put(itemOid, "This value exceeds required width=" + width);
+                        hardv.put(itemOid, "Value exceeds maximum length=" + width + ". Please ensure values do not exceed maximum width.");
                     }
                     int decimal = Validator.parseDecimal(widthDecimal);
                     if (decimal > 0 && BigDecimal.valueOf(new Double(displayItemBean.getData().getValue()).doubleValue()).scale() > decimal) {
-                        hardv.put(itemOid, "This value exceeds required decimal=" + decimal);
+                        hardv.put(itemOid, "Value exceeds maximum number of decimal digits=" + decimal + ". Please ensure values do not exceed maximum decimal digits.");
                     }
                 } catch (Exception ee) {
                     // pass if blank, tbh
                     if (!"".equals(displayItemBean.getData().getValue())) {
-                        hardv.put(itemOid, "This value is not a real number.");
+                        hardv.put(itemOid, "Non-numeric value in numeric item. Please ensure numeric items only contain numbers.");
                     }
                 }
             }
@@ -1296,11 +1305,11 @@ public class ImportCRFDataService {
                     try {
                         Double d = new Double(displayItemBean.getData().getValue());
                         if (BigDecimal.valueOf(d).scale() > decimal) {
-                            hardv.put(itemOid, "This value exceeds required decimal=" + decimal);
+                            hardv.put(itemOid, "Value exceeds maximum number of decimal digits=" + decimal + ". Please ensure values do not exceed maximum decimal digits.");
                         }
                     } catch (Exception e) {
                         if (!"".equals(displayItemBean.getData().getValue())) {
-                            hardv.put(itemOid, "This value is not a real number.");
+                            hardv.put(itemOid, "Non-numeric value in numeric item. Please ensure numeric items only contain numbers.");
                         }
                     }
                 }
@@ -1321,7 +1330,7 @@ public class ImportCRFDataService {
                 if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                     // fail it here
                     logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
-                    hardv.put(itemOid, "This is not in the correct response set.");
+                    hardv.put(itemOid, "Value is not in the response set used by an item. Please ensure responses are included in the set referenced by an item.");
                     // throw new OpenClinicaException("One of your items did not
                     // have the correct response set. Please review Item OID "
                     // + displayItemBean.getItem().getOid() + " repeat key " +
@@ -1339,7 +1348,7 @@ public class ImportCRFDataService {
                 if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                     // fail it here? found an 0,1 in the place of a NULL
                     // logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
-                    hardv.put(itemOid, "This is not in the correct response set.");
+                    hardv.put(itemOid, "Value is not in the response set used by an item. Please ensure responses are included in the set referenced by an item.");
                 }
                 displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
                 // errors = v.validate();
@@ -1522,7 +1531,7 @@ public class ImportCRFDataService {
 	                               if (studyEvent == null || studyEvent.getId() == 0) {
 	                            	    if(studyEventDefintionBean.isRepeating()) {
 	                            	    	mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-		                                    Object[] arguments = { sedOid, oid };
+		                                    Object[] arguments = { sedOid, studySubjectBean.getLabel() };
 		                                    errors.add(mf.format(arguments));
 		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
 	                            	    }else {
@@ -1536,7 +1545,7 @@ public class ImportCRFDataService {
                             	}
                             } else if (studyEventDefintionBean == null) {
                                 mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-                                Object[] arguments = { sedOid, oid };
+                                Object[] arguments = { sedOid, studySubjectBean.getLabel() };
                                 errors.add(mf.format(arguments));
                                 logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
                             }
@@ -2732,6 +2741,21 @@ public class ImportCRFDataService {
        return studySubjectDAO.findByLabelAndStudy(subjectDataBean.getStudySubjectID(), studyBean);
     }
     return null;
+  }
+
+  /**
+   * Transform the given date string into the format that the database supports.
+   * @param dateString the date string to be converted
+   * @return the transformed date string
+   * @throws ParseException if there is an error parsing the date string.
+   */
+  private String transformDateString(String dateString) throws ParseException {
+    // Check if the given date format matches any of the allowed formats
+    Date originalDate = DateUtils.parseDateStrictly(dateString, ALLOWED_DATE_FORMATS);
+    SimpleDateFormat databaseDateFormat = new SimpleDateFormat(DB_DATE_FORMAT);
+    databaseDateFormat.setLenient(false);
+    // Convert the given date into the date format used in the database
+    return databaseDateFormat.format(originalDate);
   }
 
 }

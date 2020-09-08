@@ -421,7 +421,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     @Transactional
     public void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs
-            , String accessToken, String studyOid, String subjectOid) throws Exception{
+            , String accessToken, String studyOid, String subjectOid, UserAccountBean ub) throws Exception{
         boolean completeStudyEvent = true;
         Study parentPublicStudy = studyBuildService.getParentPublicStudy(studyOid);
         // Loop thru event CRFs and complete all that are participant events.
@@ -454,6 +454,14 @@ public class ParticipateServiceImpl implements ParticipateService {
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged,false);
             StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
             studyEventDao.saveOrUpdateTransactional(container);
+            StudySubject studySubject = studyEvent.getStudySubject();
+            if (statusChanged && studySubject.getStatus().isSigned())
+            {
+                studySubject.setStatus(Status.AVAILABLE);
+                studySubject.setUpdateId(ub.getId());
+                studySubject.setDateUpdated(new Date());
+                studySubjectDao.saveOrUpdate(studySubject);
+            }
         }
 
 

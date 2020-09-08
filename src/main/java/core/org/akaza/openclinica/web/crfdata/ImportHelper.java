@@ -132,8 +132,7 @@ public class ImportHelper {
 
                 if (idt.equals(ItemDataType.ST)) {
                     // a string's size could be more than 255, which is more
-                    // than
-                    // the db field length
+                    // than the db field length
                     v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3999);
 
                 } else if (idt.equals(ItemDataType.INTEGER)) {
@@ -146,12 +145,9 @@ public class ImportHelper {
                      v.addValidation(inputName, Validator.IS_A_NUMBER);
                     // v.alwaysExecuteLastValidation(inputName);
                 } else if (idt.equals(ItemDataType.BL)) {
-                    // there is no validation here since this data type is
-                    // explicitly
-                    // allowed to be null
-                    // if the string input for this field parses to a non-zero
-                    // number, the
-                    // value will be true; otherwise, 0
+                    // there is no validation here since this data type is explicitly
+                    // allowed to be null if the string input for this field parses to a non-zero
+                    // number, the value will be true; otherwise, 0
                 } else if (idt.equals(ItemDataType.BN)) {
 
                 } else if (idt.equals(ItemDataType.SET)) {

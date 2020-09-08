@@ -156,7 +156,7 @@
               </c:when>
               <c:otherwise>
                 <td class="table_cell">
-                  <c:out value="${displayEvents.studyEvent.status.name}"/>
+                  <c:out value="${displayEvents.studyEvent.workflowStatus.displayValue}"/>
                 </td>
               </c:otherwise>
            </c:choose>

@@ -282,7 +282,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                     // ignore blank line
                     if (dataRows[i].toString().replaceAll("[\\n\\t\\r]", "").trim().length() > 0) {
                         //Empty participant label in csv, gives ""
-                        participantId = dataRow[indexofParticipantID].toString().trim().replaceAll("\"","");
+                        participantId = dataRow[indexofParticipantID].toString().trim().replaceAll("\"", "");
                         //logger.info(i+ "************dataRow************************"+ dataRow);
 
                         if (participantId != null && participantId.trim().length() > 0) {
@@ -386,7 +386,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 
             if (!foundItemData) {
-                throw new OpenClinicaSystemException( "errorCode.NoItemDataFound", "Import failed because no matched item data found in data file");
+                throw new OpenClinicaSystemException("errorCode.NoItemDataFound", "Import failed because no matched item data found in data file");
             }
 
 
@@ -527,7 +527,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         for (int j = 0; j < rawMappingStrRows.length; j++) {
 
             String rawMappingStrRowsStr = rawMappingStrRows[j];
-            if(rawMappingStrRowsStr.startsWith("#"))
+            if (rawMappingStrRowsStr.startsWith("#"))
                 continue;
             keyValueStr = rawMappingStrRowsStr.split("=");
             //logger.info("++keyValueStr======================+" +keyValueStr);
@@ -560,7 +560,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                     boolean isCorrectFormat = true;
                     if (isCorrectFormat) {
                         String tempKeyValStr = key + val;
-                        if (tempKeyValStr != null && tempKeyValStr.trim().length() > 0 ) {
+                        if (tempKeyValStr != null && tempKeyValStr.trim().length() > 0) {
 
                             String[] itemMappingvalue = toArray(val, ".");
                             // logger.info("===********************itemMappingvalue:" + itemMappingvalue);
@@ -709,24 +709,25 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         return studyOID;
     }
 
-    public String getStudySubject(File mappingFile, File rawItemDataFile)throws OpenClinicaSystemException, Exception{
+    public String getStudySubject(File mappingFile, File rawItemDataFile) throws OpenClinicaSystemException, Exception {
         ResourceBundleProvider.updateLocale(Locale.US);
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(Locale.US);
         MessageFormat mf = new MessageFormat("");
 
         String participantLabel = getParticipantID(mappingFile, rawItemDataFile);
         //Empty participant label in csv, gives ""
-        participantLabel = participantLabel.replaceAll("\"","");
+        participantLabel = participantLabel.replaceAll("\"", "");
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudySubjectBean studySubjectBean = studySubjectDAO.findByLabel(participantLabel);
 
-        if(studySubjectBean.getId() == 0){
+        if (studySubjectBean.getId() == 0) {
             mf.applyPattern(respage.getString("your_subject_label_does_not_reference"));
-            Object[] arguments = { participantLabel };
+            Object[] arguments = {participantLabel};
             throw new OpenClinicaSystemException("errorCode.ValidationFailed", mf.format(arguments));
         }
         return participantLabel;
     }
+
     /**
      * FormOID=F_DEMOGRAPHICS
      * FormVersion=1
@@ -771,7 +772,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                         if (keyWord != null && keyWord.trim().length() > 0) {
                             ;
                         } else {
-                            errorMsg = currentLine + " in wrong format,please use the format like 'key=value', key or value could not be blank.";
+                            errorMsg = "Invalid format for " + currentLine + ". Format must be 'key=value'";
                             errorMsgs.add(errorMsg);
 
                         }
@@ -779,7 +780,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                         if (value != null && value.trim().length() > 0) {
                             ;
                         } else {
-                            errorMsg = currentLine + " in wrong format,please use the format like 'key=value', key or value could not be blank.";
+                            errorMsg = "Invalid format for " + currentLine + ". Format must be 'key=value'";
                             errorMsgs.add(errorMsg);
                         }
 
@@ -803,7 +804,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                         } else if (keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") || keyWord.trim().indexOf("SkipMatchCriteria") == 1)) {
                             //check SkipMatchCriteria format
                             if (value != null && value.trim().length() > 0) {
-                                errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
+                                errorMsg = this.validateSkipMatchCriteriaFormat(currentLine);
 
                                 if (errorMsg != null) {
                                     errorMsgs.add(errorMsg);
@@ -832,9 +833,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
                         }
                     } else {
-
-                        errorMsg = currentLine + " in wrong format,should have only one '=' in each line ";
-
+                        errorMsg = "Invalid format for " + currentLine + ". Only one '=' can be included in this line.";
                         errorMsgs.add(errorMsg);
                     }
                 }
@@ -896,7 +895,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
     /**
      * Height Units=IG_VITAL_GROUP1.HeightUnitsOID
-     * @param itemStr
+     * @param keyValueStr
      * @return
      */
     private String validateItemFormat(String[] keyValueStr) {
@@ -914,7 +913,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
             String[] itemMappingvalue = toArray(val, ".");
 
             if (itemMappingvalue.length < 2) {
-                errorMsg = "Missing the information of Item or Item Group OID setting in Item configuration section: " + val + "\n";
+                errorMsg = "Invalid mapping format for " + val + ". Item mapping must be in the format ColumnName=ItemGroupOID.ItemOID.\n";
                 return errorMsg;
             }
 
@@ -922,12 +921,12 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
             String itemOid = itemMappingvalue[1];
 
             if (itemGrpOid == null || itemGrpOid.trim().length() == 0) {
-                errorMsg = "Missing the information of Item Group OID setting for:" + keyValueStr[0] + "=" + keyValueStr[1] + "\n";
+                errorMsg = "Invalid mapping format for " + keyValueStr[0] + "=" + keyValueStr[1] + ". Item mapping must be in the format ColumnName=ItemGroupOID.ItemOID.\n";
                 return errorMsg;
             }
 
             if (itemOid == null || itemOid.trim().length() == 0) {
-                errorMsg = "Missing the information of Item OID setting for:" + keyValueStr[0] + "=" + keyValueStr[1] + "\n";
+                errorMsg = "Invalid mapping format for " + keyValueStr[0] + "=" + keyValueStr[1] + ". Item mapping must be in the format ColumnName=ItemGroupOID.ItemOID.\n";
                 return errorMsg;
             }
         }
@@ -938,7 +937,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
     /**
      * Height Units=IG_VITAL_GROUP1.HeightUnitsOID
-     * @param itemStr
+     * @param keyValueStr
      * @return
      */
     private ImportItemGroupDTO convertToImportItemGroupDTO(String[] keyValueStr) {
@@ -1005,15 +1004,15 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
         return importItemGroupDTOs;
     }
 
-    private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
-
+    private String validateSkipMatchCriteriaFormat(String currentLine) {
+        String[] keyValueStr = currentLine.split("=");
         String errorMsg = null;
         String key;
         String skipMatchCriteriaStr;
         String[] skipMatchCriteriaVal;
 
         if (keyValueStr.length != 2) {
-            errorMsg = "SkipMatchCriteria in wrong format,may have more than one '=' sign ";
+            errorMsg = "Invalid SkipMatchCriteria parameter " + currentLine + ". Each parameter must be in the format  ItemGroupOID.ItemOID with additional parameters separated by commas.";
             return errorMsg;
         } else {
             key = keyValueStr[0].trim();
@@ -1025,10 +1024,10 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                 String[] itemMappingvalue = toArray(val, ".");
 
                 if (itemMappingvalue.length < 2) {
-                    errorMsg = "Missing the information of Item or Item Group OID setting in SkipMatchCriteria " + val + "\n";
+                    errorMsg = "Invalid SkipMatchCriteria parameter " + val + ". Each parameter must be in the format ItemGroupOID.ItemOID with additional parameters separated by commas.\n";
                     return errorMsg;
                 } else if (itemMappingvalue.length > 2) {
-                    errorMsg = "Wrong format in SkipMatchCriteria Item or Item Group OID setting, may have more than one '.' in  " + val + "\n";
+                    errorMsg = "Invalid SkipMatchCriteria parameter " + val + ". Each parameter must be in the format  ItemGroupOID.ItemOID with additional parameters separated by commas.\n";
                     return errorMsg;
                 }
 
@@ -1036,12 +1035,12 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
                 String itemOid = itemMappingvalue[1];
 
                 if (itemGrpOid == null || itemGrpOid.trim().length() == 0) {
-                    errorMsg = "Missing the information of Item Group OID setting in SkipMatchCriteria " + val + "\n";
+                    errorMsg = "Invalid SkipMatchCriteria parameter " + val + ". Each parameter must be in the format ItemGroupOID.ItemOID with additional parameters separated by commas. \n";
                     return errorMsg;
                 }
 
                 if (itemOid == null || itemOid.trim().length() == 0) {
-                    errorMsg = "Missing the information of Item OID setting in SkipMatchCriteria" + val + "\n";
+                    errorMsg = "Invalid SkipMatchCriteria parameter " + val + ". Each parameter must be in the format ItemGroupOID.ItemOID with additional parameters separated by commas. \n";
                     return errorMsg;
                 }
 

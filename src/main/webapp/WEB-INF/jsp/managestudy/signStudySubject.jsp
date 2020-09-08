@@ -540,23 +540,19 @@
                             <tr style="width: inherit;">
                               <td style="width: 54%; text-align: end;">
                                 <c:choose>
-                                    <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
-                                        <c:choose>
-                                            <c:when test="${dedc.eventCRF.id>0}">
-                                                <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <c:when test="${dedc.status.name=='locked'}">
+                                        <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"></span>
+                                    </c:when>
+                                    <c:when test="${dedc.eventCRF.id>0}">
+                                        <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                        <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
                                     </c:otherwise>
                                 </c:choose>
                               </td>
                               <td>
-                                <c:if test="${studyEvent.locked == true}">
+                                <c:if test="${dse.studyEvent.locked}">
                                     <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
                                 </c:if>
                               </td>
@@ -618,7 +614,7 @@
                             <td style="width: 54%; text-align: end;">
                                 <c:choose>
                                     <c:when test="${ (dec.eventCRF.workflowStatus != 'NOT_STARTED' && dse.studyEvent.isRemoved()) || dec.eventCRF.isRemoved() }">
-                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
                                     </c:when>
                                     <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
                                         <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
@@ -630,7 +626,7 @@
                                         <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
                                     </c:otherwise>
                                 </c:choose>
                             </td>

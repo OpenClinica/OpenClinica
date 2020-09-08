@@ -91,12 +91,10 @@ public class EventService implements EventServiceInterface {
     public void unArchiveEventForm(EventDefinitionCrf edc, UserAccount userAccount) {
         unArchiveEventDefnCrf(edc, userAccount);
         logger.info("Restoring Archived event_crfs By Event Form");
-        unsignStudyEventsForNotStartedAndRequiredForms(edc,userAccount);
 
         List<EventCrf> eventCrfs = eventCrfDao.findallByStudyEventOIdAndCrfOId(edc.getStudyEventDefinition().getOc_oid(), edc.getCrf().getOcOid());
         for (EventCrf eventCrf : eventCrfs) {
-            if (isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(eventCrf)
-                    || isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(eventCrf, edc))
+            if (isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(eventCrf))
                 unSignStudyEvent(eventCrf.getStudyEvent(), userAccount);
 
             unArchiveEventCrf(eventCrf, userAccount);
@@ -279,16 +277,6 @@ public class EventService implements EventServiceInterface {
         return false;
     }
 
-    public boolean isUnsigningStudyEventConditionMetWhenUnArchivingEventForm(EventCrf eventCrf, EventDefinitionCrf edc) {
-
-        if (eventCrf.getStudyEvent().isCurrentlySigned()
-                && eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)) {
-            setEdcForSiteSubjectsIfExists(edc, eventCrf.getStudySubject());
-            if (edc.getRequiredCrf().equals(Boolean.TRUE)) return true;
-        }
-        return false;
-    }
-
 
     public boolean isUnsigningStudyEventConditionMetWhenArchivingEventForm(EventCrf eventCrf) {
         if (eventCrf.getStudyEvent().isCurrentlySigned()
@@ -297,29 +285,5 @@ public class EventService implements EventServiceInterface {
             return true;
         return false;
     }
-
-
-    public void unsignStudyEventsForNotStartedAndRequiredForms(EventDefinitionCrf edc, UserAccount userAccount){
-            List<StudyEvent> studyEvents = studyEventDao.findAllByEventDefinition(edc.getStudyEventDefinition().getOc_oid());
-            for (StudyEvent studyEvent : studyEvents) {
-                setEdcForSiteSubjectsIfExists(edc,studyEvent.getStudySubject());
-                EventCrf eventCrf = eventCrfDao.findByStudyEventOIdStudySubjectOIdCrfOId(studyEvent.getStudyEventDefinition().getOc_oid(), studyEvent.getStudySubject().getLabel(), edc.getCrf().getOcOid(), studyEvent.getSampleOrdinal());
-                if (edc.getRequiredCrf() && eventCrf == null) {
-                    unSignStudyEvent(studyEvent, userAccount);
-                }
-            }
-    }
-
-    private void setEdcForSiteSubjectsIfExists(EventDefinitionCrf edc, StudySubject studySubject) {
-        Study subjectStudy = studySubject.getStudy();
-        if (subjectStudy.isSite()) {
-            EventDefinitionCrf site_edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                    edc.getStudyEventDefinition().getStudyEventDefinitionId(), edc.getCrf().getCrfId(), subjectStudy.getStudyId());
-            if (site_edc != null) {
-                edc = site_edc;
-            }
-        }
-    }
-
 
 }

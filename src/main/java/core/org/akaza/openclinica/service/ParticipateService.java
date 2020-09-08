@@ -33,6 +33,6 @@ public interface ParticipateService extends ModuleProcessor {
 
 	 Study getParentStudy(String oid);
 
-	 void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs, String acessToken, String studyOid, String subjectOid) throws Exception;
+	 void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs, String acessToken, String studyOid, String subjectOid, UserAccountBean ub) throws Exception;
 
 	}
