@@ -819,6 +819,8 @@ public class ImportServiceImpl implements ImportService {
         }
 
         FormLayout formLayout = formLayoutDao.findByNameCrfId(formLayoutName, crf.getCrfId());
+        if(formLayout == null)
+            return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_FOUND);
         return formLayout;
     }
 

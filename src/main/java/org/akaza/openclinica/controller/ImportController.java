@@ -239,7 +239,7 @@ public class ImportController {
                 try {
                     importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isSystemUserImport);
                 } catch (Exception e) {
-                    logger.error("Exception is thrown while processing dataImport: " + e);
+                    logger.error("Exception is thrown while processing dataImport: ", e);
                     userService.persistJobFailed(jobDetail,fileNm);
                 }
                 return null;
