@@ -366,8 +366,8 @@
                 <tr>
                     <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/></td>
                     <td class="table_cell">
-                        <c:if test="${study.study != null && study.study.studyId > 0}">
-                            <c:out value="${study.name}"/>
+                        <c:if test="${subjectStudy.study != null && subjectStudy.study.studyId > 0}">
+                            <c:out value="${subjectStudy.name}"/>
                         </c:if>&nbsp;</td>
                 </tr>
 
