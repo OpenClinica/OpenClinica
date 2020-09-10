@@ -39,7 +39,7 @@ public class BoardUrlConfig {
             study -> {
               String schema = study.getSchemaName();
               CoreResources.setRequestSchema(schema);
-              Study tenantSchemaStudy = studyDao.findByUniqueId(study.getUniqueIdentifier());
+              Study tenantSchemaStudy = studyDao.findStudyByOid(study.getOc_oid());
               setBoardUrl(tenantSchemaStudy, systemToken);
             }
     );
