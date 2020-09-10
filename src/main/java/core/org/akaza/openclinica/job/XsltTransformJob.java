@@ -116,7 +116,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private static final long KILOBYTE = 1024;
 
     @Override
-    protected void executeInternal(JobExecutionContext context) {
+    protected synchronized void executeInternal(JobExecutionContext context) {
         logger.info("Job " + context.getJobDetail().getDescription() + " started.");
         JobDataMap dataMap = context.getMergedJobDataMap();
         initDependencies(context.getScheduler(), dataMap);
@@ -486,7 +486,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     subject = "Job Ran: " + datasetBean.getName();
                 }
 
-                Study study =studyDao.findByPK(datasetBean.getStudyId());
+                Study study = studyDao.findByPK(datasetBean.getStudyId());
 
                 if (successMsg == null || successMsg.isEmpty()) {
                     logger.info("email buffer??" + emailBuffer);
@@ -494,7 +494,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 } else {
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
-                                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?study_oid="+study.getOc_oid().toLowerCase()+"&fileId=" + fbFinal.getId()
+                                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?study_oid=" + study.getOc_oid().toLowerCase() + "&fileId=" + fbFinal.getId()
                                         + "\"> [Click Here] </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
@@ -624,7 +624,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
             logger.info("Job " + context.getJobDetail().getDescription() + " finished.");
         }
-
     }
 
     /**
