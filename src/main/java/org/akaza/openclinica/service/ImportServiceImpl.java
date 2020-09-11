@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.JobService;
 import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
@@ -23,6 +24,7 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -340,6 +342,9 @@ public class ImportServiceImpl implements ImportService {
 
 
                             }//itemDataBean for loop
+                            if(itemGroupDataBean.isItemGroupRemoved()){
+                                removeItemGroup(tenantStudy, studySubject, eventCrf, (ItemGroup) itemGroupObject, itemGroupDataBean, userAccount);
+                            }
 
                         } //itemGroupDataBean for loop
 
@@ -1559,6 +1564,21 @@ public class ImportServiceImpl implements ImportService {
         return false;
     }
 
+    private void removeItemGroup(Study study, StudySubject studySubject, EventCrf eventCrf, ItemGroup itemGroup, ImportItemGroupDataBean igDataBean, UserAccount userAccount) {
+        List<ItemData> itemDataList = (ArrayList<ItemData>)itemDataDao.findByEventCrfGroup(eventCrf.getEventCrfId(), itemGroup.getItemGroupId());
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(eventCrf.getFormLayout().getCrf().getCrfId()).get(0);
+        for(ItemData itemData : itemDataList){
+            ItemGroupMetadata igm = itemGroupMetadataDao.findByItemCrfVersion(itemData.getItem().getItemId(), crfVersion.getCrfVersionId());
+            if(igm.isRepeatingGroup() && itemData.getOrdinal() == Integer.parseInt(igDataBean.getItemGroupRepeatKey()) && !itemData.isDeleted()){
+                itemData.setDeleted(true);
+                updateItemData(itemData, userAccount, itemData.getValue());
+                queryService.closeItemDiscrepancyNotesForItemData(study, userAccount, studySubject, itemData);
+                logger.debug("Updating Item Data Id {}", itemData.getItemDataId());
+            }
+        }
+
+
+    }
     public void updateEventAndSubjectStatusIfSigned(StudyEvent studyEvent, StudySubject studySubject, UserAccount userAccount) {
         if (studyEvent.isCurrentlySigned()) {
             studyEvent.setSigned(Boolean.FALSE);

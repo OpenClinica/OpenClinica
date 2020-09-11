@@ -152,6 +152,11 @@
             <bind-xml name="ItemGroupRepeatKey" node="attribute"/>
         </field>
 
+        <field name="itemGroupRemovedAsString"
+               type="java.lang.String">
+            <bind-xml name="Removed" node="attribute"/>
+        </field>
+
         <field name="ItemData"
                type="core.org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean"
                collection="arraylist">

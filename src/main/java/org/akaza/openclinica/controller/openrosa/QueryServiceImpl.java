@@ -4,17 +4,14 @@ import static org.akaza.openclinica.control.core.SecureController.respage;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.xform.QueriesBean;
@@ -217,6 +214,68 @@ public class QueryServiceImpl implements QueryService {
             dn.setThreadNumber(maxThreadNumber+1);
         }
         return dn;
+    }
+
+    public void closeItemDiscrepancyNotesForItemData(Study study, UserAccount user, StudySubject studySubject, ItemData itemData) {
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
+
+        // Notes & Discrepancies must be set to "closed" when event CRF is deleted
+        // parentDiscrepancyNoteList is the list of the parent DNs records only
+        List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(itemData.getItemDataId());
+        for (DiscrepancyNote parentDiscrepancyNote : parentDiscrepancyNoteList) {
+            if (parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != 4
+                    && parentDiscrepancyNote.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() != 4) { // if
+                // the
+                // DN's
+                // resolution
+                // status is not set to
+                // Closed
+                String description = resword.getString("dn_auto-closed_description");
+                String detailedNotes = resword.getString("dn_auto_closed_item_detailed_notes");
+                // create new DN record , new DN Map record , also update the parent record
+                DiscrepancyNote dn = new DiscrepancyNote();
+                ResolutionStatus resStatus = resolutionStatusDao.findByResolutionStatusId(4);
+                dn.setStudy(study);
+                dn.setEntityType("itemData");
+                dn.setDescription(description);
+                dn.setDetailedNotes(detailedNotes);
+                dn.setDiscrepancyNoteType(parentDiscrepancyNote.getDiscrepancyNoteType()); // set to parent DN Type Id
+                dn.setResolutionStatus(resStatus); // set to closed
+                dn.setUserAccount(user);
+                dn.setUserAccountByOwnerId(user);
+                dn.setParentDiscrepancyNote(parentDiscrepancyNote);
+                dn.setDateCreated(new Date());
+                dn = discrepancyNoteDao.saveOrUpdate(dn);
+
+                // Create Mapping for new Discrepancy Note
+                DnItemDataMapId dnItemDataMapId = new DnItemDataMapId();
+                dnItemDataMapId.setDiscrepancyNoteId(dn.getDiscrepancyNoteId());
+                dnItemDataMapId.setItemDataId(itemData.getItemDataId());
+                dnItemDataMapId.setStudySubjectId(studySubject.getStudySubjectId());
+                dnItemDataMapId.setColumnName("value");
+
+                DnItemDataMap mapping = new DnItemDataMap();
+                mapping.setDnItemDataMapId(dnItemDataMapId);
+                mapping.setItemData(itemData);
+                mapping.setStudySubject(studySubject);
+                mapping.setActivated(false);
+                mapping.setDiscrepancyNote(dn);
+                dnItemDataMapDao.saveOrUpdate(mapping);
+
+                DiscrepancyNote itemParentNote = discrepancyNoteDao.findByDiscrepancyNoteId(dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
+                itemParentNote.setResolutionStatus(resStatus);
+                itemParentNote.setDetailedNotes(detailedNotes);
+                itemParentNote.setUserAccount(user);
+                discrepancyNoteDao.saveOrUpdate(itemParentNote);
+            }
+        }
+
+        // Deactivate existing mappings for this ItemData
+        List<DnItemDataMap> existingMappings = dnItemDataMapDao.findByItemData(itemData.getItemDataId());
+        for (DnItemDataMap mapping : existingMappings) {
+            mapping.setActivated(false);
+            dnItemDataMapDao.saveOrUpdate(mapping);
+        }
     }
 
     private UserAccount createUserAccount(String assignedTo, Study study) {
