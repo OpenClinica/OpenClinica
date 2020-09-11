@@ -16,6 +16,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
 import org.slf4j.Logger;
@@ -389,11 +390,11 @@ public class XformMetaDataService {
             return itemDataTypeDao.findByItemDataTypeCode("DATE");
         else
             return null;
-
     }
 
     private ResponseType getResponseType(XformItem xformItem) {
-        String responseType = xformItem.getItemDataType();
+        String responseType = xformItem.getItemResponseType();
+
         String readOnly = "";
         String relevant = "";
         if (xformItem.getReadonly() != null)
@@ -403,20 +404,8 @@ public class XformMetaDataService {
 
         if ((xformItem.isCalculate() && !readOnly.equals("true()") && !relevant.equals("false()")) || (xformItem.isCalculate() && relevant.equals("false()")))
             return responseTypeDao.findByResponseTypeName("calculation");
-        else if (responseType.equals("string"))
-            return responseTypeDao.findByResponseTypeName("text");
-        else if (responseType.equals("int"))
-            return responseTypeDao.findByResponseTypeName("text");
-        else if (responseType.equals("decimal"))
-            return responseTypeDao.findByResponseTypeName("text");
-        else if (responseType.equals("date"))
-            return responseTypeDao.findByResponseTypeName("text");
-        else if (responseType.equals("select"))
-            return responseTypeDao.findByResponseTypeName("checkbox");
-        else if (responseType.equals("select1"))
-            return responseTypeDao.findByResponseTypeName("radio");
-        else if (responseType.equals("binary"))
-            return responseTypeDao.findByResponseTypeName("file");
+        else if(!StringUtils.isEmpty(responseType))
+            return responseTypeDao.findByResponseTypeName(responseType);
         else
             return null;
     }
