@@ -216,7 +216,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     resetSdvStatus(container);
 
                     // Close discrepancy notes
-                    closeItemDiscrepancyNotes(container, existingItemData);
+                    queryService.closeItemDiscrepancyNotesForItemData(container.getStudy(), container.getUser(), container.getSubject(), existingItemData);
                 } else if (itemOrdinal < maxRowCount) {
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);

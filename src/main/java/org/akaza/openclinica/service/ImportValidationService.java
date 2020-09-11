@@ -23,4 +23,6 @@ public interface ImportValidationService {
     void validateForm(FormDataBean formDataBean, Study tenantStudy, StudyEventDefinition studyEventDefinition);
 
     void validateSignatureForStudyEvent(StudyEventDataBean studyEventDataBean, StudyEvent studyEvent, StudySubject studySubject);
+
+    void validateItemGroupRemoved(ImportItemGroupDataBean itemGroupDataBean, ItemGroup itemGroup);
 }

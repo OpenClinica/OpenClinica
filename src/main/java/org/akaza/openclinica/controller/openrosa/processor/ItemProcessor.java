@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.openclinica.kafka.KafkaService;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import core.org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -61,6 +62,9 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private QueryService queryService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -253,7 +257,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     itemData = itemDataDao.saveOrUpdate(itemData);
 
                     // Close discrepancy notes
-                    closeItemDiscrepancyNotes(container, itemData);
+                    queryService.closeItemDiscrepancyNotesForItemData(container.getStudy(), container.getUser(), container.getSubject(), itemData);
                 }
             }
         }

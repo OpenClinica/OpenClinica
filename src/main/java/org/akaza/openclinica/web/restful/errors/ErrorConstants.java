@@ -224,5 +224,9 @@ public class ErrorConstants {
     public static final String ERR_ATTESTATION_IS_MISSING = "errorCode.attestationIsMissing";
     public static final String ERR_ATTESTATION_TEXT_TOO_LONG = "errorCode.attestationTextTooLong";
     public static final String ERR_ATTESTATION_ALREADY_EXIST_IN_SYSTEM = "errorCode.attestationAlreadyExistInSystem";
+    public static final String ERR_STATUS_ATTRIBUTE_INVALID = "errorCode.statusAttributeIsInvalid";
+    public static final String ERR_ITEMGROUP_REMOVED_ATTRIBUTE_INVALID = "errorCode.itemGroupRemovedAttributeIsInvalid";
+    public static final String ERR_FIRST_REPEATING_ITEMGROUP_CANNOT_BE_REMOVED = "errorCode.firstRepeatingGroupCannotBeRemoved";
+    public static final String ERR_NON_REPEATING_ITEMGROUP_CANNOT_BE_REMOVED = "errorCode.nonRepeatingGroupCannotBeRemoved";
 
 }

@@ -7,6 +7,7 @@ import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import core.org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.service.ImportValidationServiceImpl;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -142,14 +143,12 @@ public class StudyEventDataBean {
     }
 
     public Boolean getSigned(){
-        if(this.signed == null)
-            return null;
-        else if(this.signed.equalsIgnoreCase(STATUS_ATTRIBUTE_FALSE))
-            return false;
-        else if(this.signed.equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE))
-            return true;
-        else
+        try {
+            return ImportValidationServiceImpl.getStatusAttribute(this.signed);
+        } catch (OpenClinicaSystemException ose){
             throw new OpenClinicaSystemException("FAILED", ErrorConstants.ERR_SIGNED_STATUS_INVALID);
+        }
+
     }
 
     public void setSigned(Boolean signed){
