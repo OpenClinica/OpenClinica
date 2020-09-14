@@ -1288,10 +1288,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             if (studyEventBean.getDateStarted() != null)
                 eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
             if (studyEventBean.isRemoved()) {
-                eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+                eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
             } else {
-                eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue()).br();
+                eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue());
             }
+            eventDiv.append(" &nbsp; ");
             if (studyEventBean.isSigned()) {
                 eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
             }
@@ -1465,10 +1466,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.bold().append(formatDate(studyEvents.get(0).getDateStarted())).boldEnd();
             }
             if (studyEvents.size() > 0 && studyEvents.get(0).isRemoved()) {
-                eventDiv.br().bold().append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+                eventDiv.br().bold().append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
             } else {
-                eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
+                eventDiv.br().bold().append(eventStatus.getDisplayValue());
             }
+            eventDiv.append(" &nbsp; ");
             if (studyEvents.size() > 0) {
                 if (studyEvents.get(0).isSigned()) {
                     eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
@@ -1488,10 +1490,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 if (studyEvents.get(0).getDateStarted() != null)
                     eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
                 if (studyEvents.get(0).isRemoved()) {
-                    eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+                    eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
                 } else {
-                    eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue()).br();
+                    eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue());
                 }
+                eventDiv.append(" &nbsp; ");
                 if (studyEvents.get(0).isSigned()) {
                     eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
                 }
