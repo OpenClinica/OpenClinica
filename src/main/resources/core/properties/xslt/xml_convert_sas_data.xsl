@@ -14,7 +14,7 @@
                     <xsl:element name="SubjectID">
                         <xsl:value-of select="../../../@OpenClinica:StudySubjectID"/>
                     </xsl:element>
-                    <xsl:element name="ProtocolID">
+                    <xsl:element name="SiteID">
                         <xsl:variable name="studyOID" select="../../../../@StudyOID"/>
                         <xsl:variable name="studyElement" select="//odm:Study[@OID = $studyOID]"/>
                         <xsl:value-of select="$studyElement/odm:GlobalVariables/odm:ProtocolName"/>

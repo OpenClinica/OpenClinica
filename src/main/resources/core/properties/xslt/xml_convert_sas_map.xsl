@@ -37,7 +37,7 @@
             <DATATYPE>string</DATATYPE>
             <LENGTH>50</LENGTH>
         </row>
-        <row name="ProtocolID">
+        <row name="SiteID">
             <TYPE>character</TYPE>
             <DATATYPE>string</DATATYPE>
             <LENGTH>255</LENGTH>
