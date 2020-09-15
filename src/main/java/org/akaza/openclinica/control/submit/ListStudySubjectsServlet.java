@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -22,18 +23,22 @@ import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.Component;
 import core.org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
 
 /**
  * Servlet for creating a table.
@@ -217,6 +222,25 @@ public class ListStudySubjectsServlet extends SecureController {
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
         session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
+        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
+        List<StudySubjectBean> participants = getStudySubjectDAO().findAllByStudy(currentStudy);
+        request.setAttribute("participants", participants);
+
+        Map<String, Study> studyByParticipant = new HashMap<String, Study>();
+        Map<String, ArrayList> eventsByParticipant = new HashMap<String, ArrayList>();
+        for (StudySubjectBean participant: participants) {
+            String participantName = participant.getName();
+
+            Study studyRelatedToStudySub = (Study) getStudyDao().findById(participant.getStudyId());
+            studyByParticipant.put(participantName, studyRelatedToStudySub);
+
+            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(participant, factory.getCurrentUser(), currentRole, currentStudy);
+            ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
+            eventsByParticipant.put(participantName, allEventRows);
+        }
+        request.setAttribute("studyByParticipant", studyByParticipant);
+        request.setAttribute("eventsByParticipant", eventsByParticipant);
+        
         forwardPage(Page.LIST_STUDY_SUBJECTS);
 
     }

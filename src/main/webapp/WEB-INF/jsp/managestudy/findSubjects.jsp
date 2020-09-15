@@ -140,5 +140,15 @@
     </div>
 </c:if>
 
+<c:forEach var="studySub" items="${participants}">
+    ${studySub.name}<br>
+    <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+    <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+        <table>
+            <%@include file="eventActions.jsp"%>
+        </table>
+    </c:forEach>
+</c:forEach>
+
 <br>
 <jsp:include page="../include/footer.jsp"/>
