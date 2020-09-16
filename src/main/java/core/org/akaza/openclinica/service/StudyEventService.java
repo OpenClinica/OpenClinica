@@ -34,4 +34,6 @@ public interface StudyEventService {
 
     void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean);
 
+    boolean isEventSignable(StudyEvent studyEvent);
+
 }
