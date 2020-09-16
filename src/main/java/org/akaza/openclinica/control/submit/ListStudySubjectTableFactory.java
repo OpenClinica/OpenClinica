@@ -442,7 +442,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             List<StudyEventBean> allStudyEventsForStudySubject = getStudyEventDAO().findAllByStudySubject(studySubjectBean);
             HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
 
-            theItem.put("isSignable", studySubjectService.isSignable(currentRole, studySubjectBean.getId()));
+            if (currentRole.isInvestigator()){
+                theItem.put("isSignable", studySubjectService.isSignable(studySubjectBean.getId()));
+            } else {
+                theItem.put("isSignable", false);
+            }
 
             for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
                 if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {

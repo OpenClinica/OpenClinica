@@ -978,7 +978,7 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
     private boolean areAllEventCrfsValid(StudyEvent studyEvent) {
         List<EventCrf> eventCrfs = studyEvent.getEventCrfs();
         for (EventCrf eventCrf: eventCrfs) {
-            EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(eventCrf.getStudyEvent().getStudyEventId(), eventCrf.getCrfVersion().getCrfVersionId());
+            EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCRFDAO.findForStudyByStudyEventIdAndCRFVersionId(eventCrf.getStudyEvent().getStudyEventId(), eventCrf.getCrfVersion().getCrfVersionId());
             // AC1 :An event will be eligible to sign only if all non-Archived required forms in the event
             // have Complete workflow status and are not Removed.
             // AC2: An event will be eligible to sign only if all non-Archived forms in the event
