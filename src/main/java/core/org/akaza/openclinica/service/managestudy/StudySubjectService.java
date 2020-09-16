@@ -62,6 +62,6 @@ public interface StudySubjectService {
 
     void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs);
 
-    Boolean isSignable(StudyUserRoleBean currentRole, int studySubjectId);
+    Boolean isSignable(int studySubjectId);
 
 }

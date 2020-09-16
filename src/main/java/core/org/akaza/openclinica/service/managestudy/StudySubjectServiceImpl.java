@@ -546,10 +546,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
 
 
-    public Boolean isSignable(StudyUserRoleBean currentRole, int studySubjectId) {
-        if (!currentRole.isInvestigator()){
-            return false;
-        }
+    public Boolean isSignable(int studySubjectId) {
+
         boolean archivedCommonEvent=false;
         StudySubject studySubject = studySubjectDao.findById(studySubjectId);
         List<StudyEvent> studyEvents = studySubject.getStudyEvents();
