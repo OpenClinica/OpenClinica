@@ -716,6 +716,11 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return edc;
 	}
 
+	public EventDefinitionCRFBean findByStudyEventIdAndCRFVersionId(int studyEventId, int crfVersionId) {
+		EventDefinitionCRFBean edc = this.findForStudyByStudyEventIdAndCRFVersionId(studyEventId, crfVersionId);
+		return edc;
+	}
+
 	public EventDefinitionCRFBean findByStudyEventIdAndFormLayoutId(Study study, int studyEventId, int formLayoutId) {
 		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
 

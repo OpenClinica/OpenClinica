@@ -68,6 +68,14 @@
        <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="eventDefinitionCRFDAO" class="core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="studySubjectDAO" class="core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="eventCRFJDBCDao" class="core.org.akaza.openclinica.dao.submit.EventCRFDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
