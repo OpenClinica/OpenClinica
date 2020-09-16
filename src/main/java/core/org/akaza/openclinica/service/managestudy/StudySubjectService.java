@@ -62,4 +62,6 @@ public interface StudySubjectService {
 
     void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs);
 
+    Boolean isSignable(int studySubjectId);
+
 }

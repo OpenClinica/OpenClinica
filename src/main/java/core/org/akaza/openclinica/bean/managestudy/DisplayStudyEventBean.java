@@ -88,6 +88,7 @@ public class DisplayStudyEventBean extends AuditableEntityBean {
     /**
      * @param uncompletedCRFs The uncompletedCRFs to set.
      */
+    // NOTE: This is really "un-started" eventCRFs, uncompleted eventCRFs is misleading.
     public void setUncompletedCRFs(ArrayList<DisplayEventDefinitionCRFBean> uncompletedCRFs) {
         this.uncompletedCRFs = uncompletedCRFs;
     }

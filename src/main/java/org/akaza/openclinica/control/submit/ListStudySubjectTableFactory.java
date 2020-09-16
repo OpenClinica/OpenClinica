@@ -80,6 +80,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private UserService userService;
     private HttpServletRequest request;
     private ViewStudySubjectService viewStudySubjectService;
+    private StudySubjectService studySubjectService;
     private PermissionService permissionService;
     public static final String PAGE_NAME = "participant-matrix";
     public static final String  COMPONENT_NAME="participant-matrix-table";
@@ -304,7 +305,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
         List<String> userStatuses = new ArrayList<>();
 
-
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
+                session.getServletContext()).getBean("studySubjectService");
         if (!limit.isComplete()) {
             Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, null, 0, 0);
             if (items!=null)
@@ -439,7 +441,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             // key and a list of study events as the value.
             List<StudyEventBean> allStudyEventsForStudySubject = getStudyEventDAO().findAllByStudySubject(studySubjectBean);
             HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
-            theItem.put("isSignable", isSignable( studySubjectBean.getId()));
+
+            if (currentRole.isInvestigator()){
+                theItem.put("isSignable", studySubjectService.isSignable(studySubjectBean.getId()));
+            } else {
+                theItem.put("isSignable", false);
+            }
 
             for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
                 if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {
@@ -488,45 +495,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // Do not forget to set the items back on the tableFacade.
         tableFacade.setItems(theItems);
 
-    }
-
-    private Boolean isSignable(int studySubjectId) {
-        boolean archivedCommonEvent=false;
-        // https://jira.openclinica.com/browse/OC-13185
-        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
-                session.getServletContext()).getBean("studySubjectService");
-        StudySubjectBean studySub = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
-        List<DisplayStudyEventBean> displayStudyEvents = studySubjectService.getDisplayStudyEventsForStudySubject(
-                studySub, currentUser, currentRole, studyBean);
-
-        if (studySub.getStatus().isSigned() || displayStudyEvents.size() == 0)
-            return false;
-
-        for(DisplayStudyEventBean displayStudyEvent: displayStudyEvents) {
-            StudyEventBean studyEventBean = displayStudyEvent.getStudyEvent();
-
-            if(studyEventBean.getStudyEventDefinition().isTypeCommon()){
-               List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEventBean.getId(),studySub.getOid());
-               if(eventCrfs.size()!=0 && eventCrfs.get(0).isCurrentlyArchived()){
-                   archivedCommonEvent= true;
-               }
-            }
-
-            if (!studyEventBean.isRemoved() && !studyEventBean.isArchived() && !archivedCommonEvent) {
-                if (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                    return false;
-                } else {
-                    if (!displayStudyEvent.isSignAble()) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     private void getColumnNames() {
