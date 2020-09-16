@@ -246,11 +246,16 @@ public class ViewStudySubjectServlet extends SecureController {
                     .getBean("studySubjectService");
             List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole, study);
             List<DisplayStudyEventBean> tempList = new ArrayList<>();
+            List<String> commonList = new ArrayList<String>();
             for (DisplayStudyEventBean displayEvent : displayEvents) {
-                if (!displayEvent.getStudyEvent().getStudyEventDefinition().getType().equals(COMMON)) {
+                if (displayEvent.getStudyEvent().getStudyEventDefinition().getType().equals(COMMON)) {
+                    commonList.add("'" + displayEvent.getStudyEvent().getStudyEventDefinition().getName() + "'");
+                }
+                else {
                     tempList.add(displayEvent);
                 }
             }
+            request.setAttribute("showCommons", String.join(", ", commonList));
             displayEvents = new ArrayList(tempList);
             List<String> itemPathList =null;
             String givenStudyOid=null ;
