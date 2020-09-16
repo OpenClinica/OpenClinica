@@ -544,6 +544,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         }
     }
 
+
+
     public Boolean isSignable(StudyUserRoleBean currentRole, int studySubjectId) {
         if (!currentRole.isInvestigator()){
             return false;
@@ -557,7 +559,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         for (StudyEvent studyEvent: studyEvents) {
             if(studyEvent.getStudyEventDefinition().getType().equals(COMMON)){
-                List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getId(), studySubject.getOcOid());
+                List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
                 if(eventCrfs.size()!=0 && eventCrfs.get(0).isCurrentlyArchived()){
                     archivedCommonEvent= true;
                 }
