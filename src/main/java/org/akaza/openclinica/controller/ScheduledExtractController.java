@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -84,6 +85,14 @@ public class ScheduledExtractController {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID,
                     "No study found for StudyOId:" + studyOid + ".")).body(null);
         }
+
+        StudyUserRoleBean studyRoleBean = userAccountBean.getRoleByStudy(study);
+        if (studyRoleBean.getRole() == Role.RESEARCHASSISTANT || studyRoleBean.getRole() == Role.RESEARCHASSISTANT2
+                || studyRoleBean.getRole() == Role.STUDY_RESEARCHASSISTANT || studyRoleBean.getRole() == Role.STUDY_RESEARCHASSISTANT2) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+                    "Insufficient privileges.")).body(null);
+        }
+
         List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
         if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
@@ -123,11 +132,17 @@ public class ScheduledExtractController {
             return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
-
         Study study = studyDao.findPublicStudy(studyOid);
         if(study == null){
             String errorMessage = errorHelper("No study found for StudyOId:" +  studyOid + ".", response);
             return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+        }
+
+        StudyUserRoleBean studyRoleBean = userAccountBean.getRoleByStudy(study);
+        if (studyRoleBean.getRole() == Role.RESEARCHASSISTANT || studyRoleBean.getRole() == Role.RESEARCHASSISTANT2
+                || studyRoleBean.getRole() == Role.STUDY_RESEARCHASSISTANT || studyRoleBean.getRole() == Role.STUDY_RESEARCHASSISTANT2) {
+            String errorMessage = errorHelper("Insufficient privileges.", response);
+            return new ResponseEntity<>(errorMessage, org.springframework.http.HttpStatus.UNAUTHORIZED);
         }
 
         List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
