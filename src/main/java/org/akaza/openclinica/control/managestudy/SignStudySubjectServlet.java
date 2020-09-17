@@ -311,7 +311,7 @@ public class SignStudySubjectServlet extends SecureController {
 
         Study study = (Study) getStudyDao().findByPK(studyId);
 
-        // request.setAttribute("study", study);
+        request.setAttribute("subjectStudy", study);
 
         if (study.isSite()) {// this is a site,find parent
             Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
