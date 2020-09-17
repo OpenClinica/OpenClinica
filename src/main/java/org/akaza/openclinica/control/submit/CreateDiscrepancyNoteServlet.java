@@ -57,11 +57,13 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Create a discrepancy note for a data entity
@@ -147,6 +149,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
     public static final String NOTE_SUBMITTED = "note_submitted";
 
+    private QueryService queryService;
+
     /*
      * (non-Javadoc)
      *
@@ -168,6 +172,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        queryService = (QueryService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("queryService");
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         List<DiscrepancyNoteType> types = DiscrepancyNoteType.list;
 
@@ -604,6 +610,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             note.setResolutionStatusId(resStatusId);
             note.setDiscrepancyNoteTypeId(typeId);
             note.setParentDnId(parent.getId());
+            note.setDisplayId(queryService.generateDisplayId(!parent.isActive()));
+
 
             if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.FAILEDVAL.getId()
                     && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
@@ -744,6 +752,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         // This way one can be the parent that updates as the
                         // status changes, but one also stays as New.
                         note.setParentDnId(note.getId());
+                        note.setDisplayId(queryService.generateDisplayId(false));
                         note = (DiscrepancyNoteBean) dndao.create(note);
                         dndao.createMapping(note);
                     }

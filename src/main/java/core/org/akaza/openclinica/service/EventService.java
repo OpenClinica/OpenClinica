@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,8 @@ public class EventService implements EventServiceInterface {
     FormLayoutDao formLayoutDao;
     @Autowired
     EventDefinitionCrfDao eventDefinitionCrfDao;
+    @Autowired
+    QueryService queryService;
 
     @SuppressWarnings( {"unchecked", "rawtypes"} )
     public void archiveEventDefinition(StudyEventDefinition sed, UserAccount userAccount, Study study) {
@@ -223,6 +226,7 @@ public class EventService implements EventServiceInterface {
                 childDiscrepancyNote.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
                 childDiscrepancyNote.setDateCreated(new Date());
                 childDiscrepancyNote.setDetailedNotes(detailedNotes);
+                childDiscrepancyNote.setDisplayId(queryService.generateDisplayId(false));
                 discrepancyNoteDao.saveOrUpdate(childDiscrepancyNote);
                 saveQueryItemDatamap(childDiscrepancyNote, itemData);
 

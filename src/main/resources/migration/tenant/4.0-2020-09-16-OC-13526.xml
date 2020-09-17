@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="sbalasubramanian" id="2020-09-16-OC-13526-01">
+        <comment>Adding new column display_id in discrepancy_note table</comment>
+        <addColumn tableName="discrepancy_note">
+            <column name="display_id" type="VARCHAR(32)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2020-09-16-OC-13526-02">
+        <addUniqueConstraint columnNames="display_id" constraintName="unique_display_id" tableName="discrepancy_note"/>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2020-09-16-OC-13526-03">
+        <comment>Migrating the child discrepancy_note_id to new display_id</comment>
+        <sql>
+            update discrepancy_note set display_id  = 'CDN_' || discrepancy_note_id where parent_dn_id is not null;
+        </sql>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2020-09-16-OC-13526-04">
+        <comment>Migrating the parent discrepancy_note_id to new display_id</comment>
+        <sql>
+            update discrepancy_note set display_id  = 'DN_' || discrepancy_note_id where parent_dn_id is null;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

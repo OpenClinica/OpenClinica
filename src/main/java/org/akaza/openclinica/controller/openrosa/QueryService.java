@@ -33,4 +33,5 @@ public interface QueryService {
     
     DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean, boolean parentDn) throws Exception;
     void saveQueryItemDatamap(QueryServiceHelperBean helperBean);
+    String generateDisplayId(Boolean parentDn);
 }

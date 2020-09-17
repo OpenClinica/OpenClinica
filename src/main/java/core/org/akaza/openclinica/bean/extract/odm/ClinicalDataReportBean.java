@@ -875,8 +875,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         String nls = System.getProperty("line.separator");
         // Boolean p = s.length()>0||i.length()>0||d.toString().length()>0||n>0 ? true : false;
         xml.append(currentIndent + "<OpenClinica:DiscrepancyNote ");
-        if (dn.getOid() != null) {
-            String i = dn.getOid();
+        if (dn.getDisplayId() != null) {
+            String i = dn.getDisplayId();
             if (i.length() > 0) {
                 xml.append("ID=\"" + StringEscapeUtils.escapeXml(i) + "\" ");
             }
@@ -923,8 +923,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             for (ChildNoteBean cn : dn.getChildNotes()) {
                 xml.append(currentIndent + indent + "<OpenClinica:ChildNote ");
 
-                if (cn.getOid() != null) {
-                    String s = cn.getOid();
+                if (cn.getDisplayId() != null) {
+                    String s = cn.getDisplayId();
                     if (s.length() > 0) {
                         xml.append("ID=\"" + s + "\" ");
                     }

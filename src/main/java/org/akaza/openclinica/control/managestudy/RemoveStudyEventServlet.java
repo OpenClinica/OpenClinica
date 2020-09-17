@@ -35,9 +35,11 @@ import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jxu
@@ -51,6 +53,7 @@ public class RemoveStudyEventServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private QueryService queryService;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -77,7 +80,7 @@ public class RemoveStudyEventServlet extends SecureController {
         int studySubId = fp.getInt("studySubId");// studySubjectId
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
-
+        queryService = (QueryService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("queryService");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
@@ -160,7 +163,10 @@ public class RemoveStudyEventServlet extends SecureController {
                                         dnb.setParentDnId(itemParentNote.getId());
                                         dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
                                         dnb.setThreadUuid(itemParentNote.getThreadUuid());
+                                        dnb.setDisplayId(queryService.generateDisplayId(false));
                                     }
+                                    else
+                                        dnb.setDisplayId(queryService.generateDisplayId(true));
                                     dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
                                     dnb.setStudyId(currentStudy.getStudyId());
                                     dnb.setAssignedUserId(ub.getId());

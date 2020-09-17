@@ -196,5 +196,19 @@ public class ErrorConstants {
     public static final String ERR_EVENT_ORDINAL_IS_INCORRECT = "errorCode.eventOrdinalIsIncorrect";
 
     public static final String ERR_HAS_NO_ACCESS_TO_FORM = "errorCode.hasNoAccessToForm";
+    public static final String ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID = "errorCode.discrepancyNoteStatusNotValid";
+    public static final String ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID = "errorCode.discrepancyNoteTypeNotValid";
+    public static final String ERR_DISCREPANCY_NOTE_ID_TOO_LONG = "errorCode.descrepancyNoteIdTooLong";
+    public static final String ERR_USER_NOT_VALID = "errorCode.userNotValid";
+    public static final String ERR_ASSIGNED_USER_NOT_VALID = "errorCode.assignedUserNotValid";
+    public static final String ERR_DETAILED_NOTE_NOT_AVAILABLE = "errorCode.detailedNoteNotAvailable";
+    public static final String ERR_DETAILED_NOTE_TOO_LONG = "errorCode.detailedNoteLengthTooLong";
+    public static final String ERR_STATUS_NOT_APPLICABLE = "errorCode.statusNotApplicable";
+    public static final String ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES = "errorCode.newQueryInBetweenOldQueries";
+    public static final String ERR_ANNOTATION_IMPORT_CANNOT_HAVE_MANY_CHILD_NOTES = "errorCode.annotationImportCannotHaveManyChildNotes";
+    public static final String ERR_PARENT_DISPLAYID_IS_ALREADY_USED_AS_CHILD_DISPLAYID = "errorCode.parentDisplayIdIsAlreadyUsedForChildDisplayId";
+    public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED_AS_PARENT_DISPLAYID = "errorCode.childDisplayIdIsAlreadyUsedForParentDisplayId";
+    public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED = "errorCode.childDisplayIdIsAlreadyUsed";
+    public static final String ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID = "errorCode.childDisplayIdIsANotCorrespondingToParentDisplayId";
 
 }

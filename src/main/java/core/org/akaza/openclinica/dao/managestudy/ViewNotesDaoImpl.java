@@ -54,6 +54,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         @Override
         public DiscrepancyNoteBean mapRow(ResultSet rs, int rowNum) throws SQLException {
             DiscrepancyNoteBean b = new DiscrepancyNoteBean();
+            b.setDisplayId(rs.getString("display_id"));
             b.setId(rs.getInt("discrepancy_note_id"));
             b.setColumn(rs.getString("column_name"));
             b.setStudyId(rs.getInt("study_id"));

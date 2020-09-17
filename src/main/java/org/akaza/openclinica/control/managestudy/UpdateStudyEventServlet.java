@@ -46,6 +46,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
@@ -93,6 +94,7 @@ public class UpdateStudyEventServlet extends SecureController {
     private StudySubjectDao studySubjectDao;
     private EventCRFDAO eventCRFDAO;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
+    private QueryService queryService;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -113,6 +115,7 @@ public class UpdateStudyEventServlet extends SecureController {
         studySubjectDao = (StudySubjectDao) SpringServletAccess.getApplicationContext(context).getBean("studySubjectDaoDomain");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         studyEventDefinitionDAO = (StudyEventDefinitionDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefinitionJDBCDao");
+        queryService = (QueryService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("queryService");
 
         FormDiscrepancyNotes discNotes = null;
         FormProcessor fp = new FormProcessor(request);
@@ -728,7 +731,7 @@ public class UpdateStudyEventServlet extends SecureController {
         child.setEntityType(parent.getEntityType());
         child.setColumn(parent.getColumn());
         child.setField(parent.getField());
-
+        child.setDisplayId(queryService.generateDisplayId(false));
         return child;
     }
 

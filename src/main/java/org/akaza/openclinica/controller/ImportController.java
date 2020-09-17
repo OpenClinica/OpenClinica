@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import core.org.akaza.openclinica.service.CustomParameterizedException;
 import core.org.akaza.openclinica.service.UtilService;
 import io.swagger.annotations.Api;
@@ -134,7 +135,7 @@ public class ImportController {
 
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-
+        DiscrepancyNotesBean ds = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0).getFormData().get(0).getItemGroupData().get(0).getItemData().get(0).getDiscrepancyNotes();
         if (studyOID.isEmpty()) {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_OID_MISSING, HttpStatus.NOT_FOUND);
         }
@@ -239,7 +240,7 @@ public class ImportController {
                 try {
                     importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isSystemUserImport);
                 } catch (Exception e) {
-                    logger.error("Exception is thrown while processing dataImport: " + e);
+                    logger.error("Exception is thrown while processing dataImport: " , e);
                     userService.persistJobFailed(jobDetail,fileNm);
                 }
                 return null;

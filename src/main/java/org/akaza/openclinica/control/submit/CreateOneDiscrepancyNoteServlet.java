@@ -40,12 +40,14 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Create a discrepancy note
@@ -72,6 +74,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String BOX_DN_MAP = "boxDNMap";
     public static final String BOX_TO_SHOW = "boxToShow";
 
+    QueryService queryService;
+
     /*
      * (non-Javadoc)
      *
@@ -96,6 +100,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        queryService = (QueryService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("queryService");
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
 
         int eventCRFId = fp.getInt(CreateDiscrepancyNoteServlet.EVENT_CRF_ID);
@@ -179,6 +185,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             dn.setField(field);
 
             if(parentId > 0) {
+                    if(dn.getDisplayId() == null)
+                        dn.setDisplayId(queryService.generateDisplayId(false));
                     if (dn.getResolutionStatusId() != parent.getResolutionStatusId()) {
                         parent.setResolutionStatusId(dn.getResolutionStatusId());
                         dndao.update(parent);
@@ -198,6 +206,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                         }
                     }
             } else {
+                if(dn.getDisplayId() == null)
+                    dn.setDisplayId(queryService.generateDisplayId(true));
                 ypos = "0";
             }
 

@@ -94,6 +94,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String itemGroupName;
     private String threadUuid;
     private Integer threadNumber;
+    private String displayId;
     private List <CustomColumn> customColumns;
 
     private Study study = new Study();
@@ -668,5 +669,13 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setEventCrfWorkflowStatus(EventCrfWorkflowStatusEnum eventCrfWorkflowStatus) {
         this.eventCrfWorkflowStatus = eventCrfWorkflowStatus;
+    }
+
+    public String getDisplayId() {
+        return displayId;
+    }
+
+    public void setDisplayId(String displayId) {
+        this.displayId = displayId;
     }
 }
