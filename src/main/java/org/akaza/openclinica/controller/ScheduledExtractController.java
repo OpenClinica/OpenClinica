@@ -6,7 +6,6 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.service.UtilService;
@@ -16,7 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.controller.dto.ScheduledExtractJobDetailDTO;
 import org.akaza.openclinica.service.ValidateService;
-import org.akaza.openclinica.service.ValidateServiceImpl;
 import org.apache.http.entity.ContentType;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -32,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.util.ArrayList;
@@ -75,18 +72,18 @@ public class ScheduledExtractController {
         utilService.setSchemaFromStudyOid(studyOid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
                     "Insufficient privileges.")).body(null);
         }
 
         Study study = studyDao.findPublicStudy(studyOid);
-        if(study == null){
+        if (study == null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID,
                     "No study found for StudyOId:" + studyOid + ".")).body(null);
         }
         List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
         if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
                     "Insufficient privileges.")).body(null);
         }
 
@@ -125,8 +122,8 @@ public class ScheduledExtractController {
 
 
         Study study = studyDao.findPublicStudy(studyOid);
-        if(study == null){
-            String errorMessage = errorHelper("No study found for StudyOId:" +  studyOid + ".", response);
+        if (study == null) {
+            String errorMessage = errorHelper("No study found for StudyOId:" + studyOid + ".", response);
             return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
         }
 
