@@ -297,7 +297,6 @@ $(function() {
     var codes = {};
     var columns = {};
     var errors = [];
-    var showCommons = [${showCommons}];
 
     function logError(message, objs) {
         console.log(arguments);
@@ -371,16 +370,14 @@ $(function() {
 
         var numVisitBased = 0;
         foreach(metadata.StudyEventDef, function(studyEvent) {
-            var studyEventOid = studyEvent['@OID'];
-            studyEvents[studyEventOid] = studyEvent;
+            studyEvents[studyEvent['@OID']] = studyEvent;
 
             var eventType = studyEvent['@OpenClinica:EventType'];
             if (eventType === 'Common') {
-                var notArchived = studyEvent['@OpenClinica:Status'] !== 'DELETED';
-                var showEvenArchived = showCommons.indexOf(studyEvent['@Name']) > -1;
-                if (studyEvent['@OpenClinica:Removed'] !== 'Yes' && (notArchived || showEvenArchived))
+                if (studyEvent['@OpenClinica:Removed'] !== 'Yes')
                     studyEvent.showMe = true;
                 else {
+                    studyEventOid = studyEvent['@OID'];
                     $.ajax({
                         type: "GET",
                         url: 'rest/clinicaldata/json/stats/${study.oc_oid}/${studySub.oid}/' + studyEventOid,
@@ -399,6 +396,7 @@ $(function() {
 
             studyEvent.forms = {};
             foreach(studyEvent.FormRef, function(ref) {
+                var studyEventOid = studyEvent['@OID'];
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
                 var columnTitles = [];
