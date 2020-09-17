@@ -1216,7 +1216,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String add_another_occurrence = resword.getString("add_another_occurrence");
-        String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
@@ -1428,7 +1427,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String add_another_occurrence = resword.getString("add_another_occurrence");
-        String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
@@ -1516,11 +1514,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         }
         eventDiv.trEnd(0);
-        eventDiv.tr(0).id("Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("display: all").close();
-        eventDiv.td(0).styleClass("table_cell_left").colspan("2").close().append("<i>").append(click_for_more_options).append("</i>").tdEnd();
-        eventDiv.trEnd(0);
 
-        eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("display: none").close();
+        eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).close();
         eventDiv.td(0).colspan("2").close();
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
@@ -1669,16 +1664,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
                                  StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
-        String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseover += "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_collapse.gif');";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
         String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
-        builder.a().href(href1 + href2);
-        builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
+        builder.a().onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
 
@@ -1688,14 +1680,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                                           StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseover += "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_collapse.gif');";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
         String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
-        builder.a().href(href1 + href2);
+        builder.a().href(href1);
         builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
@@ -1715,18 +1706,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
                 + "); ";
-        String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "moveObject('Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "', event); ";
         onmouseover += "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_expand.gif');";
         String onmouseout = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseout += "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif');";
         String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
-        String href = studyEvents.size() > 1 ? href1Repeating + href2 : href1 + href2;
+        String href = studyEvents.size() > 1 ? href1Repeating : "";
         builder.a().href(href);
-        // builder.onmouseover(onmouseover);
-        // builder.onmouseout(onmouseout);
         builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
@@ -1747,14 +1734,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private void linkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
-        String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
         String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
-        builder.a().href(href1 + href2);
-        builder.onclick(onClick1 + onClick2 + onClick3 + onClick4);
+        builder.a().onclick(onClick1 + onClick2 + onClick3 + onClick4);
         builder.close().append("X").aEnd();
 
     }

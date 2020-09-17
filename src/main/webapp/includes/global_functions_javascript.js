@@ -1605,15 +1605,10 @@ function hideObjects( obj ) {
             prevObject = obj;
         } else {
                 getObject( prevObject ).querySelector( 'a' ).click();
-                // make sure the options show up correctly
-                setTimeout(function() {
                     const menuOn = getObject( obj.replace('Lock', 'Menu_on').replace('Event', 'Menu_on') );
-                    const menuOff = getObject( obj.replace('Lock', 'Menu_off').replace('Event', 'Menu_off') );
                     if ( menuOn && menuOn.style.display === "none" ) {
                         menuOn.style.display =  "";
-                        menuOff.style.display = "none";
                     }
-                }, 10);
             prevObject = obj;
         }
 }
