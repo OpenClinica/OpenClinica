@@ -141,10 +141,12 @@
 </c:if>
 
 <c:forEach var="studySub" items="${participants}">
-    ${studySub.name}<br>
     <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
     <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
-        <table>
+        <table id="${studySub.name}-${currRow.bean.studyEvent.studyEventDefinition.id}-${currRow.bean.studyEvent.sampleOrdinal}">
+            <td>
+                ${studySub.name}-${currRow.bean.studyEvent.studyEventDefinition.name}-${currRow.bean.studyEvent.sampleOrdinal} 
+            </td>
             <%@include file="eventActions.jsp"%>
         </table>
     </c:forEach>

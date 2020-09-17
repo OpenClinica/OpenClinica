@@ -1516,69 +1516,69 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                eventDiv.tr(0).valign("top").close();
-                eventDiv.td(0).styleClass("table_cell_left").close();
-                enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-                eventDiv.tdEnd().trEnd(0);
-                if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
-                        && currentRole.getRole() != Role.MONITOR) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
-                    eventDiv.tdEnd().trEnd(0);
-                    if(!studyEvents.get(0).isLocked()) {
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell_left").close();
-                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                        eventDiv.tdEnd().trEnd(0);
-                    }
-                }
-            }
+            // else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+            //     eventDiv.tr(0).valign("top").close();
+            //     eventDiv.td(0).styleClass("table_cell_left").close();
+            //     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
+            //     eventDiv.tdEnd().trEnd(0);
+            //     if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
+            //             && currentRole.getRole() != Role.MONITOR) {
+            //         eventDiv.tr(0).valign("top").close();
+            //         eventDiv.td(0).styleClass("table_cell_left").close();
+            //         updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
+            //         eventDiv.tdEnd().trEnd(0);
+            //         if(!studyEvents.get(0).isLocked()) {
+            //             eventDiv.tr(0).valign("top").close();
+            //             eventDiv.td(0).styleClass("table_cell_left").close();
+            //             removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+            //             eventDiv.tdEnd().trEnd(0);
+            //         }
+            //     }
+            // }
 
-            else if (studyEvents.size()>0 &&  studyEvents.get(0).isLocked()) {
-                eventDiv.tdEnd().trEnd(0);
-                if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-                    eventDiv.tdEnd().trEnd(0);
-                }
-            } else {
-                eventDiv.tr(0).valign("top").close();
-                eventDiv.td(0).styleClass("table_cell_left").close();
-                enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-                eventDiv.tdEnd().trEnd(0);
+            // else if (studyEvents.size()>0 &&  studyEvents.get(0).isLocked()) {
+            //     eventDiv.tdEnd().trEnd(0);
+            //     if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
+            //         eventDiv.tr(0).valign("top").close();
+            //         eventDiv.td(0).styleClass("table_cell_left").close();
+            //         enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
+            //         eventDiv.tdEnd().trEnd(0);
+            //     }
+            // } else {
+            //     eventDiv.tr(0).valign("top").close();
+            //     eventDiv.td(0).styleClass("table_cell_left").close();
+            //     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
+            //     eventDiv.tdEnd().trEnd(0);
 
-                if (studyEvents.size() > 0 &&  studyEvents.get(0).isRemoved()) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    eventDiv.append(restoreStudySubjectLinkBuilder(studySubject, restoreText));
-                    eventDiv.tdEnd().trEnd(0);
-                } else {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
-                    eventDiv.tdEnd().trEnd(0);
-                    if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
-                            && currentRole.getRole() != Role.MONITOR && !eventStatus.equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
-                        if(!studyEvents.get(0).isLocked()) {
-                            eventDiv.tr(0).valign("top").close();
-                            eventDiv.td(0).styleClass("table_cell_left").close();
-                            removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                            eventDiv.tdEnd().trEnd(0);
-                        }
-                    }
-                }
-            }
+            //     if (studyEvents.size() > 0 &&  studyEvents.get(0).isRemoved()) {
+            //         eventDiv.tr(0).valign("top").close();
+            //         eventDiv.td(0).styleClass("table_cell_left").close();
+            //         eventDiv.append(restoreStudySubjectLinkBuilder(studySubject, restoreText));
+            //         eventDiv.tdEnd().trEnd(0);
+            //     } else {
+            //         eventDiv.tr(0).valign("top").close();
+            //         eventDiv.td(0).styleClass("table_cell_left").close();
+            //         updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
+            //         eventDiv.tdEnd().trEnd(0);
+            //         if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
+            //                 && currentRole.getRole() != Role.MONITOR && !eventStatus.equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
+            //             if(!studyEvents.get(0).isLocked()) {
+            //                 eventDiv.tr(0).valign("top").close();
+            //                 eventDiv.td(0).styleClass("table_cell_left").close();
+            //                 removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+            //                 eventDiv.tdEnd().trEnd(0);
+            //             }
+            //         }
+            //     }
+            // }
         }
 
-        if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
-            eventDiv.tr(0).valign("top").close();
-            eventDiv.td(0).styleClass("table_cell_left").close();
-            enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-            eventDiv.tdEnd().trEnd(0);
-        }
+        // if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
+        //     eventDiv.tr(0).valign("top").close();
+        //     eventDiv.td(0).styleClass("table_cell_left").close();
+        //     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
+        //     eventDiv.tdEnd().trEnd(0);
+        // }
         eventDiv.tableEnd(0).tdEnd().trEnd(0);
 
         eventDiv.tableEnd(0);
