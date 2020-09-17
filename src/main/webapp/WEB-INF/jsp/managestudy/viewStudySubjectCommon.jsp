@@ -374,7 +374,7 @@ $(function() {
 
             var eventType = studyEvent['@OpenClinica:EventType'];
             if (eventType === 'Common') {
-                if (studyEvent['@OpenClinica:Removed'] !== 'Yes')
+                if (studyEvent['@OpenClinica:Status'] !== 'DELETED')
                     studyEvent.showMe = true;
                 else {
                     studyEventOid = studyEvent['@OID'];
