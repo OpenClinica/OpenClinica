@@ -205,6 +205,14 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                                                          Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<>();
 
+        FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
+        Iterator edcs = eventDefinitionCRFs.iterator();
+        while(edcs.hasNext()) {
+            EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.next();
+            ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edcBean.getCrfId());
+            edcBean.setVersions(versions);
+        }
+
         for (int i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
 
