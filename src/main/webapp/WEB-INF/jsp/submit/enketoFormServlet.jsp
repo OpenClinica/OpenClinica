@@ -60,12 +60,6 @@
         function receiveMessage(event) {
             var postMessage = JSON.parse(event.data);
 
-            if (postMessage.enketoEvent === 'close') {
-                var url = new URL(iframe.src);
-                var ecid = url.searchParams.get("ecid");
-                jQuery.get(myContextPath + '/pages/closeForm?ecid=' + ecid);
-            }
-
             if ((postMessage.enketoEvent === 'submissionsuccess') ||
                 (postMessage.enketoEvent === 'close')) {
                 iframe = document.getElementById("enketo");

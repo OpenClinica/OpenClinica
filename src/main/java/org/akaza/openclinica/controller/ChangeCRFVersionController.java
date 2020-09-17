@@ -134,15 +134,16 @@ public class ChangeCRFVersionController {
         resetPanel(request);
         ModelMap gridMap = new ModelMap();
 
+
         request.setAttribute("eventCrfId", eventCRFId);
-        request.setAttribute("studySubjectLabel", studySubjectLabel);
+        request.setAttribute("studySubjectLabel", StringEscapeUtils.escapeHtml(studySubjectLabel));
         request.setAttribute("eventDefinitionCRFId", eventDefinitionCRFId);
         request.setAttribute("studySubjectId", studySubjectId);
         request.setAttribute("crfId", crfId);
-        request.setAttribute("crfName", crfName);
+        request.setAttribute("crfName", StringEscapeUtils.escapeHtml(crfName));
         request.setAttribute("formLayoutId", formLayoutId);
-        request.setAttribute("formLayoutName", formLayoutName.trim());
-        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPage);
+        request.setAttribute("formLayoutName", StringEscapeUtils.escapeHtml(formLayoutName.trim()));
+        request.setAttribute(SecureController.ORIGINATING_PAGE, StringEscapeUtils.escapeHtml(originatingPage));
 
         ArrayList<String> pageMessages = initPageMessages(request);
         String errorMessage = request.getParameter("errorMessage");

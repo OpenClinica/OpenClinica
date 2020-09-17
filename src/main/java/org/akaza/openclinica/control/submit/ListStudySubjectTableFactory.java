@@ -491,6 +491,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private Boolean isSignable(int studySubjectId) {
+        boolean archivedCommonEvent=false;
         // https://jira.openclinica.com/browse/OC-13185
         StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
                 session.getServletContext()).getBean("studySubjectService");
@@ -504,7 +505,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         for(DisplayStudyEventBean displayStudyEvent: displayStudyEvents) {
             StudyEventBean studyEventBean = displayStudyEvent.getStudyEvent();
 
-            if (!studyEventBean.isRemoved() && !studyEventBean.isArchived()) {
+            if(studyEventBean.getStudyEventDefinition().isTypeCommon()){
+               List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEventBean.getId(),studySub.getOid());
+               if(eventCrfs.size()!=0 && eventCrfs.get(0).isCurrentlyArchived()){
+                   archivedCommonEvent= true;
+               }
+            }
+
+            if (!studyEventBean.isRemoved() && !studyEventBean.isArchived() && !archivedCommonEvent) {
                 if (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                         && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
                         && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)

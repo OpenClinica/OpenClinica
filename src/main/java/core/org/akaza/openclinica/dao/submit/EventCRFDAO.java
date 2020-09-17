@@ -724,7 +724,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
             variables.put(new Integer(3), studyId);
             variables.put(new Integer(4), parentStudyId);
         }
-        sql =sql+" "+ digester.getQuery("getCountWithFilterPart2");
+        sql =sql+" "+ digester.getQuery("getWithFilterAndSortPart2");
 
         sql += filter.execute("");
 
