@@ -938,10 +938,11 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
         if (studyEvents.size() > 0 && studyEvents.get(0).isRemoved()) {
-            eventDiv.append(resword.getString("status")).append(": ").append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+            eventDiv.append(resword.getString("status")).append(": ").append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
         } else {
-            eventDiv.append(resword.getString("status")).append(": ").append(eventStatus.getDisplayValue()).br();
+            eventDiv.append(resword.getString("status")).append(": ").append(eventStatus.getDisplayValue());
         }
+        eventDiv.append(" &nbsp; ");
         if (studyEvents.size() > 0) {
             if (studyEvents.get(0).isSigned()) {
                 eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
