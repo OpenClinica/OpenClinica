@@ -140,17 +140,59 @@
     </div>
 </c:if>
 
-<c:forEach var="studySub" items="${participants}">
-    <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
-    <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
-        <table id="${studySub.name}-${currRow.bean.studyEvent.studyEventDefinition.id}-${currRow.bean.studyEvent.sampleOrdinal}">
-            <td>
-                ${studySub.name}-${currRow.bean.studyEvent.studyEventDefinition.name}-${currRow.bean.studyEvent.sampleOrdinal} 
-            </td>
-            <%@include file="eventActions.jsp"%>
-        </table>
+<div>
+    <c:forEach var="studySub" items="${participants}">
+        <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+        <div id="actions4${studySub.name}">
+            <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                <div>
+                    ${studySub.name}
+                    ${currRow.bean.studyEvent.studyEventDefinition.id}
+                    ${currRow.bean.studyEvent.sampleOrdinal} 
+                    ${currRow.bean.studyEvent.studyEventDefinition.name}    
+                </div>
+                <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}" data-occurrence="${currRow.bean.studyEvent.sampleOrdinal}">
+                    <%@include file="eventActions.jsp"%>
+                </table>
+            </c:forEach>    
+        </div>
     </c:forEach>
-</c:forEach>
+    <script>
+        jQuery('#findSubjects').on('click', 'a', function() {
+            var menu = jQuery(this).prev('div[id^=Event_]');
+            if (!menu.length)
+                return;
+
+            var parts = menu.attr('id').split('_');
+            var participantId = parts[1];
+            var eventDefId = parts[2];
+            var extra = jQuery('#actions4' + participantId);
+            if (!extra.length)
+                return;
+
+            extra = extra.children('[data-event-def-id=' + eventDefId + ']');
+            if (!extra.length)
+                return;
+                        
+            var actions = extra.find('td');
+            actions.each(function() {
+                var td = jQuery(this);
+                td.css('display', 'block');
+                td.children('a').append('&nbsp;&nbsp;&nbsp;' + td.find('span').attr('title'));
+            });
+
+            var target = menu.find('table').find('table');
+            var tbody = target.children('tbody');
+            if (tbody.length)
+                target = tbody;
+
+            actions.appendTo(target);
+            extra.remove();
+
+            window.menu = menu;
+        });
+    </script>
+</div>
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
