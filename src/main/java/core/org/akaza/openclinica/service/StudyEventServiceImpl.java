@@ -1,15 +1,5 @@
 package core.org.akaza.openclinica.service;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -20,8 +10,6 @@ import core.org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.controller.dto.*;
-import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -35,10 +23,12 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.controller.dto.*;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +38,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service( "StudyEventService" )
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+@Service("StudyEventService")
 public class StudyEventServiceImpl implements StudyEventService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Autowired
-    @Qualifier( "dataSource" )
+    @Qualifier("dataSource")
     private BasicDataSource dataSource;
 
     @Autowired
@@ -523,10 +522,9 @@ public class StudyEventServiceImpl implements StudyEventService {
      * <li>The subject does not yet have a study event for the given study event
      * definition
      * </ul>
-     *
      * @param studyEventDefinition The definition of the study event which is to be added for the
-     *                             subject.
-     * @param studySubject         The subject for which the study event is to be added.
+     * subject.
+     * @param studySubject The subject for which the study event is to be added.
      * @return <code>true</code> if the subject may receive an additional study
      * event, <code>false</code> otherwise.
      */
@@ -631,7 +629,6 @@ public class StudyEventServiceImpl implements StudyEventService {
                     if (eventObject instanceof ErrorObj) {
                         return eventObject;
                     } else if (eventObject instanceof StudyEvent) {
-
                         studyEventResponseDTO = new StudyEventResponseDTO();
                         studyEventResponseDTO.setSubjectKey(subjectDataBean.getStudySubjectID());
                         studyEventResponseDTO.setStudyEventOID(studyEventDataBean.getStudyEventOID());
@@ -862,7 +859,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                 String startDate = studyEventScheduleDTO.getStartDate();
                 String endDate = studyEventScheduleDTO.getEndDate();
                 String studyEventStatus = studyEventScheduleDTO.getStudyEventStatus();
-                Integer rowNumber=studyEventScheduleDTO.getRowNum();
+                Integer rowNumber = studyEventScheduleDTO.getRowNum();
 
                 ODMContainer odmContainer = new ODMContainer();
                 Object result = null;
@@ -876,8 +873,8 @@ public class StudyEventServiceImpl implements StudyEventService {
                     studyEventScheduleRequestDTO.setEndDate(endDate);
                     populateOdmContainerForEventSchedule(odmContainer, studyEventScheduleRequestDTO, siteOid);
                     result = studyEventProcess(odmContainer, study.getOc_oid(), siteOid, userAccountBean, CREATE);
-                    if(result instanceof StudyEventResponseDTO) {
-                        dataImportReport = new DataImportReport(rowNumber,participantId, studyEventOID,((StudyEventResponseDTO) result).getStudyEventRepeatKey(), CREATED, null);
+                    if (result instanceof StudyEventResponseDTO) {
+                        dataImportReport = new DataImportReport(rowNumber, participantId, studyEventOID, ((StudyEventResponseDTO) result).getStudyEventRepeatKey(), CREATED, null);
                     }
 
                 } else {
@@ -891,12 +888,12 @@ public class StudyEventServiceImpl implements StudyEventService {
                     studyEventUpdateRequestDTO.setEventStatus(studyEventStatus);
                     populateOdmContainerForEventUpdate(odmContainer, studyEventUpdateRequestDTO, siteOid);
                     result = studyEventProcess(odmContainer, study.getOc_oid(), siteOid, userAccountBean, UPDATE);
-                    if(result instanceof StudyEventResponseDTO) {
-                        dataImportReport = new DataImportReport(rowNumber,participantId, studyEventOID,((StudyEventResponseDTO) result).getStudyEventRepeatKey(), UPDATED, null);
+                    if (result instanceof StudyEventResponseDTO) {
+                        dataImportReport = new DataImportReport(rowNumber, participantId, studyEventOID, ((StudyEventResponseDTO) result).getStudyEventRepeatKey(), UPDATED, null);
                     }
                 }
                 if (result instanceof ErrorObj) {
-                    dataImportReport = new DataImportReport(rowNumber,participantId, studyEventOID, eventRepeatKey, ((ErrorObj) result).getCode(), ((ErrorObj) result).getMessage());
+                    dataImportReport = new DataImportReport(rowNumber, participantId, studyEventOID, eventRepeatKey, ((ErrorObj) result).getCode(), ((ErrorObj) result).getMessage());
                 }
                 dataImportReports.add(dataImportReport);
 
@@ -909,33 +906,31 @@ public class StudyEventServiceImpl implements StudyEventService {
             userService.persistJobFailed(jobDetail, fileName);
             logger.error("Error " + e.getMessage());
         }
-
-
     }
 
-public void convertStudyEventStatus(String value, StudyEvent studyEvent){
-        StudyEventWorkflowStatusEnum workflowStatus=convertOriginalStudyEventStatusToWorkflowSatus(value);
-        if (workflowStatus!=null) {
+    public void convertStudyEventStatus(String value, StudyEvent studyEvent) {
+        StudyEventWorkflowStatusEnum workflowStatus = convertOriginalStudyEventStatusToWorkflowSatus(value);
+        if (workflowStatus != null) {
             studyEvent.setWorkflowStatus(workflowStatus);
-        }else{
+        } else {
             if (value.equals("7")) {
                 studyEvent.setLocked(Boolean.TRUE);
-            }else if (value.equals("8")){
+            } else if (value.equals("8")) {
                 studyEvent.setSigned(Boolean.TRUE);
             }
         }
-}
+    }
 
-    public void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean){
-        StudyEventWorkflowStatusEnum workflowStatus=convertOriginalStudyEventStatusToWorkflowSatus(value);
-        if (workflowStatus!=null) {
-            if( !studyEventBean.getWorkflowStatus().equals(workflowStatus) && studyEventBean.isSigned())
+    public void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean) {
+        StudyEventWorkflowStatusEnum workflowStatus = convertOriginalStudyEventStatusToWorkflowSatus(value);
+        if (workflowStatus != null) {
+            if (!studyEventBean.getWorkflowStatus().equals(workflowStatus) && studyEventBean.isSigned())
                 studyEventBean.setSigned(Boolean.FALSE);
             studyEventBean.setWorkflowStatus(workflowStatus);
-        }else{
+        } else {
             if (value.equals("7")) {
                 studyEventBean.setLocked(Boolean.TRUE);
-            }else if (value.equals("8")){
+            } else if (value.equals("8")) {
                 studyEventBean.setSigned(Boolean.TRUE);
             }
         }

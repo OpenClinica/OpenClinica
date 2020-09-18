@@ -2,17 +2,6 @@ package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
-import core.org.akaza.openclinica.service.JobService;
-import core.org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.akaza.openclinica.controller.dto.DataImportReport;
-import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
-import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
-import org.akaza.openclinica.controller.openrosa.QueryService;
-import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import core.org.akaza.openclinica.core.form.xform.QueryBean;
 import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -21,7 +10,18 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.service.JobService;
+import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.controller.dto.DataImportReport;
+import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
+import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.controller.openrosa.QueryService;
+import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
+import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -128,6 +128,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String DATA_ENTRY_COMPLETE = "data entry complete";
     public static final String COMPLETE = "complete";
     public static final String DATA_ENTRY_STARTED = "data entry started";
+    public static final String LOCKED = "locked";
 
     public static final String FAILED = "Failed";
     public static final String INSERTED = "Inserted";
@@ -189,7 +190,7 @@ public class ImportServiceImpl implements ImportService {
 
                 ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
                 for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-                    if(studyEventDataBean.getWorkflowStatus() == null){
+                    if (studyEventDataBean.getWorkflowStatus() == null) {
                         studyEventDataBean.setWorkflowStatusAsString(studyEventDataBean.getEventStatus());
                     }
                     if (studyEventDataBean.getStudyEventOID() != null)
@@ -585,8 +586,7 @@ public class ImportServiceImpl implements ImportService {
     private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
         // only created new event crf once
         if (eventCrf.getEventCrfId() == 0) {
-            if(eventCrf.getStudyEvent().getStudyEventId() == 0)
-            {
+            if (eventCrf.getStudyEvent().getStudyEventId() == 0) {
                 eventCrf.setStudyEvent(studyEventDao.saveOrUpdate(eventCrf.getStudyEvent()));
             }
             eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
@@ -654,7 +654,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     public StudyEvent buildStudyEvent(StudySubject studySubject, StudyEventDefinition studyEventDefinition, int ordinal,
-                                       UserAccount userAccount, String startDate, String endDate) {
+                                      UserAccount userAccount, String startDate, String endDate) {
 
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
@@ -674,10 +674,15 @@ public class ImportServiceImpl implements ImportService {
 
 
     public StudyEvent updateStudyEventDatesAndStatus(StudyEvent studyEvent, UserAccount userAccount, String startDate, String endDate, String eventStatus) {
-        StudyEventWorkflowStatusEnum newEventStatus = getWorkflowStatus(eventStatus);
-        if( !studyEvent.getWorkflowStatus().equals(newEventStatus) && studyEvent.isCurrentlySigned())
-            studyEvent.setSigned(Boolean.FALSE);
-        studyEvent.setWorkflowStatus(getWorkflowStatus(eventStatus));
+        if (eventStatus.equalsIgnoreCase(LOCKED)) {
+            studyEvent.setLocked(true);
+        } else {
+            StudyEventWorkflowStatusEnum newEventStatus = getWorkflowStatus(eventStatus);
+            if (!studyEvent.getWorkflowStatus().equals(newEventStatus) && studyEvent.isCurrentlySigned())
+                studyEvent.setSigned(Boolean.FALSE);
+            studyEvent.setWorkflowStatus(getWorkflowStatus(eventStatus));
+        }
+
         setEventStartAndEndDate(studyEvent, startDate, endDate);
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
@@ -697,10 +702,14 @@ public class ImportServiceImpl implements ImportService {
     }
 
     public StudyEvent updateStudyEvntStatus(StudyEvent studyEvent, UserAccount userAccount, String eventStatus) {
-        StudyEventWorkflowStatusEnum newEventStatus = getWorkflowStatus(eventStatus);
-        if( !studyEvent.getWorkflowStatus().equals(newEventStatus) && studyEvent.isCurrentlySigned())
-            studyEvent.setSigned(Boolean.FALSE);
-        studyEvent.setWorkflowStatus(newEventStatus);
+        if (eventStatus.equalsIgnoreCase(LOCKED)) {
+            studyEvent.setLocked(true);
+        } else {
+            StudyEventWorkflowStatusEnum newEventStatus = getWorkflowStatus(eventStatus);
+            if (!studyEvent.getWorkflowStatus().equals(newEventStatus) && studyEvent.isCurrentlySigned())
+                studyEvent.setSigned(Boolean.FALSE);
+            studyEvent.setWorkflowStatus(newEventStatus);
+        }
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
@@ -748,7 +757,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ErrorObj validateForReal(String value) {
-        if(NumberUtils.isParsable(value))
+        if (NumberUtils.isParsable(value))
             return null;
         return new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
     }
@@ -790,7 +799,7 @@ public class ImportServiceImpl implements ImportService {
 
 
     private ErrorObj validateRadioOrSingleSelect(ResponseSet responseSet, String value) {
-        if(responseSet.getOptionsText().equals("_") && responseSet.getOptionsValues().equals("_"))
+        if (responseSet.getOptionsText().equals("_") && responseSet.getOptionsValues().equals("_"))
             return null;
         if (!responseSet.getOptionsValues().contains(value)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_CHOICE_NOT_FOUND);
@@ -835,10 +844,10 @@ public class ImportServiceImpl implements ImportService {
         for (StudyEvent stEvent : studyEvents) {
             eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
             if (eventCrfs.size() > 0) {
-            	eventCrf = eventCrfs.get(0);
-            	break;
+                eventCrf = eventCrfs.get(0);
+                break;
             }
-            
+
         }
 
         return eventCrf;
@@ -892,7 +901,7 @@ public class ImportServiceImpl implements ImportService {
 
                         // If the event is not imported correctly, StudyEvent will be in Scheduled state,
                         // So checking the errorCode.repeatKeyAndFormMismatch only on other event status
-                        if(!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)){
+                        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                             List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
                             if (eventCrfs.size() == 0 || eventCrfs.get(0) == null)
                                 return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
@@ -927,7 +936,7 @@ public class ImportServiceImpl implements ImportService {
                     return studyEvent;
                 } else {
 
-                		studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
+                    studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
 
                     studyEvent = scheduleEventForImport(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     return studyEvent;
@@ -1015,11 +1024,11 @@ public class ImportServiceImpl implements ImportService {
 
         if (studyEvent != null && (
                 // OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
-                                studyEvent.isCurrentlyLocked() ||
-                                studyEvent.isCurrentlyRemoved() ||
-                                studyEvent.isCurrentlyArchived() ||
-                        studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)  ||
-                        studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED) )) {
+                studyEvent.isCurrentlyLocked() ||
+                        studyEvent.isCurrentlyRemoved() ||
+                        studyEvent.isCurrentlyArchived() ||
+                        studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED) ||
+                        studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))) {
 
             errorObj = new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
         }
@@ -1116,28 +1125,30 @@ public class ImportServiceImpl implements ImportService {
 
 
     public ErrorObj validateEventTransition(StudyEvent studyEvent, UserAccount userAccount, String eventStatus) {
+        //for locked study events
+        if (eventStatus.equalsIgnoreCase(LOCKED)) {
+            return null;
+        }
+
         StudyEventWorkflowStatusEnum workflowStatus = getWorkflowStatus(eventStatus);
+
         if (workflowStatus == null)
             return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_EVENT_TRANSITION_STATUS);
 
-        if (!studyEvent.getWorkflowStatus().equals(workflowStatus) ) {
+        if (!studyEvent.getWorkflowStatus().equals(workflowStatus)) {
             if (!(workflowStatus.equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
                     && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
-                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED) ))
+                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)))
                     &&
                     !(workflowStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)
                             && studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))
                     &&
                     !(workflowStatus.equals(StudyEventWorkflowStatusEnum.STOPPED)
-                            && studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) )
+                            && studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))
                     &&
                     !(workflowStatus.equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                            && studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) )
-                    /****************  &&
-                    !(workflowStatus.equals(StudyEventWorkflowEnum.LOCKED)
-                            && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)
-                            || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SKIPPED)))*/
-            ) {
+                            && studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))
+                    ) {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_EVENT_TRANSITION_STATUS);
             }
         }
@@ -1162,8 +1173,8 @@ public class ImportServiceImpl implements ImportService {
             return StudyEventWorkflowStatusEnum.SKIPPED;
         } else if (StudyEventWorkflowStatusEnum.STOPPED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.STOPPED;
-       /************** } else if (StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
-            return StudyEventWorkflowEnum.LOCKED;*/
+            /************** } else if (StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+             return StudyEventWorkflowEnum.LOCKED;*/
         }
         return null;
     }
@@ -1175,11 +1186,7 @@ public class ImportServiceImpl implements ImportService {
                 && !StudyEventWorkflowStatusEnum.COMPLETED.toString().equalsIgnoreCase(eventStatus)
                 && !StudyEventWorkflowStatusEnum.SKIPPED.toString().equalsIgnoreCase(eventStatus)
                 && !StudyEventWorkflowStatusEnum.STOPPED.toString().equalsIgnoreCase(eventStatus)
-/********************
-                && !StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(eventStatus)
-*/  )
-
-        {
+                && !LOCKED.equalsIgnoreCase(eventStatus)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_EVENT_STATUS);
         }
         return null;
@@ -1305,7 +1312,7 @@ public class ImportServiceImpl implements ImportService {
             }
         }
         if (eventCrf != null) {
-            if(eventCrf.isCurrentlyArchived() || eventCrf.isCurrentlyRemoved()){
+            if (eventCrf.isCurrentlyArchived() || eventCrf.isCurrentlyRemoved()) {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
             }
         }
@@ -1532,9 +1539,9 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_FOUND);
         }
 
-        if(formDataBean.getWorkflowStatus() == null && formDataBean.getEventCRFStatus() != null){
+        if (formDataBean.getWorkflowStatus() == null && formDataBean.getEventCRFStatus() != null) {
             formDataBean.setWorkflowStatusAsString(formDataBean.getEventCRFStatus());
-            if(formDataBean.getWorkflowStatus() == null){
+            if (formDataBean.getWorkflowStatus() == null) {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
             }
         }
@@ -1542,11 +1549,11 @@ public class ImportServiceImpl implements ImportService {
         if (formDataBean.getWorkflowStatus() == null) {
             formDataBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         }
-        if(!formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
-                && !formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)){
+        if (!formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                && !formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
         }
-        
+
         return formLayout;
     }
 
@@ -1585,7 +1592,7 @@ public class ImportServiceImpl implements ImportService {
 
 
     private void updateSdvStatusIfAlreadyVerified(EventCrf eventCrf, UserAccount userAccount) {
-        if(eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED)){
+        if (eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED)) {
             eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrfDao.saveOrUpdate(eventCrf);
