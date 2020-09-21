@@ -467,7 +467,7 @@ public class DataController {
                 	displayItemBeanWrappers = this.dataImportService.getImportCRFDataService().getDisplayItemBeanWrappers(request, odmContainer, userBean, permittedEventCRFIds, locale);
                 }
                 
-                List<String> auditMsgs = new DataImportService(studyDao).submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
+                List<String> auditMsgs = dataImportService.submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
                         importedCRFStatuses);
 
                 // run rules if applicable

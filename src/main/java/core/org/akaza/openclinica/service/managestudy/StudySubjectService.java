@@ -23,6 +23,7 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 import javax.sql.DataSource;
@@ -63,5 +64,7 @@ public interface StudySubjectService {
     void populateUncompletedCRFsWithCRFAndVersions(DataSource ds, ArrayList uncompletedEventDefinitionCRFs);
 
     Boolean isSignable(int studySubjectId);
+
+    void updateStudySubject(StudySubject studySubject, int userBeanId);
 
 }

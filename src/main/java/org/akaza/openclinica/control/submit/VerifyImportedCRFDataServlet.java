@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -59,6 +60,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
     Locale locale;
     private EventCRFDAO eventCRFDAO;
+    private StudyEventDAO studyEventDao;
 
     /**
      *
@@ -85,9 +87,10 @@ public class VerifyImportedCRFDataServlet extends SecureController {
     @SuppressWarnings(value = "unchecked")
     public void processRequest() throws Exception {
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studyEventDao = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
         itemDataDao.setFormatDates(false);
-        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource(), getStudyDao());
+        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource(), getStudyDao(), studyEventDao, eventCRFDAO);
         String action = request.getParameter("action");
 
         FormProcessor fp = new FormProcessor(request);
