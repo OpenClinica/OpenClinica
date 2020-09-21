@@ -85,4 +85,6 @@ public interface ValidateService {
     boolean isEventOidAndParticipantIdAreLinked(String studyEventOid, int studySubjectId, int ordinal);
 
     boolean isStudySubjectPresent(String studySubjectLabel, Study study);
+
+    boolean isUserResearchAssistantInStudy(UserAccountBean userAccountBean, Study study);
 }
