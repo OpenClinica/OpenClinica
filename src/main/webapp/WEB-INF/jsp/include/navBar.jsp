@@ -317,7 +317,7 @@
             <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager'}">
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="${study.manager.replace('.build.','.design.').replace('/#/account-study', '')}${study.boardUrl}"><fmt:message key="design" bundle="${resword}"/></a>
+                <a href="${study.manager.replace('.build.','.design.').replace('/#/account-study', '')}${study.derivedBoardUrl}"><fmt:message key="design" bundle="${resword}"/></a>
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
                 &nbsp;&nbsp;|&nbsp;&nbsp;

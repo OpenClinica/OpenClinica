@@ -73,12 +73,12 @@ public class ScheduledExtractController {
         utilService.setSchemaFromStudyOid(studyOid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
                     "Insufficient privileges.")).body(null);
         }
 
         Study study = studyDao.findPublicStudy(studyOid);
-        if(study == null){
+        if (study == null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID,
                     "No study found for StudyOId:" + studyOid + ".")).body(null);
         }
@@ -90,7 +90,7 @@ public class ScheduledExtractController {
 
         List<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
         if (!validateService.isUserHasAccessToStudyOrSiteForStudy(userRoles, studyOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES,
                     "Insufficient privileges.")).body(null);
         }
 
@@ -128,8 +128,8 @@ public class ScheduledExtractController {
         }
 
         Study study = studyDao.findPublicStudy(studyOid);
-        if(study == null){
-            String errorMessage = errorHelper("No study found for StudyOId:" +  studyOid + ".", response);
+        if (study == null) {
+            String errorMessage = errorHelper("No study found for StudyOId:" + studyOid + ".", response);
             return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
         }
 

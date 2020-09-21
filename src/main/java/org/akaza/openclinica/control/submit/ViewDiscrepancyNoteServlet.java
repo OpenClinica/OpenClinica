@@ -647,8 +647,10 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         if (currentStudy.isSite()) {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.checkAndGetParentStudyId(), subjectId);
         } else if (subjectStudy.isSite()) {
+            CoreResources.setRequestSchema(request,currentSchema);
             Study publicSubjectStudy = getStudyDao().findByUniqueId(subjectStudy.getUniqueIdentifier());
-            userAccounts = udao.findAllUsersByStudyOrSite(publicSubjectStudy.getStudyId(), publicSubjectStudy.checkAndGetParentStudyId(), subjectId);
+            CoreResources.setRequestSchema(request, "public");
+            userAccounts = udao.findAllUsersByStudyOrSite(studyId, publicSubjectStudy.checkAndGetParentStudyId(), subjectId);
         } else {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }

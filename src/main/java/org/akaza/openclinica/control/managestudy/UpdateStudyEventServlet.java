@@ -242,7 +242,9 @@ public class UpdateStudyEventServlet extends SecureController {
                 // only case that this will screw up is if there are no crfs
                 // whatsoever
                 // this is addressed in the if-clause above
-                boolean crfIsRequired = edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao());
+                FormLayoutDAO formLayoutDAO = new FormLayoutDAO(sm.getDataSource());
+                FormLayoutBean formLayoutBean= (FormLayoutBean) formLayoutDAO.findByPK(existingBean.getFormLayoutId());
+                boolean crfIsRequired = edefcrfdao.isRequiredInDefinition(formLayoutBean.getCrfId() , studyEvent, getStudyDao());
                 boolean crfIsCompleted = existingBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED);
                 boolean crfIsRemoved = existingBean.isRemoved();
                 boolean crfIsArchived = existingBean.isArchived();
@@ -255,12 +257,12 @@ public class UpdateStudyEventServlet extends SecureController {
                 }
                 // }
                 EventDefinitionCRFBean tempEventDefnCRFBean = edefcrfdao.findForStudyByStudyEventIdAndCRFVersionId(studyEvent.getId(), existingBean.getCRFVersionId());
-                if(tempEventDefnCRFBean.getId() == ecrfBean.getId())
+                if(tempEventDefnCRFBean.getId() == ecrfBean.getId() || (ecrfBean.getParentId() != 0 &&  tempEventDefnCRFBean.getId() == ecrfBean.getParentId()) )
                     isEventCrfCreated = true;
             }
             //This condition is created to check the removed the completed workflow status
             // if the eventDefnCrf is required and eventCrf is not created in db i.e. Not started
-            if(ecrfBean.isRequiredCRF() && !isEventCrfCreated)
+            if(!ecrfBean.getStatus().isDeleted() && ecrfBean.isRequiredCRF() && !isEventCrfCreated)
             {
                 eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.COMPLETED);
             }
