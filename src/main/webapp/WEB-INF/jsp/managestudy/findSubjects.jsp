@@ -166,30 +166,34 @@
             var parts = menu.attr('id').split('_');
             var participantId = parts[1];
             var eventDefId = parts[2];
-            var extra = jQuery('#actions4' + participantId);
-            if (!extra.length)
+            var extraMenu = jQuery('#actions4' + participantId);
+            if (!extraMenu.length)
                 return;
 
-            extra = extra.children('[data-event-def-id=' + eventDefId + ']');
-            if (!extra.length)
+            extraMenu = extraMenu.children('[data-event-def-id=' + eventDefId + ']');
+            if (!extraMenu.length)
                 return;
-                        
-            var actions = extra.find('td');
-            actions.each(function() {
+            
+            extraMenu.find('td').each(function() {
                 var td = jQuery(this);
                 td.css('display', 'block');
                 td.children('a').append('&nbsp;&nbsp;&nbsp;' + td.find('span').attr('title'));
             });
 
             var target = menu.find('table').find('table');
+            var innerTable = target.find('table');
+            if (innerTable.length)
+                target = innerTable;
             var tbody = target.children('tbody');
             if (tbody.length)
                 target = tbody;
-
-            actions.appendTo(target);
-            extra.remove();
-
-            window.menu = menu;
+            
+            window.extraMenu = extraMenu;
+            window.target = target;
+            for (var i=0; i<target.length; i++) {
+                extraMenu.eq(i).find('td').appendTo(target.get(i));
+            }
+            extraMenu.remove();
         });
     </script>
 </div>

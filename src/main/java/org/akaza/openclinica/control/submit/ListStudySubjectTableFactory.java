@@ -1307,7 +1307,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.td(0).colspan("2").close();
             eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
-            linksDivBuilder(eventDiv, subject, rowCount, studyEvents, sed, studySubject, studyEventBean);
+            // linksDivBuilder(eventDiv, subject, rowCount, studyEvents, sed, studySubject, studyEventBean);
             eventDiv.tableEnd(0).tdEnd().trEnd(0);
             eventDiv.tableEnd(0);
             eventDiv.tdEnd();
