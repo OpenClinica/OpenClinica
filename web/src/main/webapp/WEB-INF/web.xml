@@ -67,6 +67,12 @@
 
     </listener>
 
+    <session-config>
+        <cookie-config>
+            <secure>true</secure>
+        </cookie-config>
+    </session-config>
+
 
     <!-- <filter> -->
     <!-- <filter-name>restODMFilter</filter-name> -->

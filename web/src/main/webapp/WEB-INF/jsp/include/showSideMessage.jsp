@@ -11,7 +11,7 @@
 <c:if test="${!empty pageMessages}">
 <div class="alert">    
 <c:forEach var="message" items="${pageMessages}">
- <c:out value="${message}" escapeXml="false"/> 
+ <c:out value="${message}" />
  <br><br>
 </c:forEach>
 </div>
@@ -20,7 +20,7 @@
 
 <c:if test="${empty pageMessages && param.alertmessage!=null  }">
 <div class="alert"> 
- <c:out value="${param.alertmessage}" escapeXml="false"/> 
+ <c:out value="${param.alertmessage}" />
  <br><br>
 </div>
 </c:if>

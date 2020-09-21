@@ -570,91 +570,92 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 </td>
 <td class="table_cell_left">
     <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
-    <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
+        <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
 
-            <td valign="top">
-                <!--  formfieldM_BG-->
+                <td valign="top">
+                    <!--  formfieldM_BG-->
 
-                <c:choose>
-                <c:when
-                  test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
-                <c:choose>
-                <c:when test="${isInError_Int}">
-                <div class="aka_input_error">
-                    <label for="interviewer"></label><input id="interviewer" type="text" name="interviewer" size="15"
-                                                            value="<c:out value="${interviewer}" />" class="aka_input_error">
-                    </c:when>
-                    <c:otherwise>
-                    <div class=" formfieldM_BG">
-                        <input type="text" name="interviewer" size="15"
-                               value="<c:out value="${interviewer}" />" class="formfieldM">
-                        </c:otherwise>
-                        </c:choose>
+                    <c:choose>
+                        <c:when test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
+                            <c:choose>
+                                <c:when test="${isInError_Int}">
+                                    <div class="aka_input_error">
+                                    <label for="interviewer"></label>
+                                    <input id="interviewer" type="text" name="interviewer" size="15"
+                                           value="<c:out value="${interviewer}" />" class="aka_input_error">
+                                </c:when>
+                                <c:otherwise>
+                                    <div class=" formfieldM_BG">
+                                    <input type="text" name="interviewer" size="15"
+                                           value="<c:out value="${interviewer}" />" class="formfieldM">
+                                </c:otherwise>
+                            </c:choose>
                         </c:when>
                         <c:otherwise>
-                        <div class=" formfieldM_BG">
-                            <input type="text" disabled size="15"
-                                   value="<c:out value="${interviewer}" />" class="formfieldM">
-                            <input type="hidden" name="interviewer"
-                                   value="<c:out value="${interviewer}" />">
-                            </c:otherwise>
-                            </c:choose></div>
-                        <%--BWP>>new error message design:  <jsp:include page="../showMessage.jsp">
-                          <jsp:param name="key" value="interviewer" />
-                        </jsp:include>--%>
-            </td>
-            <td valign="top" nowrap>
-                <c:set var="isNewDN" value="${hasNameNote eq 'yes' ? 0 : 1}"/>
-
-                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                    <%--<c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
-                <c:choose>
-                  <c:when test="${nameNoteResStatus == 0}">
-                      <c:set var="imageFileName" value="icon_noNote" />
-                  </c:when>
-                  <c:when test="${nameNoteResStatus == 1}">
-                      <c:set var="imageFileName" value="icon_Note" />
-                  </c:when>
-                  <c:when test="${nameNoteResStatus == 2}">
-                      <c:set var="imageFileName" value="icon_flagYellow" />
-                  </c:when>
-                  <c:when test="${nameNoteResStatus == 3}">
-                      <c:set var="imageFileName" value="icon_flagGreen" />
-                  </c:when>
-                  <c:when test="${nameNoteResStatus == 4}">
-                      <c:set var="imageFileName" value="icon_flagBlack" />
-                  </c:when>
-                  <c:when test="${nameNoteResStatus == 5}">
-                      <c:set var="imageFileName" value="icon_flagWhite" />
-                  </c:when>
-                  <c:otherwise>
-                  </c:otherwise>
-                </c:choose>
-
-                <c:choose>
-                 <c:when test="${hasNameNote eq 'yes'}">
-                <a href="#" id="nameNote1"
-           onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${fn:escapeXml(studySubject.id)}&itemId=${fn:escapeXml(itemId)}&id=${fn:escapeXml(InterviewerNameNote.eventCRFId)}&name=${fn:escapeXml(InterviewerNameNote.entityType)}&field=interviewer&column=${fn:escapeXml(InterviewerNameNote.column)}&enterData=${fn:escapeXml(enterData)}&monitor=${fn:escapeXml(monitor)}&blank=${fn:escapeXml(blank)}','spanAlert-interviewDate'); return false;">
-                    <img id="flag_interviewer" name="flag_interviewer" src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </c:when>
-                    <c:otherwise>
-                    <a id="nameNote1" href="#"
-           onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
-                        <img id="flag_interviewer" name="flag_interviewer" src="<c:out value="${contextPath}" />/images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                            <div class=" formfieldM_BG">
+                                <input type="text" disabled size="15"
+                                       value="<c:out value="${interviewer}" />" class="formfieldM">
+                                <input type="hidden" name="interviewer"
+                                       value="<c:out value="${interviewer}" />">
                         </c:otherwise>
-                        </c:choose>
-                    </a>
-                        <%--</c:if>--%>
-                    </c:if>
-            </td>
-        </tr>
-        <tr>
-            <td valign="top">
-                <span ID="spanAlert-interviewer" class="alert"></span>
-            </td>
-        </tr>
-    </table>
+                    </c:choose>
+                    </div>
+                            <%--BWP>>new error message design:  <jsp:include page="../showMessage.jsp">
+                              <jsp:param name="key" value="interviewer" />
+                            </jsp:include>--%>
+                </td>
+                <td valign="top" nowrap>
+                    <c:set var="isNewDN" value="${hasNameNote eq 'yes' ? 0 : 1}"/>
+
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                        <%--<c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
+                    <c:choose>
+                      <c:when test="${nameNoteResStatus == 0}">
+                          <c:set var="imageFileName" value="icon_noNote" />
+                      </c:when>
+                      <c:when test="${nameNoteResStatus == 1}">
+                          <c:set var="imageFileName" value="icon_Note" />
+                      </c:when>
+                      <c:when test="${nameNoteResStatus == 2}">
+                          <c:set var="imageFileName" value="icon_flagYellow" />
+                      </c:when>
+                      <c:when test="${nameNoteResStatus == 3}">
+                          <c:set var="imageFileName" value="icon_flagGreen" />
+                      </c:when>
+                      <c:when test="${nameNoteResStatus == 4}">
+                          <c:set var="imageFileName" value="icon_flagBlack" />
+                      </c:when>
+                      <c:when test="${nameNoteResStatus == 5}">
+                          <c:set var="imageFileName" value="icon_flagWhite" />
+                      </c:when>
+                      <c:otherwise>
+                      </c:otherwise>
+                    </c:choose>
+
+                    <c:choose>
+                     <c:when test="${hasNameNote eq 'yes'}">
+                    <a href="#" id="nameNote1"
+               onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${fn:escapeXml(studySubject.id)}&itemId=${fn:escapeXml(itemId)}&id=${fn:escapeXml(InterviewerNameNote.eventCRFId)}&name=${fn:escapeXml(InterviewerNameNote.entityType)}&field=interviewer&column=${fn:escapeXml(InterviewerNameNote.column)}&enterData=${fn:escapeXml(enterData)}&monitor=${fn:escapeXml(monitor)}&blank=${fn:escapeXml(blank)}','spanAlert-interviewDate'); return false;">
+                        <img id="flag_interviewer" name="flag_interviewer" src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                        </c:when>
+                        <c:otherwise>
+                        <a id="nameNote1" href="#"
+               onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
+                            <img id="flag_interviewer" name="flag_interviewer" src="<c:out value="${contextPath}" />/images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                            </c:otherwise>
+                            </c:choose>
+                        </a>
+                            <%--</c:if>--%>
+                        </c:if>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">
+                    <span ID="spanAlert-interviewer" class="alert"></span>
+                </td>
+            </tr>
+        </table>
     </c:if>
 </td>
 

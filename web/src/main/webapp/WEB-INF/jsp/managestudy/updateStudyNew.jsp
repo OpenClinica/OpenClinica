@@ -697,7 +697,7 @@
       </td></tr>
 
       <tr valign="top"><td class="formlabel"><fmt:message key="facility_country" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-      <input type="text" name="facCountry" value="<c:out value="${studyToView.facilityCountry}"/>" class="formfieldXL"></div>
+      <input type="text" autocomplete="off" name="facCountry" value="<c:out value="${studyToView.facilityCountry}"/>" class="formfieldXL"></div>
       <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facCountry"/></jsp:include>
       </td></tr>
 

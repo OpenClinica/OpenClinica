@@ -313,8 +313,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         // The extract data job failed with the message:
                         // ERROR: relation "demographics" already exists
                         // More information may be available in the log files.
-                        addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
-                            + "<br/><br/>More information may be available in the log files.");
+                        addPageMessage("The extract data job failed with the message:");
+                        addPageMessage(failMessage);
+                        addPageMessage("More information may be available in the log files.");
+
                         request.getSession().removeAttribute("jobName");
                         request.getSession().removeAttribute("groupName");
                         request.getSession().removeAttribute("datasetId");
@@ -358,8 +360,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
         successMsg =
-            successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId()
-                + "\">here </a>");
+            successMsg.replace("$linkURL", CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId());
 
         return successMsg;
     }
