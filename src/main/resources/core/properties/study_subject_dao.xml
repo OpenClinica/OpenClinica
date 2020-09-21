@@ -293,8 +293,8 @@
 		<sql>
 		   INSERT INTO study_subject
 		   (LABEL,  SUBJECT_ID,  STUDY_ID, STATUS_ID,
-		    DATE_CREATED, OWNER_ID, ENROLLMENT_DATE, SECONDARY_LABEL, OC_OID)
-		   VALUES (?,?,?,?,now(),?,?,?,?)
+		    DATE_CREATED, OWNER_ID, ENROLLMENT_DATE, SECONDARY_LABEL, OC_OID, DATE_UPDATED, update_id)
+		   VALUES (?,?,?,?,now(),?,?,?,?,now(),?)
 		</sql>
 	</query>
 	<query>

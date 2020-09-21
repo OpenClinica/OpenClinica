@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
@@ -47,6 +48,7 @@ import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -54,9 +56,9 @@ import org.springframework.transaction.annotation.Transactional;
 import core.org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 
 /**
- * 
+ *
  * @author thickerson, daniel
- * 
+ *
  */
 @Service("DataImportService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
@@ -76,6 +78,18 @@ public class DataImportService {
     }
 
     Locale locales;
+
+    @Autowired
+    @Qualifier("itemDataJDBCDao")
+    ItemDataDAO itemDataDao;
+
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    EventCRFDAO eventCrfDao;
+
+    @Autowired
+    @Qualifier("studyEventJDBCDao")
+    StudyEventDAO studyEventDAO;
 
     @Autowired
     private StudyDao studyDao;
@@ -118,9 +132,9 @@ public class DataImportService {
      * Import Data, the logic which imports the data for our data service. Note that we will return three strings string
      * 0: status, either 'success', 'fail', or 'warn'. string 1: the message string which will be returned in our soap
      * response string 2: the audit message, currently not used but will be saved in the event of a success.
-     * 
+     *
      * import consist from 3 steps 1) parse xml and extract data 2) validation 3) data submission
-     * 
+     *
      * @author thickerson
      * @param dataSource
      * @param resources
@@ -130,9 +144,9 @@ public class DataImportService {
      * @param importedCRFStatuses
      * @return
      * @throws Exception
-     * 
+     *
      *             /* VALIDATE data on all levels
-     * 
+     *
      *             msg - contains status messages
      * @return list of errors
      */
@@ -145,7 +159,7 @@ public class DataImportService {
         StringBuffer auditMsg = new StringBuffer();
         List<String> errors = new ArrayList<String>();
         HashMap validateDataResult  = new HashMap<>();
-        
+
         // htaycher: return back later?
         auditMsg.append(respage.getString("passed_study_check") + " ");
         auditMsg.append(respage.getString("passed_oid_metadata_check") + " ");
@@ -153,20 +167,20 @@ public class DataImportService {
         try {
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, userBean);
-        
-        errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean,request));        
+
+        errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean,request));
         if(!(errors.isEmpty())) {
         	validateDataResult.put("errors", errors);
         	return validateDataResult;
         }
-        
+
         HashMap fetchEventCRFBeansResult=  getImportCRFDataService().fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE,request);
-        
+
         List<EventCRFBean> eventCRFBeans = (List<EventCRFBean>) fetchEventCRFBeansResult.get("eventCRFBeans");
-        ArrayList<StudyEventBean> studyEventBeans = (ArrayList<StudyEventBean>) fetchEventCRFBeansResult.get("studyEventBeans");       
+        ArrayList<StudyEventBean> studyEventBeans = (ArrayList<StudyEventBean>) fetchEventCRFBeansResult.get("studyEventBeans");
         validateDataResult.put("eventCRFBeans", eventCRFBeans);
         validateDataResult.put("studyEventBeans", studyEventBeans);
-        
+
         // The following line updates a map that is used for setting the EventCRF status post import
         getImportCRFDataService().fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
 
@@ -174,11 +188,11 @@ public class DataImportService {
 
         // -- does the event already exist? if not, fail
         if (eventCRFBeans == null) {
-            errors.add(respage.getString("the_event_crf_not_correct_status"));            
+            errors.add(respage.getString("the_event_crf_not_correct_status"));
         } else if (eventCRFBeans.isEmpty() && !eventCRFStatusesValid) {
-            errors.add(respage.getString("the_event_crf_not_correct_status"));            
+            errors.add(respage.getString("the_event_crf_not_correct_status"));
         } else if (eventCRFBeans.isEmpty()) {
-            errors.add(respage.getString("no_event_crfs_matching_the_xml_metadata"));            
+            errors.add(respage.getString("no_event_crfs_matching_the_xml_metadata"));
         }
         if(!(errors.isEmpty())) {
         	validateDataResult.put("errors", errors);
@@ -209,7 +223,7 @@ public class DataImportService {
         HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
         HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
 
-      
+
             List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             // htaycher: this should be rewritten with validator not to use request to store data
            // MockHttpServletRequest request = new MockHttpServletRequest();
@@ -239,7 +253,7 @@ public class DataImportService {
         	}else {
         		 errors.add(oce1.getOpenClinicaMessage());
         	}
-           
+
             logger.debug("=== threw the openclinica message, import === " + oce1.getOpenClinicaMessage());
         }
 
@@ -255,9 +269,7 @@ public class DataImportService {
 
         boolean discNotesGenerated = false;
 
-        ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
         itemDataDao.setFormatDates(false);
-        EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
 
         StringBuffer auditMsg = new StringBuffer();
         int eventCrfBeanId = -1;
@@ -265,7 +277,7 @@ public class DataImportService {
         ArrayList<Integer> eventCrfInts;
         ItemDataBean itemDataBean;
 
-        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao);
+        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao, studyEventDAO, eventCrfDao);
         for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
             boolean resetSDV = false;
 
@@ -285,16 +297,18 @@ public class DataImportService {
                             .getData().getOrdinal());
                     if (wrapper.isOverwrite() && itemDataBean.isActive()) {
 
-                        if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue()))
+                        if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue())) {
                             resetSDV = true;
 
-                        logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
-                        itemDataBean.setUpdatedDate(new Date());
-                        itemDataBean.setUpdater(userBean);
-                        itemDataBean.setValue(displayItemBean.getData().getValue());
 
-                        // set status?
-                        itemDataDao.update(itemDataBean);
+                            logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
+                            itemDataBean.setUpdatedDate(new Date());
+                            itemDataBean.setUpdater(userBean);
+                            itemDataBean.setValue(displayItemBean.getData().getValue());
+
+                            // set status?
+                            itemDataDao.update(itemDataBean);
+                        }
                         logger.debug("updated: " + itemDataBean.getItemId());
                         // need to set pk here in order to create dn
                         displayItemBean.getData().setId(itemDataBean.getId());
@@ -334,10 +348,10 @@ public class DataImportService {
                         if ( (eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
                                 || eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY))
                                 && eventCrfBean.isAvailable()) {
-                        	
+
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean, true);
                         } else {
-                        	
+
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean, true);
                         }
                         eventCrfInts.add(new Integer(eventCrfBean.getId()));

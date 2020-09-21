@@ -37,6 +37,7 @@ import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.StudyEventServiceImpl;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -551,6 +552,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             uncompletedEventDefinitionCRFs.set(i, dedcrf);
         }
     }
+    public void updateStudySubject(StudySubject studySubject, int userBeanId){
+        studySubject.setUpdateId(userBeanId);
+        studySubject.setDateUpdated(new Date());
+        studySubjectDao.saveOrUpdate(studySubject);
+    }
+
 
 
 
