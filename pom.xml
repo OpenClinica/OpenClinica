@@ -3,7 +3,7 @@
     <groupId>com.openclinica</groupId>
     <artifactId>OpenClinica-web</artifactId>
     <packaging>war</packaging>
-    <version>4.12.1</version>
+    <version>4.12.2-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
@@ -997,7 +997,7 @@
     </build>
     <scm>
         <developerConnection>scm:git:https://github.com/OpenClinica/OpenClinica.git</developerConnection>
-        <tag>4.12.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
