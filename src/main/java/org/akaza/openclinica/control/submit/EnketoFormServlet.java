@@ -17,6 +17,8 @@ import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.FormCacheServiceImpl;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -24,6 +26,7 @@ import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 
 public class EnketoFormServlet extends SecureController {
@@ -150,6 +153,21 @@ public class EnketoFormServlet extends SecureController {
             logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
             formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), formLayout,
                     flavor, null, role, mode, loadWarning, isFormLocked, formContainsContactData, binds, ub);
+            // OC-11179 Form statuses for forms that have only reserved contact items and cross-form read items
+            if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
+                studyEvent.setUpdateId(ub.getId());
+                studyEvent.setDateUpdated(new Date());
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                studyEventDao.saveOrUpdate(studyEvent);
+            }
+
+            if (eventCrf != null && eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)
+                    && (eventCrf.getUpdateId() == null || eventCrf.getDateUpdated() == null)) {
+                eventCrf.setUpdateId(ub.getId());
+                eventCrf.setDateUpdated(new Date());
+                eventCrfDao.saveOrUpdate(eventCrf);
+            }
         } else if (Integer.valueOf(eventCrfId) == 0) {
             logger.info("eventCrfId is zero user:" + ub.getName());
             String hash = formLayout.getXform();

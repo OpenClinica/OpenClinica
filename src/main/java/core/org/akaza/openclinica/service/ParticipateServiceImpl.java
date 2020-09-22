@@ -1,7 +1,6 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
@@ -29,7 +28,6 @@ import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -212,6 +210,17 @@ public class ParticipateServiceImpl implements ParticipateService {
                                     formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
                                 }else {
                                     formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                                    // OC-13517 Prefilled Contact Form prevents Participate to move to next Event
+                                    if (nextEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                                            || nextEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
+                                        StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
+                                        studyEvent.setUpdateId(ub.getId());
+                                        studyEvent.setDateUpdated(new Date());
+                                        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                                        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+                                        StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
+                                        studyEventDao.saveOrUpdateTransactional(container);
+                                    }
                                 }
                                 formDatas.add(getFormDataPerCrf(formLayout, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                             }

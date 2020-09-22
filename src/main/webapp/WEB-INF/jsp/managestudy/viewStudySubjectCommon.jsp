@@ -369,23 +369,24 @@ $(function() {
             return;
 
         var numVisitBased = 0;
-        foreach(metadata.StudyEventDef, function(studyEvent) {
-            studyEvents[studyEvent['@OID']] = studyEvent;
+        foreach(metadata.StudyEventDef, function(eventDef) {
+            var eventOid = eventDef['@OID'];
+            studyEvents[eventOid] = eventDef;
 
-            var eventType = studyEvent['@OpenClinica:EventType'];
+            var eventType = eventDef['@OpenClinica:EventType'];
             if (eventType === 'Common') {
-                if (studyEvent['@OpenClinica:Removed'] !== 'Yes')
-                    studyEvent.showMe = true;
+                if (eventDef['@OpenClinica:Status'] !== 'DELETED') {
+                    eventDef.showMe = true;
+                }
                 else {
-                    studyEventOid = studyEvent['@OID'];
                     $.ajax({
                         type: "GET",
-                        url: 'rest/clinicaldata/json/stats/${study.oc_oid}/${studySub.oid}/' + studyEventOid,
+                        url: 'rest/clinicaldata/json/stats/${study.oc_oid}/${studySub.oid}/' + eventOid,
                         async: false,
                         success: function(statData) {
                             var stats = statData;
                             if (stats.body.matchingForms > 0) {
-                                studyEvent.showMe = true;
+                                eventDef.showMe = true;
                             }
                         }
                     });
@@ -394,14 +395,13 @@ $(function() {
             else if (eventType === 'Unscheduled')
                 numVisitBased++;
 
-            studyEvent.forms = {};
-            foreach(studyEvent.FormRef, function(ref) {
-                var studyEventOid = studyEvent['@OID'];
+            eventDef.forms = {};
+            foreach(eventDef.FormRef, function(ref) {
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
                 var columnTitles = [];
                 var submissionFields = {};
-                var componentOid = studyEventOid + '.' + formOid;
+                var componentOid = eventOid + '.' + formOid;
                 var components = columns[componentOid];
                 foreach(components, function(col) {
                     var item = items[col];
@@ -422,7 +422,7 @@ $(function() {
                     submissionFields[col] = [];
                 }, errors);
 
-                studyEvent.forms[formOid] = $.extend({
+                eventDef.forms[formOid] = $.extend({
                     columnTitles: columnTitles,
                     submissionFields: submissionFields,
                     submissions: [],

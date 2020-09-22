@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -139,6 +140,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         EventDefinitionCRFDAO eddao = new EventDefinitionCRFDAO(sm.getDataSource());
         SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
         DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+        FormLayoutDAO flDAO = new FormLayoutDAO(sm.getDataSource());
 
         ListDiscNotesSubjectTableFactory factory = new ListDiscNotesSubjectTableFactory(ResourceBundleProvider.getTermsBundle(locale));
         factory.setStudyEventDefinitionDao(seddao);
@@ -155,6 +157,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setEventDefintionCRFDAO(eddao);
         factory.setStudyGroupDAO(sgdao);
         factory.setDiscrepancyNoteDAO(dnDAO);
+        factory.setFormLayoutDAO(flDAO);
 
         factory.setModule(moduleStr);
         factory.setDiscNoteType(discNoteType);

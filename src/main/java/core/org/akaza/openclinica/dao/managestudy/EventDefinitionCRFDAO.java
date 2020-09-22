@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
+import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -686,62 +687,17 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * 
 	 * @return boolean to tell us if it's required or not.
 	 */
-	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent, StudyDao studyDao) {
-		Study study = studyDao.findByStudySubjectId(studyEvent.getStudySubjectId());
-		int studyEventId = studyEvent.getId();
+	public boolean isRequiredInDefinition(int crfId, StudyEventBean studyEvent, StudyDao studyDao) {
+		Study subjectStudy = studyDao.findByStudySubjectId(studyEvent.getStudySubjectId());
 
-		/*
-		 * select distinct event_definition_crf.study_id,
-		 * event_definition_crf.required_crf, event_definition_crf.parent_id
-		 * from event_definition_crf, event_crf, crf_version, study_event where
-		 * crf_version.crf_version_id = 29 and crf_version.crf_version_id =
-		 * event_crf.crf_version_id and crf_version.crf_id =
-		 * event_definition_crf.crf_id and
-		 * event_definition_crf.study_event_definition_id =
-		 * study_event.study_event_definition_id and study_event.study_event_id
-		 * = 91
-		 */
-
-		this.unsetTypeExpected();
-		this.setTypeExpected(1, TypeNames.BOOL);
-		this.setTypeExpected(2, TypeNames.INT);
-		this.setTypeExpected(3, TypeNames.INT);
-		HashMap variables = new HashMap();
-		variables.put(new Integer(2), new Integer(studyEventId));
-		variables.put(new Integer(1), new Integer(crfVersionId));
-
-		String sql = digester.getQuery("isRequiredInDefinition");
-
-		ArrayList alist = this.select(sql, variables);
-		Iterator it = alist.iterator();
-		Boolean answer = false;
-		Boolean siteR = false;
-		Boolean studyR = false;
-		Boolean isExisted = false;
-		while (it.hasNext()) {
-			HashMap hm = (HashMap) it.next();
-			Integer dbStudyId = (Integer) hm.get("study_id");
-			Integer parentId = (Integer) hm.get("parent_id");
-			if (dbStudyId == study.getStudyId()) {
-				if (parentId != null && parentId > 0) {
-					siteR = (Boolean) hm.get("required_crf");
-					isExisted = true;
-				} else {
-					studyR = (Boolean) hm.get("required_crf");
-				}
-			} else if (dbStudyId == study.getStudy().getStudyId()) {
-				studyR = (Boolean) hm.get("required_crf");
-			}
+		EventDefinitionCRFBean eventDefinitionCRFBean=null;
+		 eventDefinitionCRFBean= findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinitionId(),crfId,subjectStudy.getStudyId());
+        if(eventDefinitionCRFBean==null ||
+				!eventDefinitionCRFBean.isActive()){
+			eventDefinitionCRFBean= findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinitionId(),crfId,subjectStudy.getStudy().getStudyId());
 		}
-		if (study.isSite() && isExisted) {
-			answer = siteR;
-		} else {
-			answer = studyR;
+		return eventDefinitionCRFBean.isRequiredCRF();
 		}
-
-		logger.debug("We are returning " + answer.toString() + " for crfVersionId " + crfVersionId + " and studyEventId " + studyEventId);
-		return answer.booleanValue();
-	}
 
 	/**
 	 * @param study

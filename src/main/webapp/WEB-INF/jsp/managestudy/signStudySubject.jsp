@@ -366,8 +366,8 @@
                 <tr>
                     <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/></td>
                     <td class="table_cell">
-                        <c:if test="${study.study != null && study.study.studyId > 0}">
-                            <c:out value="${study.name}"/>
+                        <c:if test="${subjectStudy.study != null && subjectStudy.study.studyId > 0}">
+                            <c:out value="${subjectStudy.name}"/>
                         </c:if>&nbsp;</td>
                 </tr>
 
@@ -603,7 +603,7 @@
                 <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" />&nbsp;</td>
                 <td class="table_cell">
-                    <c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;
+                    <c:out value="${dec.eventCRF.formLayout.name}" />&nbsp;
                     <c:if test="${dec.eventCRF.formLayout.status.name == 'Removed'}">
                         <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
                     </c:if>
