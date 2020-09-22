@@ -8,16 +8,15 @@
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
+import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -30,9 +29,19 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.view.Page;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
+import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.view.Page;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Krikor Krumlian
@@ -147,6 +156,26 @@ public class ListEventsForSubjectsServlet extends SecureController {
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
         session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
         //
+
+        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
+        List<StudySubjectBean> participants = getStudySubjectDAO().findAllByStudy(currentStudy);
+        request.setAttribute("participants", participants);
+
+        Map<String, Study> studyByParticipant = new HashMap<String, Study>();
+        Map<String, ArrayList> eventsByParticipant = new HashMap<String, ArrayList>();
+        for (StudySubjectBean participant: participants) {
+            String participantName = participant.getName();
+
+            Study studyRelatedToStudySub = (Study) getStudyDao().findById(participant.getStudyId());
+            studyByParticipant.put(participantName, studyRelatedToStudySub);
+
+            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(participant, ub, currentRole, currentStudy);
+            ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
+            eventsByParticipant.put(participantName, allEventRows);
+        }
+        request.setAttribute("studyByParticipant", studyByParticipant);
+        request.setAttribute("eventsByParticipant", eventsByParticipant);
+
         forwardPage(Page.LIST_EVENTS_FOR_SUBJECTS);
 
     }

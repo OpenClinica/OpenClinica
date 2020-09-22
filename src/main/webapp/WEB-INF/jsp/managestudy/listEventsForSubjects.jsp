@@ -111,4 +111,23 @@
 <br>
 <input type="button" onclick="confirmExit('MainMenu');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
 
+<div>
+    <c:forEach var="studySub" items="${participants}">
+        <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+        <div id="actions4${studySub.name}">
+            <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                <div>
+                    ${studySub.name}
+                    ${currRow.bean.studyEvent.studyEventDefinition.id}
+                    ${currRow.bean.studyEvent.sampleOrdinal}
+                    ${currRow.bean.studyEvent.studyEventDefinition.name}
+                </div>
+                <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}" data-occurrence="${currRow.bean.studyEvent.sampleOrdinal}">
+                    <%@include file="eventActions.jsp"%>
+                </table>
+            </c:forEach>
+        </div>
+    </c:forEach>
+</div>
+
 <jsp:include page="../include/footer.jsp"/>

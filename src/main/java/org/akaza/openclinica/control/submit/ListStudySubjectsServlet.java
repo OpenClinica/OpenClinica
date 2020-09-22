@@ -234,7 +234,7 @@ public class ListStudySubjectsServlet extends SecureController {
             Study studyRelatedToStudySub = (Study) getStudyDao().findById(participant.getStudyId());
             studyByParticipant.put(participantName, studyRelatedToStudySub);
 
-            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(participant, factory.getCurrentUser(), currentRole, currentStudy);
+            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(participant, ub, currentRole, currentStudy);
             ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
             eventsByParticipant.put(participantName, allEventRows);
         }
