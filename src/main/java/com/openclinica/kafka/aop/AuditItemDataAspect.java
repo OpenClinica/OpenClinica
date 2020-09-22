@@ -100,7 +100,7 @@ public class AuditItemDataAspect {
 
     private void updateStudySubjectLastModifiedDetails(ItemDataBean itemDataBean){
         EventCrf eventCrf = eventCrfDao.findById(itemDataBean.getEventCRFId());
-        if (itemDataBean.getUpdater() != null)
+        if (itemDataBean.getUpdater() != null && itemDataBean.getUpdater().getId() > 0)
             studySubjectService.updateStudySubject(eventCrf.getStudySubject(), itemDataBean.getUpdater().getId());
         else
             studySubjectService.updateStudySubject(eventCrf.getStudySubject(), itemDataBean.getOwnerId());

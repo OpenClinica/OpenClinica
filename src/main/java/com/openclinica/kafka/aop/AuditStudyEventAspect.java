@@ -100,7 +100,7 @@ public class AuditStudyEventAspect {
 
     private void updateStudySubjectLastModifiedDetails(StudyEventBean studyEventBean){
         StudySubject studySubject = studySubjectDao.findByPK(studyEventBean.getStudySubjectId());
-        if (studyEventBean.getUpdater() != null)
+        if (studyEventBean.getUpdater() != null && studyEventBean.getUpdater().getId() > 0)
             studySubjectService.updateStudySubject(studySubject, studyEventBean.getUpdater().getId());
         else
             studySubjectService.updateStudySubject(studySubject, studyEventBean.getOwnerId());
