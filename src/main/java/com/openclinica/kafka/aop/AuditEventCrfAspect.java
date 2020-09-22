@@ -171,7 +171,7 @@ public class AuditEventCrfAspect {
 
     private void updateStudySubjectLastModifiedDetails(EventCRFBean eventCRFBean){
         StudySubject studySubject = studySubjectDao.findByPK(eventCRFBean.getStudySubjectId());
-        if (eventCRFBean.getUpdater() != null)
+        if (eventCRFBean.getUpdater() != null && eventCRFBean.getUpdater().getId() > 0)
             studySubjectService.updateStudySubject(studySubject, eventCRFBean.getUpdater().getId());
         else
             studySubjectService.updateStudySubject(studySubject, eventCRFBean.getOwnerId());
