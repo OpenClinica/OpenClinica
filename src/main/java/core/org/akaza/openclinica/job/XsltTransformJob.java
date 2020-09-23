@@ -116,7 +116,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private static final long KILOBYTE = 1024;
 
     @Override
-    protected synchronized void executeInternal(JobExecutionContext context) {
+    protected void executeInternal(JobExecutionContext context) {
         logger.info("Job " + context.getJobDetail().getDescription() + " started.");
         JobDataMap dataMap = context.getMergedJobDataMap();
         initDependencies(context.getScheduler(), dataMap);
@@ -884,7 +884,7 @@ public class XsltTransformJob extends QuartzJobBean {
         }
     }
 
-    private ArchivedDatasetFileBean generateFileRecord(String name, String dir, double time, long fileLength, ExportFormatBean efb,
+    private synchronized ArchivedDatasetFileBean generateFileRecord(String name, String dir, double time, long fileLength, ExportFormatBean efb,
                                                        Set<Integer> edcSet, ArchivedDatasetFileBean archivedDatasetFileBean) {
 
         // Updating archive dataset file that is IN_PROGRESS.
