@@ -142,20 +142,21 @@
 
 <div>
     <c:forEach var="studySub" items="${participants}">
-        <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
-        <div id="actions4${studySub.name}">
-            <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
-                <div>
-                    ${studySub.name}
-                    ${currRow.bean.studyEvent.studyEventDefinition.id}
-                    ${currRow.bean.studyEvent.sampleOrdinal} 
-                    ${currRow.bean.studyEvent.studyEventDefinition.name}    
-                </div>
-                <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}" data-occurrence="${currRow.bean.studyEvent.sampleOrdinal}">
-                    <%@include file="eventActions.jsp"%>
-                </table>
-            </c:forEach>    
-        </div>
+        <c:if test="${not empty eventsByParticipant.get(studySub.name)}">
+            <div>${studySub.name}</div>
+            <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+            <div id="actions4${studySub.name}" style="margin-left:40px;">
+                <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                    <div>
+                        ${currRow.bean.studyEvent.studyEventDefinition.name}    
+                        ${currRow.bean.studyEvent.sampleOrdinal} 
+                    </div>
+                    <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}">
+                        <%@include file="eventActions.jsp"%>
+                    </table>
+                </c:forEach>
+            </div>
+        </c:if>
     </c:forEach>
     <script>
         jQuery('#findSubjects').on('click', 'a', function() {
@@ -188,12 +189,10 @@
             if (tbody.length)
                 target = tbody;
             
-            window.extraMenu = extraMenu;
-            window.target = target;
             for (var i=0; i<target.length; i++) {
                 extraMenu.eq(i).find('td').appendTo(target.get(i));
             }
-            extraMenu.remove();
+            extraMenu.parent().remove();
         });
     </script>
 </div>

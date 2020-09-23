@@ -113,21 +113,47 @@
 
 <div>
     <c:forEach var="studySub" items="${participants}">
-        <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
-        <div id="actions4${studySub.name}">
-            <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
-                <div>
-                    ${studySub.name}
-                    ${currRow.bean.studyEvent.studyEventDefinition.id}
-                    ${currRow.bean.studyEvent.sampleOrdinal}
-                    ${currRow.bean.studyEvent.studyEventDefinition.name}
-                </div>
-                <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}" data-occurrence="${currRow.bean.studyEvent.sampleOrdinal}">
-                    <%@include file="eventActions.jsp"%>
-                </table>
-            </c:forEach>
-        </div>
+        <c:if test="${not empty eventsByParticipant.get(studySub.name)}">
+            <div>${studySub.name}</div>
+            <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+            <div id="actions4${studySub.name}" style="margin-left:40px;">
+                <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                    <table>
+                        <%@include file="eventActions.jsp"%>
+                    </table>
+                </c:forEach>
+            </div>
+        </c:if>
     </c:forEach>
+    <script>
+        jQuery('#listEventsForSubject').on('click', 'a', function() {
+            var menu = jQuery(this).prev('div[id^=S_Event_]');
+            if (!menu.length)
+                return;
+
+            var parts = menu.attr('id').split('_');
+            var participantId = parts[2];
+            var extraMenu = jQuery('#actions4' + participantId);
+            if (!extraMenu.length)
+                return;
+
+            var index = Math.floor(menu.closest('table').index() / 2);
+            extraMenu = extraMenu.children().eq(index);
+            var actions = extraMenu.find('td');
+            actions.each(function() {
+                var td = jQuery(this);
+                td.css('display', 'block');
+                td.children('a').append('&nbsp;&nbsp;&nbsp;' + td.find('span').attr('title'));
+            });
+
+            var target = menu.find('table').find('table');
+            var tbody = target.children('tbody');
+            if (tbody.length)
+                target = tbody;
+
+            actions.appendTo(target);
+        });
+    </script>
 </div>
 
 <jsp:include page="../include/footer.jsp"/>

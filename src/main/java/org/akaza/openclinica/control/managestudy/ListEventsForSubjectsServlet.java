@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -170,7 +171,9 @@ public class ListEventsForSubjectsServlet extends SecureController {
             studyByParticipant.put(participantName, studyRelatedToStudySub);
 
             List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(participant, ub, currentRole, currentStudy);
-            ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
+            ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(
+                displayEvents.stream().filter(dseb -> dseb.getStudyEvent().getStudyEventDefinitionId() == definitionId).collect(Collectors.toList())
+            );
             eventsByParticipant.put(participantName, allEventRows);
         }
         request.setAttribute("studyByParticipant", studyByParticipant);
