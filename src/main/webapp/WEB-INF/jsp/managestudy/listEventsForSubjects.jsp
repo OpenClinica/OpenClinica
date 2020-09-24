@@ -123,6 +123,22 @@
                     </table>
                 </c:forEach>
             </div>
+            <div id="crfActions4${studySub.name}" style="margin-left:40px;">
+                <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                    <c:forEach var="dedc" items="${currRow.bean.uncompletedCRFs}">
+                        CRF-${dedc.edc.defaultVersionId}
+                        <table>
+                            <%@include file="uncompletedCrfActions.jsp"%>
+                        </table>
+                    </c:forEach>
+                    <c:forEach var="dec" items="${currRow.bean.displayEventCRFs}">
+                        CRF-${dec.eventCRF.formLayout.id}
+                        <table>
+                            <%@include file="crfActions.jsp"%>
+                        </table>
+                    </c:forEach>
+                </c:forEach>
+            </div>
         </c:if>
     </c:forEach>
     <script>
