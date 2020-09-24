@@ -39,10 +39,9 @@ public class AuditItemDataAspect {
         this.itemDataDao = itemDataDao;
     }
 
-    // Point these to ItemProcessor and FSItemProcessor
-    @AfterReturning("execution(* org.akaza.openclinica.service.DataSaveServiceImpl.saveOrUpdate(..))")
-    public void onDataSaveServiceSaveOrUpdate(JoinPoint joinPoint) {
-        log.info("AoP: onDataSaveServiceSaveOrUpdate triggered");
+    @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.ItemDataDao.saveOrUpdate(..))")
+    public void onItemDataDaoSaveOrUpdate(JoinPoint joinPoint) {
+        log.info("AoP: onItemDataDaoSaveOrUpdate triggered");
         try {
             ItemData itemData = (ItemData) joinPoint.getArgs()[0];
             kafkaService.sendItemDataChangeMessage(itemData);
