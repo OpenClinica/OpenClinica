@@ -202,7 +202,11 @@ public class EventCrfLayerBuilder {
         }
         html.tdEnd().trEnd(0);
 
-        html.tr(0).id("Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).style("display: none").close();
+        html.tr(0)
+            .id("Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
+            .value(Integer.toString(getStudyEvent() != null ? getStudyEvent().getId() : 0))
+            .style("display: none")
+            .close();
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
