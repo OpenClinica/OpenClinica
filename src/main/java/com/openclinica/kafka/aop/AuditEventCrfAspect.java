@@ -68,7 +68,8 @@ public class AuditEventCrfAspect {
                 log.info("AoP: eventCRF is the same! Skipping kafka message.");
                 return true; }
             else {
-                if(discardSdvChanges && existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus()))
+                if(discardSdvChanges && ((existingEventCrf.getSdvStatus() == null && eventCrf.getSdvStatus() != null ) ||
+                        (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus()))))
                     return true;
                 log.info("AoP: eventCRF is not the same!");
                 return false; }
@@ -91,11 +92,12 @@ public class AuditEventCrfAspect {
     public boolean areEventCrfStatusesTheSame(EventCrf eventCrf, EventCrf existingEventCrf){
         if (!existingEventCrf.getWorkflowStatus().equals(eventCrf.getWorkflowStatus())){
             return false;}
-        if (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus())){
+
+        if ((existingEventCrf.getSdvStatus() == null && eventCrf.getSdvStatus() != null ) || (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus()))){
             return false;}
-        if (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived())){
+        if ((existingEventCrf.getArchived() == null && eventCrf.getArchived() != null ) || (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived()))){
             return false;}
-        if (existingEventCrf.getRemoved() != null && eventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())){
+        if ((existingEventCrf.getRemoved() == null && eventCrf.getRemoved() != null ) || (existingEventCrf.getRemoved() != null && eventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved()))){
             return false;}
         return true;
     }
