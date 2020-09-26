@@ -198,4 +198,14 @@
 			WHERE ale.event_crf_id=? and ale.audit_log_event_type_id = 8;
 		</sql>
 	</query>
+	<query>
+		<name>findLastItemAuditedByEventCrf</name>
+		<sql>
+			SELECT *
+			FROM audit_log_event ale
+			WHERE ale.event_crf_id=? and ale.audit_log_event_type_id = 1
+			ORDER BY audit_date DESC
+			LIMIT 1
+		</sql>
+	</query>
 </queries>

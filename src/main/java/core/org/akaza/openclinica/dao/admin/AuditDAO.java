@@ -600,4 +600,21 @@ public class AuditDAO extends EntityDAO {
         }
     }
 
+    public EntityBean findLastItemAuditedByStudyEventId(int eventCrfId) {
+        AuditBean eb = new AuditBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventCrfId));
+
+        String sql = digester.getQuery("findLastItemAuditedByEventCrf");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
+    }
+
 }

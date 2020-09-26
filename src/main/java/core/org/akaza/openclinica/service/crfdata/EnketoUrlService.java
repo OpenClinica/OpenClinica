@@ -11,16 +11,19 @@ import java.util.*;
 
 import javax.servlet.ServletContext;
 
+import core.org.akaza.openclinica.bean.admin.AuditBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.core.form.xform.LogBean;
 import core.org.akaza.openclinica.core.form.xform.QueriesBean;
 import core.org.akaza.openclinica.core.form.xform.QueryBean;
 import core.org.akaza.openclinica.core.form.xform.QueryType;
+import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -187,15 +190,6 @@ public class EnketoUrlService {
         StudyEventDefinition eventDef = null;
         StudySubject subject = null;
 
-        String goTo = null;
-        if (subjectContext.getItemName() != null) {
-            goTo = (subjectContext.isItemInRepeatingGroup()) ? "//" + subjectContext.getItemRepeatGroupName() + "["
-                    + subjectContext.getItemRepeatOrdinalAdjusted() + "]//" + subjectContext.getItemName() : "//" + subjectContext.getItemName();
-            goTo=goTo+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
-        }
-        if (flavor.equals(SINGLE_ITEM_FLAVOR))
-            goTo = "//" + subjectContext.getItemName()+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
-
         // Lookup relevant data
 
         eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
@@ -214,6 +208,50 @@ public class EnketoUrlService {
             logger.info("creating new event crf {}",eventCrf.getEventCrfId());
             logger.info("Subject Context info *** {} *** ",subjectContext.toString());
         }
+
+        String goTo = null;
+        // OC-12389 Update Participate button to open form that has already been started
+        AuditDAO auditDao = new AuditDAO(dataSource);
+        AuditBean audit = (AuditBean) auditDao.findLastItemAuditedByStudyEventId(eventCrf.getEventCrfId());
+        if (audit != null && goTo == null) {
+            ItemDataDAO iddao = new ItemDataDAO(dataSource);
+            ItemDataBean itemDataBean = (ItemDataBean) iddao.findByPK(audit.getEntityId());
+            ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(dataSource);
+            ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(itemDataBean.getItemId(), eventCrf.getCrfVersion().getCrfVersionId());
+            ItemGroupDAO igdao = new ItemGroupDAO<>(dataSource);
+            ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
+            int repeatOrdinal = itemDataBean.getOrdinal();
+            ItemDataBean idata = null;
+            if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
+                if (itemDataBean.isDeleted()) {
+                    repeatOrdinal = 0;
+                } else {
+                    List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), eventCrf.getCrfVersion().getCrfVersionId());
+
+                    for (int i = 0; i < itemDataBean.getOrdinal(); i++) {
+                        for (ItemGroupMetadataBean igm : igms) {
+                            idata = iddao.findByItemIdAndEventCRFIdAndOrdinal(igm.getItemId(), eventCrf.getEventCrfId(), i + 1);
+                            if (idata != null && idata.isDeleted()) {
+                                repeatOrdinal--;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
+            subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
+            subjectContext.setItemName(audit.getEntityName());
+            subjectContext.setItemRepeatOrdinalAdjusted(repeatOrdinal);
+        }
+
+        if (subjectContext.getItemName() != null) {
+            goTo = (subjectContext.isItemInRepeatingGroup()) ? "//" + subjectContext.getItemRepeatGroupName() + "["
+                    + subjectContext.getItemRepeatOrdinalAdjusted() + "]//" + subjectContext.getItemName() : "//" + subjectContext.getItemName();
+            goTo=goTo+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
+        }
+        if (flavor.equals(SINGLE_ITEM_FLAVOR))
+            goTo = "//" + subjectContext.getItemName()+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
         boolean markComplete = true;
@@ -258,7 +296,6 @@ public class EnketoUrlService {
         if (eur.getEnketoUrlResponse().getUrl() != null) {
             editURL = eur.getEnketoUrlResponse().getUrl();
         }
-
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new FormUrlObject(editURL, eur.isLockOn());
