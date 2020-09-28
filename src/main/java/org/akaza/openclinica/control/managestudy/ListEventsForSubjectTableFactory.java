@@ -960,7 +960,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         eventDiv.tdEnd();
         eventDiv.trEnd(0);
 
-        eventDiv.tr(0).id("S_Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("display: none").close();
+        eventDiv.tr(0).id("S_Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).close();
         eventDiv.td(0).colspan("2").close();
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
