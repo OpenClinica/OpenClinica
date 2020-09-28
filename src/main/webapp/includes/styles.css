@@ -121,6 +121,10 @@ a{
   text-decoration: none;
 }
 
+a[onclick] {
+  cursor: pointer;
+}
+
 #ol{
     background-image: url(overlay.png);
     filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");

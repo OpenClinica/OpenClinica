@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3"
+                xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0"
+                xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd">
     <!-- Output types for result-document instructions. -->
     <xsl:output encoding="utf-8" indent="yes" method="xml" name="xml"/>
     <xsl:output encoding="utf-8" indent="no" method="text" name="plain" omit-xml-declaration="yes"/>
@@ -7,7 +10,8 @@
     <xsl:template match="text()"/>
     <!-- //odm:Study[position()=1]/@OID translates to the study oid in the xml file (e.g. S_12345678910(TEST)) -->
     <!-- The string manipulation: S_12345678910(TEST) -> 12345678910(TEST) -> S12345678910(TEST) -> S12345678910 -> S1234567 -->
-    <xsl:variable name="study_oid" select="substring(substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '('),1,8)"/>
+    <xsl:variable name="study_oid"
+                  select="substring(substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '('),1,8)"/>
     <!-- Index of objects for lookup. -->
     <xsl:key name="event-name" match="odm:StudyEventDef" use="@OID"/>
     <xsl:key name="item-name" match="odm:ItemDef" use="@OID"/>
@@ -33,6 +37,11 @@
             <DATATYPE>string</DATATYPE>
             <LENGTH>50</LENGTH>
         </row>
+        <row name="SiteID">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>255</LENGTH>
+        </row>
         <row name="StudyEvent">
             <TYPE>character</TYPE>
             <DATATYPE>string</DATATYPE>
@@ -48,6 +57,11 @@
             <LENGTH>255</LENGTH>
         </row>
         <row name="FormVersion">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>50</LENGTH>
+        </row>
+        <row name="FormStatus">
             <TYPE>character</TYPE>
             <DATATYPE>string</DATATYPE>
             <LENGTH>50</LENGTH>
@@ -192,7 +206,7 @@
                     <xsl:element name="LENGTH">
                         <xsl:value-of select="$itemdef/@Length"/>
                     </xsl:element>
-                 </xsl:when>
+                </xsl:when>
             </xsl:choose>
             <xsl:choose>
                 <xsl:when test="$itemdef/@Comment!=''">
@@ -202,7 +216,7 @@
                                 <xsl:value-of select="substring($itemdef/@Comment, 1, 255)"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="$itemdef/@Comment" />
+                                <xsl:value-of select="$itemdef/@Comment"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:element>

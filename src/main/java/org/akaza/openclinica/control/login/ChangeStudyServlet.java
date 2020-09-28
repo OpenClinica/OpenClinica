@@ -199,7 +199,6 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("changeStudySchema", newStudySchema);
         request.setAttribute("requestSchema",newStudySchema);
         Study newStudy = getStudyDao().findStudyWithSPVByStudyEnvUuid(studyEnvUuid);
-        getCurrentBoardUrl(newStudy, session);
 
         request.setAttribute("changeStudySchema", null);
 

@@ -63,7 +63,7 @@
 	   	<a href="javascript:leftnavExpand('Menu_on_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>'); 
 	 </c:otherwise>
 	 </c:choose> 	
-		     javascript:leftnavExpand('Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');" 
+		     " 
 		     
 		     onmouseover="layersShowOrHide('visible','Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
 				javascript:setImage('ExpandIcon_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>','images/icon_collapse.gif');" onclick="layersShowOrHide('hidden','Lock_all'); 
@@ -95,7 +95,7 @@
 		               <!--</td>-->
 						<td class="table_header_row_left" align="right" colspan="3">
 						<a href="javascript:ExpandEventOccurrences('${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>',<c:out value="${currEvent.repeatingNum}"/>);		              
-						javascript:leftnavExpand('Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');"						
+						"						
 							onClick="layersShowOrHide('hidden','Lock_all'); 
 								layersShowOrHide('hidden','Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
 								layersShowOrHide('hidden','Lock_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
@@ -359,12 +359,6 @@
 					<div id="bt_Scroll_Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>_next_dis" style="display: none;"><img src="images/arrow_status_next_dis.gif" border="0"></div>
 					</td>
 					</tr>
-
-					<tr id="Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>" style="">
-					
-					<td class="table_cell_left" colspan="<c:out value="${currEvent.repeatingNum}"/>"><i><fmt:message key="click_for_more_options" bundle="${restext}"/></i>
-					</td>
-					</tr>
 					
               <!--  end of repeating events      -->
 		               </c:when>               
@@ -384,7 +378,7 @@
 						</td>
 						<td class="table_header_row_left" align="right">
 
-            <a href="javascript:leftnavExpand('Menu_on_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>'); javascript:leftnavExpand('Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');"
+            <a href="javascript:leftnavExpand('Menu_on_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>'); "
 							onClick="layersShowOrHide('hidden','Lock_all'); 
 								layersShowOrHide('hidden','Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
 								layersShowOrHide('hidden','Lock_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
@@ -395,7 +389,7 @@
 							</td>
 							<td class="table_header_row_left" align="right">
 
-            <a href="javascript:leftnavExpand('Menu_on_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>'); javascript:leftnavExpand('Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');"
+            <a href="javascript:leftnavExpand('Menu_on_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>'); "
 							onClick="layersShowOrHide('hidden','Lock_all'); 
 								layersShowOrHide('hidden','Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
 								layersShowOrHide('hidden','Lock_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
@@ -427,9 +421,6 @@
 						</c:otherwise>
 						</c:choose>
 						
-						</tr>
-						<tr id="Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>" style="display: all">
-							<td class="table_cell_left" colspan="2"><i><fmt:message key="click_for_more_options" bundle="${restext}"/></i></td>
 						</tr>
 						<tr id="Menu_on_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>" style="display: none">
 							<td colspan="2">
@@ -543,7 +534,7 @@
 	 </c:otherwise>
 	 </c:choose>        
          <%--if(! detectIEWindows(navigator.userAgent)){
-          javascript:leftnavExpand('Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');"
+          "
 							onmouseover="moveObject('Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>', event);
 							javascript:setImage('ExpandIcon_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>','images/icon_expand.gif');"
 							onmouseout="layersShowOrHide('hidden','Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');
@@ -551,7 +542,7 @@
 							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>', event);">--%>
 
 
-              javascript:leftnavExpand('Menu_off_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>');"
+              "
               onmouseover=
 			  "moveObject('Event_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>', event); setImage('ExpandIcon_${esc.escapeJavaScript(subjectName)}_<c:out value="${count}"/>_<c:out value="${eblRowCount}"/>','images/icon_expand.gif');"
 				onmouseout=

@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -311,7 +312,7 @@ public class SignStudySubjectServlet extends SecureController {
 
         Study study = (Study) getStudyDao().findByPK(studyId);
 
-        // request.setAttribute("study", study);
+        request.setAttribute("subjectStudy", study);
 
         if (study.isSite()) {// this is a site,find parent
             Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
@@ -328,18 +329,7 @@ public class SignStudySubjectServlet extends SecureController {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
-        // find all eventcrfs for each event
-
-        ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub, sm.getDataSource(), ub, currentRole);
-
-        for (DisplayStudyEventBean displayEvent : displayEvents) {
-            StudyEventBean studyEvent = displayEvent.getStudyEvent();
-            ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(displayEvent.getStudyEvent());
-            ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
-            ArrayList displayEventCRFs = studySubjectService.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
-                    studyEvent.getWorkflowStatus(), study);
-            displayEvent.setDisplayEventCRFs(displayEventCRFs);
-        }
+        List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole, study);
 
         // Don't filter for now; disc note beans are returned with eventCRFId
         // set
