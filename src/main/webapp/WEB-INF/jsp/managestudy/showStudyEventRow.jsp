@@ -249,7 +249,7 @@
                             <td class="table_cell" width="140">
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr valign="top">
-                                        <%@include file="eventActions.jsp"%>
+                                        <%@include file="crfActions.jsp"%>
                                     </tr>
                                 </table>
                             </td>
