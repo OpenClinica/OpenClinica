@@ -92,7 +92,7 @@ public class AuditStudyEventAspect {
     }
 
     private void updateStudySubjectLastModifiedDetails(StudyEvent studyEvent){
-        if(studyEvent.getUpdateId() > 0)
+        if(studyEvent.getUpdateId() != null && studyEvent.getUpdateId() > 0 )
             studySubjectService.updateStudySubject(studyEvent.getStudySubject(), studyEvent.getUpdateId());
         else
             studySubjectService.updateStudySubject(studyEvent.getStudySubject(), studyEvent.getUserAccount().getUserId());
