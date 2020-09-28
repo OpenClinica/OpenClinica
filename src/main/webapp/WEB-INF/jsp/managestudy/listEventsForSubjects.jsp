@@ -178,12 +178,15 @@
                 return
 
             var menubody = menu.find('tbody');
+            menubody.empty();
+
             extras.find('td').map(function(idx, td) {
                 var btn = jQuery(td).find('span');
                 var link = btn.closest('a');
                 link.append('&nbsp;&nbsp;' + btn.attr('title'));
                 return td.wrap('tr');
             }).appendTo(menubody);
+            extras.remove();
         }
 
         jQuery('#listEventsForSubject').on('click', 'a', function() {
