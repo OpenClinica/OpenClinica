@@ -198,7 +198,40 @@
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="50">
                                 <table style="width: 100%;">
                                     <tr style="width: inherit;">
-                                        <%@include file="crfActions.jsp"%>
+                                        <td style="width: 54%; text-align: end;">
+                                            <c:choose>
+                                                <c:when test="${ dec.eventCRF.removed == true || (currRow.bean.studyEvent.removed ==true && dec.eventCRF.workflowStatus != 'NOT_STARTED')}">
+                                                    <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:choose>
+                                                        <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
+                                                            <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
+                                                        </c:when>
+                                                        <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
+                                                            <span class=" icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>">
+                                                        </c:when>
+                                                        <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                                            <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="icon icon-file-excel red" alt="<fmt:message key="status_removed" bundle="${resword}"/>" title="<fmt:message key="status_removed" bundle="${resword}"/>">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:if test="${currRow.bean.studyEvent.signed == true && dec.eventCRF.removed != true && !dec.eventCRF.isArchived() && dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                                <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
+                                            </c:if>
+                                            <c:if test="${currRow.bean.studyEvent.locked == true}">
+                                                <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
+                                            </c:if>
+                                            <c:if test="${dec.eventCRF.isArchived()}">
+                                                <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                                            </c:if>
+                                        </td>
                                     </tr>
                                 </table>
                             </td>
