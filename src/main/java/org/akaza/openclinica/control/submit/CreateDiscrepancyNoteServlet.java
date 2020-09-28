@@ -953,7 +953,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             CoreResources.setRequestSchema(request,currentSchema);
             Study publicSubjectStudy = getStudyDao().findByUniqueId(subjectStudy.getUniqueIdentifier());
             CoreResources.setRequestSchema(request, "public");
-            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(publicSubjectStudy.getStudyId(), publicSubjectStudy.getStudy().getStudyId(), subjectId);
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, publicSubjectStudy.getStudy().getStudyId(), subjectId);
         } else {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }

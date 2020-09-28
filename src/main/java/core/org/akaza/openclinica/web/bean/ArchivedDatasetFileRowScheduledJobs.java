@@ -1,7 +1,9 @@
 package core.org.akaza.openclinica.web.bean;
 
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class ArchivedDatasetFileRowScheduledJobs extends EntityBeanRow {
@@ -14,6 +16,7 @@ public class ArchivedDatasetFileRowScheduledJobs extends EntityBeanRow {
     public static final int COL_FILEOWNER = 5;
     public static final int COL_STATUS = 6;
     public static final int COL_ACTION = 7;
+    public SimpleDateFormat sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_time_format_string"));
 
     @Override
     protected int compareColumn(Object row, int sortingColumn) {
@@ -56,7 +59,7 @@ public class ArchivedDatasetFileRowScheduledJobs extends EntityBeanRow {
     @Override
     public String getSearchString() {
         ArchivedDatasetFileBean thisAccount = (ArchivedDatasetFileBean) bean;
-        return thisAccount.getFormat() + " " + thisAccount.getName() + " " + thisAccount.getDateCreated() + " " +
+        return thisAccount.getFormat() + " " + thisAccount.getName() + " " + sdf.format(thisAccount.getDateCreated()) + " " +
                 thisAccount.getOwner() + " " + thisAccount.getStatus();
     }
 

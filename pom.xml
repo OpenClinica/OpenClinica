@@ -3,7 +3,7 @@
     <groupId>com.openclinica</groupId>
     <artifactId>OpenClinica-web</artifactId>
     <packaging>war</packaging>
-    <version>4.11.5-SNAPSHOT</version>
+    <version>4.12.0-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
@@ -102,7 +102,7 @@
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore />
+                                                <ignore/>
                                             </action>
                                         </pluginExecution>
                                     </pluginExecutions>
