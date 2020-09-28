@@ -16,6 +16,8 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -64,7 +66,6 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
         boolean newQueriesStarted = false;
         boolean isResolutionTypeAnnotation = false;
-        ResourceBundleProvider.updateLocale(Locale.ENGLISH);
         if(!checkDiscrepancyNoteTypeValid(discrepancyNoteBean.getNoteType()))
             errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID));
         isResolutionTypeAnnotation = QueryType.ANNOTATION.getName().equalsIgnoreCase(discrepancyNoteBean.getNoteType());
@@ -184,6 +185,26 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 }
                 if (!idList.contains(formLayout.getFormLayoutId()))
                     throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
+            }
+        }
+
+    }
+
+    public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf) {
+        if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
+            SdvStatus newSdvStatus = SdvStatus.getByI18nDescription(formDataBean.getSdvStatusString());
+            if(formDataBean.getSdvStatusString().equalsIgnoreCase("Never Verified")) {
+                if(eventCrf.getSdvStatus() != null) {
+                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE);
+                }
+            } else if(newSdvStatus == null ){
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_NOT_VALID);
+            } else if((eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus)) && newSdvStatus.equals(SdvStatus.VERIFIED)) {
+                if (eventCrf == null || !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION);
+                } else if (eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()) {
+                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED);
+                }
             }
         }
     }

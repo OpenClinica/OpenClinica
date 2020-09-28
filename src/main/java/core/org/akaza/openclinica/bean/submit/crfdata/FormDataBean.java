@@ -15,6 +15,7 @@ public class FormDataBean {
     private String formOID;
     private String EventCRFStatus;
     private String reasonForChangeForCompleteForms;
+    private String sdvStatusString;
 
 
     private String formLayoutName;
@@ -140,5 +141,13 @@ public class FormDataBean {
         if(this.workflowStatus == null)
             return null;
         return this.workflowStatus.getDisplayValue();
+    }
+
+    public String getSdvStatusString() {
+        return sdvStatusString;
+    }
+
+    public void setSdvStatusString(String sdvStatusString) {
+        this.sdvStatusString = sdvStatusString;
     }
 }

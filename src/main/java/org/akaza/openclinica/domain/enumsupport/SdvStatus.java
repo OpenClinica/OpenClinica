@@ -31,10 +31,11 @@ public enum SdvStatus {
 
     public static SdvStatus getByI18nDescription(String description) {
         HashMap<String, SdvStatus> sdvObjects = new HashMap<String, SdvStatus>();
+        sdvObjects.put(SdvStatus.NOT_VERIFIED.getDisplayValueForNonSdvPage().toLowerCase(), SdvStatus.NOT_VERIFIED);
         for (SdvStatus theEnum : SdvStatus.values()) {
-            sdvObjects.put(theEnum.getDisplayValue(), theEnum);
+            sdvObjects.put(theEnum.getDisplayValue().toLowerCase(), theEnum);
         }
-        return sdvObjects.get(description);
+        return sdvObjects.get(description.toLowerCase());
     }
 
     public static SdvStatus getBySdvStatusString(String sdvStatusString) {
