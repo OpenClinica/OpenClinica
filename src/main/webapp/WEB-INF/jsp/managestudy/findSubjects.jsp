@@ -192,7 +192,7 @@
             for (var i=0; i<target.length; i++) {
                 extraMenu.eq(i).find('td').appendTo(target.get(i));
             }
-            extraMenu.parent().remove();
+            extraMenu.remove();
         });
     </script>
 </div>
