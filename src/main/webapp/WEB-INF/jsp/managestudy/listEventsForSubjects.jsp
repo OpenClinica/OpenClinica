@@ -111,7 +111,7 @@
 <br>
 <input type="button" onclick="confirmExit('MainMenu');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
 
-<div>
+<div style="display:none;">
     <c:set var="originatingPage" value="ListEventsForSubjects?module=submit&defId=${defId}"/>
     <c:forEach var="studySub" items="${participants}">
         <c:if test="${not empty eventsByParticipant.get(studySub.name)}">

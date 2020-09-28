@@ -140,7 +140,7 @@
     </div>
 </c:if>
 
-<div>
+<div style="display:none;">
     <c:forEach var="studySub" items="${participants}">
         <c:if test="${not empty eventsByParticipant.get(studySub.name)}">
             <div>${studySub.name}</div>
@@ -148,7 +148,7 @@
             <div id="actions4${studySub.name}" style="margin-left:40px;">
                 <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
                     <div>
-                        ${currRow.bean.studyEvent.studyEventDefinition.name}    
+                        ${currRow.bean.studyEvent.studyEventDefinition.name}
                         ${currRow.bean.studyEvent.sampleOrdinal} 
                     </div>
                     <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}">
