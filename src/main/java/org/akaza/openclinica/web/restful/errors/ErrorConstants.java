@@ -203,12 +203,13 @@ public class ErrorConstants {
     public static final String ERR_ASSIGNED_USER_NOT_VALID = "errorCode.assignedUserNotValid";
     public static final String ERR_DETAILED_NOTE_NOT_AVAILABLE = "errorCode.detailedNoteNotAvailable";
     public static final String ERR_DETAILED_NOTE_TOO_LONG = "errorCode.detailedNoteLengthTooLong";
-    public static final String ERR_STATUS_NOT_APPLICABLE = "errorCode.statusNotApplicable";
+    public static final String ERR_QUERY_STATUS_NOT_APPLICABLE = "errorCode.queryStatusNotApplicable";
     public static final String ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES = "errorCode.newQueryInBetweenOldQueries";
-    public static final String ERR_ANNOTATION_IMPORT_CANNOT_HAVE_MANY_CHILD_NOTES = "errorCode.annotationImportCannotHaveManyChildNotes";
+    public static final String ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE = "errorCode.annotationMustHaveOneChildNote";
     public static final String ERR_PARENT_DISPLAYID_IS_ALREADY_USED_AS_CHILD_DISPLAYID = "errorCode.parentDisplayIdIsAlreadyUsedForChildDisplayId";
     public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED_AS_PARENT_DISPLAYID = "errorCode.childDisplayIdIsAlreadyUsedForParentDisplayId";
     public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED = "errorCode.childDisplayIdIsAlreadyUsed";
     public static final String ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID = "errorCode.childDisplayIdIsANotCorrespondingToParentDisplayId";
+    public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
 
 }

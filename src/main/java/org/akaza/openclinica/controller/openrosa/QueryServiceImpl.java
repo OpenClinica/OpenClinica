@@ -15,6 +15,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.xform.QueriesBean;
@@ -36,6 +38,7 @@ import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.pform.OpenRosaService;
 import core.org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -166,7 +169,7 @@ public class QueryServiceImpl implements QueryService {
         }
     }
 
-    public DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception {
+    public DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) {
         DiscrepancyNote dn = new DiscrepancyNote();
         dn.setStudy(helperBean.getContainer().getStudy());
         dn.setEntityType("itemData");
@@ -453,12 +456,15 @@ public class QueryServiceImpl implements QueryService {
     public String generateDisplayId(Boolean parentDn){
         DiscrepancyNote dn = null;
         String newDisplayId =null;
+        int counter = 0;
         do {
             String randomNo = StringUtils.leftPad(Integer.toString(RandomUtils.nextInt(0, 1000000000)), 9, '0');
             newDisplayId = parentDn ? "DN_"+randomNo : "CDN_"+randomNo;
             dn = discrepancyNoteDao.findByDisplayId(newDisplayId);
-        }while(dn != null);
-
+            counter++;
+        }while(dn != null && counter < 10);
+        if(counter >= 10)
+            throw new OpenClinicaSystemException("Failed", ErrorConstants.ERR_GENERATING_DISCREPANCY_NOTE_ID);
         return newDisplayId;
     }
 }

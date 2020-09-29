@@ -68,7 +68,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID));
         isResolutionTypeAnnotation = QueryType.ANNOTATION.getName().equalsIgnoreCase(discrepancyNoteBean.getNoteType());
         if(isResolutionTypeAnnotation && discrepancyNoteBean.getChildNotes().size() > 1)
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_IMPORT_CANNOT_HAVE_MANY_CHILD_NOTES));
+            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
         DiscrepancyNote parentDN =null;
         if(discrepancyNoteBean.getDisplayId() != null) {
             parentDN = discrepancyNoteDao.findByDisplayId(discrepancyNoteBean.getDisplayId());
@@ -82,8 +82,11 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         }
 
         for(ChildNoteBean childNoteBean : discrepancyNoteBean.getChildNotes()){
-            if(!isResolutionTypeAnnotation && !checkDiscrepancyNoteStatusValid(childNoteBean.getStatus()))
+            boolean discrepancyNoteStatusValid = true;
+            if(!isResolutionTypeAnnotation && !checkDiscrepancyNoteStatusValid(childNoteBean.getStatus())){
+                discrepancyNoteStatusValid = false;
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID));
+            }
             if(!isUserExist(childNoteBean.getOwnerUserName()))
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_USER_NOT_VALID));
             if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName()))
@@ -99,8 +102,8 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 childDN = discrepancyNoteDao.findByDisplayId(childNoteBean.getDisplayId());
             }
             if (childDN == null) {
-                    if (!isResolutionTypeAnnotation && !isChildStatusApplicable(childNoteBean.getStatus()))
-                        errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_STATUS_NOT_APPLICABLE));
+                    if (!isResolutionTypeAnnotation && discrepancyNoteStatusValid && !isChildStatusApplicable(childNoteBean.getStatus()))
+                        errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_QUERY_STATUS_NOT_APPLICABLE));
                     setResolutionStatusForCheckingChildNotesValidity(childNoteBean.getStatus());
                     newQueriesStarted = true;
             }else{
@@ -116,7 +119,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
             if(parentDN != null && isResolutionTypeAnnotation
                     && (childNoteBean.getDisplayId() == null || childDN == null)){
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_IMPORT_CANNOT_HAVE_MANY_CHILD_NOTES));
+                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
             }
         }
         if(errors.size() ==0 && !newQueriesStarted){
@@ -128,42 +131,26 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     }
 
     public void validateItem(ImportItemDataBean itemDataBean, CrfBean crf, ImportItemGroupDataBean itemGroupDataBean, ItemCountInForm itemCountInForm) {
-        ErrorObj errorObj = null;
-        List<ErrorObj> errors = new ArrayList<>();
         if (itemDataBean.getItemOID() == null) {
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND));
-            throw new OpenClinicaSystemException(FAILED, errors);
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
         Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
-
         // ItemOID is not valid
         if (item == null || (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND));
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }else {
-
-            if (!validateItemInGroup(item, itemGroupDataBean, crf)) {
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUP_DOES_NOT_CONTAIN_ITEMDATA));
-            }
-
+            validateItemInGroup(item, itemGroupDataBean, crf);
             if (itemDataBean.getValue() == null) {
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_VALUE));
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_MISSING_VALUE);
             } else if (itemDataBean.getValue().length() > 3999) {
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_TOO_LONG));
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_TOO_LONG);
             } else if (StringUtils.isNotEmpty(itemDataBean.getValue())) {
-                if (!validateItemDataType(item, itemDataBean.getValue(), itemCountInForm))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH));
-
-
+                validateItemDataType(item, itemDataBean.getValue(), itemCountInForm);
                 Set<ItemFormMetadata> ifms = item.getItemFormMetadatas();
                 ResponseSet responseSet = ifms.iterator().next().getResponseSet();
-                if (!validateResponseSets(responseSet, itemDataBean.getValue(), itemCountInForm))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_CHOICE_NOT_FOUND));
-
+                validateResponseSets(responseSet, itemDataBean.getValue(), itemCountInForm);
             }
-        }
-        if(errors.size() > 0){
-            throw new OpenClinicaSystemException(FAILED, errors);
         }
     }
 
@@ -288,108 +275,104 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         }
     }
 
-    private boolean validateItemInGroup(Item item, ImportItemGroupDataBean itemGroupDataBean, CrfBean crf) {
+    private void validateItemInGroup(Item item, ImportItemGroupDataBean itemGroupDataBean, CrfBean crf) {
         ItemGroup itemGroup = itemGroupDao.findByOcOIDCrfId(itemGroupDataBean.getItemGroupOID(), crf);
         for (ItemGroupMetadata itemGroupMetadata : itemGroup.getItemGroupMetadatas()) {
             if (itemGroupMetadata.getItem().getOcOid().equals(item.getOcOid())) {
-                return true;
+                return;
             }
         }
-        return false;
+        throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEMGROUP_DOES_NOT_CONTAIN_ITEMDATA);
     }
-    private Boolean validateResponseSets(ResponseSet responseSet, String value, ItemCountInForm itemCountInForm) {
+    private void validateResponseSets(ResponseSet responseSet, String value, ItemCountInForm itemCountInForm) {
         ResponseType responseType = responseSet.getResponseType();
         switch (responseType.getName()) {
             case ("checkbox"):
-                return validateCheckBoxOrMultiSelect(responseSet, value);
+                validateCheckBoxOrMultiSelect(responseSet, value);
             case ("multi-select"):
-                return validateCheckBoxOrMultiSelect(responseSet, value);
+                validateCheckBoxOrMultiSelect(responseSet, value);
             case ("radio"):
-                return validateRadioOrSingleSelect(responseSet, value);
+                validateRadioOrSingleSelect(responseSet, value);
             case ("single-select"):
-                return validateRadioOrSingleSelect(responseSet, value);
+                validateRadioOrSingleSelect(responseSet, value);
             case ("text"):
-                return true;
+                return;
             case ("textarea"):
-                return true;
+                return;
             case ("calculation"):
-                return true;
+                return;
             default:
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
         }
     }
 
-    private Boolean validateCheckBoxOrMultiSelect(ResponseSet responseSet, String value) {
+    private void validateCheckBoxOrMultiSelect(ResponseSet responseSet, String value) {
         String[] values = value.split(",");
 
         for (String v : values) {
             if (!responseSet.getOptionsValues().contains(v)) {
-                return false;
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_CHOICE_NOT_FOUND);
             }
         }
-        return true;
+        return;
     }
 
-    private Boolean validateRadioOrSingleSelect(ResponseSet responseSet, String value) {
+    private void validateRadioOrSingleSelect(ResponseSet responseSet, String value) {
         if(responseSet.getOptionsText().equals("_") && responseSet.getOptionsValues().equals("_"))
-            return true;
+            return;
         if (!responseSet.getOptionsValues().contains(value)) {
-            return false;
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_CHOICE_NOT_FOUND);
         }
-        return true;
     }
 
-    private Boolean validateItemDataType(Item item, String value, ItemCountInForm itemCountInForm) {
+    private void validateItemDataType(Item item, String value, ItemCountInForm itemCountInForm) {
         ItemDataType itemDataType = item.getItemDataType();
         switch (itemDataType.getCode()) {
             case "BL":
-                return validateForBoolean(value);
+                validateForBoolean(value);
             case "ST":
-                return true;
+                return;
             case "INT":
-                return validateForInteger(value);
+                validateForInteger(value);
             case "REAL":
-                return validateForReal(value);
+                validateForReal(value);
             case "DATE":
-                return validateForDate(value);
+                validateForDate(value);
             default:
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
         }
     }
 
-    private Boolean validateForBoolean(String value) {
+    private void validateForBoolean(String value) {
         if (!value.equals("true") && !value.equals("false")) {
-            return false;
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
         }
-        return true;
 
     }
-    private Boolean validateForInteger(String value) {
+    private void validateForInteger(String value) {
         try {
             Integer int1 = Integer.parseInt(value);
         } catch (NumberFormatException nfe) {
             nfe.getStackTrace();
-            return false;
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
         }
-        return true;
     }
 
-    private Boolean validateForReal(String value) {
+    private void validateForReal(String value) {
         if(NumberUtils.isParsable(value))
-            return true;
-        return false;
+            return;
+        throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
     }
 
-    private Boolean validateForDate(String value) {
+    private void validateForDate(String value) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
             LocalDate date = LocalDate.parse(value, formatter);
         } catch (Exception pe) {
             pe.getStackTrace();
-            return false;
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
         }
-        return true;
     }
 }

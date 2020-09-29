@@ -321,13 +321,9 @@ public class ImportServiceImpl implements ImportService {
                                     itemObject = createOrUpdateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm, tenantStudy, studySubject, reasonForChange);
                                 }
                                 catch (OpenClinicaSystemException e){
-                                    if(e.getMultiErrors() !=null){
-                                        for(ErrorObj err : e.getMultiErrors()){
-                                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), err.getCode(), null, err.getMessage());
-                                            dataImportReports.add(dataImportReport);
-                                        }
-                                        logger.error("ItemOID {} related issue: ", itemDataBean.getItemOID());
-                                    }
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), e.getErrorCode(), null, e.getMessage());
+                                    dataImportReports.add(dataImportReport);
+                                    logger.error("ItemOID {} related issue: ", itemDataBean.getItemOID());
                                     continue;
                                 }
                                 if (itemObject instanceof DataImportReport) {
@@ -1319,12 +1315,7 @@ public class ImportServiceImpl implements ImportService {
         }
         childNoteBean.setOwnerUserName(userAccount.getUserName());
         discrepancyNoteBean.getChildNotes().add(childNoteBean);
-        try {
-            createQuery(discrepancyNoteBean, study, studySubject, itemData.getEventCrf(), itemData.getItem().getOcOid(), itemGroupDataBean,  itemData, null, null, true, new ArrayList<DataImportReport>());
-        } catch(OpenClinicaSystemException e){
-            logger.error("Query Import Failed: ", e);
-            eb = new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
-    }
+        createQuery(discrepancyNoteBean, study, studySubject, itemData.getEventCrf(), itemData.getItem().getOcOid(), itemGroupDataBean,  itemData, null, null, true, new ArrayList<DataImportReport>());
         return eb;
     }
 
@@ -1346,62 +1337,56 @@ public class ImportServiceImpl implements ImportService {
         QueryBean queryBean = new QueryBean();
         String displayId = isParentDn ? discrepancyNoteBean.getDisplayId() : childNoteBean.getDisplayId();
         Boolean isNoteCreated = false;
-        try {
-            if(displayId != null)
-                discNote = discrepancyNoteDao.findByDisplayId(displayId);
-            if(discNote == null) {
-                isNoteCreated = true;
-                queryBean.setType(discrepancyNoteBean.getNoteType());
-                queryBean.setDisplayId(displayId);
-                if (!isParentDn){
-                    queryBean.setComment(childNoteBean.getDetailedNote());
-                    queryBean.setStatus(childNoteBean.getStatus());
-                    queryBean.setUser(childNoteBean.getOwnerUserName());
-                    UserAccount userAccount = userAccountDao.findByUserName(childNoteBean.getOwnerUserName());
-                    helperBean.getContainer().setUser(userAccount);
-                    if(childNoteBean.getUserRef() != null)
-                        queryBean.setAssigned_to(childNoteBean.getUserRef().getUserName());
-                }
-                else
-                    queryBean.setComment("");
-                discNote = (DiscrepancyNote) queryService.createQuery(helperBean, queryBean, isParentDn);
-                if (isParentDn)
-                    discNote.setThreadUuid(UUID.randomUUID().toString());
-                else {
-                    discNote.setThreadUuid(parentDn.getThreadUuid());
-                    discNote.setParentDiscrepancyNote(parentDn);
-                    helperBean.setParentDn(parentDn);
-                }
-                helperBean.setDn(discNote);
-                discNote = discrepancyNoteDao.saveOrUpdate(discNote);
-                queryService.saveQueryItemDatamap(helperBean);
-                DataImportReport dataImportReport =  new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(),
-                        eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid(), eventCrf.getStudyEvent().getSampleOrdinal().toString(),
-                        eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, discNote.getDisplayId()+" "+INSERTED, sdf_logFile.format(new Date()),  null);
-                dataImportReports.add(dataImportReport);
+        if(displayId != null)
+            discNote = discrepancyNoteDao.findByDisplayId(displayId);
+        if(discNote == null) {
+            isNoteCreated = true;
+            queryBean.setType(discrepancyNoteBean.getNoteType());
+            queryBean.setDisplayId(displayId);
+            if (!isParentDn){
+                queryBean.setComment(childNoteBean.getDetailedNote());
+                queryBean.setStatus(childNoteBean.getStatus());
+                queryBean.setUser(childNoteBean.getOwnerUserName());
+                UserAccount userAccount = userAccountDao.findByUserName(childNoteBean.getOwnerUserName());
+                helperBean.getContainer().setUser(userAccount);
+                if(childNoteBean.getUserRef() != null)
+                    queryBean.setAssigned_to(childNoteBean.getUserRef().getUserName());
             }
+            else
+                queryBean.setComment("");
+            discNote = (DiscrepancyNote) queryService.createQuery(helperBean, queryBean, isParentDn);
             if (isParentDn)
-            {
-                for(int i = 0 ; i < discrepancyNoteBean.getChildNotes().size();i++){
-                    DiscrepancyNote childNote = createQuery(discrepancyNoteBean, study, studySubject, eventCrf, itemOid, itemGroupDataBean, itemData, discrepancyNoteBean.getChildNotes().get(i), discNote, false, dataImportReports);
-                    if(i == discrepancyNoteBean.getChildNotes().size()-1){
-                        discNote.setResolutionStatus(childNote.getResolutionStatus());
-                        discNote.setUserAccount(childNote.getUserAccount());
-                        discNote.setDetailedNotes(childNote.getDetailedNotes());
-                        discNote.setUserAccountByOwnerId(childNote.getUserAccountByOwnerId());
-                        discNote = discrepancyNoteDao.saveOrUpdate(discNote);
-                        if(!isNoteCreated){
-                            DataImportReport dataImportReport =  new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(),
-                                    eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid(), eventCrf.getStudyEvent().getSampleOrdinal().toString(),
-                                    eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, discNote.getDisplayId()+" "+UPDATED, sdf_logFile.format(new Date()),  null);
-                            dataImportReports.add(dataImportReport);
-                        }
+                discNote.setThreadUuid(UUID.randomUUID().toString());
+            else {
+                discNote.setThreadUuid(parentDn.getThreadUuid());
+                discNote.setParentDiscrepancyNote(parentDn);
+                helperBean.setParentDn(parentDn);
+            }
+            helperBean.setDn(discNote);
+            discNote = discrepancyNoteDao.saveOrUpdate(discNote);
+            queryService.saveQueryItemDatamap(helperBean);
+            DataImportReport dataImportReport =  new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(),
+                    eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid(), eventCrf.getStudyEvent().getSampleOrdinal().toString(),
+                    eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, discNote.getDisplayId()+" "+INSERTED, sdf_logFile.format(new Date()),  null);
+            dataImportReports.add(dataImportReport);
+        }
+        if (isParentDn) {
+            for(int i = 0 ; i < discrepancyNoteBean.getChildNotes().size();i++){
+                DiscrepancyNote childNote = createQuery(discrepancyNoteBean, study, studySubject, eventCrf, itemOid, itemGroupDataBean, itemData, discrepancyNoteBean.getChildNotes().get(i), discNote, false, dataImportReports);
+                if(i == discrepancyNoteBean.getChildNotes().size()-1){
+                    discNote.setResolutionStatus(childNote.getResolutionStatus());
+                    discNote.setUserAccount(childNote.getUserAccount());
+                    discNote.setDetailedNotes(childNote.getDetailedNotes());
+                    discNote.setUserAccountByOwnerId(childNote.getUserAccountByOwnerId());
+                    discNote = discrepancyNoteDao.saveOrUpdate(discNote);
+                    if(!isNoteCreated){
+                        DataImportReport dataImportReport =  new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(),
+                                eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid(), eventCrf.getStudyEvent().getSampleOrdinal().toString(),
+                                eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, discNote.getDisplayId()+" "+UPDATED, sdf_logFile.format(new Date()),  null);
+                        dataImportReports.add(dataImportReport);
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.error("Query Import Failed: ", e);
-            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
         }
         return  discNote;
     }

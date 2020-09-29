@@ -454,8 +454,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 for(DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
                         pdfDoc.add(this.createTableFromBean(discNoteBean, parentDisplayId));
-                        if(isParentDiscrepancyNote)
-                        {
+                        if(isParentDiscrepancyNote) {
                             parentDisplayId = discNoteBean.getDisplayId();
                             isParentDiscrepancyNote = false;
                         }
