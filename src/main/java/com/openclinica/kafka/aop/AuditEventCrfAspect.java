@@ -4,8 +4,11 @@ import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -26,23 +29,28 @@ public class AuditEventCrfAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private KafkaService kafkaService;
     private EventCrfDao eventCrfDao;
+    private StudySubjectService studySubjectService;
+    private StudySubjectDao studySubjectDao;
 
-    public AuditEventCrfAspect(KafkaService kafkaService, EventCrfDao eventCrfDao){
+    public AuditEventCrfAspect(KafkaService kafkaService, EventCrfDao eventCrfDao, StudySubjectService studySubjectService, StudySubjectDao studySubjectDao){
         this.kafkaService = kafkaService;
         this.eventCrfDao = eventCrfDao;
+        this.studySubjectService = studySubjectService;
+        this.studySubjectDao = studySubjectDao;
     }
 
     @Around("execution(* core.org.akaza.openclinica.dao.hibernate.EventCrfDao.saveOrUpdate(..))")
     public EventCrf beforeEventCrfDaoSaveOrUpdate(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         EventCrf eventCrf = (EventCrf) proceedingJoinPoint.getArgs()[0];
-        boolean eventCrfIsSame = eventCrfIsTheSame(eventCrf);
+        boolean eventCrfIsSame = eventCrfIsTheSame(eventCrf, false);
 
         EventCrf afterEventCrf = (EventCrf) proceedingJoinPoint.proceed();
-
         if (!eventCrfIsSame){
             log.info("AoP: triggered sendFormAttributeChangeMessage");
             kafkaService.sendFormAttributeChangeMessage(afterEventCrf);
+
         }
+        updateStudySubjectLastModifiedDetails(eventCrf);
 
         return afterEventCrf;
     }
@@ -50,7 +58,7 @@ public class AuditEventCrfAspect {
     // The reasoning for this check is that the eventCRF's updatedBy and lastUpdated fields are updated every time a single item data
     // field within the form is changed. We don't want to trigger the processing of rules in rules-engine every time a single item
     // data field is changed so we are filtering out those minimal changes here just to look for changes in the status of the eventCRF.
-    public boolean eventCrfIsTheSame(EventCrf eventCrf){
+    public boolean eventCrfIsTheSame(EventCrf eventCrf,Boolean discardSdvChanges){
         EventCrf existingEventCrf = getExistingEventCrf(eventCrf);
 
         if (existingEventCrf != null){
@@ -58,6 +66,9 @@ public class AuditEventCrfAspect {
                 log.info("AoP: eventCRF is the same! Skipping kafka message.");
                 return true; }
             else {
+                if(discardSdvChanges && ((existingEventCrf.getSdvStatus() == null && eventCrf.getSdvStatus() != null ) ||
+                        (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus()))))
+                    return true;
                 log.info("AoP: eventCRF is not the same!");
                 return false; }
         }
@@ -79,9 +90,12 @@ public class AuditEventCrfAspect {
     public boolean areEventCrfStatusesTheSame(EventCrf eventCrf, EventCrf existingEventCrf){
         if (!existingEventCrf.getWorkflowStatus().equals(eventCrf.getWorkflowStatus())){
             return false;}
-        if (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus())){
+
+        if ((existingEventCrf.getSdvStatus() == null && eventCrf.getSdvStatus() != null ) || (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus()))){
             return false;}
-        if (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived())){
+        if ((existingEventCrf.getArchived() == null && eventCrf.getArchived() != null ) || (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived()))){
+            return false;}
+        if ((existingEventCrf.getRemoved() == null && eventCrf.getRemoved() != null ) || (existingEventCrf.getRemoved() != null && eventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved()))){
             return false;}
         if (eventCrf.getRemoved() != null){
             if (existingEventCrf.getRemoved() == null || !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())){
@@ -106,7 +120,9 @@ public class AuditEventCrfAspect {
     public void onEventCrfDAOupdate(JoinPoint joinPoint) {
         log.info("AoP: onEventCrfDAOupdate triggered");
         try {
-            kafkaService.sendFormAttributeChangeMessage((EventCRFBean) joinPoint.getArgs()[0]);
+            EventCRFBean eventCRFBean = (EventCRFBean) joinPoint.getArgs()[0];
+            kafkaService.sendFormAttributeChangeMessage(eventCRFBean);
+            updateStudySubjectLastModifiedDetails(eventCRFBean);
         } catch (Exception e) {
             log.error("Could not send kafka message triggered by EventCRFDAO.update: ", e);
         }
@@ -116,7 +132,9 @@ public class AuditEventCrfAspect {
     public void onEventCrfDAOmarkComplete(JoinPoint joinPoint) {
         log.info("AoP: onEventCrfDAOmarkComplete triggered");
         try {
-            kafkaService.sendFormAttributeChangeMessage((EventCRFBean) joinPoint.getArgs()[0]);
+            EventCRFBean eventCRFBean = (EventCRFBean) joinPoint.getArgs()[0];
+            kafkaService.sendFormAttributeChangeMessage(eventCRFBean);
+            updateStudySubjectLastModifiedDetails(eventCRFBean);
         } catch (Exception e) {
             log.error("Could not send kafka message triggered by EventCRFDAO.markComplete: ", e);
         }
@@ -126,7 +144,9 @@ public class AuditEventCrfAspect {
     public void onEventCrfDAOcreate(JoinPoint joinPoint) {
         log.info("AoP: onEventCrfDAOcreate triggered");
         try {
-            kafkaService.sendFormAttributeChangeMessage((EventCRFBean) joinPoint.getArgs()[0]);
+            EventCRFBean eventCRFBean = (EventCRFBean) joinPoint.getArgs()[0];
+            kafkaService.sendFormAttributeChangeMessage(eventCRFBean);
+            updateStudySubjectLastModifiedDetails(eventCRFBean);
         } catch (Exception e) {
             log.error("Could not send kafka message triggered by EventCRFDAO.create: ", e);
         }
@@ -136,9 +156,40 @@ public class AuditEventCrfAspect {
     public void onEventCrfDAOupdateFormLayoutID(JoinPoint joinPoint) {
         log.info("AoP: onEventCrfDAOupdateFormLayoutID triggered");
         try {
-            kafkaService.sendFormAttributeChangeMessage((EventCRFBean) joinPoint.getArgs()[0]);
+            EventCRFBean eventCRFBean = (EventCRFBean) joinPoint.getArgs()[0];
+            kafkaService.sendFormAttributeChangeMessage(eventCRFBean);
+            updateStudySubjectLastModifiedDetails(eventCRFBean);
         } catch (Exception e) {
             log.error("Could not send kafka message triggered by EventCRFDAO.updateFormLayoutID: ", e);
         }
+    }
+
+    @AfterReturning("execution(* core.org.akaza.openclinica.dao.submit.EventCRFDAO.setSDVStatus(..))")
+    public void onEventCrfDAOupdateSdvStatus(JoinPoint joinPoint) {
+        log.info("AoP: onEventCrfDAOupdateSdvStatus triggered");
+        try {
+            EventCRFBean eventCRFBean = (EventCRFBean) joinPoint.getArgs()[0];
+            kafkaService.sendFormAttributeChangeMessage(eventCRFBean);
+        } catch (Exception e) {
+            log.error("Could not send kafka message triggered by EventCRFDAO.setSDVStatus: ", e);
+        }
+    }
+
+    private void updateStudySubjectLastModifiedDetails(EventCrf eventCrf){
+        boolean eventCrfIsSameWithoutSdvChanges = eventCrfIsTheSame(eventCrf, true);
+        if(!eventCrfIsSameWithoutSdvChanges){
+            if(eventCrf.getUpdateId() != null && eventCrf.getUpdateId() > 0)
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), eventCrf.getUpdateId());
+            else
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), eventCrf.getUserAccount().getUserId());
+        }
+    }
+
+    private void updateStudySubjectLastModifiedDetails(EventCRFBean eventCRFBean){
+        StudySubject studySubject = studySubjectDao.findByPK(eventCRFBean.getStudySubjectId());
+        if (eventCRFBean.getUpdater() != null && eventCRFBean.getUpdater().getId() > 0)
+            studySubjectService.updateStudySubject(studySubject, eventCRFBean.getUpdater().getId());
+        else
+            studySubjectService.updateStudySubject(studySubject, eventCRFBean.getOwnerId());
     }
 }

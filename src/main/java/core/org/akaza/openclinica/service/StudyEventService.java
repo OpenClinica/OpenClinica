@@ -38,6 +38,8 @@ public interface StudyEventService {
 
     void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean);
 
+    boolean isEventSignable(StudyEvent studyEvent);
+
     StudyEvent validateStudyEventExists(StudySubject studySubject, String studyEventOID, String studyEventRepeatKey, CustomRuntimeException validationErrors);
 
     void removeStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent, UserAccountBean userAccountBean);

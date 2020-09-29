@@ -356,6 +356,7 @@ public class ImportServiceImpl implements ImportService {
                          *  so this need to skip the existing set event status logic
                          */
                         if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
+                            updateSdvStatusIfAlreadyVerified(eventCrf, userAccount);
                             updateEventAndSubjectStatusIfSigned(studyEvent, studySubject, userAccount);
                         }
 
@@ -1586,5 +1587,14 @@ public class ImportServiceImpl implements ImportService {
         StudyEvent studyEvent = buildStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
         logger.debug("Scheduling new Visit Base  Event ID {}", studyEvent.getStudyEventId());
         return studyEvent;
+    }
+
+
+    private void updateSdvStatusIfAlreadyVerified(EventCrf eventCrf, UserAccount userAccount) {
+        if(eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED)){
+            eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
+            eventCrf.setUpdateId(userAccount.getUserId());
+            eventCrfDao.saveOrUpdate(eventCrf);
+        }
     }
 }

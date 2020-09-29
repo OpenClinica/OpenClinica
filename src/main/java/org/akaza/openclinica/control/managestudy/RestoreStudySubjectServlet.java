@@ -92,7 +92,7 @@ public class RestoreStudySubjectServlet extends SecureController {
                 }
 
                 request.setAttribute("subject", subject);
-                request.setAttribute("study", study);
+                request.setAttribute("subjectStudy", study);
                 request.setAttribute("studySub", studySub);
                 request.setAttribute("events", displayEvents);
 
@@ -110,9 +110,10 @@ public class RestoreStudySubjectServlet extends SecureController {
                 // restore all study events
                 // restore all event crfs
 
+                Study currentStudy = (Study) request.getSession().getAttribute("study");
                 String emailBody =
                     respage.getString("the_subject") + " " + studySub.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "
-                        + study.getName() + ".";
+                        + currentStudy.getName() + ".";
                     addPageMessage(emailBody);
 //                try{
 //                    sendEmail(emailBody);

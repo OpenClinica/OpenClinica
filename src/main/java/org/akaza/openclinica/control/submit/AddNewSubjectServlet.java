@@ -271,6 +271,7 @@ public class AddNewSubjectServlet extends SecureController {
                 studySubject.setLabel(label);
                 studySubject.setStatus(Status.AVAILABLE);
                 studySubject.setOwner(ub);
+                studySubject.setUpdater(ub);
                 studySubject = ssd.createWithoutGroup(studySubject);
                 if (!studySubject.isActive()) {
                     throw new OpenClinicaException(resexception.getString("could_not_create_study_subject"), "4");

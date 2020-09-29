@@ -39,6 +39,7 @@ import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import core.org.akaza.openclinica.core.OpenClinicaMailSender;
@@ -115,6 +116,7 @@ public class ImportSpringJob extends QuartzJobBean {
     private ImportCRFDataService dataService;
     private ItemDataDAO itemDataDao;
     private EventCRFDAO eventCrfDao;
+    private StudyEventDAO studyEventDao;
     private AuditEventDAO auditEventDAO;
     private TriggerService triggerService;
     private StudyDao studyDao;
@@ -155,9 +157,10 @@ public class ImportSpringJob extends QuartzJobBean {
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
             studyDao = (StudyDao) appContext.getBean("studyDaoDomain");
+            studyEventDao = (StudyEventDAO) appContext.getBean("studyEventDAO");
+            eventCrfDao = (EventCRFDAO) appContext.getBean("eventCRFDAO");
 
             itemDataDao = new ItemDataDAO(dataSource);
-            eventCrfDao = new EventCRFDAO(dataSource);
             auditEventDAO = new AuditEventDAO(dataSource, studyDao);
 
             int userId = dataMap.getInt(USER_ID);
@@ -621,7 +624,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // setup ruleSets to run if applicable
                 List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(dataSource, studyBean, ub, ruleSetService, odmContainer);
 
-                CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao);
+                CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao, studyEventDao, eventCrfDao);
                 for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
                     boolean resetSDV = false;

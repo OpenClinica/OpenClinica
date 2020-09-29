@@ -1487,7 +1487,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected void setStudy(Study study, HttpSession session) {
-        getCurrentBoardUrl(study, session);
         session.setAttribute("study", study);
     }
 

@@ -220,6 +220,17 @@ public class ParticipateServiceImpl implements ParticipateService {
                                     formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
                                 }else {
                                     formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                                    // OC-13517 Prefilled Contact Form prevents Participate to move to next Event
+                                    if (nextEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                                            || nextEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
+                                        StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
+                                        studyEvent.setUpdateId(ub.getId());
+                                        studyEvent.setDateUpdated(new Date());
+                                        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                                        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+                                        StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
+                                        studyEventDao.saveOrUpdateTransactional(container);
+                                    }
                                 }
                                 formDatas.add(getFormDataPerCrf(formLayout, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                             }

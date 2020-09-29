@@ -1265,4 +1265,9 @@ public class Study extends DataMapDomainObject {
     public String getEnvUuid() {
         return isSite() ? study.getStudyEnvUuid() : studyEnvUuid;
     }
+
+    @Transient
+    public String getDerivedBoardUrl() {
+        return isSite() ? study.getBoardUrl() : boardUrl;
+    }
 }

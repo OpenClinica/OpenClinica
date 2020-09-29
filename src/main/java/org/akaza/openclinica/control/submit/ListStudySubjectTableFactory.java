@@ -82,6 +82,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private UserService userService;
     private HttpServletRequest request;
     private ViewStudySubjectService viewStudySubjectService;
+    private StudySubjectService studySubjectService;
     private PermissionService permissionService;
     public static final String PAGE_NAME = "participant-matrix";
     public static final String  COMPONENT_NAME="participant-matrix-table";
@@ -306,7 +307,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
         List<String> userStatuses = new ArrayList<>();
 
-
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
+                session.getServletContext()).getBean("studySubjectService");
         if (!limit.isComplete()) {
             Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, null, 0, 0);
             if (items!=null)
@@ -441,7 +443,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             // key and a list of study events as the value.
             List<StudyEventBean> allStudyEventsForStudySubject = getStudyEventDAO().findAllByStudySubject(studySubjectBean);
             HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
-            theItem.put("isSignable", isSignable( studySubjectBean.getId()));
+
+            if (currentRole.isInvestigator()){
+                theItem.put("isSignable", studySubjectService.isSignable(studySubjectBean.getId()));
+            } else {
+                theItem.put("isSignable", false);
+            }
 
             for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
                 if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {
@@ -490,37 +497,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // Do not forget to set the items back on the tableFacade.
         tableFacade.setItems(theItems);
 
-    }
-
-    private Boolean isSignable(int studySubjectId) {
-        // https://jira.openclinica.com/browse/OC-13185
-        StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(
-                session.getServletContext()).getBean("studySubjectService");
-        StudySubjectBean studySub = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
-        List<DisplayStudyEventBean> displayStudyEvents = studySubjectService.getDisplayStudyEventsForStudySubject(
-                studySub, currentUser, currentRole, studyBean);
-
-        if (studySub.getStatus().isSigned() || displayStudyEvents.size() == 0)
-            return false;
-
-        for(DisplayStudyEventBean displayStudyEvent: displayStudyEvents) {
-            StudyEventBean studyEventBean = displayStudyEvent.getStudyEvent();
-
-            if (!studyEventBean.isRemoved() && !studyEventBean.isArchived()) {
-                if (!studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
-                        && !studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                    return false;
-                } else {
-                    if (!displayStudyEvent.isSignAble()) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     private void getColumnNames() {
@@ -1211,7 +1187,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String add_another_occurrence = resword.getString("add_another_occurrence");
-        String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
@@ -1283,10 +1258,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             if (studyEventBean.getDateStarted() != null)
                 eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
             if (studyEventBean.isRemoved()) {
-                eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+                eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
             } else {
-                eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue()).br();
+                eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue());
             }
+            eventDiv.append(" &nbsp; ");
             if (studyEventBean.isSigned()) {
                 eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
             }
@@ -1422,7 +1398,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String add_another_occurrence = resword.getString("add_another_occurrence");
-        String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
@@ -1460,10 +1435,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.bold().append(formatDate(studyEvents.get(0).getDateStarted())).boldEnd();
             }
             if (studyEvents.size() > 0 && studyEvents.get(0).isRemoved()) {
-                eventDiv.br().bold().append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+                eventDiv.br().bold().append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
             } else {
-                eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
+                eventDiv.br().bold().append(eventStatus.getDisplayValue());
             }
+            eventDiv.append(" &nbsp; ");
             if (studyEvents.size() > 0) {
                 if (studyEvents.get(0).isSigned()) {
                     eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
@@ -1483,10 +1459,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 if (studyEvents.get(0).getDateStarted() != null)
                     eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
                 if (studyEvents.get(0).isRemoved()) {
-                    eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase()).br();
+                    eventDiv.append(EventCrfStatusEnum.REMOVED.toString().toLowerCase());
                 } else {
-                    eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue()).br();
+                    eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue());
                 }
+                eventDiv.append(" &nbsp; ");
                 if (studyEvents.get(0).isSigned()) {
                     eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
                 }
@@ -1508,11 +1485,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         }
         eventDiv.trEnd(0);
-        eventDiv.tr(0).id("Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("display: all").close();
-        eventDiv.td(0).styleClass("table_cell_left").colspan("2").close().append("<i>").append(click_for_more_options).append("</i>").tdEnd();
-        eventDiv.trEnd(0);
 
-        eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("display: none").close();
+        eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).close();
         eventDiv.td(0).colspan("2").close();
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
@@ -1661,16 +1635,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
                                  StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
-        String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseover += "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_collapse.gif');";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
         String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
-        builder.a().href(href1 + href2);
-        builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
+        builder.a().onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
 
@@ -1680,14 +1651,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                                           StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseover += "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_collapse.gif');";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
         String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
-        builder.a().href(href1 + href2);
+        builder.a().href(href1);
         builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
@@ -1707,18 +1677,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
                 + "); ";
-        String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "moveObject('Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "', event); ";
         onmouseover += "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_expand.gif');";
         String onmouseout = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseout += "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif');";
         String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
-        String href = studyEvents.size() > 1 ? href1Repeating + href2 : href1 + href2;
+        String href = studyEvents.size() > 1 ? href1Repeating : "";
         builder.a().href(href);
-        // builder.onmouseover(onmouseover);
-        // builder.onmouseout(onmouseout);
         builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
@@ -1739,14 +1705,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private void linkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
-        String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
-        String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
         String onClick2 = "layersShowOrHide('hidden','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
-        builder.a().href(href1 + href2);
-        builder.onclick(onClick1 + onClick2 + onClick3 + onClick4);
+        builder.a().onclick(onClick1 + onClick2 + onClick3 + onClick4);
         builder.close().append("X").aEnd();
 
     }
