@@ -28,10 +28,12 @@ import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -46,6 +48,7 @@ public class UpdateStudySubjectServlet extends SecureController {
     StudySubjectBean studySub;
     SubjectBean subject;
     FormDiscrepancyNotes formDiscNotes;
+    private QueryService queryService;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -71,6 +74,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO studySubdao = new StudySubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
+        queryService = (QueryService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("queryService");
         boolean updateIsValid = false;
 
         String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
@@ -304,6 +308,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         child.setEntityType(parent.getEntityType());
         child.setColumn(parent.getColumn());
         child.setField(parent.getField());
+        child.setDisplayId(queryService.generateDisplayId(false));
 
         return child;
     }

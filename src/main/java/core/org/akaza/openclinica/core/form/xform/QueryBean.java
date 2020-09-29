@@ -40,6 +40,8 @@ public class QueryBean {
     private String thread_id;
     @JsonProperty("visible_thread_id")
     private String visible_thread_id;
+    @JsonProperty("display_id")
+    private String displayId;
 
 
     /**
@@ -217,5 +219,13 @@ public class QueryBean {
     @JsonProperty("visible_thread_id")
     public void setVisible_thread_id(String visible_thread_id) {
         this.visible_thread_id = visible_thread_id;
+    }
+    @JsonProperty("display_id")
+    public String getDisplayId() {
+        return displayId;
+    }
+    @JsonProperty("display_id")
+    public void setDisplayId(String displayId) {
+        this.displayId = displayId;
     }
 }

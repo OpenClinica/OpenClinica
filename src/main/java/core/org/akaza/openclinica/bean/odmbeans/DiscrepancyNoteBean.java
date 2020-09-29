@@ -19,6 +19,7 @@ import java.util.List;
  *
  */
 public class DiscrepancyNoteBean extends ElementOIDBean {
+    private String displayId;
     private String status;
     private String noteType;
     private Date dateUpdated;
@@ -81,5 +82,13 @@ public class DiscrepancyNoteBean extends ElementOIDBean {
 
     public void setThreadUuid(String threadUuid) {
         this.threadUuid = threadUuid;
+    }
+
+    public String getDisplayId() {
+        return displayId;
+    }
+
+    public void setDisplayId(String displayId) {
+        this.displayId = displayId;
     }
 }

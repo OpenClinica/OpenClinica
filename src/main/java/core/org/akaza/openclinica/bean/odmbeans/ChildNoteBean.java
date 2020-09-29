@@ -17,6 +17,7 @@ import java.util.Date;
  *
  */
 public class ChildNoteBean extends ElementOIDBean {
+    private String displayId;
     private String status;
     private Date dateCreated;
     private String description;
@@ -75,4 +76,12 @@ public class ChildNoteBean extends ElementOIDBean {
 	public void setOwnerFirstName(String ownerFirstName) {
 		this.ownerFirstName = ownerFirstName;
 	}
+
+    public String getDisplayId() {
+        return displayId;
+    }
+
+    public void setDisplayId(String displayId) {
+        this.displayId = displayId;
+    }
 }

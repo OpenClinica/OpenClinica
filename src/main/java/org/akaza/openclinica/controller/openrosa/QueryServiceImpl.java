@@ -15,6 +15,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.xform.QueriesBean;
@@ -36,7 +38,9 @@ import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.pform.OpenRosaService;
 import core.org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +81,7 @@ public class QueryServiceImpl implements QueryService {
     @Autowired
     private ApplicationContext appContext;
     public static final String DASH = "-";
+    public static final String QUERY_KEYWORD = "Query";
 
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
@@ -164,21 +169,21 @@ public class QueryServiceImpl implements QueryService {
         }
     }
 
-    public DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception {
+    public DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) {
         DiscrepancyNote dn = new DiscrepancyNote();
         dn.setStudy(helperBean.getContainer().getStudy());
         dn.setEntityType("itemData");
 
         dn.setDetailedNotes(queryBean.getComment());
-        if (queryBean.getType().equals(QueryType.QUERY.getName())) {
+        if (queryBean.getType().equalsIgnoreCase(QueryType.QUERY.getName()) || queryBean.getType().equalsIgnoreCase(QUERY_KEYWORD)) {
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
             setResolutionStatus(queryBean, dn);
         }else if
-            (queryBean.getType().equals(QueryType.REASON.getName())){
+            (queryBean.getType().equalsIgnoreCase(QueryType.REASON.getName())){
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(4));
             dn.setResolutionStatus(resolutionStatusDao.findById(5));
         }else if
-        (queryBean.getType().equals(QueryType.ANNOTATION.getName())){
+        (queryBean.getType().equalsIgnoreCase(QueryType.ANNOTATION.getName())){
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(2));
             dn.setResolutionStatus(resolutionStatusDao.findById(5));
         }
@@ -191,7 +196,7 @@ public class QueryServiceImpl implements QueryService {
         }
 
         String assignedTo = "";
-        if (queryBean.getType().equals(QueryType.QUERY.getName())) {
+        if (queryBean.getType().equalsIgnoreCase(QueryType.QUERY.getName()) || queryBean.getType().equalsIgnoreCase(QUERY_KEYWORD)) {
             if (queryBean.getComment().startsWith("Automatic query for:")) {
                 assignedTo = helperBean.getContainer().getUser().getUserName();
             } else {
@@ -212,10 +217,14 @@ public class QueryServiceImpl implements QueryService {
         }
         dn.setDateCreated(new Date());
         dn.setThreadUuid(queryBean.getThread_id());
-        if(parentDn && queryBean.getType().equals(QueryType.QUERY.getName())){
+        if(parentDn && (queryBean.getType().equalsIgnoreCase(QueryType.QUERY.getName()) || queryBean.getType().equalsIgnoreCase(QUERY_KEYWORD))){
             int maxThreadNumber= discrepancyNoteDao.getMaxThreadNumber();
             dn.setThreadNumber(maxThreadNumber+1);
         }
+        if(queryBean.getDisplayId() != null)
+            dn.setDisplayId(queryBean.getDisplayId());
+        else
+            dn.setDisplayId(generateDisplayId(parentDn));
         return dn;
     }
 
@@ -432,15 +441,30 @@ public class QueryServiceImpl implements QueryService {
     private void setResolutionStatus(QueryBean queryBean, DiscrepancyNote dn) {
         if (queryBean.getStatus() == null) {
             dn.setResolutionStatus(resolutionStatusDao.findById(5));
-        } else if (queryBean.getStatus().equals("new")) {
+        } else if (queryBean.getStatus().equalsIgnoreCase("new")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(1));
-        } else if (queryBean.getStatus().equals("updated")) {
+        } else if (queryBean.getStatus().equalsIgnoreCase("updated")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(2));
-        } else if (queryBean.getStatus().equals("closed")) {
+        } else if (queryBean.getStatus().equalsIgnoreCase("closed")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(4));
-        } else if (queryBean.getStatus().equals("closed-modified")) {
+        } else if (queryBean.getStatus().equalsIgnoreCase("closed-modified")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(6));
         } else {
         }
+    }
+
+    public String generateDisplayId(Boolean parentDn){
+        DiscrepancyNote dn = null;
+        String newDisplayId =null;
+        int counter = 0;
+        do {
+            String randomNo = StringUtils.leftPad(Integer.toString(RandomUtils.nextInt(0, 1000000000)), 9, '0');
+            newDisplayId = parentDn ? "DN_"+randomNo : "CDN_"+randomNo;
+            dn = discrepancyNoteDao.findByDisplayId(newDisplayId);
+            counter++;
+        }while(dn != null && counter < 10);
+        if(counter >= 10)
+            throw new OpenClinicaSystemException("Failed", ErrorConstants.ERR_GENERATING_DISCREPANCY_NOTE_ID);
+        return newDisplayId;
     }
 }

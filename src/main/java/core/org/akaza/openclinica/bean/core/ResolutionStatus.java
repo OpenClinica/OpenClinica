@@ -106,7 +106,7 @@ public class ResolutionStatus extends Term {
     public static ResolutionStatus getByName(String name) {
         for (int i = 0; i < list.size(); i++) {
             ResolutionStatus temp = list.get(i);
-            if (temp.getName().equals(name)) {
+            if (temp.getName().equalsIgnoreCase(name)) {
                 return temp;
             }
         }
@@ -147,6 +147,20 @@ public class ResolutionStatus extends Term {
         ResourceBundleProvider.updateLocale(new Locale("en"));
 
         ResolutionStatus test = new ResolutionStatus(1, "New", null, null);
+    }
+
+    public static ResolutionStatus getByEnglishDescription(String resStatus){
+        if(resStatus == null)
+            return null;
+        if(resStatus.equalsIgnoreCase("Closed-Modified"))
+            return ResolutionStatus.CLOSED_MODIFIED;
+        for(ResolutionStatus res: listResStatus){
+            if(res.getName().equalsIgnoreCase(resStatus))
+                if(!res.equals(CLOSED_MODIFIED))
+                    return res;
+        }
+
+        return null;
     }
 
 }

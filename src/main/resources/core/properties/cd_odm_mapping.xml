@@ -177,5 +177,63 @@
                type="java.lang.String">
             <bind-xml name="IsNull" node="attribute"/>
         </field>
+        <field name="discrepancyNotes"
+               type="core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean">
+            <bind-xml name="OpenClinica:DiscrepancyNotes"/>
+        </field>
+    </class>
+    <class name="core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean">
+        <map-to xml="OpenClinica:DiscrepancyNotes"/>
+        <field name="DiscrepancyNotes"
+               type="core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean"
+               collection="arraylist">
+            <bind-xml name="OpenClinica:DiscrepancyNote"/>
+        </field>
+    </class>
+    <class name="core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean">
+        <map-to xml="OpenClinica:DiscrepancyNote"/>
+        <field name="displayId"
+               type="java.lang.String">
+            <bind-xml name="ID" node="attribute"/>
+        </field>
+        <field name="noteType"
+               type="java.lang.String">
+            <bind-xml name="NoteType" node="attribute"/>
+        </field>
+        <field name="childNotes"
+               type="core.org.akaza.openclinica.bean.odmbeans.ChildNoteBean"
+               collection="arraylist">
+            <bind-xml name="OpenClinica:ChildNote"/>
+        </field>
+    </class>
+    <class name="core.org.akaza.openclinica.bean.odmbeans.ChildNoteBean">
+        <map-to xml="OpenClinica:ChildNote"/>
+        <field name="displayId"
+               type="java.lang.String">
+            <bind-xml name="ID" node="attribute"/>
+        </field>
+        <field name="status"
+               type="java.lang.String">
+            <bind-xml name="Status" node="attribute"/>
+        </field>
+        <field name="ownerUserName"
+               type="java.lang.String">
+            <bind-xml name="UserName" node="attribute"/>
+        </field>
+        <field name="DetailedNote"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:DetailedNote" node="element"/>
+        </field>
+        <field name="userRef"
+               type="core.org.akaza.openclinica.bean.odmbeans.ElementRefBean">
+            <bind-xml name="UserRef"/>
+        </field>
+    </class>
+    <class name="core.org.akaza.openclinica.bean.odmbeans.ElementRefBean">
+        <map-to xml="UserRef"/>
+        <field name="userName"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:UserName" node="attribute"/>
+        </field>
     </class>
 </mapping>
