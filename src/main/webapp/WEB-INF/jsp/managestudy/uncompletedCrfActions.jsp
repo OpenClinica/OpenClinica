@@ -5,7 +5,7 @@
                 <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                   onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                   onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                 <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
+                 <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="right" hspace="6">
                 </a>
             </td>
         </c:when>
@@ -15,7 +15,7 @@
                   href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                   onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                   onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                 <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
+                 <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="right" hspace="6">
                 </a>
             </td>
         </c:otherwise>
@@ -26,6 +26,6 @@
       href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
-      <span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" align="left" hspace="6">
+      <span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6">
   </a>
 </td>
