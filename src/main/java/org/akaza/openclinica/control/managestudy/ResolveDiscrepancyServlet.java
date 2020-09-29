@@ -127,7 +127,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String JINI = "jini";
     private static final String VIEW_NOTES = "ViewNotes";
     public static final String FORWARD_SLASH = "/";
-    public static final String NO_COLLAPES="no-collapse";
+    public static final String NO_COLLAPSE="no-collapse";
 
     private final String ENTITY_TYPE = "name";
     private final String ENTITY_COLUMN = "column";
@@ -721,7 +721,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
         group.setLabel(metaLabel);
         group.setUsercontrol(userControls);
-        group.setAppearance(NO_COLLAPES);
+        group.setAppearance(NO_COLLAPSE);
         List<Group> groups = new ArrayList<>();
         groups.add(group);
         body.setGroup(groups);
