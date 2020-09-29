@@ -26,7 +26,7 @@ public enum SubjectEventStatus  implements CodedEnum {
 		this(code,null);
 	}
 	
-	SubjectEventStatus(int code,String  description)
+	SubjectEventStatus(int code,String description)
 	{
 		this.code = code;
 		this.description = description;
