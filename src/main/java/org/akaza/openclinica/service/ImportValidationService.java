@@ -9,7 +9,7 @@ import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 
 public interface ImportValidationService {
 
-    void validateQuery(DiscrepancyNoteBean discrepancyNotesBean);
+    void validateQuery(DiscrepancyNoteBean discrepancyNotesBean,ItemData itemData);
 
     void validateItem(ImportItemDataBean itemDataBean, CrfBean crf, ImportItemGroupDataBean itemGroupDataBean, ItemCountInForm itemCountInForm);
 

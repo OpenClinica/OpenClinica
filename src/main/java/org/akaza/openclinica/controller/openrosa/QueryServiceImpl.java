@@ -16,6 +16,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -82,6 +83,8 @@ public class QueryServiceImpl implements QueryService {
     private ApplicationContext appContext;
     public static final String DASH = "-";
     public static final String QUERY_KEYWORD = "Query";
+
+    public static final Integer DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH = 9;
 
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
@@ -458,7 +461,7 @@ public class QueryServiceImpl implements QueryService {
         String newDisplayId =null;
         int counter = 0;
         do {
-            String randomNo = StringUtils.leftPad(Integer.toString(RandomUtils.nextInt(0, 1000000000)), 9, '0');
+            String randomNo = generateRandomNoForDisplayId();
             newDisplayId = parentDn ? "DN_"+randomNo : "CDN_"+randomNo;
             dn = discrepancyNoteDao.findByDisplayId(newDisplayId);
             counter++;
@@ -466,5 +469,21 @@ public class QueryServiceImpl implements QueryService {
         if(counter >= 10)
             throw new OpenClinicaSystemException("Failed", ErrorConstants.ERR_GENERATING_DISCREPANCY_NOTE_ID);
         return newDisplayId;
+    }
+
+    public String generateRandomNoForDisplayId() {
+        int discrepancyNoteLength;
+        try {
+             discrepancyNoteLength = Integer.parseInt(CoreResources.getField("discrepancyNote.displayId.length"));
+            if (discrepancyNoteLength <= 0 || discrepancyNoteLength > DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH) {
+                discrepancyNoteLength = DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH;
+                logger.error("Maximum DiscrepancyNoteLength is "+DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH);
+            }
+        }catch (Exception e){
+            discrepancyNoteLength = DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH;
+            logger.error("Error fetching DiscrepancyNoteLength from properties file");
+        }
+        int max = (int) Math.pow(10, discrepancyNoteLength);
+        return StringUtils.leftPad(Integer.toString(RandomUtils.nextInt(0, max)), discrepancyNoteLength, '0');
     }
 }

@@ -54,7 +54,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     private boolean isQueryClosedStatusValid;
     private boolean isQueryClosedModifiedStatusValid;
 
-    public void validateQuery(DiscrepancyNoteBean discrepancyNoteBean){
+    public void validateQuery(DiscrepancyNoteBean discrepancyNoteBean, ItemData itemData){
         ArrayList<ErrorObj> errors = new ArrayList<>();
         isQueryNewStatusValid = true;
         isQueryUpdatedStatusValid = false;
@@ -73,6 +73,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         if(discrepancyNoteBean.getDisplayId() != null) {
             parentDN = discrepancyNoteDao.findByDisplayId(discrepancyNoteBean.getDisplayId());
             if (parentDN != null) {
+                if(!isResolutionTypeAnnotation && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
+                        parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEMDATA_DOES_NOT_CONTAIN_PARENT_DISPLAYID));
                 if(parentDN.getParentDiscrepancyNote() != null)
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_PARENT_DISPLAYID_IS_ALREADY_USED_AS_CHILD_DISPLAYID));
                 setResolutionStatusForCheckingChildNotesValidity(parentDN.getResolutionStatus().getName());
@@ -289,12 +292,16 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         switch (responseType.getName()) {
             case ("checkbox"):
                 validateCheckBoxOrMultiSelect(responseSet, value);
+                return;
             case ("multi-select"):
                 validateCheckBoxOrMultiSelect(responseSet, value);
+                return;
             case ("radio"):
                 validateRadioOrSingleSelect(responseSet, value);
+                return;
             case ("single-select"):
                 validateRadioOrSingleSelect(responseSet, value);
+                return;
             case ("text"):
                 return;
             case ("textarea"):
@@ -331,14 +338,18 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         switch (itemDataType.getCode()) {
             case "BL":
                 validateForBoolean(value);
+                return;
             case "ST":
                 return;
             case "INT":
                 validateForInteger(value);
+                return;
             case "REAL":
                 validateForReal(value);
+                return;
             case "DATE":
                 validateForDate(value);
+                return;
             default:
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
@@ -372,7 +383,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             LocalDate date = LocalDate.parse(value, formatter);
         } catch (Exception pe) {
             pe.getStackTrace();
-            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_INVALID_DATE_FORMAT);
         }
     }
 }
