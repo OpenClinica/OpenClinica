@@ -84,6 +84,8 @@ public class QueryServiceImpl implements QueryService {
     public static final String DASH = "-";
     public static final String QUERY_KEYWORD = "Query";
 
+    public static final Integer DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH = 9;
+
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
         String node = itemNode.getTextContent();
@@ -472,13 +474,13 @@ public class QueryServiceImpl implements QueryService {
     public String generateRandomNoForDisplayId() {
         int discrepancyNoteLength;
         try {
-             discrepancyNoteLength = Integer.parseInt(CoreResources.getField("dicrepancyNote.DisplayId.GenerationLength"));
-            if (discrepancyNoteLength <= 0 || discrepancyNoteLength > 9) {
-                discrepancyNoteLength = 9;
-                logger.error("Maximum DiscrepancyNoteLength is 9");
+             discrepancyNoteLength = Integer.parseInt(CoreResources.getField("discrepancyNote.displayId.length"));
+            if (discrepancyNoteLength <= 0 || discrepancyNoteLength > DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH) {
+                discrepancyNoteLength = DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH;
+                logger.error("Maximum DiscrepancyNoteLength is "+DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH);
             }
         }catch (Exception e){
-            discrepancyNoteLength = 9;
+            discrepancyNoteLength = DEFAULT_DISCREPANCY_NOTE_DISPLAYID_LENGTH;
             logger.error("Error fetching DiscrepancyNoteLength from properties file");
         }
         int max = (int) Math.pow(10, discrepancyNoteLength);
