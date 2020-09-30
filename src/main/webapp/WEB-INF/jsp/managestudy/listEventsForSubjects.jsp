@@ -145,7 +145,7 @@
     <script>
         function eventPopup(menu) {
             var parts = menu.attr('id').split('_');
-            var participantId = parts[2];
+            var participantId = parts.slice(2, parts.length-2).join('_');
             var extraMenu = jQuery('#actions4' + participantId);
             if (!extraMenu.length)
                 return;
@@ -170,7 +170,7 @@
         function crfPopup(popup) {
             var menu = popup.find('[value]');
             var parts = popup.attr('id').split('_');
-            var participantId = parts[1];
+            var participantId = parts.slice(1, parts.length-2).join('_');
             var formLayoutId = parts[2];
             var studyEventId = menu.attr('value');
             var extras = jQuery('#actions4' + participantId + '-' + studyEventId + '-' + formLayoutId);
