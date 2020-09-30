@@ -217,5 +217,10 @@ public class ErrorConstants {
     public static final String ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE = "errorCode.neverVerifiedSdvStatusNotAvailable";
     public static final String ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED = "errorCode.formWithRemovedOrArchivedAttributeCannotBeSdvVerified";
     public static final String ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE = "errorCode.sdvStatusCannotBeUpdatedBecauseOfItemImportFailure";
+    public static final String ERR_SIGNED_STATUS_INVALID = "errorCode.signedStatusIsInvalid";
+    public static final String ERR_EVENT_IS_NOT_ELLIGIBLE_TO_BE_SIGNED = "errorCode.eventIsNotElligibleToBeSigned";
+    public static final String ERR_ATTESTATION_IS_MISSING = "errorCode.attestationIsMissing";
+    public static final String ERR_ATTESTATION_TEXT_TOO_LONG = "errorCode.attestationTextTooLong";
+    public static final String ERR_ATTESTATION_ALREADY_EXIST_IN_SYSTEM = "errorCode.attestationAlreadyExistInSystem";
 
 }

@@ -4,6 +4,7 @@ import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.SignatureBean;
 import core.org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
@@ -23,4 +24,6 @@ public interface ImportValidationService {
     void validateEventDefnCrf(Study tenantStudy, StudyEventDefinition studyEventDefinition, CrfBean crf);
 
     void validateForm(FormDataBean formDataBean, Study tenantStudy, StudyEventDefinition studyEventDefinition);
+
+    void validateSignatureForStudyEvent(List<SignatureBean> signatureBeans, String signedStatus, StudyEvent studyEvent, StudySubject studySubject);
 }

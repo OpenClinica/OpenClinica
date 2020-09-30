@@ -968,9 +968,27 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
         }
     }
 
-    public boolean isEventSignable(StudyEvent studyEvent){
-        if (!areAllEventCrfsValid(studyEvent) || !areAllRequiredEventCrfsComplete(studyEvent)) {
-            return false;
+    public boolean isEventSignable(StudyEvent studyEvent, StudySubject studySubject){
+        boolean archivedCommonEvent=false;
+        if(studyEvent.getStudyEventDefinition().getType().equals(COMMON)){
+            List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+            if(eventCrfs.size()!=0 && eventCrfs.get(0).isCurrentlyArchived()){
+                archivedCommonEvent= true;
+            }
+        }
+
+        if (!studyEvent.isCurrentlyRemoved() && !studyEvent.isCurrentlyArchived() && !archivedCommonEvent) {
+            if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                return false;
+            } else {
+                if (!areAllEventCrfsValid(studyEvent) || !areAllRequiredEventCrfsComplete(studyEvent)) {
+                    return false;
+                }
+                return true;
+            }
         }
         return true;
     }

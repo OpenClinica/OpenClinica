@@ -7,6 +7,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
 import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
@@ -34,6 +35,6 @@ public interface StudyEventService {
 
     void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean);
 
-    boolean isEventSignable(StudyEvent studyEvent);
+    boolean isEventSignable(StudyEvent studyEvent, StudySubject studySubject);
 
 }
