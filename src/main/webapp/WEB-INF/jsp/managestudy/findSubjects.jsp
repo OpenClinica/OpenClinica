@@ -166,7 +166,7 @@
 
             var parts = menu.attr('id').split('_');
             var participantId = parts.slice(1, parts.length-2).join('_');
-            var eventDefId = parts[2];
+            var eventDefId = parts[parts.length-2];
             var extraMenu = jQuery('#actions4' + participantId);
             if (!extraMenu.length)
                 return;

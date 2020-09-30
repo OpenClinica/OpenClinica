@@ -171,7 +171,7 @@
             var menu = popup.find('[value]');
             var parts = popup.attr('id').split('_');
             var participantId = parts.slice(1, parts.length-2).join('_');
-            var formLayoutId = parts[2];
+            var formLayoutId = parts[parts.length-2];
             var studyEventId = menu.attr('value');
             var extras = jQuery('#actions4' + participantId + '-' + studyEventId + '-' + formLayoutId);
             if (!extras.length)
