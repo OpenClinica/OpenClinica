@@ -208,8 +208,9 @@ public class ErrorConstants {
     public static final String ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE = "errorCode.annotationMustHaveOneChildNote";
     public static final String ERR_PARENT_DISPLAYID_IS_ALREADY_USED_AS_CHILD_DISPLAYID = "errorCode.parentDisplayIdIsAlreadyUsedForChildDisplayId";
     public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED_AS_PARENT_DISPLAYID = "errorCode.childDisplayIdIsAlreadyUsedForParentDisplayId";
+    public static final String ERR_ITEMDATA_DOES_NOT_CONTAIN_PARENT_DISPLAYID = "errorCode.itemDataDoesNotContainParentDisplayId";
     public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED = "errorCode.childDisplayIdIsAlreadyUsed";
-    public static final String ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID = "errorCode.childDisplayIdIsANotCorrespondingToParentDisplayId";
+    public static final String ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID = "errorCode.childDisplayIdIsNotCorrespondingToParentDisplayId";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
 
 }

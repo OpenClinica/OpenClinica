@@ -340,10 +340,12 @@ public class ImportServiceImpl implements ImportService {
                                 } else if (itemObject instanceof Item) {
                                     item = (Item) itemObject;
                                 }
+                                item = itemDao.findByOcOID(itemDataBean.getItemOID());
+                                ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
                                 for(DiscrepancyNoteBean discrepancyNoteBean : itemDataBean.getDiscrepancyNotes().getDiscrepancyNotes()){
                                     try {
-                                        importValidationService.validateQuery(discrepancyNoteBean);
-                                        createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean ,null,null, null, true, dataImportReports);
+                                        importValidationService.validateQuery(discrepancyNoteBean, itemData);
+                                        createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean , itemData, null, null, true, dataImportReports);
                                     }catch (OpenClinicaSystemException e){
                                         for(ErrorObj err : e.getMultiErrors()){
                                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), err.getCode(), null, err.getMessage());
