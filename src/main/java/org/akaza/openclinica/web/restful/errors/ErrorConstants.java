@@ -212,5 +212,6 @@ public class ErrorConstants {
     public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED = "errorCode.childDisplayIdIsAlreadyUsed";
     public static final String ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID = "errorCode.childDisplayIdIsNotCorrespondingToParentDisplayId";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
+    public static final String DiscrepancyNoteLengthMissingInDatainfoProperties = "errorCode.DiscrepancyNoteLengthMissingInDatainfoProperties";
 
 }
