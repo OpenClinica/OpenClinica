@@ -80,9 +80,9 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
 
     public DiscrepancyNote findByDisplayId(String displayId){
         if(StringUtils.startsWithIgnoreCase(displayId,"DN_"))
-            displayId = displayId.substring(2);
+            displayId = "\\"+displayId.substring(2);
         if(StringUtils.startsWithIgnoreCase(displayId,"CDN_"))
-            displayId = displayId.substring(3);
+            displayId = "\\"+displayId.substring(3);
         String query = "from " + getDomainClassName() + " do where do.displayId like :displayId ";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("displayId", "%"+displayId);

@@ -201,17 +201,14 @@ public class ErrorConstants {
     public static final String ERR_DISCREPANCY_NOTE_ID_TOO_LONG = "errorCode.descrepancyNoteIdTooLong";
     public static final String ERR_USER_NOT_VALID = "errorCode.userNotValid";
     public static final String ERR_ASSIGNED_USER_NOT_VALID = "errorCode.assignedUserNotValid";
-    public static final String ERR_DETAILED_NOTE_NOT_AVAILABLE = "errorCode.detailedNoteNotAvailable";
-    public static final String ERR_DETAILED_NOTE_TOO_LONG = "errorCode.detailedNoteLengthTooLong";
+    public static final String ERR_DETAILED_NOTE_MISSING = "errorCode.detailedNoteMissing";
+    public static final String ERR_DETAILED_NOTE_TOO_LONG = "errorCode.detailedNoteTextTooLong";
     public static final String ERR_QUERY_STATUS_NOT_APPLICABLE = "errorCode.queryStatusNotApplicable";
     public static final String ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES = "errorCode.newQueryInBetweenOldQueries";
     public static final String ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE = "errorCode.annotationMustHaveOneChildNote";
-    public static final String ERR_PARENT_DISPLAYID_IS_ALREADY_USED_AS_CHILD_DISPLAYID = "errorCode.parentDisplayIdIsAlreadyUsedForChildDisplayId";
-    public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED_AS_PARENT_DISPLAYID = "errorCode.childDisplayIdIsAlreadyUsedForParentDisplayId";
-    public static final String ERR_ITEMDATA_DOES_NOT_CONTAIN_PARENT_DISPLAYID = "errorCode.itemDataDoesNotContainParentDisplayId";
-    public static final String ERR_CHILD_DISPLAYID_IS_ALREADY_USED = "errorCode.childDisplayIdIsAlreadyUsed";
-    public static final String ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID = "errorCode.childDisplayIdIsNotCorrespondingToParentDisplayId";
+    public static final String ERR_NOTE_ID_ALREADY_IN_USE = "errorCode.NoteIdAlreadyinUse";
+    public static final String ERR_ITEMDATA_DOES_NOT_CONTAIN_THIS_DISCREPANCY_NOTE = "errorCode.itemDataDoesNotContainThisDiscrepancyNote";
+    public static final String ERR_CHILD_DISPCREPANCY_NOTE_IS_NOT_CORRESPONDING_TO_PARENT_NOTE = "errorCode.childDiscrepancyNoteIsNotCorrespondingToParentNote";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
-    public static final String DiscrepancyNoteLengthMissingInDatainfoProperties = "errorCode.DiscrepancyNoteLengthMissingInDatainfoProperties";
 
 }

@@ -75,9 +75,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             if (parentDN != null) {
                 if(!isResolutionTypeAnnotation && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
                         parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEMDATA_DOES_NOT_CONTAIN_PARENT_DISPLAYID));
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEMDATA_DOES_NOT_CONTAIN_THIS_DISCREPANCY_NOTE));
                 if(parentDN.getParentDiscrepancyNote() != null)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_PARENT_DISPLAYID_IS_ALREADY_USED_AS_CHILD_DISPLAYID));
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 setResolutionStatusForCheckingChildNotesValidity(parentDN.getResolutionStatus().getName());
             }
             if(discrepancyNoteBean.getDisplayId().length() > 32)
@@ -95,7 +95,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName()))
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ASSIGNED_USER_NOT_VALID));
             if(StringUtils.isBlank(childNoteBean.getDetailedNote()))
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_NOT_AVAILABLE));
+                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_MISSING));
             if(childNoteBean.getDetailedNote().length() > 1000)
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_TOO_LONG));
             DiscrepancyNote childDN = null;
@@ -111,11 +111,11 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                     newQueriesStarted = true;
             }else{
                 if(childDN.getParentDiscrepancyNote() == null)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_DISPLAYID_IS_ALREADY_USED_AS_PARENT_DISPLAYID));
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 if(parentDN == null)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_DISPLAYID_IS_ALREADY_USED));
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 else if(!childDN.getParentDiscrepancyNote().getDisplayId().equalsIgnoreCase(parentDN.getDisplayId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_DISPLAYID_IS_NOT_CORRESPONDING_TO_PARENT_DISPLAYID));
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_DISPCREPANCY_NOTE_IS_NOT_CORRESPONDING_TO_PARENT_NOTE));
                 if(newQueriesStarted)
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES));
             }
