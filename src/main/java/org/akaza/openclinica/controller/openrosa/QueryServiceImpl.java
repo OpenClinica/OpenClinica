@@ -463,7 +463,7 @@ public class QueryServiceImpl implements QueryService {
         do {
             String randomNo = generateRandomNoForDisplayId();
             newDisplayId = parentDn ? "DN_"+randomNo : "CDN_"+randomNo;
-            dn = discrepancyNoteDao.findByDisplayId(newDisplayId);
+            dn = discrepancyNoteDao.findByDisplayIdWithoutNotePrefix(newDisplayId);
             counter++;
         }while(dn != null && counter < 10);
         if(counter >= 10)

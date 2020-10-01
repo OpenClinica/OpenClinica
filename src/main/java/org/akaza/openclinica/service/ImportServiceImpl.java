@@ -139,6 +139,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String INSERTED = "Inserted";
     public static final String UPDATED = "Updated";
     public static final String NO_CHANGE = "No Change";
+    public static final String SKIPPED = "Skipped";
     public static final String DiscrepancyNoteMessage = "import XML";
     public static final String DetailedNotes = "Update via Import";
 
@@ -345,7 +346,7 @@ public class ImportServiceImpl implements ImportService {
                                 for(DiscrepancyNoteBean discrepancyNoteBean : itemDataBean.getDiscrepancyNotes().getDiscrepancyNotes()){
                                     try {
                                         importValidationService.validateQuery(discrepancyNoteBean, itemData);
-                                        createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean , itemData, null, null, true, dataImportReports);
+                                        createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean , itemData, null, null, true, dataImportReports, userAccount);
                                     }catch (OpenClinicaSystemException e){
                                         for(ErrorObj err : e.getMultiErrors()){
                                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), err.getCode(), null, err.getMessage());
@@ -598,7 +599,7 @@ public class ImportServiceImpl implements ImportService {
         return sb.toString();
     }
 
-    private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
+    private ItemData createItemData(EventCrf eventCrf, String itemDataValue, UserAccount userAccount, Item item, int groupRepeatKey) {
         // only created new event crf once
         if (eventCrf.getEventCrfId() == 0) {
             if(eventCrf.getStudyEvent().getStudyEventId() == 0)
@@ -613,7 +614,7 @@ public class ImportServiceImpl implements ImportService {
         itemData.setEventCrf(eventCrf);
         itemData.setItem(item);
         itemData.setDeleted(false);
-        itemData.setValue(itemDataBean.getValue());
+        itemData.setValue(itemDataValue);
         itemData.setUserAccount(userAccount);
         itemData.setDateCreated(new Date());
         itemData.setOrdinal(groupRepeatKey);
@@ -1268,7 +1269,8 @@ public class ImportServiceImpl implements ImportService {
 
     private DataImportReport createOrUpdateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm, Study study, StudySubject studySubject, String reasonForChange) {
         ErrorObj errorObj = null;
-
+        if(itemDataBean.getValue() == null)
+            return new DataImportReport(null, null, null, null, null, null, null, null, SKIPPED, null, null);
         Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
         ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
 
@@ -1287,7 +1289,7 @@ public class ImportServiceImpl implements ImportService {
                 return new DataImportReport(null, null, null, null, null, null, null, null, UPDATED, sdf_logFile.format(new Date()), null);
             }
         } else {
-            itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            itemData = createItemData(eventCrf, itemDataBean.getValue(), userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if (isEventCrfCompleted(eventCrf)) {
                 createReasonForChangeQuery(userAccount, study, studySubject, itemGroupDataBean, itemData, reasonForChange);
             }
@@ -1317,12 +1319,13 @@ public class ImportServiceImpl implements ImportService {
         }
         childNoteBean.setOwnerUserName(userAccount.getUserName());
         discrepancyNoteBean.getChildNotes().add(childNoteBean);
-        createQuery(discrepancyNoteBean, study, studySubject, itemData.getEventCrf(), itemData.getItem().getOcOid(), itemGroupDataBean,  itemData, null, null, true, new ArrayList<DataImportReport>());
+        createQuery(discrepancyNoteBean, study, studySubject, itemData.getEventCrf(), itemData.getItem().getOcOid(), itemGroupDataBean,  itemData, null, null, true, new ArrayList<DataImportReport>(), userAccount);
         return eb;
     }
 
     private DiscrepancyNote createQuery(DiscrepancyNoteBean discrepancyNoteBean, Study study, StudySubject studySubject,
-             EventCrf eventCrf, String itemOid, ImportItemGroupDataBean itemGroupDataBean,ItemData itemData, ChildNoteBean childNoteBean, DiscrepancyNote parentDn, Boolean isParentDn, List<DataImportReport> dataImportReports) {
+             EventCrf eventCrf, String itemOid, ImportItemGroupDataBean itemGroupDataBean,ItemData itemData, ChildNoteBean childNoteBean,
+             DiscrepancyNote parentDn, Boolean isParentDn, List<DataImportReport> dataImportReports, UserAccount importerUserAccount) {
 
         SubmissionContainer container = new SubmissionContainer();
         container.setStudy(study);
@@ -1331,6 +1334,9 @@ public class ImportServiceImpl implements ImportService {
         if(itemData == null) {
             Item item = itemDao.findByOcOID(itemOid);
             itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            if(itemData == null){
+                itemData = createItemData(eventCrf, "", importerUserAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            }
         }
         helperBean.setItemData(itemData);
         helperBean.setContainer(container);
@@ -1340,7 +1346,7 @@ public class ImportServiceImpl implements ImportService {
         String displayId = isParentDn ? discrepancyNoteBean.getDisplayId() : childNoteBean.getDisplayId();
         Boolean isNoteCreated = false;
         if(displayId != null)
-            discNote = discrepancyNoteDao.findByDisplayId(displayId);
+            discNote = discrepancyNoteDao.findByDisplayIdWithoutNotePrefix(displayId);
         if(discNote == null) {
             isNoteCreated = true;
             queryBean.setType(discrepancyNoteBean.getNoteType());
@@ -1374,7 +1380,7 @@ public class ImportServiceImpl implements ImportService {
         }
         if (isParentDn) {
             for(int i = 0 ; i < discrepancyNoteBean.getChildNotes().size();i++){
-                DiscrepancyNote childNote = createQuery(discrepancyNoteBean, study, studySubject, eventCrf, itemOid, itemGroupDataBean, itemData, discrepancyNoteBean.getChildNotes().get(i), discNote, false, dataImportReports);
+                DiscrepancyNote childNote = createQuery(discrepancyNoteBean, study, studySubject, eventCrf, itemOid, itemGroupDataBean, itemData, discrepancyNoteBean.getChildNotes().get(i), discNote, false, dataImportReports, importerUserAccount);
                 if(i == discrepancyNoteBean.getChildNotes().size()-1){
                     discNote.setResolutionStatus(childNote.getResolutionStatus());
                     discNote.setUserAccount(childNote.getUserAccount());
