@@ -8,6 +8,8 @@ import org.hibernate.query.Query;
 
 public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
 
+    private static final String PARENT_DISCREPANCY_NOTE_PREFIX = "DN_";
+    private static final String CHILD_DISCREPANCY_NOTE_PREFIX = "CDN_";
     @Override
     Class<DiscrepancyNote> domainClass() {
         return DiscrepancyNote.class;
@@ -78,14 +80,27 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
 
     }
 
+    public DiscrepancyNote findByDisplayIdWithoutNotePrefix(String displayId){
+        DiscrepancyNote dn = findByDisplayId(displayId);
+        if(dn != null)
+            return dn;
+        else if(StringUtils.startsWith(displayId, PARENT_DISCREPANCY_NOTE_PREFIX)){
+            //Checking if there is child discrepancy note
+            displayId = "C" + displayId;
+            return findByDisplayId(displayId);
+        }
+        else if(StringUtils.startsWith(displayId, CHILD_DISCREPANCY_NOTE_PREFIX)){
+            //Checking if there is parent discrepancy note
+            displayId = displayId.substring(1);
+            return findByDisplayId(displayId);
+        }
+        return null;
+    }
+
     public DiscrepancyNote findByDisplayId(String displayId){
-        if(StringUtils.startsWithIgnoreCase(displayId,"DN_"))
-            displayId = "\\"+displayId.substring(2);
-        if(StringUtils.startsWithIgnoreCase(displayId,"CDN_"))
-            displayId = "\\"+displayId.substring(3);
-        String query = "from " + getDomainClassName() + " do where do.displayId like :displayId ";
+        String query = "from " + getDomainClassName() + " do where do.displayId = :displayId ";
         Query q = getCurrentSession().createQuery(query);
-        q.setParameter("displayId", "%"+displayId);
+        q.setParameter("displayId", displayId);
         return (DiscrepancyNote) q.uniqueResult();
     }
 }

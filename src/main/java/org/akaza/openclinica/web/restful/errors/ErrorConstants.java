@@ -198,7 +198,8 @@ public class ErrorConstants {
     public static final String ERR_HAS_NO_ACCESS_TO_FORM = "errorCode.hasNoAccessToForm";
     public static final String ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID = "errorCode.discrepancyNoteStatusNotValid";
     public static final String ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID = "errorCode.discrepancyNoteTypeNotValid";
-    public static final String ERR_DISCREPANCY_NOTE_ID_TOO_LONG = "errorCode.descrepancyNoteIdTooLong";
+    public static final String ERR_DISCREPANCY_NOTE_ID_TOO_LONG = "errorCode.discrepancyNoteIdTooLong";
+    public static final String ERR_DISCREPANCY_NOTE_ID_IS_REDUNDANT = "errorCode.discrepancyNoteIdIsRedundant";
     public static final String ERR_USER_NOT_VALID = "errorCode.userNotValid";
     public static final String ERR_ASSIGNED_USER_NOT_VALID = "errorCode.assignedUserNotValid";
     public static final String ERR_DETAILED_NOTE_MISSING = "errorCode.detailedNoteMissing";
@@ -210,5 +211,6 @@ public class ErrorConstants {
     public static final String ERR_ITEMDATA_DOES_NOT_CONTAIN_THIS_DISCREPANCY_NOTE = "errorCode.itemDataDoesNotContainThisDiscrepancyNote";
     public static final String ERR_CHILD_DISPCREPANCY_NOTE_IS_NOT_CORRESPONDING_TO_PARENT_NOTE = "errorCode.childDiscrepancyNoteIsNotCorrespondingToParentNote";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
+    public static final String ERR_CHILD_NOTES_NOT_AVAILABLE_IN_IMPORT_FILE = "errorCode.ChildNotesNotAvailableInImport";
 
 }
