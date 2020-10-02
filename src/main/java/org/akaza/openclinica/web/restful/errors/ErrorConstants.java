@@ -212,5 +212,10 @@ public class ErrorConstants {
     public static final String ERR_CHILD_DISPCREPANCY_NOTE_IS_NOT_CORRESPONDING_TO_PARENT_NOTE = "errorCode.childDiscrepancyNoteIsNotCorrespondingToParentNote";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
     public static final String ERR_CHILD_NOTES_NOT_AVAILABLE_IN_IMPORT_FILE = "errorCode.ChildNotesNotAvailableInImport";
+    public static final String ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION = "errorCode.formStatusShouldBeCompleteForSettingSdvVerifiedStatus";
+    public static final String ERR_SDV_STATUS_NOT_VALID = "errorCode.sdvStatusNotValid";
+    public static final String ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE = "errorCode.neverVerifiedSdvStatusNotAvailable";
+    public static final String ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED = "errorCode.formWithRemovedOrArchivedAttributeCannotBeSdvVerified";
+    public static final String ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE = "errorCode.sdvStatusCannotBeUpdatedBecauseOfItemImportFailure";
 
 }

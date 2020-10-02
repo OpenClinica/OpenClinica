@@ -129,6 +129,11 @@
             <bind-xml name="OpenClinica:WorkflowStatus" node="attribute"/>
         </field>
 
+        <field name="sdvStatusString"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:SdvStatus" node="attribute"/>
+        </field>
+
         <field name="ReasonForChangeForCompleteForms" type="java.lang.String">
             <bind-xml name="OpenClinica:ReasonForChangeForCompleteForms" node="attribute"/>
         </field>

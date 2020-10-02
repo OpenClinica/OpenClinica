@@ -5,6 +5,7 @@ import core.org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.JobService;
 import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
@@ -142,12 +143,14 @@ public class ImportServiceImpl implements ImportService {
     public static final String SKIPPED = "Skipped";
     public static final String DiscrepancyNoteMessage = "import XML";
     public static final String DetailedNotes = "Update via Import";
+    public static final String SDV_STATUS_UPDATED = "Sdv status imported";
 
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
     public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
+        ResourceBundleProvider.updateLocale(Locale.ENGLISH);
         CoreResources.setRequestSchema(schema);
         Study tenantStudy;
         if (siteOid != null) {
@@ -219,7 +222,7 @@ public class ImportServiceImpl implements ImportService {
                     ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                     int formDataBeanCount = 0;
                     for (FormDataBean formDataBean : formDataBeans) {
-
+                        Boolean proceedToSdv = true;
                         String reasonForChange = formDataBean.getReasonForChangeForCompleteForms();
                         formDataBeanCount++;
                         if (formDataBean.getFormOID() != null)
@@ -272,7 +275,7 @@ public class ImportServiceImpl implements ImportService {
                         EventCrf eventCrf = null;
                         try {
                             importValidationService.validateEventCrf(studySubject, studyEvent, formLayout, edc);
-                            eventCrf = getEventCrf(formDataBean, studySubject, studyEvent, studyEventDefinition, userAccount, crf, formLayout, edc);
+                            eventCrf = getEventCrf(studySubject, studyEvent, userAccount, crf, formLayout, formDataBean);
                         }catch (OpenClinicaSystemException e){
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, e.getErrorCode(), null, e.getMessage());
                             dataImportReports.add(dataImportReport);
@@ -303,6 +306,7 @@ public class ImportServiceImpl implements ImportService {
                             if (itemGroupObject instanceof ErrorObj) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), null, ((ErrorObj) itemGroupObject).getCode(), null, ((ErrorObj) itemGroupObject).getMessage());
                                 dataImportReports.add(dataImportReport);
+                                proceedToSdv = false;
                                 logger.error("ItemGroupOID {} related issue", itemGroupDataBean.getItemGroupOID());
                                 continue;
                             } else if (itemGroupObject instanceof ItemGroup) {
@@ -391,6 +395,24 @@ public class ImportServiceImpl implements ImportService {
                         }
 
                         // check if all Forms within this Event is Complete
+                        try {
+                            if(!proceedToSdv)
+                                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE);
+                            importValidationService.validateSdvStatus(studySubject, formDataBean, eventCrf);
+                            Boolean sdvImported = setSdvStatusOnEventCrf(formDataBean, eventCrf, userAccount);
+                            if(sdvImported) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(),
+                                        studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(),
+                                        null, null, null, SDV_STATUS_UPDATED, sdf_logFile.format(new Date()), null);
+                                dataImportReports.add(dataImportReport);
+                            }
+                        }catch (OpenClinicaSystemException e) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(),
+                                    studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(),
+                                    null, null, null, e.getErrorCode(), null, e.getMessage());
+                            dataImportReports.add(dataImportReport);
+                            logger.error("Setting sdvStatus {} related issue", formDataBean.getFormOID());
+                        }
                     } // formDataBean for loop
 
 
@@ -600,16 +622,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ItemData createItemData(EventCrf eventCrf, String itemDataValue, UserAccount userAccount, Item item, int groupRepeatKey) {
-        // only created new event crf once
-        if (eventCrf.getEventCrfId() == 0) {
-            if(eventCrf.getStudyEvent().getStudyEventId() == 0)
-            {
-                eventCrf.setStudyEvent(studyEventDao.saveOrUpdate(eventCrf.getStudyEvent()));
-            }
-            eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
-            updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);
-        }
-
+        saveEventCrf(eventCrf, userAccount);
         ItemData itemData = new ItemData();
         itemData.setEventCrf(eventCrf);
         itemData.setItem(item);
@@ -632,6 +645,23 @@ public class ImportServiceImpl implements ImportService {
         return itemData;
     }
 
+    private EventCrf saveSdvStatus(EventCrf eventCrf, SdvStatus sdvStatus, UserAccount userAccount){
+        eventCrf.setSdvStatus(sdvStatus);
+        return saveEventCrf(eventCrf, userAccount);
+    }
+
+    public EventCrf saveEventCrf(EventCrf eventCrf, UserAccount userAccount){
+        // only created new event crf once
+        if (eventCrf.getEventCrfId() == 0) {
+            if(eventCrf.getStudyEvent().getStudyEventId() == 0)
+            {
+                eventCrf.setStudyEvent(studyEventDao.saveOrUpdate(eventCrf.getStudyEvent()));
+            }
+            updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);
+        }
+        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        return eventCrf;
+    }
 
     private EventCrf createEventCrf(StudySubject studySubject, StudyEvent studyEvent, FormLayout formLayout, UserAccount userAccount) {
         EventCrf eventCrf = new EventCrf();
@@ -1215,7 +1245,8 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private EventCrf getEventCrf(FormDataBean formDataBean, StudySubject studySubject, StudyEvent studyEvent, StudyEventDefinition studyEventDefinition, UserAccount userAccount, CrfBean crf, FormLayout formLayout, EventDefinitionCrf edc) {
+    private EventCrf getEventCrf(StudySubject studySubject, StudyEvent studyEvent, UserAccount userAccount,
+                                 CrfBean crf, FormLayout formLayout, FormDataBean formDataBean) {
 
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
 
@@ -1238,7 +1269,27 @@ public class ImportServiceImpl implements ImportService {
 
             logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
         }
+
         return eventCrf;
+    }
+
+    public boolean setSdvStatusOnEventCrf(FormDataBean formDataBean, EventCrf eventCrf, UserAccount userAccount){
+        if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
+            SdvStatus newSdvStatus = SdvStatus.getByI18nDescription(formDataBean.getSdvStatusString());
+            if (newSdvStatus != null && (eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus))) {
+                if (newSdvStatus.equals(SdvStatus.VERIFIED)) {
+                    if (eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && !eventCrf.isCurrentlyRemoved()
+                            && !eventCrf.isCurrentlyArchived()) {
+                        saveSdvStatus(eventCrf, newSdvStatus, userAccount);
+                        return true;
+                    }
+                } else {
+                    saveSdvStatus(eventCrf, newSdvStatus, userAccount);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Object validateItemGroup(ImportItemGroupDataBean itemGroupDataBean, EventCrf eventCrf, CrfBean crf) {
