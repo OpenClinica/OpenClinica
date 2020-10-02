@@ -337,8 +337,10 @@ public class UpdateStudySubjectServlet extends SecureController {
                 }
             }
 
-
             String label = StringEscapeUtils.escapeXml11(fp.getString("label").trim());
+            // Quotes and ampersands are allowed
+            label = label.replace("&amp;", "&").replace("&apos;", "'").replace("&quot;", "\"");
+
             studySub.setLabel(label);
             subject.setGender(' ');
             errors = validator.validate();
