@@ -7,6 +7,7 @@ import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.JobService;
+import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
@@ -125,6 +126,9 @@ public class ImportServiceImpl implements ImportService {
     @Autowired
     private ImportValidationService importValidationService;
 
+    @Autowired
+    private AuditLogEventDao auditLogEventDao;
+
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
     public static final String SEPERATOR = ",";
@@ -144,6 +148,12 @@ public class ImportServiceImpl implements ImportService {
     public static final String DiscrepancyNoteMessage = "import XML";
     public static final String DetailedNotes = "Update via Import";
     public static final String SDV_STATUS_UPDATED = "Sdv status imported";
+    private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
+    private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
+    private static final String ATTESTATIONS_IMPORTED = "Attestations Imported";
+    private static final String EVENT_IS_SIGNED = "Event is Signed";
+
+
 
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -414,7 +424,25 @@ public class ImportServiceImpl implements ImportService {
                             logger.error("Setting sdvStatus {} related issue", formDataBean.getFormOID());
                         }
                     } // formDataBean for loop
-
+                    try{
+                        if(studyEventDataBean.getSignatures() != null) {
+                            importValidationService.validateSignatureForStudyEvent(studyEventDataBean.getSignatures(), studyEventDataBean.getSignedString(), studyEvent, studySubject);
+                            importSignatures(studyEventDataBean, studyEvent, userAccount);
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, ATTESTATIONS_IMPORTED, sdf_logFile.format(new Date()), null);
+                            dataImportReports.add(dataImportReport);
+                            if (studyEventDataBean.getSignedString() != null &&
+                                    studyEventDataBean.getSignedString().equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE)) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, EVENT_IS_SIGNED, sdf_logFile.format(new Date()), null);
+                                dataImportReports.add(dataImportReport);
+                            }
+                        }
+                    }catch (OpenClinicaSystemException e){
+                        for(ErrorObj err : e.getMultiErrors()) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, err.getCode(), null, err.getMessage());
+                            dataImportReports.add(dataImportReport);
+                        }
+                        logger.error("Signature {} related issue", studyEventDataBean.getStudyEventOID());
+                    }
 
                 } // StudyEventDataBean for loop
             } // StudySubjectDataBean for loop
@@ -1514,5 +1542,47 @@ public class ImportServiceImpl implements ImportService {
         StudyEvent studyEvent = buildStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
         logger.debug("Scheduling new Visit Base  Event ID {}", studyEvent.getStudyEventId());
         return studyEvent;
+    }
+
+    public void importSignatures(StudyEventDataBean studyEventDataBean, StudyEvent studyEvent, UserAccount userAccount){
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
+        AuditLogEventType auditLogEventType = new AuditLogEventType();
+        auditLogEventType.setAuditLogEventTypeId(65);
+        List<SignatureBean> signatureBeans = studyEventDataBean.getSignatures();
+        boolean manuallyImportToAuditLog = true;
+        for(SignatureBean signatureBean: signatureBeans){
+
+            String attestationMsg = signatureBean.getAttestation().concat(resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
+            AuditLogEvent auditLogEvent = new AuditLogEvent();
+            auditLogEvent.setNewValue("false");
+
+            //condition to check if this is the last signature bean
+            if(signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) && studyEventDataBean.getSignedString() != null &&
+                studyEventDataBean.getSignedString().equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE)){
+                    //Auto-insert to audit_log_event won't get triggered if the signed status and attestation is same
+                    if(!studyEvent.isCurrentlySigned() || studyEvent.getAttestation() == null || !studyEvent.getAttestation().equals(attestationMsg))
+                        manuallyImportToAuditLog = false;
+                    else {
+                        auditLogEvent.setNewValue("true");
+                        if(studyEvent.getSigned() != null)
+                            auditLogEvent.setOldValue(studyEvent.getSigned().toString());
+                    }
+                    studyEvent.setAttestation(attestationMsg);
+                    studyEvent.setSigned(true);
+                    studyEvent.setUpdateId(userAccount.getUserId());
+                    studyEvent.setDateUpdated(new Date());
+                    studyEventDao.saveOrUpdate(studyEvent);
+            }
+            if(manuallyImportToAuditLog) {
+                auditLogEvent.setAuditDate(new Date());
+                auditLogEvent.setAuditTable("study_event");
+                auditLogEvent.setUserAccount(userAccount);
+                auditLogEvent.setEntityId(studyEvent.getStudyEventId());
+                auditLogEvent.setEntityName("Signed");
+                auditLogEvent.setAuditLogEventType(auditLogEventType);
+                auditLogEvent.setDetails(attestationMsg);
+                auditLogEventDao.saveOrUpdate(auditLogEvent);
+            }
+        }
     }
 }

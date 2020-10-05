@@ -102,13 +102,28 @@
             <bind-xml name="OpenClinica:WorkflowStatus" node="attribute"/>
         </field>
 
+        <field name="SignedString"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:Signed" node="attribute"/>
+        </field>
+
         <field name="FormData"
                type="core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean"
                collection="arraylist">
             <bind-xml name="FormData"/>
         </field>
+        <field name="signatures"
+               type="core.org.akaza.openclinica.bean.submit.crfdata.SignatureBean"
+               collection="arraylist">
+            <bind-xml name="Signature"/>
+        </field>
     </class>
-
+    <class name="core.org.akaza.openclinica.bean.submit.crfdata.SignatureBean">
+        <map-to xml="Signature"/>
+        <field name="attestation" type="java.lang.String">
+            <bind-xml name="OpenClinica:Attestation" node="attribute"/>
+        </field>
+    </class>
     <class name="core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean">
         <map-to xml="FormData"/>
 

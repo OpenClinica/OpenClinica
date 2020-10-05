@@ -3,9 +3,7 @@ package org.akaza.openclinica.service;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.Status;
@@ -13,12 +11,14 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +47,17 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     @Autowired
     private CrfDao crfDao;
+    @Autowired
+    private StudyEventService studyEventService;
+    @Autowired
+    private AuditLogEventDao auditLogEventDao;
 
     public static final String FAILED = "Failed";
     public static final String NO_CHANGE_IN_QUERIES="No change in queries";
     public static final String QUERY_KEYWORD = "Query";
+    private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
+    private static final String STATUS_ATTRIBUTE_FALSE = "No";
+    private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
     private boolean isQueryNewStatusValid;
     private boolean isQueryUpdatedStatusValid;
     private boolean isQueryClosedStatusValid;
@@ -243,6 +250,37 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 tenantStudy.getStudy() == null ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId());
         if (edc == null || (edc != null && !edc.getStatusId().equals(Status.AVAILABLE.getCode()))) {
             throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORMOID_NOT_FOUND);
+        }
+    }
+
+    public void validateSignatureForStudyEvent(List<SignatureBean> signatureBeans, String signedStatus, StudyEvent studyEvent, StudySubject studySubject){
+        ArrayList<ErrorObj> errors = new ArrayList<>();
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
+        Boolean eventNeedsToBeSigned = null;
+        if(signedStatus == null || signedStatus.equalsIgnoreCase(STATUS_ATTRIBUTE_FALSE))
+            eventNeedsToBeSigned = false;
+        else if(signedStatus.equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE))
+            eventNeedsToBeSigned = true;
+        else {
+            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_SIGNED_STATUS_INVALID));
+            eventNeedsToBeSigned = false;
+        }
+        for (SignatureBean signatureBean: signatureBeans) {
+            if (signatureBean.getAttestation() == null)
+                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_IS_MISSING));
+            else if (signatureBean.getAttestation().length() > 1000)
+                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_TEXT_TOO_LONG));
+            else if (!signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) || !eventNeedsToBeSigned) {
+                String attestationMsg = signatureBean.getAttestation().concat(resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
+                if (!auditLogEventDao.findSignedEventAuditLogByAttestation(attestationMsg).isEmpty())
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_ALREADY_EXIST_IN_SYSTEM));
+            }
+        }
+        if (eventNeedsToBeSigned && !studyEventService.isEventSignable(studyEvent, studySubject))
+            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_IS_NOT_ELLIGIBLE_TO_BE_SIGNED));
+
+        if(errors.size() > 0){
+            throw new OpenClinicaSystemException(FAILED, errors);
         }
     }
 

@@ -548,7 +548,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     public Boolean isSignable(int studySubjectId) {
 
-        boolean archivedCommonEvent=false;
         StudySubject studySubject = studySubjectDao.findById(studySubjectId);
         List<StudyEvent> studyEvents = studySubject.getStudyEvents();
 
@@ -556,27 +555,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             return false;}
 
         for (StudyEvent studyEvent: studyEvents) {
-            if(studyEvent.getStudyEventDefinition().getType().equals(COMMON)){
-                List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
-                if(eventCrfs.size()!=0 && eventCrfs.get(0).isCurrentlyArchived()){
-                    archivedCommonEvent= true;
-                }
-            }
-
-            if (!studyEvent.isCurrentlyRemoved() && !studyEvent.isCurrentlyArchived() && !archivedCommonEvent) {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
-                        && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                        && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
-                        && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                    return false;
-                } else {
-                    if (!studyEventService.isEventSignable(studyEvent)) {
-                        return false;
-                    }
-                }
-            }
+            if (!studyEventService.isEventSignable(studyEvent, studySubject))
+                return false;
         }
-
         return true;
     }
 
