@@ -397,6 +397,9 @@ $(function() {
 
             eventDef.forms = {};
             foreach(eventDef.FormRef, function(ref) {
+                if (ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'Yes') {
+                    return;
+                }
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
                 var columnTitles = [];
@@ -430,6 +433,11 @@ $(function() {
                     showMe: false
                 }, form);
             }, errors);
+
+            var numVisibleForms = Object.keys(eventDef.forms).length;
+            if (numVisibleForms === 0) {
+                eventDef.showMe = false;
+            }
         }, errors);
 
         if (numVisitBased && $('#subjectEvents').hasClass('hide')) {
@@ -643,8 +651,7 @@ $(function() {
                     }, sectionErrors);
 
                     form.submissions.push(submission);
-                    form.showMe = true;
-                    studyEvent.showMe = true;
+                    form.showMe = studyEvent.showMe = true;
                 }, sectionErrors);
 
                 var sectionBody = $(sectionBodyTmpl({
