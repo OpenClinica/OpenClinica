@@ -486,7 +486,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     subject = "Job Ran: " + datasetBean.getName();
                 }
 
-                Study study =studyDao.findByPK(datasetBean.getStudyId());
+                Study study = studyDao.findByPK(datasetBean.getStudyId());
 
                 if (successMsg == null || successMsg.isEmpty()) {
                     logger.info("email buffer??" + emailBuffer);
@@ -494,7 +494,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 } else {
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
-                                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?study_oid="+study.getOc_oid().toLowerCase()+"&fileId=" + fbFinal.getId()
+                                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?study_oid=" + study.getOc_oid().toLowerCase() + "&fileId=" + fbFinal.getId()
                                         + "\"> [Click Here] </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
@@ -624,7 +624,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
             logger.info("Job " + context.getJobDetail().getDescription() + " finished.");
         }
-
     }
 
     /**
@@ -885,7 +884,7 @@ public class XsltTransformJob extends QuartzJobBean {
         }
     }
 
-    private ArchivedDatasetFileBean generateFileRecord(String name, String dir, double time, long fileLength, ExportFormatBean efb,
+    private synchronized ArchivedDatasetFileBean generateFileRecord(String name, String dir, double time, long fileLength, ExportFormatBean efb,
                                                        Set<Integer> edcSet, ArchivedDatasetFileBean archivedDatasetFileBean) {
 
         // Updating archive dataset file that is IN_PROGRESS.
