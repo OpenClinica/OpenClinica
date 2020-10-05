@@ -327,14 +327,14 @@
 <jsp:useBean scope='request' id='crf' class='core.org.akaza.openclinica.bean.admin.CRFBean'/>
 <h1 id="header">
   <span class="title_manage">
-    <fmt:message key="study_subject" bundle="${resword}"/> <c:out value="${esc.unescapeXml(studySub.label)}"/>
+    <fmt:message key="study_subject" bundle="${resword}"/> <c:out value="${studySub.label}"/>
   </span>
 </h1>
 <input type="button" class="invisible" id="reset-all-filters" value='<fmt:message key="custom_view_on" bundle="${resword}"/> &nbsp; &times;' onclick="resetAllFilters();">
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
-      <c:out value="${esc.unescapeXml(studySub.label)}"/><fmt:message key="audit_log" bundle="${resword}"/>
+      <c:out value="${studySub.label}"/> <fmt:message key="audit_log" bundle="${resword}"/>
     </a>
   </span>
   <span>&nbsp; | &nbsp;</span>
@@ -416,7 +416,7 @@
                                       <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                     </td>
                                     <td class="table_cell_top" width="25%">
-                                      <c:out value="${esc.unescapeXml(studySub.label)}"/>
+                                      <c:out value="${studySub.label}"/>
                                     </td>
 
                                     <td class="table_header_column" width="25%">
@@ -793,7 +793,7 @@
                                     <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                   </td>
                                   <td class="table_cell_top">
-                                    <c:out value="${esc.unescapeXml(studySub.label)}"/>
+                                    <c:out value="${studySub.label}"/>
                                   </td>
                                   <td class="table_header_row">
                                     <fmt:message key="person_ID" bundle="${resword}"/>
@@ -1145,7 +1145,7 @@
                                                             <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <input onfocus="this.select()" type="text" name="label" value="<c:out value="${esc.unescapeXml(studySub.label)}"/>" width="30"
+                                                            <input onfocus="this.select()" type="text" name="label" value="<c:out value="${studySub.label}"/>" width="30"
                                                                    class="formfieldXL form-control">
                                                         </c:otherwise>
                                                     </c:choose>
