@@ -1283,7 +1283,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.td(0).colspan("2").close();
             eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
-            linksDivBuilder(eventDiv, subject, rowCount, studyEvents, sed, studySubject, studyEventBean);
             eventDiv.tableEnd(0).tdEnd().trEnd(0);
             eventDiv.tableEnd(0);
             eventDiv.tdEnd();
@@ -1337,10 +1336,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
                         eventDiv.tdEnd().trEnd(0);
                     }
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell").close();
-                    reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
-                    eventDiv.tdEnd().trEnd(0);
                 }
             } else if ( currentEvent.isLocked()) {
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
@@ -1348,12 +1343,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     eventDiv.td(0).styleClass("table_cell").close();
                     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                     eventDiv.tdEnd().trEnd(0);
-                    if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell").close();
-                        reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
-                        eventDiv.tdEnd().trEnd(0);
-                    }
                 }
             } else {
                 eventDiv.tr(0).valign("top").close();
@@ -1379,10 +1368,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                             removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
                             eventDiv.tdEnd().trEnd(0);
                         }
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell").close();
-                        reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
-                        eventDiv.tdEnd().trEnd(0);
                     }
                 }
             }
@@ -1487,7 +1472,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence);
                 eventDiv.tdEnd().trEnd(0);
             }
-
         }
         eventDiv.trEnd(0);
 
@@ -1496,90 +1480,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
-
             if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
-
-            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                eventDiv.tr(0).valign("top").close();
-                eventDiv.td(0).styleClass("table_cell_left").close();
-                enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-                eventDiv.tdEnd().trEnd(0);
-                if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
-                        && currentRole.getRole() != Role.MONITOR) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
-                    eventDiv.tdEnd().trEnd(0);
-                    if(!studyEvents.get(0).isLocked()) {
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell_left").close();
-                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                        eventDiv.tdEnd().trEnd(0);
-                    }
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell").close();
-                    reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
-                    eventDiv.tdEnd().trEnd(0);
-                }
-            }
-
-            else if (studyEvents.size()>0 &&  studyEvents.get(0).isLocked()) {
-                eventDiv.tdEnd().trEnd(0);
-                if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-                    eventDiv.tdEnd().trEnd(0);
-                    if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell").close();
-                        reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
-                        eventDiv.tdEnd().trEnd(0);
-                    }
-                }
-            } else {
-                eventDiv.tr(0).valign("top").close();
-                eventDiv.td(0).styleClass("table_cell_left").close();
-                enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-                eventDiv.tdEnd().trEnd(0);
-
-                if (studyEvents.size() > 0 &&  studyEvents.get(0).isRemoved()) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    eventDiv.append(restoreStudySubjectLinkBuilder(studySubject, restoreText));
-                    eventDiv.tdEnd().trEnd(0);
-                } else {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
-                    eventDiv.tdEnd().trEnd(0);
-                    if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
-                            && currentRole.getRole() != Role.MONITOR && !eventStatus.equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
-                        if(!studyEvents.get(0).isLocked()) {
-                            eventDiv.tr(0).valign("top").close();
-                            eventDiv.td(0).styleClass("table_cell_left").close();
-                            removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                            eventDiv.tdEnd().trEnd(0);
-                        }
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell").close();
-                        reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
-                        eventDiv.tdEnd().trEnd(0);
-                    }
-                }
-            }
-        }
-
-        if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
-            eventDiv.tr(0).valign("top").close();
-            eventDiv.td(0).styleClass("table_cell_left").close();
-            enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
-            eventDiv.tdEnd().trEnd(0);
         }
         eventDiv.tableEnd(0).tdEnd().trEnd(0);
 
@@ -1604,16 +1510,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         builder.a().href(href1);
         builder.close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
-        builder.nbsp().nbsp().a().href(href1);
-        builder.close().append(remove).aEnd();
-
-    }
-
-    private void reassignStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String remove) {
-        String href1 = "ReassignStudySubject?action=confirm&id=" + studyEventId + "&studySubId=" + studySubjectId;
-        builder.a().href(href1);
-        builder.close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(remove).aEnd();
 

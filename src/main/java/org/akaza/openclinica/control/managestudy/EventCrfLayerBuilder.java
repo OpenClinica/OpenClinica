@@ -185,7 +185,10 @@ public class EventCrfLayerBuilder {
         String table_cell_left = "table_cell_left";
         String studySubjectLabel = studySubject.getLabel();
 
-        html.tr(0).id("Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).close();
+        html.tr(0)
+            .id("Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
+            .value(Integer.toString(getStudyEvent() != null ? getStudyEvent().getId() : 0))
+            .close();
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
 

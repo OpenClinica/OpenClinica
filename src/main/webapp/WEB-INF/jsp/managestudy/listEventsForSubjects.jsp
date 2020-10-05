@@ -111,4 +111,97 @@
 <br>
 <input type="button" onclick="confirmExit('MainMenu');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
 
+<div style="display:none;">
+    <c:set var="originatingPage" value="ListEventsForSubjects?module=submit&defId=${defId}"/>
+    <c:forEach var="studySub" items="${participants}">
+        <c:if test="${not empty eventsByParticipant.get(studySub.name)}">
+            <div>${studySub.name}</div>
+            <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+            <div id="actions4${studySub.name}" style="margin-left:40px;">
+                <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                    <table>
+                        <%@include file="eventActions.jsp"%>
+                    </table>
+                </c:forEach>
+            </div>
+            <div style="margin-left:40px;">
+                <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                    <c:forEach var="dedc" items="${currRow.bean.uncompletedCRFs}">
+                        CRF-${currRow.bean.studyEvent.id}-${dedc.edc.defaultVersionId}
+                        <table id="actions4${studySub.name}-${currRow.bean.studyEvent.id}-${dedc.edc.defaultVersionId}">
+                            <%@include file="uncompletedCrfActions.jsp"%>
+                        </table>
+                    </c:forEach>
+                    <c:forEach var="dec" items="${currRow.bean.displayEventCRFs}">
+                        CRF-${currRow.bean.studyEvent.id}-${dec.eventCRF.formLayout.id}
+                        <table id="actions4${studySub.name}-${currRow.bean.studyEvent.id}-${dec.eventCRF.formLayout.id}">
+                            <%@include file="crfActions.jsp"%>
+                        </table>
+                    </c:forEach>
+                </c:forEach>
+            </div>
+        </c:if>
+    </c:forEach>
+    <script>
+        function eventPopup(menu) {
+            var parts = menu.attr('id').split('_');
+            var participantId = parts.slice(2, parts.length-2).join('_');
+            var extraMenu = jQuery('#actions4' + participantId);
+            if (!extraMenu.length)
+                return;
+
+            var index = Math.floor(menu.closest('table').index() / 2);
+            extraMenu = extraMenu.children().eq(index);
+            var actions = extraMenu.find('td');
+            actions.each(function() {
+                var td = jQuery(this);
+                td.css('display', 'block');
+                td.children('a').append('&nbsp;&nbsp;&nbsp;' + td.find('span').attr('title'));
+            });
+
+            var target = menu.find('table').find('table');
+            var tbody = target.children('tbody');
+            if (tbody.length)
+                target = tbody;
+
+            actions.appendTo(target);
+        }
+
+        function crfPopup(popup) {
+            var menu = popup.find('[value]');
+            var parts = popup.attr('id').split('_');
+            var participantId = parts.slice(1, parts.length-2).join('_');
+            var formLayoutId = parts[parts.length-2];
+            var studyEventId = menu.attr('value');
+            var extras = jQuery('#actions4' + participantId + '-' + studyEventId + '-' + formLayoutId);
+            if (!extras.length)
+                return
+
+            var menubody = menu.find('tbody');
+            menubody.empty();
+
+            extras.find('td').map(function(idx, td) {
+                var btn = jQuery(td).find('span');
+                var link = btn.closest('a');
+                link.append('&nbsp;&nbsp;' + btn.attr('title'));
+                return td.wrap('tr');
+            }).appendTo(menubody);
+            extras.remove();
+        }
+
+        jQuery('#listEventsForSubject').on('click', 'a', function() {
+            var popup = jQuery(this).prev();
+            var popupId = popup.attr('id');
+            if (popupId) {
+                if (popupId.startsWith('S_Event_')) {
+                    eventPopup(popup);
+                }
+                else if (popupId.startsWith('Event_')) {
+                    crfPopup(popup);
+                }                
+            }
+        });
+    </script>
+</div>
+
 <jsp:include page="../include/footer.jsp"/>

@@ -140,5 +140,62 @@
     </div>
 </c:if>
 
+<div style="display:none;">
+    <c:forEach var="studySub" items="${participants}">
+        <c:if test="${not empty eventsByParticipant.get(studySub.name)}">
+            <div>${studySub.name}</div>
+            <c:set var="studyRelatedTostudySub" value="${studyByParticipant.get(studySub.name)}"/>
+            <div id="actions4${studySub.name}" style="margin-left:40px;">
+                <c:forEach var="currRow" items="${eventsByParticipant.get(studySub.name)}">
+                    <div>
+                        ${currRow.bean.studyEvent.studyEventDefinition.name}
+                        ${currRow.bean.studyEvent.sampleOrdinal} 
+                    </div>
+                    <table data-event-def-id="${currRow.bean.studyEvent.studyEventDefinition.id}">
+                        <%@include file="eventActions.jsp"%>
+                    </table>
+                </c:forEach>
+            </div>
+        </c:if>
+    </c:forEach>
+    <script>
+        jQuery('#findSubjects').on('click', 'a', function() {
+            var menu = jQuery(this).prev('div[id^=Event_]');
+            if (!menu.length)
+                return;
+
+            var parts = menu.attr('id').split('_');
+            var participantId = parts.slice(1, parts.length-2).join('_');
+            var eventDefId = parts[parts.length-2];
+            var extraMenu = jQuery('#actions4' + participantId);
+            if (!extraMenu.length)
+                return;
+
+            extraMenu = extraMenu.children('[data-event-def-id=' + eventDefId + ']');
+            if (!extraMenu.length)
+                return;
+            
+            extraMenu.find('td').each(function() {
+                var td = jQuery(this);
+                td.css('display', 'block');
+                td.children('a').append('&nbsp;&nbsp;&nbsp;' + td.find('span').attr('title'));
+            });
+
+            var target = menu.find('table').find('table');
+            var innerTable = target.find('table');
+            if (innerTable.length)
+                target = innerTable;
+            var tbody = target.children('tbody');
+            if (tbody.length)
+                target = tbody;
+            
+            for (var i=0; i<target.length; i++) {
+                extraMenu.eq(i).find('td').appendTo(target.get(i));
+            }
+            extraMenu.remove();
+        });
+    </script>
+</div>
+
 <br>
 <jsp:include page="../include/footer.jsp"/>
