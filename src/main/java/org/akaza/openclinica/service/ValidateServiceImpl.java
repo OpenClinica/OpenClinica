@@ -15,7 +15,6 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
-import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -257,12 +256,12 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    public boolean isUserHasAccessToStudyOrSiteForStudy(List<StudyUserRoleBean> userRoles, String studyOid){
+    public boolean isUserHasAccessToStudyOrSiteForStudy(List<StudyUserRoleBean> userRoles, String studyOid) {
         Study study = studyDao.findPublicStudy(studyOid);
         Study tempPublicStudy = null;
         for (StudyUserRoleBean userRole : userRoles) {
             tempPublicStudy = null;
-            if(Role.siteRoleMap.containsKey(userRole.getRole().getId()))
+            if (Role.siteRoleMap.containsKey(userRole.getRole().getId()))
                 tempPublicStudy = studyDao.getPublicStudy(userRole.getStudyId());
             if (study.getStudyId() == userRole.getStudyId() ||
                     (tempPublicStudy != null && tempPublicStudy.isSite() && study.getStudyId() == tempPublicStudy.getStudy().getStudyId())) {
@@ -272,7 +271,7 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    public boolean hasArchivedDatasetFileAccessPermission(String studyOid, ArchivedDatasetFileBean adfBean, HttpServletRequest request){
+    public boolean hasArchivedDatasetFileAccessPermission(String studyOid, ArchivedDatasetFileBean adfBean, HttpServletRequest request) {
         Study study = studyDao.findPublicStudy(studyOid);
         List<ArchivedDatasetFilePermissionTag> adfTags = archivedDatasetFilePermissionTagDao.findAllByArchivedDatasetFileId(adfBean.getId());
         List<String> permissionTagsList = permissionService.getPermissionTagsList(study, request);
@@ -375,7 +374,7 @@ public class ValidateServiceImpl implements ValidateService {
         }
 
     }
-    
+
     public void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean) {
 
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
@@ -535,8 +534,7 @@ public class ValidateServiceImpl implements ValidateService {
         return crfDao.findByOcOID(formOid) != null;
     }
 
-    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int ordinal, HttpServletRequest request)
-    {
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int ordinal, HttpServletRequest request) {
         if (!isStudyOidValid(studyOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
 
@@ -568,6 +566,12 @@ public class ValidateServiceImpl implements ValidateService {
         EventCrf eventCrf = eventCrfDao.findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOid, studySubjectLabel, formOid, ordinal);
         if (!permissionService.hasFormAccess(eventCrf, eventCrf.getFormLayout().getFormLayoutId(), eventCrf.getStudyEvent().getStudyEventId(), request))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_HAS_NO_ACCESS_TO_FORM);
+    }
+
+    public boolean isUserResearchAssistantInStudy(UserAccountBean userAccountBean, Study study) {
+        StudyUserRoleBean studyRoleBean = userAccountBean.getRoleByStudy(study);
+        return (studyRoleBean.getRole() == Role.RESEARCHASSISTANT || studyRoleBean.getRole() == Role.RESEARCHASSISTANT2
+                || studyRoleBean.getRole() == Role.STUDY_RESEARCHASSISTANT || studyRoleBean.getRole() == Role.STUDY_RESEARCHASSISTANT2);
     }
 }
 
