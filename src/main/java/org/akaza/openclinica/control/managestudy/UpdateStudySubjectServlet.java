@@ -338,7 +338,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             }
 
 
-            String label = StringEscapeUtils.escapeXml11(fp.getString("label").trim());
+            String label = fp.getString("label").trim();
             studySub.setLabel(label);
             subject.setGender(' ');
             errors = validator.validate();
