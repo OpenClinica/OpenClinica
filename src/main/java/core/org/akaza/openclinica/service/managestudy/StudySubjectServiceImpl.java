@@ -20,7 +20,10 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -28,13 +31,19 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.service.StudyEventService;
+import core.org.akaza.openclinica.service.StudyEventServiceImpl;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.sql.DataSource;
 import java.util.*;
@@ -46,12 +55,24 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     private DataSource dataSource;
 
+    private final String COMMON = "common";
     @Autowired
     @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
     @Autowired
     @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCrfDAO;
+    @Autowired
+    private EventCrfDao eventCrfDao;
+    @Autowired
+    private StudySubjectDAO studySubjectDAO;
+    @Autowired
+    StudySubjectDao studySubjectDao;
+    @Autowired
+    private StudyEventDao studyEventDao;
+    @Autowired
+    StudyEventService studyEventService;
+
 
     @Transactional
     @Override
@@ -99,17 +120,17 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                     (eventCrfListByStudyEvent.containsKey(event.getId())) ? eventCrfListByStudyEvent.get(event.getId()) : Collections.EMPTY_LIST);
 
             // construct info needed on view study event page
-            DisplayStudyEventBean de = new DisplayStudyEventBean();
-            de.setStudyEvent(event);
-            de.setDisplayEventCRFs((ArrayList<DisplayEventCRFBean>) getDisplayEventCRFs(eventCRFs, userAccount, currentRole, event.getWorkflowStatus(),
+            DisplayStudyEventBean displayStudyEventBean = new DisplayStudyEventBean();
+            displayStudyEventBean.setStudyEvent(event);
+            displayStudyEventBean.setDisplayEventCRFs((ArrayList<DisplayEventCRFBean>) getDisplayEventCRFs(eventCRFs, userAccount, currentRole, event.getWorkflowStatus(),
                     study, nonEmptyEventCrf, formLayoutById, crfById, event.getStudyEventDefinitionId(), eventDefinitionCRFs));
-            ArrayList<DisplayEventDefinitionCRFBean> al = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus(), nonEmptyEventCrf,
+            ArrayList<DisplayEventDefinitionCRFBean> unstartedEventCrfs = getUnstartedEventCrfs(eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus(), nonEmptyEventCrf,
                     formLayoutById, crfById);
-            populateUncompletedCRFsWithCRFAndVersions(al, formLayoutById, crfById);
-            de.setUncompletedCRFs(al);
-            de.setMaximumSampleOrdinal(maxOrdinalByStudyEvent.get(event.getStudyEventDefinitionId()));
+            populateUnstartedCRFsWithCRFAndVersions(unstartedEventCrfs, formLayoutById, crfById);
+            displayStudyEventBean.setUncompletedCRFs(unstartedEventCrfs);
+            displayStudyEventBean.setMaximumSampleOrdinal(maxOrdinalByStudyEvent.get(event.getStudyEventDefinitionId()));
 
-            displayEvents.add(de);
+            displayEvents.add(displayStudyEventBean);
         }
 
         return displayEvents;
@@ -185,6 +206,14 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                                                          Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<>();
 
+        FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
+        Iterator edcs = eventDefinitionCRFs.iterator();
+        while(edcs.hasNext()) {
+            EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.next();
+            ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edcBean.getCrfId());
+            edcBean.setVersions(versions);
+        }
+
         for (int i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
 
@@ -219,14 +248,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 ecb.setStage(DataEntryStage.LOCKED);
             } else if (!flb.getStatus().equals(Status.AVAILABLE)) {
                 ecb.setStage(DataEntryStage.LOCKED);
-            }
-
-            FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
-            Iterator edcs = eventDefinitionCRFs.iterator();
-            while (edcs.hasNext()) {
-                EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.next();
-                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edcBean.getCrfId());
-                edcBean.setVersions(versions);
             }
 
             // above added 092007-102007 tbh
@@ -317,8 +338,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         return answer;
     }
 
-    private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs, List eventCRFs, StudyEventWorkflowStatusEnum status,
-                                                                        Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
+    private ArrayList<DisplayEventDefinitionCRFBean> getUnstartedEventCrfs(List eventDefinitionCRFs, List eventCRFs, StudyEventWorkflowStatusEnum status,
+                                                                           Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
         int i;
         HashMap<Integer, Boolean> completed = new HashMap<>();
         HashMap<Integer, EventCRFBean> startedButIncompleted = new HashMap<>();
@@ -463,8 +484,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public void populateUncompletedCRFsWithCRFAndVersions(ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
-                                                          Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
+    public void populateUnstartedCRFsWithCRFAndVersions(ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
+                                                        Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
 
         FormLayoutDAO formLayoutDAo = new FormLayoutDAO(dataSource);
 
@@ -530,6 +551,48 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             dedcrf.getEdc().setVersions(versions);
             uncompletedEventDefinitionCRFs.set(i, dedcrf);
         }
+    }
+    public void updateStudySubject(StudySubject studySubject, int userBeanId){
+        studySubject.setUpdateId(userBeanId);
+        studySubject.setDateUpdated(new Date());
+        studySubjectDao.saveOrUpdate(studySubject);
+    }
+
+
+
+
+    public Boolean isSignable(int studySubjectId) {
+
+        boolean archivedCommonEvent=false;
+        StudySubject studySubject = studySubjectDao.findById(studySubjectId);
+        List<StudyEvent> studyEvents = studySubject.getStudyEvents();
+
+        if (studySubject.getStatus().isSigned() || studyEvents.size() == 0){
+            return false;}
+
+        for (StudyEvent studyEvent: studyEvents) {
+            if(studyEvent.getStudyEventDefinition().getType().equals(COMMON)){
+                List <EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+                if(eventCrfs.size()!=0 && eventCrfs.get(0).isCurrentlyArchived()){
+                    archivedCommonEvent= true;
+                }
+            }
+
+            if (!studyEvent.isCurrentlyRemoved() && !studyEvent.isCurrentlyArchived() && !archivedCommonEvent) {
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                        && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                        && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
+                        && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                    return false;
+                } else {
+                    if (!studyEventService.isEventSignable(studyEvent)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     public DataSource getDataSource() {

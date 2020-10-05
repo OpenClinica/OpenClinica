@@ -2,31 +2,30 @@ package core.org.akaza.openclinica.service;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.*;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import core.org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -35,6 +34,7 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
@@ -71,9 +71,17 @@ public class StudyEventServiceImpl implements StudyEventService {
 
     @Autowired
     StudyEventDao studyEventDao;
+    @Autowired
+    EventCrfDao eventCrfDao;
+    @Autowired
+    StudySubjectDao studySubjectDao;
+    @Autowired
+    EventDefinitionCrfDao eventDefinitionCrfDao;
 
     @Autowired
     UserService userService;
+    @Autowired
+    EventDefinitionCRFDAO eventDefinitionCRFDAO;
 
     @Autowired
     private CSVService csvService;
@@ -960,6 +968,58 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
         }
     }
 
+    public boolean isEventSignable(StudyEvent studyEvent){
+        if (!areAllEventCrfsValid(studyEvent) || !areAllRequiredEventCrfsComplete(studyEvent)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean areAllEventCrfsValid(StudyEvent studyEvent) {
+        List<EventCrf> eventCrfs = studyEvent.getEventCrfs();
+        for (EventCrf eventCrf: eventCrfs) {
+            EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCRFDAO.findForStudyByStudyEventIdAndCRFVersionId(eventCrf.getStudyEvent().getStudyEventId(), eventCrf.getCrfVersion().getCrfVersionId());
+            // AC1 :An event will be eligible to sign only if all non-Archived required forms in the event
+            // have Complete workflow status and are not Removed.
+            // AC2: An event will be eligible to sign only if all non-Archived forms in the event
+            // have Not Started or Complete workflow status or are Removed
+            if (!eventCrf.isCurrentlyArchived()) {
+                if (eventDefinitionCrf.isRequiredCRF()) {
+                    if (eventCrf.isCurrentlyRemoved() || !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                        return false;
+                    }
+                } else {
+                    if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
+                            && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)
+                            && !eventCrf.isCurrentlyRemoved()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean areAllRequiredEventCrfsComplete(StudyEvent studyEvent) {
+
+        List<EventCrf> existingEventCrfs = studyEvent.getEventCrfs();
+        List<EventDefinitionCrf> requiredEventDefinitionCrfs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs().stream().
+                filter(eventDefinitionCrf -> eventDefinitionCrf.getRequiredCrf()).
+                collect(Collectors.toList());
+
+        for (EventDefinitionCrf requiredEventDefinitionCrf : requiredEventDefinitionCrfs){
+            boolean requiredFound = false;
+            for (EventCrf existingEventCrf : existingEventCrfs){
+                if (existingEventCrf.getCrfVersion().getCrf().getCrfId() == requiredEventDefinitionCrf.getCrf().getCrfId()){
+                    requiredFound = true;
+                }
+            }
+            if (!requiredFound){
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 
