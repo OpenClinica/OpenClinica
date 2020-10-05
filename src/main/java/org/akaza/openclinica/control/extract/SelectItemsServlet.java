@@ -15,7 +15,10 @@ import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.VersioningMap;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -33,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * @author jxu
@@ -45,6 +49,8 @@ public class SelectItemsServlet extends SecureController {
     // < ResourceBundlerestext,resexception,respage;
 
     public static String CURRENT_DEF_ID = "currentDefId";
+    private VersioningMapDao versioningMapDao;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -171,7 +177,11 @@ public class SelectItemsServlet extends SecureController {
             ItemFormMetadataBean meta = imfdao.findByItemIdAndCRFVersionId(item.getId(), item.getItemMeta().getCrfVersionId());
             // TODO change the above data access function, tbh
             // ArrayList metas = imfdao.findAllByItemId(item.getId());
-            meta.setCrfVersionName(item.getItemMeta().getCrfVersionName());
+            ArrayList<VersioningMap> versioningMaps= getVersioningMapDao().findByVersionIdAndItemId(item.getItemMeta().getCrfVersionId(),item.getId());
+            meta.setCrfVersionName(versioningMaps
+                    .stream()
+                    .map(a -> String.valueOf(a.getFormLayout().getName()))
+                    .collect(Collectors.joining(",")));
             // logger.info("crf versionname" + meta.getCrfVersionName());
             item.getItemMetas().add(meta);
             // item.setItemMetas(metas);
@@ -205,6 +215,9 @@ public class SelectItemsServlet extends SecureController {
         session.setAttribute("allItems", itemArray);
 
         forwardPage(Page.CREATE_DATASET_2);
+    }
+    public VersioningMapDao getVersioningMapDao() {
+        return (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
     }
 
 }

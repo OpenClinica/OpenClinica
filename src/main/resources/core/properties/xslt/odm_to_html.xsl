@@ -38,7 +38,9 @@
     <xsl:variable name="desc" select="/odm:ODM/@Description"/>
     <xsl:variable name="subject_count" select="count(/odm:ODM/odm:ClinicalData/odm:SubjectData)"/>
     <xsl:key name="studyEvents" match="odm:StudyEventData" use="@StudyEventOID"/>
-    <xsl:key name="eventCRFs" match="odm:FormData" use="@FormOID"/>
+    <xsl:key name="eventCRFs"
+    			 match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"
+    			 use="concat(../@StudyEventOID, '|', @FormOID)"/>
     <xsl:key name="itemDataKey" match="odm:ItemData" use="@ItemOID"/>
 
     <xsl:variable name="sexExist" select="//odm:SubjectData/@OpenClinica:Sex"/>
@@ -3361,8 +3363,8 @@
         <!--<xsl:variable name="crfPosition" select="count(preceding-sibling::*) + 1"/>
 		<xsl:variable name="crfPositionCalc" select="number($crfPosition)-number($eventDefCount)-1"/>	-->
         <xsl:apply-templates
-                select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',$FormOID)[1]) and ../@StudyEventOID = $eventOID]"
-                mode="CrfInfo">
+				select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',concat($eventOID,'|',$FormOID))[1])]"
+        mode="CrfInfo">
             <xsl:with-param name="oid" select="$FormOID"/>
             <xsl:with-param name="formName" select="$formName"/>
             <xsl:with-param name="crfPosition" select="$crfRefPosition"/>
