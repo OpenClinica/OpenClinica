@@ -135,7 +135,7 @@ public class ImportController {
 
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        DiscrepancyNotesBean ds = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0).getFormData().get(0).getItemGroupData().get(0).getItemData().get(0).getDiscrepancyNotes();
+
         if (studyOID.isEmpty()) {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_OID_MISSING, HttpStatus.NOT_FOUND);
         }

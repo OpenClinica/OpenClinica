@@ -73,7 +73,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
         boolean newQueriesStarted = false;
         boolean isResolutionTypeAnnotation = false;
-        if(!checkDiscrepancyNoteTypeValid(discrepancyNoteBean.getNoteType()))
+        if(discrepancyNoteBean.getNoteType() == null)
+            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_DISCREPANCY_NOTE_TYPE));
+        else if(!checkDiscrepancyNoteTypeValid(discrepancyNoteBean.getNoteType()))
             errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID));
         isResolutionTypeAnnotation = QueryType.ANNOTATION.getName().equalsIgnoreCase(discrepancyNoteBean.getNoteType());
         if(isResolutionTypeAnnotation && discrepancyNoteBean.getChildNotes().size() > 1)
@@ -97,17 +99,25 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_NOTES_NOT_AVAILABLE_IN_IMPORT_FILE));
         for(ChildNoteBean childNoteBean : discrepancyNoteBean.getChildNotes()){
             boolean discrepancyNoteStatusValid = true;
-            if(!isResolutionTypeAnnotation && !checkDiscrepancyNoteStatusValid(childNoteBean.getStatus())){
-                discrepancyNoteStatusValid = false;
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID));
+            if(!isResolutionTypeAnnotation) {
+                if (childNoteBean.getStatus() == null) {
+                    discrepancyNoteStatusValid = false;
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_DISCREPANCY_NOTE_STATUS));
+                }
+                else if(!checkDiscrepancyNoteStatusValid(childNoteBean.getStatus())) {
+                    discrepancyNoteStatusValid = false;
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID));
+                }
             }
-            if(!isUserExist(childNoteBean.getOwnerUserName()))
+            if(childNoteBean.getOwnerUserName() == null)
+                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_USER_NAME));
+            else if(!isUserExist(childNoteBean.getOwnerUserName()))
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_USER_NOT_VALID));
             if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName()))
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ASSIGNED_USER_NOT_VALID));
             if(StringUtils.isBlank(childNoteBean.getDetailedNote()))
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_MISSING));
-            if(childNoteBean.getDetailedNote().length() > 1000)
+            else if(childNoteBean.getDetailedNote().length() > 1000)
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_TOO_LONG));
             DiscrepancyNote childDN = null;
             if(childNoteBean.getDisplayId() != null) {
