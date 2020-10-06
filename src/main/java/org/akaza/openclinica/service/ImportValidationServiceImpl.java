@@ -77,12 +77,12 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         boolean newQueriesStarted = false;
         boolean isResolutionTypeAnnotation = false;
         if(discrepancyNoteBean.getNoteType() == null)
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_DISCREPANCY_NOTE_TYPE));
+            errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_MISSING_DISCREPANCY_NOTE_TYPE));
         else if(!checkDiscrepancyNoteTypeValid(discrepancyNoteBean.getNoteType()))
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID));
+            errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID));
         isResolutionTypeAnnotation = QueryType.ANNOTATION.getName().equalsIgnoreCase(discrepancyNoteBean.getNoteType());
         if(isResolutionTypeAnnotation && discrepancyNoteBean.getChildNotes().size() > 1)
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
+            errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
         DiscrepancyNote parentDN =null;
         if(discrepancyNoteBean.getDisplayId() != null) {
             newDisplayNodeIds.add(discrepancyNoteBean.getDisplayId());
@@ -90,50 +90,50 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             if (parentDN != null) {
                 if(itemData != null && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
                         parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
+                    errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
                 if(parentDN.getParentDiscrepancyNote() != null)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
+                    errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 setResolutionStatusForCheckingChildNotesValidity(parentDN.getResolutionStatus().getName());
             }
             if(discrepancyNoteBean.getDisplayId().length() > 32)
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_ID_TOO_LONG));
+                errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_DISCREPANCY_NOTE_ID_TOO_LONG));
         }
         if(discrepancyNoteBean.getChildNotes() == null || discrepancyNoteBean.getChildNotes().size() == 0)
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_NOTES_NOT_AVAILABLE_IN_IMPORT_FILE));
+            errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_MISSING_CHILD_NOTE));
         for(ChildNoteBean childNoteBean : discrepancyNoteBean.getChildNotes()){
             boolean discrepancyNoteStatusValid = true;
             if(!isResolutionTypeAnnotation) {
                 if (childNoteBean.getStatus() == null) {
                     discrepancyNoteStatusValid = false;
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_DISCREPANCY_NOTE_STATUS));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_MISSING_DISCREPANCY_NOTE_STATUS));
                 }
                 else if(!checkDiscrepancyNoteStatusValid(childNoteBean.getStatus())) {
                     discrepancyNoteStatusValid = false;
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID));
                 }
             }
             if(childNoteBean.getOwnerUserName() == null)
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_USER_NAME));
+                errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_MISSING_USER_NAME));
             else if(!isUserExist(childNoteBean.getOwnerUserName()))
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_USER_NOT_VALID));
+                errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_USER_NOT_VALID));
             if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName()))
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ASSIGNED_USER_NOT_VALID));
+                errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_ASSIGNED_USER_NOT_VALID));
             if(StringUtils.isBlank(childNoteBean.getDetailedNote()))
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_MISSING));
+                errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_DETAILED_NOTE_MISSING));
             else if(childNoteBean.getDetailedNote().length() > 1000)
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DETAILED_NOTE_TOO_LONG));
+                errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_DETAILED_NOTE_TOO_LONG));
             DiscrepancyNote childDN = null;
             if(childNoteBean.getDisplayId() != null) {
                 if(newDisplayNodeIds.contains(childNoteBean.getDisplayId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_ID_IS_REDUNDANT));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_DISCREPANCY_NOTE_ID_IS_REDUNDANT));
                 newDisplayNodeIds.add(childNoteBean.getDisplayId());
                 if(childNoteBean.getDisplayId().length() > 32)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_DISCREPANCY_NOTE_ID_TOO_LONG));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_DISCREPANCY_NOTE_ID_TOO_LONG));
                 childDN = discrepancyNoteDao.findByDisplayIdWithoutNotePrefix(childNoteBean.getDisplayId());
             }
             if (childDN == null) {
                     if (!isResolutionTypeAnnotation && discrepancyNoteStatusValid && !isChildStatusApplicable(childNoteBean.getStatus()))
-                        errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_QUERY_STATUS_NOT_APPLICABLE));
+                        errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_QUERY_STATUS_NOT_APPLICABLE));
                     setResolutionStatusForCheckingChildNotesValidity(childNoteBean.getStatus());
                     newQueriesStarted = true;
             }else{
@@ -141,18 +141,18 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                         childDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
                 if(childDN.getParentDiscrepancyNote() == null)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 if(parentDN == null)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 else if(!childDN.getParentDiscrepancyNote().getDisplayId().equalsIgnoreCase(parentDN.getDisplayId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 if(!isResolutionTypeAnnotation && newQueriesStarted)
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES));
             }
 
             if(parentDN != null && isResolutionTypeAnnotation
                     && (childNoteBean.getDisplayId() == null || childDN == null)){
-                errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
+                errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
             }
             childNoteBean.setDisplayId(validateAndGenerateNewDisplayId(childNoteBean.getDisplayId(), false, errors));
         }
@@ -407,6 +407,12 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
         }
+    }
+
+    private String generateFailedErrorCode(String prefix){
+        if(prefix == null)
+            return FAILED;
+        return prefix + " " + FAILED;
     }
 
     private void validateCheckBoxOrMultiSelect(ResponseSet responseSet, String value) {
