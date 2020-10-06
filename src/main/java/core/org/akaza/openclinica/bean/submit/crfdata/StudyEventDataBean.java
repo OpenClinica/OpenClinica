@@ -5,9 +5,14 @@ import java.util.ArrayList;
 import core.org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import core.org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.BooleanUtils;
 
 public class StudyEventDataBean {
+    private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
+    private static final String STATUS_ATTRIBUTE_FALSE = "No";
     private ArrayList<FormDataBean> formData;
     private ArrayList<SignatureBean> signatures;
     private String studyEventOID;
@@ -134,5 +139,25 @@ public class StudyEventDataBean {
 
     public void setSignedString(String signed) {
         this.signed = signed;
+    }
+
+    public Boolean getSigned(){
+        if(this.signed == null)
+            return null;
+        else if(this.signed.equalsIgnoreCase(STATUS_ATTRIBUTE_FALSE))
+            return false;
+        else if(this.signed.equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE))
+            return true;
+        else
+            throw new OpenClinicaSystemException("FAILED", ErrorConstants.ERR_SIGNED_STATUS_INVALID);
+    }
+
+    public void setSigned(Boolean signed){
+        if(signed == null)
+            this.signed = null;
+        else if(BooleanUtils.isTrue(signed))
+            this.signed = STATUS_ATTRIBUTE_TRUE;
+        else
+            this.signed = STATUS_ATTRIBUTE_FALSE;
     }
 }

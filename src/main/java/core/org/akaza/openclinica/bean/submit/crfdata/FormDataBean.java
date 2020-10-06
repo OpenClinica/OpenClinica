@@ -6,9 +6,13 @@ import java.util.Date;
 import core.org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 
 public class FormDataBean {
+    private static final String SDV_NEVER_VERIFIED="Never Verified";
     private ArrayList<ImportItemGroupDataBean> itemGroupData;
     private AuditLogsBean auditLogs;
     private DiscrepancyNotesBean discrepancyNotes;
@@ -149,5 +153,24 @@ public class FormDataBean {
 
     public void setSdvStatusString(String sdvStatusString) {
         this.sdvStatusString = sdvStatusString;
+    }
+
+    public SdvStatus getSdvStatus() {
+        if(getSdvStatusString() == null)
+            return null;
+        SdvStatus sdvStatus = SdvStatus.getByI18nDescription(getSdvStatusString());
+        if(sdvStatus != null)
+            return sdvStatus;
+        else if(sdvStatus == null && getSdvStatusString().equalsIgnoreCase(SDV_NEVER_VERIFIED))
+            return null;
+        else
+            throw new OpenClinicaSystemException("FAILED", ErrorConstants.ERR_SDV_STATUS_NOT_VALID);
+    }
+
+    public void setSdvStatus(SdvStatus sdvStatus) {
+        if(sdvStatus == null)
+            this.sdvStatusString = null;
+        else
+            this.sdvStatusString = sdvStatus.getDisplayValueForNonSdvPage();
     }
 }

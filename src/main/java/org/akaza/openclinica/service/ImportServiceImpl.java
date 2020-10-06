@@ -148,7 +148,6 @@ public class ImportServiceImpl implements ImportService {
     public static final String DiscrepancyNoteMessage = "import XML";
     public static final String DetailedNotes = "Update via Import";
     public static final String SDV_STATUS_UPDATED = "Sdv status imported";
-    private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
     private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
     private static final String ATTESTATIONS_IMPORTED = "Attestations Imported";
     private static final String EVENT_IS_SIGNED = "Event is Signed";
@@ -426,18 +425,17 @@ public class ImportServiceImpl implements ImportService {
                     } // formDataBean for loop
                     try{
                         if(studyEventDataBean.getSignatures() != null) {
-                            importValidationService.validateSignatureForStudyEvent(studyEventDataBean.getSignatures(), studyEventDataBean.getSignedString(), studyEvent, studySubject);
+                            importValidationService.validateSignatureForStudyEvent(studyEventDataBean, studyEvent, studySubject);
                             importSignatures(studyEventDataBean, studyEvent, userAccount);
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, ATTESTATIONS_IMPORTED, sdf_logFile.format(new Date()), null);
                             dataImportReports.add(dataImportReport);
-                            if (studyEventDataBean.getSignedString() != null &&
-                                    studyEventDataBean.getSignedString().equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE)) {
+                            if (studyEventDataBean.getSigned() != null && studyEventDataBean.getSigned()) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, EVENT_IS_SIGNED, sdf_logFile.format(new Date()), null);
                                 dataImportReports.add(dataImportReport);
                             }
                         }
                     }catch (OpenClinicaSystemException e){
-                        for(ErrorObj err : e.getMultiErrors()) {
+                        for (ErrorObj err : e.getMultiErrors()) {
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, err.getCode(), null, err.getMessage());
                             dataImportReports.add(dataImportReport);
                         }
@@ -675,6 +673,7 @@ public class ImportServiceImpl implements ImportService {
 
     private EventCrf saveSdvStatus(EventCrf eventCrf, SdvStatus sdvStatus, UserAccount userAccount){
         eventCrf.setSdvStatus(sdvStatus);
+        eventCrf.setSdvUpdateId(userAccount.getUserId());
         return saveEventCrf(eventCrf, userAccount);
     }
 
@@ -1305,7 +1304,7 @@ public class ImportServiceImpl implements ImportService {
 
     public boolean setSdvStatusOnEventCrf(FormDataBean formDataBean, EventCrf eventCrf, UserAccount userAccount){
         if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
-            SdvStatus newSdvStatus = SdvStatus.getByI18nDescription(formDataBean.getSdvStatusString());
+            SdvStatus newSdvStatus = formDataBean.getSdvStatus();
             if (newSdvStatus != null && (eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus))) {
                 if (newSdvStatus.equals(SdvStatus.VERIFIED)) {
                     if (eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && !eventCrf.isCurrentlyRemoved()
@@ -1559,8 +1558,7 @@ public class ImportServiceImpl implements ImportService {
             auditLogEvent.setNewValue("false");
 
             //condition to check if this is the last signature bean
-            if(signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) && studyEventDataBean.getSignedString() != null &&
-                studyEventDataBean.getSignedString().equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE)){
+            if(signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) && studyEventDataBean.getSigned() != null && studyEventDataBean.getSigned()){
                     //Auto-insert to audit_log_event won't get triggered if the signed status and attestation is same
                     if(!studyEvent.isCurrentlySigned() || studyEvent.getAttestation() == null || !studyEvent.getAttestation().equals(attestationMsg))
                         manuallyImportToAuditLog = false;

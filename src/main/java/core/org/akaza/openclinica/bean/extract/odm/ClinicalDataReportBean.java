@@ -257,9 +257,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                     }
                     if (se.getSigned() != null) {
-                        boolean signed = se.getSigned();
+                        String signed = se.getSignedString();
                         if (!StringUtils.isEmpty(signed)) {
-                            xml.append("\" OpenClinica:Signed=\"" + StringEscapeUtils.escapeXml((signed ? "Yes" : "No")));
+                            xml.append("\" OpenClinica:Signed=\"" + StringEscapeUtils.escapeXml((signed)));
                         }
                     }
                     if (se.getAgeAtEvent() != null) {
@@ -438,7 +438,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             }
 
                             if (form.getSdvStatus() != null) {
-                                xml.append("\" OpenClinica:SdvStatus=\"" + StringEscapeUtils.escapeXml(form.getSdvStatus().getDisplayValueForNonSdvPage()));
+                                xml.append("\" OpenClinica:SdvStatus=\"" + StringEscapeUtils.escapeXml(form.getSdvStatusString()));
                             }
 
                             if (form.getRemoved() != null) {
