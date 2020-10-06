@@ -31,7 +31,6 @@ public class ExportFormDataBean extends FormDataBean {
     private FormLayout formLayout;
     private EventCrf eventCrf;
     private EventDefinitionCrf eventDefinitionCrf;
-    private SdvStatus sdvStatus;
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
@@ -126,13 +125,5 @@ public class ExportFormDataBean extends FormDataBean {
 
     public void setLocked(Boolean locked) {
         this.locked = locked;
-    }
-
-    public SdvStatus getSdvStatus() {
-        return sdvStatus;
-    }
-
-    public void setSdvStatus(SdvStatus sdvStatus) {
-        this.sdvStatus = sdvStatus;
     }
 }

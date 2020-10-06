@@ -209,13 +209,11 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
     public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf) {
         if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
-            SdvStatus newSdvStatus = SdvStatus.getByI18nDescription(formDataBean.getSdvStatusString());
-            if(formDataBean.getSdvStatusString().equalsIgnoreCase("Never Verified")) {
+            SdvStatus newSdvStatus = formDataBean.getSdvStatus();
+            if(newSdvStatus == null) {
                 if(eventCrf.getSdvStatus() != null) {
                     throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE);
                 }
-            } else if(newSdvStatus == null ){
-                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_NOT_VALID);
             } else if((eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus)) && newSdvStatus.equals(SdvStatus.VERIFIED)) {
                 if (eventCrf == null || !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                     throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION);
@@ -263,18 +261,21 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         }
     }
 
-    public void validateSignatureForStudyEvent(List<SignatureBean> signatureBeans, String signedStatus, StudyEvent studyEvent, StudySubject studySubject){
+    public void validateSignatureForStudyEvent(StudyEventDataBean studyEventDataBean, StudyEvent studyEvent, StudySubject studySubject){
         ArrayList<ErrorObj> errors = new ArrayList<>();
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
         Boolean eventNeedsToBeSigned = null;
-        if(signedStatus == null || signedStatus.equalsIgnoreCase(STATUS_ATTRIBUTE_FALSE))
-            eventNeedsToBeSigned = false;
-        else if(signedStatus.equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE))
-            eventNeedsToBeSigned = true;
-        else {
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_SIGNED_STATUS_INVALID));
-            eventNeedsToBeSigned = false;
+        Boolean signedStatus = null;
+        try {
+             signedStatus = studyEventDataBean.getSigned();
+        }catch (OpenClinicaSystemException e){
+            errors.add(new ErrorObj(e.getErrorCode(), e.getMessage()));
         }
+        if(BooleanUtils.isNotTrue(signedStatus))
+            eventNeedsToBeSigned = false;
+        else if(BooleanUtils.isTrue(signedStatus))
+            eventNeedsToBeSigned = true;
+        List<SignatureBean> signatureBeans = studyEventDataBean.getSignatures();
         for (SignatureBean signatureBean: signatureBeans) {
             if (signatureBean.getAttestation() == null)
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_IS_MISSING));

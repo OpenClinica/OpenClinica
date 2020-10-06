@@ -210,11 +210,11 @@ public class ErrorConstants {
     public static final String ERR_QUERY_STATUS_NOT_APPLICABLE = "errorCode.queryStatusNotApplicable";
     public static final String ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES = "errorCode.newQueryInBetweenOldQueries";
     public static final String ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE = "errorCode.annotationMustHaveOneChildNote";
-    public static final String ERR_NOTE_ID_ALREADY_IN_USE = "errorCode.NoteIdAlreadyinUse";
+    public static final String ERR_NOTE_ID_ALREADY_IN_USE = "errorCode.noteIdAlreadyinUse";
     public static final String ERR_ITEMDATA_DOES_NOT_CONTAIN_THIS_DISCREPANCY_NOTE = "errorCode.itemDataDoesNotContainThisDiscrepancyNote";
     public static final String ERR_CHILD_DISPCREPANCY_NOTE_IS_NOT_CORRESPONDING_TO_PARENT_NOTE = "errorCode.childDiscrepancyNoteIsNotCorrespondingToParentNote";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
-    public static final String ERR_CHILD_NOTES_NOT_AVAILABLE_IN_IMPORT_FILE = "errorCode.ChildNotesNotAvailableInImport";
+    public static final String ERR_CHILD_NOTES_NOT_AVAILABLE_IN_IMPORT_FILE = "errorCode.childNotesNotAvailableInImport";
     public static final String ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION = "errorCode.formStatusShouldBeCompleteForSettingSdvVerifiedStatus";
     public static final String ERR_SDV_STATUS_NOT_VALID = "errorCode.sdvStatusNotValid";
     public static final String ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE = "errorCode.neverVerifiedSdvStatusNotAvailable";
