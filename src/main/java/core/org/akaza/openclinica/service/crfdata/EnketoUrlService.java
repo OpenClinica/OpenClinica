@@ -473,8 +473,9 @@ public class EnketoUrlService {
 
         String instance = wtr.toString();
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
+        String signature = null;
         if (studyEvent.isCurrentlySigned()) {
-            String signature = studyEvent.getAttestation();
+            signature = studyEvent.getAttestation();
             if(eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()){
                 String removedOrArchivedKeyword = eventCrf.isCurrentlyRemoved() ? "removed" : "archived";
                 MessageFormat mf = new MessageFormat("");
@@ -483,9 +484,19 @@ public class EnketoUrlService {
                 signature = mf.format(arguments);
             }
 
+        } else {
+            if(eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()){
+                String removedOrArchivedKeyword = eventCrf.isCurrentlyRemoved() ? "removed" : "archived";
+                MessageFormat mf = new MessageFormat("");
+                mf.applyPattern(resword.getString("form_status_message_for_removed_or_archived"));
+                Object[] arguments = { removedOrArchivedKeyword };
+                signature = mf.format(arguments);
+            }
+        }
+
+        if (signature != null)
             instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
                     + instance.substring(instance.indexOf("</meta>"));
-        }
         logger.debug(instance);
         return instance;
     }
