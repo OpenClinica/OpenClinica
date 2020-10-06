@@ -197,10 +197,13 @@ public class ErrorConstants {
 
     public static final String ERR_HAS_NO_ACCESS_TO_FORM = "errorCode.hasNoAccessToForm";
     public static final String ERR_DISCREPANCY_NOTE_STATUS_NOT_VALID = "errorCode.discrepancyNoteStatusNotValid";
+    public static final String ERR_MISSING_DISCREPANCY_NOTE_STATUS = "errorCode.missingDiscrepancyNoteStatus";
     public static final String ERR_DISCREPANCY_NOTE_TYPE_NOT_VALID = "errorCode.discrepancyNoteTypeNotValid";
+    public static final String ERR_MISSING_DISCREPANCY_NOTE_TYPE = "errorCode.missingDiscrepancyNoteType";
     public static final String ERR_DISCREPANCY_NOTE_ID_TOO_LONG = "errorCode.discrepancyNoteIdTooLong";
     public static final String ERR_DISCREPANCY_NOTE_ID_IS_REDUNDANT = "errorCode.discrepancyNoteIdIsRedundant";
     public static final String ERR_USER_NOT_VALID = "errorCode.userNotValid";
+    public static final String ERR_MISSING_USER_NAME = "errorCode.missingUserName";
     public static final String ERR_ASSIGNED_USER_NOT_VALID = "errorCode.assignedUserNotValid";
     public static final String ERR_DETAILED_NOTE_MISSING = "errorCode.detailedNoteMissing";
     public static final String ERR_DETAILED_NOTE_TOO_LONG = "errorCode.detailedNoteTextTooLong";

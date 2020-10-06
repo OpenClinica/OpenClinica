@@ -24,7 +24,7 @@ public class ChildNoteBean extends ElementOIDBean {
     private String detailedNote;
     private ElementRefBean userRef;
     
-    private String ownerUserName="";
+    private String ownerUserName;
     private String ownerFirstName="";
     private String ownerLastName="";
     
