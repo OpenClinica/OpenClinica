@@ -53,7 +53,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     private AuditLogEventDao auditLogEventDao;
 
     public static final String FAILED = "Failed";
-    public static final String NO_CHANGE_IN_QUERIES="No change in queries";
+    public static final String NO_CHANGE="No Change";
     public static final String QUERY_KEYWORD = "Query";
     private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
     private static final String STATUS_ATTRIBUTE_FALSE = "No";
@@ -150,7 +150,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             }
         }
         if(errors.size() ==0 && !newQueriesStarted){
-            errors.add(new ErrorObj( NO_CHANGE_IN_QUERIES, ""));
+            errors.add(new ErrorObj( NO_CHANGE, ""));
         }
         if(errors.size() > 0){
             throw new OpenClinicaSystemException(FAILED, errors);
