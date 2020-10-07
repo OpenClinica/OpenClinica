@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -51,6 +52,8 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     private StudyEventService studyEventService;
     @Autowired
     private AuditLogEventDao auditLogEventDao;
+    @Autowired
+    private QueryService queryService;
 
     public static final String FAILED = "Failed";
     public static final String NO_CHANGE_IN_QUERIES="No change in queries";
@@ -85,9 +88,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             newDisplayNodeIds.add(discrepancyNoteBean.getDisplayId());
             parentDN = discrepancyNoteDao.findByDisplayIdWithoutNotePrefix(discrepancyNoteBean.getDisplayId());
             if (parentDN != null) {
-                if(!isResolutionTypeAnnotation && itemData != null && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
+                if(itemData != null && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
                         parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ITEMDATA_DOES_NOT_CONTAIN_THIS_DISCREPANCY_NOTE));
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
                 if(parentDN.getParentDiscrepancyNote() != null)
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 setResolutionStatusForCheckingChildNotesValidity(parentDN.getResolutionStatus().getName());
@@ -134,13 +137,16 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                     setResolutionStatusForCheckingChildNotesValidity(childNoteBean.getStatus());
                     newQueriesStarted = true;
             }else{
+                if(itemData != null && (childDN.getDnItemDataMaps() == null || childDN.getDnItemDataMaps().size() == 0 ||
+                        childDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
                 if(childDN.getParentDiscrepancyNote() == null)
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 if(parentDN == null)
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 else if(!childDN.getParentDiscrepancyNote().getDisplayId().equalsIgnoreCase(parentDN.getDisplayId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CHILD_DISPCREPANCY_NOTE_IS_NOT_CORRESPONDING_TO_PARENT_NOTE));
-                if(newQueriesStarted)
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
+                if(!isResolutionTypeAnnotation && newQueriesStarted)
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES));
             }
 
@@ -148,7 +154,10 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                     && (childNoteBean.getDisplayId() == null || childDN == null)){
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE));
             }
+            childNoteBean.setDisplayId(validateAndGenerateNewDisplayId(childNoteBean.getDisplayId(), false, errors));
         }
+
+        discrepancyNoteBean.setDisplayId(validateAndGenerateNewDisplayId(discrepancyNoteBean.getDisplayId(), true, errors));
         if(errors.size() ==0 && !newQueriesStarted){
             errors.add(new ErrorObj( NO_CHANGE_IN_QUERIES, ""));
         }
@@ -295,6 +304,17 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         }
     }
 
+    private String validateAndGenerateNewDisplayId(String displayId,boolean parentDn, List errors){
+        try {
+            if(displayId == null){
+                return queryService.generateDisplayId(parentDn);
+            }
+        }
+        catch (OpenClinicaSystemException e){
+            errors.add(new ErrorObj(e.getErrorCode(), e.getMessage()));
+        }
+        return displayId;
+    }
     private boolean isChildStatusApplicable(String status) {
         ResolutionStatus currResolutionStatus = ResolutionStatus.getByEnglishDescription(status);
         if(currResolutionStatus != null) {
