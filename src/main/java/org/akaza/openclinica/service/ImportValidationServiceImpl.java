@@ -142,7 +142,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                     errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
                 if(childDN.getParentDiscrepancyNote() == null)
                     errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
-                if(parentDN == null)
+                else if(parentDN == null)
                     errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 else if(!childDN.getParentDiscrepancyNote().getDisplayId().equalsIgnoreCase(parentDN.getDisplayId()))
                     errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
