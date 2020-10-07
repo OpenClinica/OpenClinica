@@ -622,6 +622,8 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
         variables.put(new Integer(ind), getValidOid(sb));
         ind++;
+        variables.put(new Integer(ind), sb.getUpdater().getId());
+        ind++;
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {

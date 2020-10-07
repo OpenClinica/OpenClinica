@@ -37,6 +37,7 @@ import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.StudyEventServiceImpl;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,6 +205,14 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                                                          Study study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
                                                          Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<>();
+
+        FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
+        Iterator edcs = eventDefinitionCRFs.iterator();
+        while(edcs.hasNext()) {
+            EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.next();
+            ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edcBean.getCrfId());
+            edcBean.setVersions(versions);
+        }
 
         for (int i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
@@ -543,6 +552,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             uncompletedEventDefinitionCRFs.set(i, dedcrf);
         }
     }
+    public void updateStudySubject(StudySubject studySubject, int userBeanId){
+        studySubject.setUpdateId(userBeanId);
+        studySubject.setDateUpdated(new Date());
+        studySubjectDao.saveOrUpdate(studySubject);
+    }
+
 
 
 

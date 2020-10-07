@@ -28,7 +28,6 @@ import core.org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import core.org.akaza.openclinica.domain.datamap.ItemGroup;
 import core.org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import core.org.akaza.openclinica.domain.datamap.ItemMetadata;
-import org.akaza.openclinica.service.DataSaveServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +61,6 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
-
-    @Autowired
-    DataSaveServiceImpl dataSaveService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -188,7 +184,6 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setInstanceId(container.getInstanceId());
-                    dataSaveService.saveOrUpdate(newItemData);
                     itemDataDao.saveOrUpdate(newItemData);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
@@ -198,7 +193,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    dataSaveService.saveOrUpdate(existingItemData);
+                    itemDataDao.saveOrUpdate(existingItemData);
                 }
             }
         }
