@@ -12,6 +12,7 @@ import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -88,21 +89,38 @@ public class AuditItemDataAspect {
         }
     }
 
+    //If discrepancy note created for new itemData, the itemData is created with empty string
+    private Boolean isEmptyItemDataCreated(Integer itemDataId,String value) {
+        if(StringUtils.isEmpty(value)) {
+            if (itemDataId == null || itemDataId == 0)
+                return true;
+            Session session = itemDataDao.getSessionFactory().openSession();
+            ItemData existingItemData = session.find(ItemData.class, itemDataId);
+            session.close();
+            if(existingItemData == null)
+                return true;
+        }
+        return false;
+    }
 
     private void updateStudySubjectLastModifiedDetails(ItemData itemData) {
-        StudySubject studySubject = itemData.getEventCrf().getStudySubject();
-        if(itemData.getUpdateId() !=null && itemData.getUpdateId() > 0)
-            studySubjectService.updateStudySubject(studySubject, itemData.getUpdateId());
-        else
-            studySubjectService.updateStudySubject(studySubject, itemData.getUserAccount().getUserId());
+        if(!isEmptyItemDataCreated(itemData.getItemDataId(), itemData.getValue())) {
+            StudySubject studySubject = itemData.getEventCrf().getStudySubject();
+            if (itemData.getUpdateId() != null && itemData.getUpdateId() > 0)
+                studySubjectService.updateStudySubject(studySubject, itemData.getUpdateId());
+            else
+                studySubjectService.updateStudySubject(studySubject, itemData.getUserAccount().getUserId());
+        }
     }
 
     private void updateStudySubjectLastModifiedDetails(ItemDataBean itemDataBean){
-        EventCrf eventCrf = eventCrfDao.findById(itemDataBean.getEventCRFId());
-        if (itemDataBean.getUpdater() != null && itemDataBean.getUpdater().getId() > 0)
-            studySubjectService.updateStudySubject(eventCrf.getStudySubject(), itemDataBean.getUpdater().getId());
-        else
-            studySubjectService.updateStudySubject(eventCrf.getStudySubject(), itemDataBean.getOwnerId());
+        if(!isEmptyItemDataCreated(itemDataBean.getId(), itemDataBean.getValue())) {
+            EventCrf eventCrf = eventCrfDao.findById(itemDataBean.getEventCRFId());
+            if (itemDataBean.getUpdater() != null && itemDataBean.getUpdater().getId() > 0)
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), itemDataBean.getUpdater().getId());
+            else
+                studySubjectService.updateStudySubject(eventCrf.getStudySubject(), itemDataBean.getOwnerId());
+        }
     }
 
 }
