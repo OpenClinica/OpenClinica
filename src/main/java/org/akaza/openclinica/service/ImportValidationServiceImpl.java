@@ -90,7 +90,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             if (parentDN != null) {
                 if(itemData != null && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
                         parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
-                    errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
+                    errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_EXISTING_NOTE_ID_ON_OTHER_ITEM));
                 if(parentDN.getParentDiscrepancyNote() != null)
                     errors.add(new ErrorObj(generateFailedErrorCode(discrepancyNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 setResolutionStatusForCheckingChildNotesValidity(parentDN.getResolutionStatus().getName());
@@ -139,7 +139,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             }else{
                 if(itemData != null && (childDN.getDnItemDataMaps() == null || childDN.getDnItemDataMaps().size() == 0 ||
                         childDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EXISTING_NOTE_ID_IN_OTHER_ITEM));
+                    errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_EXISTING_NOTE_ID_ON_OTHER_ITEM));
                 if(childDN.getParentDiscrepancyNote() == null)
                     errors.add(new ErrorObj(generateFailedErrorCode(childNoteBean.getDisplayId()), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE));
                 else if(parentDN == null)
