@@ -1,5 +1,10 @@
 package org.akaza.openclinica.controller.dto;
 
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class DataImportReport {
     private String subjectKey;
     private String studySubjectID;
@@ -9,14 +14,17 @@ public class DataImportReport {
     private String itemGroupOID;
     private String itemGroupRepeatKey;
     private String itemOID;
+    private String type;
     private String status;
     private String timeStamp;
     private String message;
     private Integer rowNumber;
     private String participateStatus;
 
+    private static ResourceBundle resWord;
 
-    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID, String status, String timeStamp, String message) {
+    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID, String type_keyword, String status, String timeStamp, String message) {
+        resWord = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
         this.subjectKey = subjectKey;
         this.studySubjectID = studySubjectID;
         this.studyEventOID = studyEventOID;
@@ -28,6 +36,7 @@ public class DataImportReport {
         this.status = status;
         this.timeStamp = timeStamp;
         this.message = message;
+        this.type = resWord.getString(type_keyword);
     }
 
     public DataImportReport(Integer rowNumber, String studySubjectID, String studyEventOID, String studyEventRepeatKey,  String status, String message) {
@@ -157,5 +166,13 @@ public class DataImportReport {
 
     public void setParticipateStatus(String participateStatus) {
         this.participateStatus = participateStatus;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
