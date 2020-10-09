@@ -216,18 +216,22 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
     }
 
-    public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf) {
+    public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf,Boolean proccedToSdv) {
         if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
             SdvStatus newSdvStatus = formDataBean.getSdvStatus();
             if(newSdvStatus == null) {
                 if(eventCrf.getSdvStatus() != null) {
                     throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE);
                 }
-            } else if((eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus)) && newSdvStatus.equals(SdvStatus.VERIFIED)) {
-                if (eventCrf == null || !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
-                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION);
-                } else if (eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()) {
-                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED);
+            } else if(newSdvStatus.equals(SdvStatus.VERIFIED)) {
+                if (!proccedToSdv)
+                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE);
+                else if (eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus)) {
+                    if (eventCrf == null || !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                        throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION);
+                    } else if (eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()) {
+                        throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED);
+                    }
                 }
             }
         }

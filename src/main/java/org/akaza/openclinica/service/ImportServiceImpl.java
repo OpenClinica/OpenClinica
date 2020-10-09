@@ -346,6 +346,7 @@ public class ImportServiceImpl implements ImportService {
                                     itemObject = createOrUpdateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm, tenantStudy, studySubject, reasonForChange);
                                 }
                                 catch (OpenClinicaSystemException e){
+                                    proceedToSdv = false;
                                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ITEM_TYPE_KEYWORD, e.getErrorCode(), null, e.getMessage());
                                     dataImportReports.add(dataImportReport);
                                     logger.error("ItemOID {} related issue: ", itemDataBean.getItemOID());
@@ -419,9 +420,7 @@ public class ImportServiceImpl implements ImportService {
 
                         // check if all Forms within this Event is Complete
                         try {
-                            if(!proceedToSdv)
-                                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE);
-                            importValidationService.validateSdvStatus(studySubject, formDataBean, eventCrf);
+                            importValidationService.validateSdvStatus(studySubject, formDataBean, eventCrf, proceedToSdv);
                             Boolean sdvImported = setSdvStatusOnEventCrf(formDataBean, eventCrf, userAccount);
                             if(sdvImported) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(),
