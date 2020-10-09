@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -443,7 +444,7 @@ public class ImportServiceImpl implements ImportService {
                             importSignatures(studyEventDataBean, studyEvent, userAccount);
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD,  ATTESTATIONS_IMPORTED, sdf_logFile.format(new Date()), null);
                             dataImportReports.add(dataImportReport);
-                            if (studyEventDataBean.getSigned() != null && studyEventDataBean.getSigned()) {
+                            if (BooleanUtils.isTrue(studyEventDataBean.getSigned())) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, EVENT_IS_SIGNED, sdf_logFile.format(new Date()), null);
                                 dataImportReports.add(dataImportReport);
                             }
@@ -1575,6 +1576,12 @@ public class ImportServiceImpl implements ImportService {
         auditLogEventType.setAuditLogEventTypeId(65);
         List<SignatureBean> signatureBeans = studyEventDataBean.getSignatures();
         boolean manuallyImportToAuditLog = true;
+        if(BooleanUtils.isNotTrue(studyEventDataBean.getSigned())) {
+            studyEvent.setSigned(false);
+            studyEvent.setUpdateId(userAccount.getUserId());
+            studyEvent.setDateUpdated(new Date());
+            studyEventDao.saveOrUpdate(studyEvent);
+        }
         for(SignatureBean signatureBean: signatureBeans){
 
             String attestationMsg = signatureBean.getAttestation().concat(resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
@@ -1582,7 +1589,7 @@ public class ImportServiceImpl implements ImportService {
             auditLogEvent.setNewValue("false");
 
             //condition to check if this is the last signature bean
-            if(signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) && studyEventDataBean.getSigned() != null && studyEventDataBean.getSigned()){
+            if(signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) && BooleanUtils.isTrue(studyEventDataBean.getSigned())){
                     //Auto-insert to audit_log_event won't get triggered if the signed status and attestation is same
                     if(!studyEvent.isCurrentlySigned() || studyEvent.getAttestation() == null || !studyEvent.getAttestation().equals(attestationMsg))
                         manuallyImportToAuditLog = false;
