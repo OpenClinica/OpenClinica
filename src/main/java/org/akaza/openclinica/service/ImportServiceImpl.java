@@ -373,7 +373,7 @@ public class ImportServiceImpl implements ImportService {
                                         createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean , itemData, null, null, true, dataImportReports, userAccount);
                                     }catch (OpenClinicaSystemException e){
                                         String insertionType = QUERY_TYPE_KEYWORD;
-                                        if(discrepancyNoteBean.getNoteType().equalsIgnoreCase(QueryType.ANNOTATION.getName()))
+                                        if(discrepancyNoteBean.getNoteType() != null && discrepancyNoteBean.getNoteType().equalsIgnoreCase(QueryType.ANNOTATION.getName()))
                                             insertionType = ANNOTATION_TYPE_KEYWORD;
                                         for(ErrorObj err : e.getMultiErrors()){
                                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), insertionType, err.getCode(), null, err.getMessage());
@@ -691,6 +691,8 @@ public class ImportServiceImpl implements ImportService {
 
     private EventCrf saveSdvStatus(EventCrf eventCrf, SdvStatus sdvStatus, UserAccount userAccount){
         eventCrf.setSdvStatus(sdvStatus);
+        if(sdvStatus.equals(SdvStatus.VERIFIED))
+            eventCrf.setLastSdvVerifiedDate(new Date());
         eventCrf.setSdvUpdateId(userAccount.getUserId());
         return saveEventCrf(eventCrf, userAccount);
     }
