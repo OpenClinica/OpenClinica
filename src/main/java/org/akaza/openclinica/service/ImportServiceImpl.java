@@ -230,7 +230,15 @@ public class ImportServiceImpl implements ImportService {
 
                     eventObject = validateStudyEvent(studyEventDataBean, studySubject, userAccount);
                     if (eventObject instanceof ErrorObj) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, EVENT_TYPE_KEYWORD, ((ErrorObj) eventObject).getCode(), null, ((ErrorObj) eventObject).getMessage());
+                        ErrorObj errorObj = (ErrorObj) eventObject;
+                        if(errorObj.getMessage().equals(ErrorConstants.ERR_FORMLAYOUTOID_NOT_FOUND)){
+                            List<FormDataBean> tempformData = studyEventDataBean.getFormData();
+                            String formOid = null;
+                            if(tempformData.size() > 0 && tempformData.get(0).getFormOID() != null)
+                                formOid = tempformData.get(0).getFormOID();
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formOid, null, null, null, FORM_TYPE_KEYWORD, errorObj.getCode(), null, errorObj.getMessage());
+                        } else
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, EVENT_TYPE_KEYWORD, errorObj.getCode(), null, errorObj.getMessage());
                         dataImportReports.add(dataImportReport);
                         logger.error("StudEventOID {} related issue", studyEventDataBean.getStudyEventOID());
                         continue;
