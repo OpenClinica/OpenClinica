@@ -1612,7 +1612,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private void updateSdvStatusIfAlreadyVerified(EventCrf eventCrf, UserAccount userAccount) {
-        if(eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED)){
+        if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED)){
             eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrfDao.saveOrUpdate(eventCrf);
