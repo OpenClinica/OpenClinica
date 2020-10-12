@@ -210,7 +210,7 @@ public class ErrorConstants {
     public static final String ERR_QUERY_STATUS_NOT_APPLICABLE = "errorCode.queryStatusNotApplicable";
     public static final String ERR_NEW_QUERIES_IN_BETWEEN_OLD_QUERIES = "errorCode.newQueryInBetweenOldQueries";
     public static final String ERR_ANNOTATION_MUST_HAVE_ONE_CHILD_NOTE = "errorCode.annotationMustHaveOneChildNote";
-    public static final String ERR_NOTE_ID_ALREADY_IN_USE = "errorCode.noteIdAlreadyinUse";
+    public static final String ERR_NOTE_ID_ALREADY_IN_USE = "errorCode.noteIdAlreadyInUse";
     public static final String ERR_EXISTING_NOTE_ID_ON_OTHER_ITEM = "errorCode.existingNoteIdOnOtherItem";
     public static final String ERR_GENERATING_DISCREPANCY_NOTE_ID = "errorCode.errorGeneratingDiscrepancyNoteId";
     public static final String ERR_MISSING_CHILD_NOTE = "errorCode.missingChildNote";

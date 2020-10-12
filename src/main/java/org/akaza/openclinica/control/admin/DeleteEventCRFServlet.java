@@ -39,6 +39,7 @@ import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -229,6 +230,10 @@ public class DeleteEventCRFServlet extends SecureController {
                 eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
                 eventCRF.setUpdater(ub);
                 eventCRF.setDateCompleted(null);
+                if(eventCRF.getSdvStatus().equals(SdvStatus.VERIFIED)) {
+                    eventCRF.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
+                    eventCRF.setSdvUpdateId(ub.getId());
+                }
                 eventCRFDAO.update(eventCRF);
 
                 if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
