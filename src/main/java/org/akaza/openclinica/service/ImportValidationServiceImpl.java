@@ -270,6 +270,16 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         }
     }
 
+    public void validateItemGroupRemoved(ImportItemGroupDataBean itemGroupDataBean, ItemGroup itemGroup){
+        if(BooleanUtils.isTrue(itemGroupDataBean.isRemoved())){
+            if(!itemGroup.getItemGroupMetadatas().get(0).isRepeatingGroup())
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_NON_REPEATING_ITEMGROUP_CANNOT_BE_REMOVED);
+            int itemGroupRepeatKey = Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey());
+            if (itemGroupRepeatKey <= 1)
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FIRST_REPEATING_ITEMGROUP_CANNOT_BE_REMOVED);
+        }
+    }
+
     public void validateSignatureForStudyEvent(StudyEventDataBean studyEventDataBean, StudyEvent studyEvent, StudySubject studySubject){
         ArrayList<ErrorObj> errors = new ArrayList<>();
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
@@ -302,6 +312,17 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         if(errors.size() > 0){
             throw new OpenClinicaSystemException(FAILED, errors);
         }
+    }
+
+    public static Boolean getStatusAttribute(String statusAttribute){
+        if(statusAttribute == null)
+            return null;
+        else if(statusAttribute.equalsIgnoreCase(STATUS_ATTRIBUTE_FALSE))
+            return false;
+        else if(statusAttribute.equalsIgnoreCase(STATUS_ATTRIBUTE_TRUE))
+            return true;
+        else
+            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_STATUS_ATTRIBUTE_INVALID);
     }
 
     private String validateAndGenerateNewDisplayId(String displayId,boolean parentDn, List errors){

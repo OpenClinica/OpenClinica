@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -159,6 +160,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String ANNOTATION_TYPE_KEYWORD = "bulk_action_log_annotation_type";
     public static final String DetailedNotes = "Update via Import";
     public static final String SDV_STATUS_UPDATED = "Sdv status imported";
+    public static final String ITEMGROUP_REMOVED = "itemGroup removed";
     private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
     private static final String ATTESTATIONS_IMPORTED = "Attestations Imported";
     private static final String EVENT_IS_SIGNED = "Event is Signed";
@@ -392,6 +394,24 @@ public class ImportServiceImpl implements ImportService {
                                 }
 
                             }//itemDataBean for loop
+                            try {
+                                importValidationService.validateItemGroupRemoved(itemGroupDataBean, (ItemGroup) itemGroupObject);
+                                if(BooleanUtils.isTrue(itemGroupDataBean.isRemoved())){
+                                    removeItemGroup(tenantStudy, studySubject, eventCrf, (ItemGroup) itemGroupObject, itemGroupDataBean, userAccount);
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(),
+                                            studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(),
+                                            itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), null, ITEM_GROUP_TYPE_KEYWORD,
+                                            ITEMGROUP_REMOVED, sdf_logFile.format(new Date()), null);
+                                    dataImportReports.add(dataImportReport);
+                                }
+                            }catch (OpenClinicaSystemException e){
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(),
+                                        studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(),
+                                        null, ITEM_GROUP_TYPE_KEYWORD,  e.getErrorCode(), null, e.getMessage());
+                                dataImportReports.add(dataImportReport);
+                                logger.error("ItemGroupOID {} related issue", itemGroupDataBean.getItemGroupOID());
+                            }
+
 
                         } //itemGroupDataBean for loop
 
@@ -1557,6 +1577,19 @@ public class ImportServiceImpl implements ImportService {
 
 
 
+    private void removeItemGroup(Study study, StudySubject studySubject, EventCrf eventCrf, ItemGroup itemGroup, ImportItemGroupDataBean igDataBean, UserAccount userAccount) {
+        List<ItemData> itemDataList = (ArrayList<ItemData>)itemDataDao.findByEventCrfGroup(eventCrf.getEventCrfId(), itemGroup.getItemGroupId());
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(eventCrf.getFormLayout().getCrf().getCrfId()).get(0);
+        for(ItemData itemData : itemDataList){
+            ItemGroupMetadata igm = itemGroupMetadataDao.findByItemCrfVersion(itemData.getItem().getItemId(), crfVersion.getCrfVersionId());
+            if(igm.isRepeatingGroup() && itemData.getOrdinal() == Integer.parseInt(igDataBean.getItemGroupRepeatKey()) && !itemData.isDeleted()){
+                itemData.setDeleted(true);
+                updateItemData(itemData, userAccount, itemData.getValue());
+                queryService.closeItemDiscrepancyNotesForItemData(study, userAccount, studySubject, itemData);
+                logger.debug("Updating Item Data Id {}", itemData.getItemDataId());
+            }
+        }
+    }
     public void updateEventAndSubjectStatusIfSigned(StudyEvent studyEvent, StudySubject studySubject, UserAccount userAccount) {
         if (studyEvent.isCurrentlySigned()) {
             studyEvent.setSigned(Boolean.FALSE);
