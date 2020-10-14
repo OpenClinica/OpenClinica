@@ -306,12 +306,12 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_TEXT_TOO_LONG));
             else if (!signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) || !eventNeedsToBeSigned) {
                 String attestationMsg = signatureBean.getAttestation().concat(resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
-                if (!auditLogEventDao.findSignedEventAuditLogByAttestation(attestationMsg).isEmpty())
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_ALREADY_EXIST_IN_SYSTEM));
+                if (!auditLogEventDao.findSignedEventAuditLogByAttestation(studyEvent, attestationMsg).isEmpty())
+                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_ALREADY_EXIST_IN_EVENT));
             }
         }
         if (eventNeedsToBeSigned && !studyEventService.isEventSignable(studyEvent, studySubject))
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_IS_NOT_ELLIGIBLE_TO_BE_SIGNED));
+            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_IS_NOT_ELIGIBLE_TO_BE_SIGNED));
 
         if(errors.size() > 0){
             throw new OpenClinicaSystemException(FAILED, errors);

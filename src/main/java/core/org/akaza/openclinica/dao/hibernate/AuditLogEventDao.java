@@ -2,6 +2,7 @@ package core.org.akaza.openclinica.dao.hibernate;
 
 import core.org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
+import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.hibernate.query.Query;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,11 +68,12 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
         return (T) q.list();
     }
 
-    public List<AuditLogEvent> findSignedEventAuditLogByAttestation(String attestation){
-        String query = "from " + getDomainClassName() + " do where do.entityName = :entityName and do.auditTable=:auditTable and do.details=:attestation";
+    public List<AuditLogEvent> findSignedEventAuditLogByAttestation(StudyEvent studyEvent, String attestation){
+        String query = "from " + getDomainClassName() + " do where do.entityName = :entityName and do.auditTable=:auditTable and do.details=:attestation and do.entityId=:event_id";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("entityName", "Signed");
         q.setParameter("auditTable", "study_event");
+        q.setParameter("event_id", studyEvent.getStudyEventId());
         q.setParameter("attestation", attestation);
         return (List<AuditLogEvent>) q.list();
     }
