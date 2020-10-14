@@ -223,7 +223,6 @@ public class ErrorConstants {
     public static final String ERR_EVENT_IS_NOT_ELIGIBLE_TO_BE_SIGNED = "errorCode.eventIsNotEligibleToBeSigned";
     public static final String ERR_ATTESTATION_IS_MISSING = "errorCode.attestationIsMissing";
     public static final String ERR_ATTESTATION_TEXT_TOO_LONG = "errorCode.attestationTextTooLong";
-    public static final String ERR_ATTESTATION_ALREADY_EXIST_IN_EVENT = "errorCode.attestationAlreadyExistsInEvent";
     public static final String ERR_STATUS_ATTRIBUTE_INVALID = "errorCode.statusAttributeIsInvalid";
     public static final String ERR_ITEMGROUP_REMOVED_ATTRIBUTE_INVALID = "errorCode.itemGroupRemovedAttributeIsInvalid";
     public static final String ERR_FIRST_REPEATING_ITEMGROUP_CANNOT_BE_REMOVED = "errorCode.firstRepeatingGroupCannotBeRemoved";
