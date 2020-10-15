@@ -1393,7 +1393,17 @@ public class ImportServiceImpl implements ImportService {
 
         errorObj = validateItemGroupRepeat(eventCrf, itemGroupDataBean, itemGroup);
         if (errorObj != null) return errorObj;
-
+        Boolean isRemovedGroup = false;
+        List<Item> itemsInGroup= itemDao.findByItemGroupCrfVersionOrdered(itemGroup.getItemGroupId(), eventCrf.getCrfVersion().getCrfVersionId());
+        for(Item item : itemsInGroup){
+            ItemData itemData  = itemDataDao.findByItemEventCrfOrdinalIncludeDeleted(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            if(itemData != null && BooleanUtils.isTrue(itemData.isDeleted())) {
+                isRemovedGroup = true;
+                break;
+            }
+        }
+        if(isRemovedGroup)
+            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUP_IS_ALREADY_REMOVED);
         return itemGroup;
     }
 
