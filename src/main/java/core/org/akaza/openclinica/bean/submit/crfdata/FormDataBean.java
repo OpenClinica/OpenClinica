@@ -12,7 +12,6 @@ import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 
 public class FormDataBean {
-    private static final String SDV_NEVER_VERIFIED="Never Verified";
     private ArrayList<ImportItemGroupDataBean> itemGroupData;
     private AuditLogsBean auditLogs;
     private DiscrepancyNotesBean discrepancyNotes;
@@ -161,8 +160,6 @@ public class FormDataBean {
         SdvStatus sdvStatus = SdvStatus.getByI18nDescription(getSdvStatusString());
         if(sdvStatus != null)
             return sdvStatus;
-        else if(sdvStatus == null && getSdvStatusString().equalsIgnoreCase(SDV_NEVER_VERIFIED))
-            return null;
         else
             throw new OpenClinicaSystemException("FAILED", ErrorConstants.ERR_SDV_STATUS_NOT_VALID);
     }

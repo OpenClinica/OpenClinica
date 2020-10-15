@@ -217,7 +217,7 @@ public class ErrorConstants {
     public static final String ERR_MISSING_CHILD_NOTE = "errorCode.missingChildNote";
     public static final String ERR_FORM_STATUS_SHOULD_BE_COMPLETE_FOR_SDV_VERIFICATION = "errorCode.formStatusShouldBeCompleteForSettingSdvVerifiedStatus";
     public static final String ERR_SDV_STATUS_NOT_VALID = "errorCode.sdvStatusNotValid";
-    public static final String ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE = "errorCode.neverVerifiedSdvStatusNotAvailable";
+    public static final String ERR_SDV_STATUS_NOT_APPLICABLE = "errorCode.sdvStatusNotApplicable";
     public static final String ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED = "errorCode.formWithRemovedOrArchivedAttributeCannotBeSdvVerified";
     public static final String ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE = "errorCode.sdvStatusCannotBeUpdatedBecauseOfItemImportFailure";
     public static final String ERR_SIGNED_STATUS_INVALID = "errorCode.signedStatusIsInvalid";
