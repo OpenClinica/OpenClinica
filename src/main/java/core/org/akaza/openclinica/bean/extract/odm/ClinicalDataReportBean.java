@@ -941,7 +941,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d) + "\" ");
                     }
                 }
-                if (cn.getOwnerUserName() != "") {
+                if (!StringUtils.isEmpty(cn.getOwnerUserName())) {
                     String ownerUserName = cn.getOwnerUserName();
                     if (ownerUserName.length() > 0) {
                         xml.append("UserName=\"" + ownerUserName + "\" ");
