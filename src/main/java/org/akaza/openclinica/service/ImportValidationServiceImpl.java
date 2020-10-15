@@ -60,7 +60,6 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     public static final String QUERY_KEYWORD = "Query";
     private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
     private static final String STATUS_ATTRIBUTE_FALSE = "No";
-    private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
     private boolean isQueryNewStatusValid;
     private boolean isQueryUpdatedStatusValid;
     private boolean isQueryClosedStatusValid;
@@ -304,14 +303,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_IS_MISSING));
             else if (signatureBean.getAttestation().length() > 1000)
                 errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_TEXT_TOO_LONG));
-            else if (!signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) || !eventNeedsToBeSigned) {
-                String attestationMsg = signatureBean.getAttestation().concat(resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
-                if (!auditLogEventDao.findSignedEventAuditLogByAttestation(attestationMsg).isEmpty())
-                    errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_ATTESTATION_ALREADY_EXIST_IN_SYSTEM));
-            }
         }
         if (eventNeedsToBeSigned && !studyEventService.isEventSignable(studyEvent, studySubject))
-            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_IS_NOT_ELLIGIBLE_TO_BE_SIGNED));
+            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_IS_NOT_ELIGIBLE_TO_BE_SIGNED));
 
         if(errors.size() > 0){
             throw new OpenClinicaSystemException(FAILED, errors);

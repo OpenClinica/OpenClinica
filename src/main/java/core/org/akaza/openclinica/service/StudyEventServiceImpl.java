@@ -40,6 +40,7 @@ import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.kafka.common.metrics.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1026,6 +1027,10 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
                 collect(Collectors.toList());
 
         for (EventDefinitionCrf requiredEventDefinitionCrf : requiredEventDefinitionCrfs){
+            //archived eventCrf is skipped checking
+            if(requiredEventDefinitionCrf.getStatusId().equals(core.org.akaza.openclinica.domain.Status.DELETED.getCode()) ||
+                    requiredEventDefinitionCrf.getStatusId().equals(core.org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()))
+                continue;
             boolean requiredFound = false;
             for (EventCrf existingEventCrf : existingEventCrfs){
                 if (existingEventCrf.getCrfVersion().getCrf().getCrfId() == requiredEventDefinitionCrf.getCrf().getCrfId()){

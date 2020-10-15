@@ -147,6 +147,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String NO_CHANGE = "No Change";
     public static final String SKIPPED = "Skipped";
     public static final String ITEMDATA_SKIPPED_MSG = "No item value present";
+    public static final String SIGNATURE_SKIPPED_MSG = "Attestation already exists in event";
     public static final String DiscrepancyNoteMessage = "import XML";
 
     public static final String PARTICIPANT_TYPE_KEYWORD = "bulk_action_log_participanct_type";
@@ -468,9 +469,11 @@ public class ImportServiceImpl implements ImportService {
                     try{
                         if(studyEventDataBean.getSignatures() != null) {
                             importValidationService.validateSignatureForStudyEvent(studyEventDataBean, studyEvent, studySubject);
-                            importSignatures(studyEventDataBean, studyEvent, userAccount);
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD,  ATTESTATIONS_IMPORTED, sdf_logFile.format(new Date()), null);
-                            dataImportReports.add(dataImportReport);
+                            Boolean signaturesImported = importSignatures(studyEventDataBean, studyEvent, userAccount, dataImportReports);
+                            if(signaturesImported) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, ATTESTATIONS_IMPORTED, sdf_logFile.format(new Date()), null);
+                                dataImportReports.add(dataImportReport);
+                            }
                             if (BooleanUtils.isTrue(studyEventDataBean.getSigned())) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, EVENT_IS_SIGNED, sdf_logFile.format(new Date()), null);
                                 dataImportReports.add(dataImportReport);
@@ -1612,51 +1615,50 @@ public class ImportServiceImpl implements ImportService {
         return studyEvent;
     }
 
-    public void importSignatures(StudyEventDataBean studyEventDataBean, StudyEvent studyEvent, UserAccount userAccount){
+    public Boolean importSignatures(StudyEventDataBean studyEventDataBean, StudyEvent studyEvent, UserAccount userAccount, List<DataImportReport> dataImportReports){
+        Boolean signaturesImported = false;
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(Locale.ENGLISH);
         AuditLogEventType auditLogEventType = new AuditLogEventType();
         auditLogEventType.setAuditLogEventTypeId(65);
         List<SignatureBean> signatureBeans = studyEventDataBean.getSignatures();
         boolean manuallyImportToAuditLog = true;
-        if(BooleanUtils.isNotTrue(studyEventDataBean.getSigned())) {
-            studyEvent.setSigned(false);
-            studyEvent.setUpdateId(userAccount.getUserId());
-            studyEvent.setDateUpdated(new Date());
-            studyEventDao.saveOrUpdate(studyEvent);
-        }
         for(SignatureBean signatureBean: signatureBeans){
 
-            String attestationMsg = signatureBean.getAttestation().concat(resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
+            String attestationMsg = signatureBean.getAttestation().concat(" " + resword.getString(IMPORT_SIGNATURE_POSTFIX_KEYWORD));
             AuditLogEvent auditLogEvent = new AuditLogEvent();
-            auditLogEvent.setNewValue("false");
 
             //condition to check if this is the last signature bean
             if(signatureBean.equals(signatureBeans.get(signatureBeans.size()-1)) && BooleanUtils.isTrue(studyEventDataBean.getSigned())){
                     //Auto-insert to audit_log_event won't get triggered if the signed status and attestation is same
                     if(!studyEvent.isCurrentlySigned() || studyEvent.getAttestation() == null || !studyEvent.getAttestation().equals(attestationMsg))
                         manuallyImportToAuditLog = false;
-                    else {
-                        auditLogEvent.setNewValue("true");
-                        if(studyEvent.getSigned() != null)
-                            auditLogEvent.setOldValue(studyEvent.getSigned().toString());
-                    }
                     studyEvent.setAttestation(attestationMsg);
                     studyEvent.setSigned(true);
                     studyEvent.setUpdateId(userAccount.getUserId());
                     studyEvent.setDateUpdated(new Date());
                     studyEventDao.saveOrUpdate(studyEvent);
+            } else if(!auditLogEventDao.findSignedEventAuditLogByAttestation(studyEvent, attestationMsg).isEmpty()) {
+                DataImportReport dataImportReport = new DataImportReport(studyEvent.getStudySubject().getOcOid(), studyEvent.getStudySubject().getLabel(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, SKIPPED, null, SIGNATURE_SKIPPED_MSG);
+                dataImportReports.add(dataImportReport);
+                continue;
             }
             if(manuallyImportToAuditLog) {
                 auditLogEvent.setAuditDate(new Date());
                 auditLogEvent.setAuditTable("study_event");
                 auditLogEvent.setUserAccount(userAccount);
+                if(studyEvent.getSigned() != null){
+                    auditLogEvent.setOldValue(studyEvent.getSigned().toString());
+                    auditLogEvent.setNewValue(studyEvent.getSigned().toString());
+                }
                 auditLogEvent.setEntityId(studyEvent.getStudyEventId());
                 auditLogEvent.setEntityName("Signed");
                 auditLogEvent.setAuditLogEventType(auditLogEventType);
                 auditLogEvent.setDetails(attestationMsg);
                 auditLogEventDao.saveOrUpdate(auditLogEvent);
+                signaturesImported = true;
             }
         }
+        return signaturesImported;
     }
 
     private void updateSdvStatusIfAlreadyVerified(EventCrf eventCrf, UserAccount userAccount) {
