@@ -1506,7 +1506,7 @@ public class ImportServiceImpl implements ImportService {
                 insertionType = ANNOTATION_TYPE_KEYWORD;
             DataImportReport dataImportReport =  new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(),
                     eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid(), eventCrf.getStudyEvent().getSampleOrdinal().toString(),
-                    eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, insertionType ,discNote.getDisplayId()+" "+INSERTED, sdf_logFile.format(new Date()),  null);
+                    eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, insertionType, INSERTED, sdf_logFile.format(new Date()),  discNote.getDisplayId());
             dataImportReports.add(dataImportReport);
         }
         if (isParentDn) {
@@ -1524,7 +1524,7 @@ public class ImportServiceImpl implements ImportService {
                             insertionType = ANNOTATION_TYPE_KEYWORD;
                         DataImportReport dataImportReport =  new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(),
                                 eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid(), eventCrf.getStudyEvent().getSampleOrdinal().toString(),
-                                eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, insertionType,discNote.getDisplayId()+" "+UPDATED, sdf_logFile.format(new Date()),  null);
+                                eventCrf.getFormLayout().getCrf().getOcOid(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemOid, insertionType, UPDATED, sdf_logFile.format(new Date()),  discNote.getDisplayId());
                         dataImportReports.add(dataImportReport);
                     }
                 }
