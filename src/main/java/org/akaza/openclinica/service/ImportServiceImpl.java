@@ -320,7 +320,7 @@ public class ImportServiceImpl implements ImportService {
                             logger.error("EventCrf {} related issue", formDataBean.getFormOID());
                             continue;
                         }
-
+                        studyEvent.addEventCrf(eventCrf);
 
                         ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
 
@@ -737,9 +737,9 @@ public class ImportServiceImpl implements ImportService {
 
     public EventCrf saveEventCrf(EventCrf eventCrf, UserAccount userAccount){
         // only created new event crf once
-        if (eventCrf.getEventCrfId() == 0) {
-            if(eventCrf.getStudyEvent().getStudyEventId() == 0)
-            {
+        if (eventCrf.getEventCrfId() == 0)
+        {
+            if(eventCrf.getStudyEvent().getStudyEventId() == 0) {
                 eventCrf.setStudyEvent(studyEventDao.saveOrUpdate(eventCrf.getStudyEvent()));
             }
             updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);

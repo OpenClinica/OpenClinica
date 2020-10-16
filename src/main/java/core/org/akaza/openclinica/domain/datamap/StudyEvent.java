@@ -1,6 +1,7 @@
 package core.org.akaza.openclinica.domain.datamap;
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -329,6 +330,15 @@ public class StudyEvent extends DataMapDomainObject  {
 		if (this.isCurrentlySigned())
 			eventStatusValue = eventStatusValue + COMMA + SIGNED.toLowerCase();
 		return eventStatusValue;
+	}
+	
+	@Transient
+	public void addEventCrf(EventCrf eventCrf){
+		if(this.eventCrfs == null)
+			this.eventCrfs = new ArrayList<>();
+		if(!this.getEventCrfs().contains(eventCrf)){
+			this.eventCrfs.add(eventCrf);
+		}
 	}
 
 }
