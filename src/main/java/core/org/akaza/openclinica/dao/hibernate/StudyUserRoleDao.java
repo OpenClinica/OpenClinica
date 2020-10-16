@@ -59,4 +59,12 @@ public class StudyUserRoleDao extends CompositeIdAbstractDomainDao<StudyUserRole
         int modifications = query.executeUpdate();
         return modifications;
     }
+
+    public ArrayList<StudyUserRole> findAllUserRolesByStudyId(int studyId) {
+        String query = "select sur from " + getDomainClassName()
+                + "  sur where status_id=1  AND study_id in (select studyId from Study s where s.studyId =:studyId OR s.study.studyId=:studyId)";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", studyId);
+        return (ArrayList<StudyUserRole>) q.list();
+    }
 }
