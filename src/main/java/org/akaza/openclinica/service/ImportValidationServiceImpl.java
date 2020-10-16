@@ -216,13 +216,12 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     }
 
     public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf,Boolean proccedToSdv) {
-        if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
+        if(formDataBean.getSdvStatusString() != null) {
             SdvStatus newSdvStatus = formDataBean.getSdvStatus();
             if(newSdvStatus == null) {
-                if(eventCrf.getSdvStatus() != null) {
-                    throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_NEVER_VERIFIED_SDV_STATUS_NOT_AVAILABLE);
-                }
-            } else if(newSdvStatus.equals(SdvStatus.VERIFIED)) {
+                return;
+            }
+            if(newSdvStatus.equals(SdvStatus.VERIFIED)) {
                 if (!proccedToSdv)
                     throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE);
                 else if (eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus)) {
@@ -231,8 +230,15 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                     } else if (eventCrf.isCurrentlyRemoved() || eventCrf.isCurrentlyArchived()) {
                         throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_FORM_WITH_REMOVED_OR_ARCHIVED_ATTRIBUTE_CANNOT_BE_SDV_VERIFIED);
                     }
+                } else {
+                    throw new OpenClinicaSystemException(NO_CHANGE, "");
                 }
             }
+            else if(eventCrf.getSdvStatus() == null || (!newSdvStatus.equals(eventCrf.getSdvStatus()) &&
+                    !(eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED) && newSdvStatus.equals(SdvStatus.NOT_VERIFIED))))
+                throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_NOT_APPLICABLE);
+            else if(newSdvStatus.equals(eventCrf.getSdvStatus()))
+                throw new OpenClinicaSystemException(NO_CHANGE, "");
         }
     }
 

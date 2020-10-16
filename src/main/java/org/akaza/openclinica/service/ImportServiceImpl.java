@@ -160,7 +160,6 @@ public class ImportServiceImpl implements ImportService {
     public static final String QUERY_TYPE_KEYWORD = "bulk_action_log_query_type";
     public static final String ANNOTATION_TYPE_KEYWORD = "bulk_action_log_annotation_type";
     public static final String DetailedNotes = "Update via Import";
-    public static final String SDV_STATUS_UPDATED = "Sdv status imported";
     public static final String ITEMGROUP_REMOVED = "itemGroup removed";
     private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
     private static final String ATTESTATIONS_IMPORTED = "Attestations Imported";
@@ -455,7 +454,7 @@ public class ImportServiceImpl implements ImportService {
                             if(sdvImported) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(),
                                         studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(),
-                                        null, null, null, SDV_TYPE_KEYWORD, SDV_STATUS_UPDATED, sdf_logFile.format(new Date()), null);
+                                        null, null, null, SDV_TYPE_KEYWORD, UPDATED, sdf_logFile.format(new Date()), null);
                                 dataImportReports.add(dataImportReport);
                             }
                         }catch (OpenClinicaSystemException e) {
@@ -1354,7 +1353,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     public boolean setSdvStatusOnEventCrf(FormDataBean formDataBean, EventCrf eventCrf, UserAccount userAccount){
-        if(StringUtils.isNotBlank(formDataBean.getSdvStatusString())) {
+        if(formDataBean.getSdvStatusString() != null) {
             SdvStatus newSdvStatus = formDataBean.getSdvStatus();
             if (newSdvStatus != null && (eventCrf.getSdvStatus() == null || !eventCrf.getSdvStatus().equals(newSdvStatus))) {
                 if (newSdvStatus.equals(SdvStatus.VERIFIED)) {
