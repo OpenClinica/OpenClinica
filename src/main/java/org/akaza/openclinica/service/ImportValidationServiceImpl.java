@@ -343,7 +343,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
                 return true;
             if (currResolutionStatus.equals(ResolutionStatus.CLOSED) && isQueryClosedStatusValid)
                 return true;
-            if (currResolutionStatus.equals(ResolutionStatus.CLOSED_MODIFIED) && isQueryClosedStatusValid)
+            if (currResolutionStatus.equals(ResolutionStatus.CLOSED_MODIFIED) && isQueryClosedModifiedStatusValid)
                 return true;
         }
         return false;
