@@ -313,11 +313,7 @@ public class ImportServiceImpl implements ImportService {
                             logger.error("EventCrf {} related issue", formDataBean.getFormOID());
                             continue;
                         }
-                        if(studyEvent.getEventCrfs() == null)
-                            studyEvent.setEventCrfs(new ArrayList<>());
-                        if(!studyEvent.getEventCrfs().contains(eventCrf)){
-                            studyEvent.getEventCrfs().add(eventCrf);
-                        }
+                        studyEvent.addEventCrf(eventCrf);
 
                         ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
 
