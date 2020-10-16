@@ -130,6 +130,9 @@ public class ImportServiceImpl implements ImportService {
     @Autowired
     private AuditLogEventDao auditLogEventDao;
 
+    @Autowired
+    private StudyUserRoleDao studyUserRoleDao;
+
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
     public static final String SEPERATOR = ",";
@@ -175,6 +178,10 @@ public class ImportServiceImpl implements ImportService {
     public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
         ResourceBundleProvider.updateLocale(Locale.ENGLISH);
         CoreResources.setRequestSchema(schema);
+        List<StudyUserRole> accepatableUserRoles = new ArrayList<>();
+        Study publicStudy = studyDao.findPublicStudy(studyOid);
+        accepatableUserRoles.addAll(studyUserRoleDao.findAllUserRolesByStudyId(publicStudy.getStudyId()));
+
         Study tenantStudy;
         if (siteOid != null) {
             tenantStudy = studyDao.findByOcOID(siteOid);
@@ -219,6 +226,7 @@ public class ImportServiceImpl implements ImportService {
                 }
 
                 tenantStudy = studySubject.getStudy();
+                Study publicStudySubjectsStudy = studyDao.findPublicStudy(studySubject.getStudy().getOc_oid());
 
                 ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
                 for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
@@ -381,7 +389,7 @@ public class ImportServiceImpl implements ImportService {
                                 ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
                                 for(DiscrepancyNoteBean discrepancyNoteBean : itemDataBean.getDiscrepancyNotes().getDiscrepancyNotes()){
                                     try {
-                                        importValidationService.validateQuery(discrepancyNoteBean, itemData);
+                                        importValidationService.validateQuery(discrepancyNoteBean, itemData, publicStudySubjectsStudy, accepatableUserRoles);
                                         createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean , itemData, null, null, true, dataImportReports, userAccount);
                                     }catch (OpenClinicaSystemException e){
                                         String insertionType = QUERY_TYPE_KEYWORD;

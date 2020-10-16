@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ImportValidationService {
 
-    void validateQuery(DiscrepancyNoteBean discrepancyNotesBean,ItemData itemData);
+    void validateQuery(DiscrepancyNoteBean discrepancyNotesBean,ItemData itemData, Study publicStudySubjectsStudy, List<StudyUserRole> accepatableUserRoles);
 
     void validateItem(ImportItemDataBean itemDataBean, CrfBean crf, ImportItemGroupDataBean itemGroupDataBean, ItemCountInForm itemCountInForm);
 

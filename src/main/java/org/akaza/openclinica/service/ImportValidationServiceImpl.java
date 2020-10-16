@@ -29,6 +29,7 @@ import javax.management.Query;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("importValidationService")
 public class ImportValidationServiceImpl implements ImportValidationService{
@@ -65,7 +66,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     private boolean isQueryClosedStatusValid;
     private boolean isQueryClosedModifiedStatusValid;
 
-    public void validateQuery(DiscrepancyNoteBean discrepancyNoteBean, ItemData itemData){
+    public void validateQuery(DiscrepancyNoteBean discrepancyNoteBean, ItemData itemData, Study publicStudySubjectsStudy, List<StudyUserRole> accepatableUserRoles){
         ArrayList<ErrorObj> errors = new ArrayList<>();
         isQueryNewStatusValid = true;
         isQueryUpdatedStatusValid = false;
@@ -113,9 +114,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             }
             if(childNoteBean.getOwnerUserName() == null)
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_MISSING_USER_NAME)));
-            else if(!isUserExist(childNoteBean.getOwnerUserName()))
+            else if(!isUserExist(childNoteBean.getOwnerUserName(), publicStudySubjectsStudy, accepatableUserRoles))
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_USER_NOT_VALID)));
-            if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName()))
+            if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName(), publicStudySubjectsStudy, accepatableUserRoles))
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_ASSIGNED_USER_NOT_VALID)));
             if(StringUtils.isBlank(childNoteBean.getDetailedNote()))
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_DETAILED_NOTE_MISSING)));
@@ -361,10 +362,18 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         return false;
     }
 
-    private boolean isUserExist(String username){
-        if(userAccountDao.findByUserName(username)!= null)
-            return true;
-        return false;
+    private boolean isUserExist(String username, Study publicStudySubjectsStudy, List<StudyUserRole> accepatableUserRoles){
+        List<StudyUserRole> filteredUserRoles = accepatableUserRoles.stream().filter(studyUserRole -> {
+            Boolean userHaveAccessToStudySubject = studyUserRole.getId().getStudyId() == publicStudySubjectsStudy.getStudyId();
+            Boolean userHaveAccessToStudySubjectsParentStudy = publicStudySubjectsStudy.isSite() && studyUserRole.getId().getStudyId() == publicStudySubjectsStudy.getStudy().getStudyId();
+            
+            if(studyUserRole.getId().getUserName().equals(username) && (userHaveAccessToStudySubject || userHaveAccessToStudySubjectsParentStudy))
+                return true;
+            return false;
+        }).collect(Collectors.toList());
+        if(filteredUserRoles.isEmpty())
+            return false;
+        return true;
     }
     public void setResolutionStatusForCheckingChildNotesValidity(String resolutionStatus){
         if(resolutionStatus != null) {
