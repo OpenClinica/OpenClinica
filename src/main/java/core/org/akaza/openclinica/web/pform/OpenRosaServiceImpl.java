@@ -8,7 +8,9 @@ import core.org.akaza.openclinica.service.OCUserRoleDTO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import org.akaza.openclinica.service.UserService;
 import org.apache.commons.lang.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +35,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service("openRosaService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class OpenRosaServiceImpl implements OpenRosaService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private String accessToken;
-    private final int USERLIST_TIMEOUT = 3000;
 
     @Autowired
     OpenRosaXMLUtil openRosaXMLUtil;
@@ -47,6 +49,8 @@ public class OpenRosaServiceImpl implements OpenRosaService {
     PermissionService permissionService;
     @Autowired
     private KeycloakClientImpl keycloakClient;
+    @Autowired
+    private UserService userService;
 
     private static final String AUTH0_ERROR_MESSAGE_ATTRIBUTE = "message";
     public static final String AUTH0_CALL_FAILED = "errorCode.auth0CallFailed";
@@ -68,13 +72,13 @@ public class OpenRosaServiceImpl implements OpenRosaService {
 
     public String getUserListFromUserService(StudyAndSiteEnvUuid studyAndSiteEnvUuid) throws Exception {
 
-        List<OCUserRoleDTO> userList = getOcUserRoleDTOs(studyAndSiteEnvUuid.studyEnvUuid);
+        List<OCUserDTO> userList = userService.getfilteredOCUsersDTOFromUserService(studyAndSiteEnvUuid, accessToken);
         return getUsersAsXml(userList, studyAndSiteEnvUuid);
     }
 
     public OCUserDTO fetchUserInfoFromUserService(StudyAndSiteEnvUuid studyAndSiteEnvUuid, String username) throws Exception {
 
-        List<OCUserRoleDTO> userList = getOcUserRoleDTOs(studyAndSiteEnvUuid.studyEnvUuid);
+        List<OCUserRoleDTO> userList = userService.getOcUserRoleDTOsFromUserService(studyAndSiteEnvUuid.studyEnvUuid, accessToken);
         for (OCUserRoleDTO ocUser : userList) {
             List<StudyEnvironmentRoleDTO> roles = ocUser.getRoles();
             OCUserDTO userInfo = ocUser.getUserInfo();
@@ -84,74 +88,16 @@ public class OpenRosaServiceImpl implements OpenRosaService {
         return null;
     }
 
-
-    public List<OCUserRoleDTO> getOcUserRoleDTOs(String studyEnvUuid) {
-        Supplier<ResponseEntity<List<OCUserRoleDTO>>> getUserList = () -> {
-
-            String baseUrl = CoreResources.getField("SBSBaseUrl");
-
-            String uri = baseUrl+"/user-service/api/study-environments/" + studyEnvUuid + "/users-with-roles" + "?page=0&size=1000";
-
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            if (StringUtils.isEmpty(accessToken))
-                accessToken = keycloakClient.getSystemToken();
-            headers.add("Authorization", "Bearer " + accessToken);
-            headers.add("Accept-Charset", "UTF-8");
-            HttpEntity<String> entity = new HttpEntity<String>(headers);
-            List<HttpMessageConverter<?>> converters = new ArrayList<>();
-            MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-            jsonConverter.setObjectMapper(objectMapper);
-            converters.add(jsonConverter);
-            restTemplate.setMessageConverters(converters);
-            Instant start = Instant.now();
-            ResponseEntity<List<OCUserRoleDTO>> response =
-                    restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserRoleDTO>>() {});
-            Instant end = Instant.now();
-            logger.info("***** Time execution for {} method : {}   *****", new Object() {
-            }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
-            // to test the future.complete(null)
-            //throw new RuntimeException("***UserList failed");
-            return response;
-
-        };
-        return callManagementApi(getUserList);
-    }
-
-    private String getUsersAsXml(List<OCUserRoleDTO> userServiceList, StudyAndSiteEnvUuid studyAndSiteEnvUuid) throws Exception {
+    private String getUsersAsXml(List<OCUserDTO> userList, StudyAndSiteEnvUuid studyAndSiteEnvUuid) throws Exception {
         Document doc = openRosaXMLUtil.buildDocument();
         Element root = openRosaXMLUtil.appendRootElement(doc);
-        List<OCUserDTO> userList = new ArrayList<>();
 
-        if (userServiceList == null)
+        if (userList == null)
             return null;
-        for (OCUserRoleDTO ocUser : userServiceList) {
-            List<StudyEnvironmentRoleDTO> roles = ocUser.getRoles();
-            OCUserDTO userInfo = ocUser.getUserInfo();
-            if (userInfo.getStatus() != UserStatus.ACTIVE)
-                continue;
-            if (userInfo.getUsername().equals("root"))
-                continue;
-            for (StudyEnvironmentRoleDTO role : roles) {
-                boolean include = true;
-                if (StringUtils.isNotEmpty(studyAndSiteEnvUuid.siteEnvUuid)) {
-                    include = false;
-                    if (StringUtils.isEmpty(role.getSiteUuid()) || (StringUtils.equals(role.getSiteUuid(), studyAndSiteEnvUuid.siteEnvUuid)))
-                        include = true;
-                } else {
-                    // site level users are anot be dded if the participant is not at the site level
-                    if (StringUtils.isNotEmpty(role.getSiteUuid())) {
-                        include = false;
-                    }
-                }
-                if (include) {
-                    userList.add(userInfo);
-                }
-            }
-        }
+        userList = userList.stream().filter(ocUserDTO -> !ocUserDTO.getUsername().equals("root")).collect(Collectors.toList());
+
+        if (userList == null)
+            return null;
         Collections.sort(userList, Comparator.comparing(OCUserDTO::getLastName));
         userList.forEach(userInfo -> {
             Element item = doc.createElement("item");
@@ -174,54 +120,5 @@ public class OpenRosaServiceImpl implements OpenRosaService {
         return writer;
     }
 
-    /**
-     * This method calls the given supplier and if the API call returns a 401 (because of expired token), it will
-     * re-initialize the token and call the API again with the new token.
-     * @param supplier the response type
-     * @return the response entity list if successful, otherwise logs an exception and returns null.
-     */
-    public  <T> List<T>  callManagementApi(Supplier<ResponseEntity<List<T>>> supplier) {
-        ResponseEntity<List<T>> response;
-
-        CompletableFuture<ResponseEntity<List<T>>> future
-                = CompletableFuture.supplyAsync(supplier);
-
-        try {
-            String timeoutStr = CoreResources.getField("queryUserListServiceTimeout");
-            response = future.get(USERLIST_TIMEOUT, TimeUnit.MILLISECONDS);
-        }  catch(TimeoutException e) {
-            logger.error("User Service Timeout", "User service did not respond within allocated time");
-            return null;
-        } catch (Exception e) {
-            Throwable t = e.getCause();
-            logger.error("Exception:" + t);
-            if (t instanceof HttpClientErrorException) {
-                HttpClientErrorException ex = (HttpClientErrorException) t;
-                if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-                    logger.error("**********Auth0 access token expired. Creating a new one.");
-                    accessToken =keycloakClient.getSystemToken();
-                    logger.error("*********Calling the api again with the new token.");
-                    response = supplier.get();
-                } else {
-                    // for all other 4xx errors, extract the error message from Auth0 and throw a 400 error
-                    String errorResponse = ex.getResponseBodyAsString();
-                    logger.error(AUTH0_CALL_FAILED, errorResponse);
-                    return null;
-                }
-            } else {
-                String errorResponse = e.getMessage();
-                logger.error(AUTH0_CALL_FAILED, errorResponse);
-                return null;
-            }
-
-        }
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new CustomParameterizedException(AUTH0_CALL_FAILED, response.getStatusCode().getReasonPhrase());
-        }
-
-        return response.getBody();
-
-    }
 
 }

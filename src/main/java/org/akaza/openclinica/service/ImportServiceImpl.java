@@ -7,8 +7,10 @@ import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.JobService;
+import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
@@ -130,9 +132,6 @@ public class ImportServiceImpl implements ImportService {
     @Autowired
     private AuditLogEventDao auditLogEventDao;
 
-    @Autowired
-    private StudyUserRoleDao studyUserRoleDao;
-
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
     public static final String SEPERATOR = ",";
@@ -174,12 +173,9 @@ public class ImportServiceImpl implements ImportService {
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
-    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
+    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport, String accessToken) {
         ResourceBundleProvider.updateLocale(Locale.ENGLISH);
         CoreResources.setRequestSchema(schema);
-        List<StudyUserRole> accepatableUserRoles = new ArrayList<>();
-        Study publicStudy = studyDao.findPublicStudy(studyOid);
-        accepatableUserRoles.addAll(studyUserRoleDao.findAllUserRolesByStudyId(publicStudy.getStudyId()));
 
         Study tenantStudy;
         if (siteOid != null) {
@@ -225,7 +221,13 @@ public class ImportServiceImpl implements ImportService {
                 }
 
                 tenantStudy = studySubject.getStudy();
-                Study publicStudySubjectsStudy = studyDao.findPublicStudy(studySubject.getStudy().getOc_oid());
+                StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
+                if(tenantStudy.isSite()) {
+                    studyAndSiteEnvUuid.setSiteEnvUuid(tenantStudy.getStudyEnvSiteUuid());
+                    studyAndSiteEnvUuid.setStudyEnvUuid(tenantStudy.getStudy().getStudyEnvUuid());
+                }else
+                    studyAndSiteEnvUuid.setStudyEnvUuid(tenantStudy.getStudyEnvUuid());
+                List<OCUserDTO> acceptedUsers = userService.getfilteredOCUsersDTOFromUserService(studyAndSiteEnvUuid, accessToken);
 
                 ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
                 for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
@@ -388,7 +390,7 @@ public class ImportServiceImpl implements ImportService {
                                 ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
                                 for(DiscrepancyNoteBean discrepancyNoteBean : itemDataBean.getDiscrepancyNotes().getDiscrepancyNotes()){
                                     try {
-                                        importValidationService.validateQuery(discrepancyNoteBean, itemData, publicStudySubjectsStudy, accepatableUserRoles);
+                                        importValidationService.validateQuery(discrepancyNoteBean, itemData, acceptedUsers);
                                         createQuery(discrepancyNoteBean, tenantStudy, studySubject, eventCrf, itemDataBean.getItemOID(), itemGroupDataBean , itemData, null, null, true, dataImportReports, userAccount);
                                     }catch (OpenClinicaSystemException e){
                                         String insertionType = QUERY_TYPE_KEYWORD;

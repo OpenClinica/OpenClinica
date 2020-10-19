@@ -22,7 +22,7 @@ import java.util.List;
 
 public interface ImportService {
 
-    boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport);
+    boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport, String accessToken);
 
     Object validateStudySubject(SubjectDataBean subjectDataBean, Study tenantStudy);
 

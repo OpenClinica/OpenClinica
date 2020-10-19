@@ -11,6 +11,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.service.StudyEventService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.controller.dto.DataImportReport;
@@ -66,7 +67,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
     private boolean isQueryClosedStatusValid;
     private boolean isQueryClosedModifiedStatusValid;
 
-    public void validateQuery(DiscrepancyNoteBean discrepancyNoteBean, ItemData itemData, Study publicStudySubjectsStudy, List<StudyUserRole> accepatableUserRoles){
+    public void validateQuery(DiscrepancyNoteBean discrepancyNoteBean, ItemData itemData, List<OCUserDTO> accepatableUsers){
         ArrayList<ErrorObj> errors = new ArrayList<>();
         isQueryNewStatusValid = true;
         isQueryUpdatedStatusValid = false;
@@ -114,9 +115,9 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             }
             if(childNoteBean.getOwnerUserName() == null)
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_MISSING_USER_NAME)));
-            else if(!isUserExist(childNoteBean.getOwnerUserName(), publicStudySubjectsStudy, accepatableUserRoles))
+            else if(!isUserExist(childNoteBean.getOwnerUserName(), accepatableUsers))
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_USER_NOT_VALID)));
-            if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName(), publicStudySubjectsStudy, accepatableUserRoles))
+            if(!isResolutionTypeAnnotation && childNoteBean.getUserRef() != null && !isUserExist(childNoteBean.getUserRef().getUserName(), accepatableUsers))
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_ASSIGNED_USER_NOT_VALID)));
             if(StringUtils.isBlank(childNoteBean.getDetailedNote()))
                 errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(childNoteBean.getDisplayId(), ErrorConstants.ERR_DETAILED_NOTE_MISSING)));
@@ -368,18 +369,8 @@ public class ImportValidationServiceImpl implements ImportValidationService{
         return false;
     }
 
-    private boolean isUserExist(String username, Study publicStudySubjectsStudy, List<StudyUserRole> accepatableUserRoles){
-        List<StudyUserRole> filteredUserRoles = accepatableUserRoles.stream().filter(studyUserRole -> {
-            Boolean userHaveAccessToStudySubject = studyUserRole.getId().getStudyId() == publicStudySubjectsStudy.getStudyId();
-            Boolean userHaveAccessToStudySubjectsParentStudy = publicStudySubjectsStudy.isSite() && studyUserRole.getId().getStudyId() == publicStudySubjectsStudy.getStudy().getStudyId();
-            
-            if(studyUserRole.getId().getUserName().equals(username) && (userHaveAccessToStudySubject || userHaveAccessToStudySubjectsParentStudy))
-                return true;
-            return false;
-        }).collect(Collectors.toList());
-        if(filteredUserRoles.isEmpty())
-            return false;
-        return true;
+    private boolean isUserExist(String username, List<OCUserDTO> acceptedUsers){
+        return acceptedUsers.stream().filter(ocUserDTO -> ocUserDTO.getUsername().equals(username)).count() > 0 ;
     }
     public void setResolutionStatusForCheckingChildNotesValidity(String resolutionStatus){
         if(resolutionStatus != null) {
