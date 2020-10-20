@@ -29,6 +29,13 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
             + "and (dn.resolutionStatus.resolutionStatusId = 1 or dn.resolutionStatus.resolutionStatusId = 2 ) "
             + "and didm.itemData.itemDataId = :itemDataId and dn.discrepancyNoteType.discrepancyNoteTypeId= :noteTypeId";
 
+    static String findClosedParentQueriesByItemDataId = "select dn from DiscrepancyNote dn "
+            + "join DnItemDataMap didm on didm.discrepancyNote.discrepancyNoteId = dn.discrepancyNoteId "
+            + "join DiscrepancyNoteType dnt on dn.discrepancyNoteType.discrepancyNoteTypeId = dnt.discrepancyNoteTypeId "
+            + "where dn.parentDiscrepancyNote is null "
+            + "and dn.resolutionStatus.resolutionStatusId = 4 "
+            + "and didm.itemData.itemDataId = :itemDataId and dn.discrepancyNoteType.discrepancyNoteTypeId= 3";
+
     static String findChildQueriesByItemData = "select dn from DiscrepancyNote dn "
             + "join DnItemDataMap didm on didm.discrepancyNote.discrepancyNoteId = dn.discrepancyNoteId "
             + "join DiscrepancyNoteType dnt on dn.discrepancyNoteType.discrepancyNoteTypeId = dnt.discrepancyNoteTypeId "
@@ -52,6 +59,12 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
         Query q = getCurrentSession().createQuery(findParentOpenQueriesByItemDataIdAndNoteTypeId);
         q.setParameter("itemDataId", itemDataId);
         q.setParameter("noteTypeId", noteTypeId);
+        return (List<DiscrepancyNote>) q.list();
+    }
+
+    public List<DiscrepancyNote> findClosedParentQueriesByItemData(Integer itemDataId) {
+        Query q = getCurrentSession().createQuery(findClosedParentQueriesByItemDataId);
+        q.setParameter("itemDataId", itemDataId);
         return (List<DiscrepancyNote>) q.list();
     }
 
