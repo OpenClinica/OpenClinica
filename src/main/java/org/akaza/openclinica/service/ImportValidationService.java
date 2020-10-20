@@ -17,7 +17,7 @@ public interface ImportValidationService {
 
     void validateEventCrf(StudySubject studySubject, StudyEvent studyEvent, FormLayout formLayout, EventDefinitionCrf edc);
 
-    void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf, Boolean proceedToSdv);
+    void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf, Boolean proceedToSdv, Boolean sdvStatusUpdatedInternally);
 
     void validateEventDefnCrf(Study tenantStudy, StudyEventDefinition studyEventDefinition, CrfBean crf);
 

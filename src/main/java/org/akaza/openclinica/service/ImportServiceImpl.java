@@ -264,6 +264,7 @@ public class ImportServiceImpl implements ImportService {
                     int formDataBeanCount = 0;
                     for (FormDataBean formDataBean : formDataBeans) {
                         Boolean proceedToSdv = true;
+                        Boolean isSdvStatusUpdatedInternally = false;
                         String reasonForChange = formDataBean.getReasonForChangeForCompleteForms();
                         formDataBeanCount++;
                         if (formDataBean.getFormOID() != null)
@@ -436,7 +437,7 @@ public class ImportServiceImpl implements ImportService {
                          *  so this need to skip the existing set event status logic
                          */
                         if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
-                            updateSdvStatusIfAlreadyVerified(eventCrf, userAccount);
+                            isSdvStatusUpdatedInternally = updateSdvStatusIfAlreadyVerified(eventCrf, userAccount);
                             updateEventAndSubjectStatusIfSigned(studyEvent, studySubject, userAccount);
                         }
 
@@ -460,7 +461,7 @@ public class ImportServiceImpl implements ImportService {
 
                         // check if all Forms within this Event is Complete
                         try {
-                            importValidationService.validateSdvStatus(studySubject, formDataBean, eventCrf, proceedToSdv);
+                            importValidationService.validateSdvStatus(studySubject, formDataBean, eventCrf, proceedToSdv, isSdvStatusUpdatedInternally);
                             Boolean sdvImported = setSdvStatusOnEventCrf(formDataBean, eventCrf, userAccount);
                             if(sdvImported) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(),
@@ -1699,11 +1700,13 @@ public class ImportServiceImpl implements ImportService {
         return signaturesImported;
     }
 
-    private void updateSdvStatusIfAlreadyVerified(EventCrf eventCrf, UserAccount userAccount) {
+    private Boolean updateSdvStatusIfAlreadyVerified(EventCrf eventCrf, UserAccount userAccount) {
         if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED)){
             eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrfDao.saveOrUpdate(eventCrf);
+            return true;
         }
+        return false;
     }
 }

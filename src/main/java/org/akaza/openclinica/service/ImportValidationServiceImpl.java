@@ -59,6 +59,8 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
     public static final String FAILED = "Failed";
     public static final String NO_CHANGE="No Change";
+    public static final String SKIPPED="Skipped";
+    public static final String SDV_SKIPPED_MSG = "SDV Status set automatically";
     public static final String QUERY_KEYWORD = "Query";
     private static final String STATUS_ATTRIBUTE_TRUE = "Yes";
     private static final String STATUS_ATTRIBUTE_FALSE = "No";
@@ -217,7 +219,7 @@ public class ImportValidationServiceImpl implements ImportValidationService{
 
     }
 
-    public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf,Boolean proccedToSdv) {
+    public void validateSdvStatus(StudySubject studySubject, FormDataBean formDataBean, EventCrf eventCrf,Boolean proccedToSdv, Boolean sdvStatusUpdatedInternally) {
         if(formDataBean.getSdvStatusString() != null) {
             SdvStatus newSdvStatus = formDataBean.getSdvStatus();
             if(newSdvStatus == null) {
@@ -239,8 +241,11 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             else if(eventCrf.getSdvStatus() == null || (!newSdvStatus.equals(eventCrf.getSdvStatus()) &&
                     !(eventCrf.getSdvStatus().equals(SdvStatus.VERIFIED) && newSdvStatus.equals(SdvStatus.NOT_VERIFIED))))
                 throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_SDV_STATUS_NOT_APPLICABLE);
-            else if(newSdvStatus.equals(eventCrf.getSdvStatus()))
+            else if(newSdvStatus.equals(eventCrf.getSdvStatus())) {
+                if (newSdvStatus.equals(SdvStatus.CHANGED_SINCE_VERIFIED) && sdvStatusUpdatedInternally)
+                    throw new OpenClinicaSystemException(SKIPPED, SDV_SKIPPED_MSG);
                 throw new OpenClinicaSystemException(NO_CHANGE, "");
+            }
         }
     }
 
