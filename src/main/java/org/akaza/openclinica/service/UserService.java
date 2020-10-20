@@ -11,7 +11,9 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.OCParticipantDTO;
 import core.org.akaza.openclinica.service.OCUserDTO;
+import core.org.akaza.openclinica.service.OCUserRoleDTO;
 import core.org.akaza.openclinica.service.ParticipantAccessDTO;
+import core.org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -49,5 +51,11 @@ public interface UserService {
     void persistJobFailed(JobDetail jobDetail,String fileName);
 
     String getFilePath(JobType jobType);
+
+    List<OCUserDTO> getfilteredOCUsersDTOFromUserService( StudyAndSiteEnvUuid studyAndSiteEnvUuid, String accessToken);
+
+    List<OCUserRoleDTO> getOcUserRoleDTOsFromUserService(String studyEnvUuid, String accessToken1);
+
+    List<OCUserDTO> filterUserBasedOnStudyEventUuid(List<OCUserRoleDTO> userServiceList, StudyAndSiteEnvUuid studyAndSiteEnvUuid);
 
 }

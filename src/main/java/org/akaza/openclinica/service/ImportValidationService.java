@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface ImportValidationService {
 
-    void validateQuery(DiscrepancyNoteBean discrepancyNotesBean,ItemData itemData, Study publicStudySubjectsStudy, List<StudyUserRole> accepatableUserRoles);
+    void validateQuery(DiscrepancyNoteBean discrepancyNotesBean,ItemData itemData, List<OCUserDTO> accepatableUsers);
 
     void validateItem(ImportItemDataBean itemDataBean, CrfBean crf, ImportItemGroupDataBean itemGroupDataBean, ItemCountInForm itemCountInForm);
 

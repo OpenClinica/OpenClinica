@@ -12,6 +12,4 @@ public interface OpenRosaService {
 
     OCUserDTO fetchUserInfoFromUserService(StudyAndSiteEnvUuid studyAndSiteEnvUuid, String username) throws Exception;
 
-    List<OCUserRoleDTO> getOcUserRoleDTOs(String studyEnvUuid);
-
 }
