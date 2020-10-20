@@ -167,6 +167,7 @@ public class ImportServiceImpl implements ImportService {
     private static final String IMPORT_SIGNATURE_POSTFIX_KEYWORD = "import_signature_postfix";
     private static final String ATTESTATIONS_IMPORTED = "Attestations Imported";
     private static final String EVENT_IS_SIGNED = "Event is Signed";
+    private static final String CLOSED_MODIFIED_RESOLUTION_STATUS = "closed-modified";
 
 
 
@@ -1432,6 +1433,7 @@ public class ImportServiceImpl implements ImportService {
                     createReasonForChangeQuery(userAccount, study, studySubject, itemGroupDataBean, itemData, reasonForChange);
                 }
                 itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
+                updateClosedToClosedModifiedQuery(userAccount, study, studySubject, itemGroupDataBean, itemData);
                 itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 return new DataImportReport(null, null, null, null, null, null, null, null, ITEM_TYPE_KEYWORD, UPDATED, sdf_logFile.format(new Date()), null);
@@ -1447,6 +1449,23 @@ public class ImportServiceImpl implements ImportService {
         }
     }
 
+    private void updateClosedToClosedModifiedQuery(UserAccount userAccount, Study study, StudySubject studySubject, ImportItemGroupDataBean itemGroupDataBean, ItemData itemData) {
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+        String closedModifiedDetailedNote = resword.getString("closed_modified_message");
+        List<DiscrepancyNote> parentDiscrepancyNotes = discrepancyNoteDao.findClosedParentQueriesByItemData(itemData.getItemDataId());
+        for(DiscrepancyNote parentDiscrepancyNote : parentDiscrepancyNotes) {
+            DiscrepancyNoteBean discrepancyNoteBean = new DiscrepancyNoteBean();
+            discrepancyNoteBean.setNoteType(QueryType.QUERY.getName());
+            discrepancyNoteBean.setDisplayId(parentDiscrepancyNote.getDisplayId());
+            ChildNoteBean childNoteBean = new ChildNoteBean();
+            childNoteBean.setStatus(CLOSED_MODIFIED_RESOLUTION_STATUS);
+            childNoteBean.setDetailedNote(closedModifiedDetailedNote);
+            childNoteBean.setOwnerUserName(userAccount.getUserName());
+
+            discrepancyNoteBean.getChildNotes().add(childNoteBean);
+            createQuery(discrepancyNoteBean, study, studySubject, itemData.getEventCrf(), itemData.getItem().getOcOid(), itemGroupDataBean, itemData, null, null, true, new ArrayList<DataImportReport>(), userAccount);
+        }
+    }
     /**
      * @param userAccount
      * @param study
