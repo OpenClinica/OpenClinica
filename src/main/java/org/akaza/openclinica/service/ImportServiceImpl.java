@@ -477,6 +477,11 @@ public class ImportServiceImpl implements ImportService {
                         }
                     } // formDataBean for loop
                     try{
+                        if(BooleanUtils.isTrue(studyEventDataBean.getSigned()) && !studyEvent.isCurrentlySigned() && studyEventDataBean.getSignatures() == null) {
+                            ArrayList<ErrorObj> errors = new ArrayList();
+                            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CANNOT_SIGN_EVENT_WITHOUT_ATTESTATION));
+                            throw new OpenClinicaSystemException(FAILED, errors);
+                        }
                         if(studyEventDataBean.getSignatures() != null) {
                             importValidationService.validateSignatureForStudyEvent(studyEventDataBean, studyEvent, studySubject);
                             Boolean signaturesImported = importSignatures(studyEventDataBean, studyEvent, userAccount, dataImportReports);

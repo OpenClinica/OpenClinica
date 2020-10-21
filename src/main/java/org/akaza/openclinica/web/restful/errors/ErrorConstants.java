@@ -222,6 +222,7 @@ public class ErrorConstants {
     public static final String ERR_SDV_STATUS_CANNOT_BE_UPDATED_BECAUSE_OF_ITEM_IMPORT_FAILURE = "errorCode.sdvStatusCannotBeUpdatedBecauseOfItemImportFailure";
     public static final String ERR_SIGNED_STATUS_INVALID = "errorCode.signedStatusIsInvalid";
     public static final String ERR_EVENT_IS_NOT_ELIGIBLE_TO_BE_SIGNED = "errorCode.eventIsNotEligibleToBeSigned";
+    public static final String ERR_CANNOT_SIGN_EVENT_WITHOUT_ATTESTATION = "errorcode.cannotSignEventWithoutAttestation";
     public static final String ERR_ATTESTATION_IS_MISSING = "errorCode.attestationIsMissing";
     public static final String ERR_ATTESTATION_TEXT_TOO_LONG = "errorCode.attestationTextTooLong";
     public static final String ERR_STATUS_ATTRIBUTE_INVALID = "errorCode.statusAttributeIsInvalid";
