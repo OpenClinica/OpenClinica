@@ -14,6 +14,7 @@ import javax.mail.internet.MimeMessage;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.ItemDataService;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.xform.QueriesBean;
@@ -25,9 +26,7 @@ import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import core.org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.OCUserDTO;
@@ -58,6 +57,8 @@ public class QueryServiceImpl implements QueryService {
     private ItemDao itemDao;
     @Autowired
     private ItemDataDao itemDataDao;
+    @Autowired
+    private ItemDataService itemDataService;
     @Autowired
     private DiscrepancyNoteDao discrepancyNoteDao;
     @Autowired
@@ -350,7 +351,7 @@ public class QueryServiceImpl implements QueryService {
         itemData.setUserAccount(helperBean.getUserAccount());
         itemData.setDeleted(false);
         itemData.setInstanceId(helperBean.getContainer().getInstanceId());
-        itemData = itemDataDao.saveOrUpdate(itemData);
+        itemData = itemDataService.saveOrUpdate(itemData);
         return itemData;
     }
 

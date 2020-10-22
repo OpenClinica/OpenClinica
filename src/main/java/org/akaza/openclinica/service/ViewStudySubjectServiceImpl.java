@@ -5,6 +5,7 @@ import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.service.StudyEventService;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
@@ -34,6 +35,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
     private CrfDao crfDao;
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private StudyEventDao studyEventDao;
+    private StudyEventService studyEventService;
     private EventCrfDao eventCrfDao;
     private StudyEventDefinitionDao studyEventDefintionDao;
     private PageLayoutDao pageLayoutDao;
@@ -51,7 +53,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
 
     public ViewStudySubjectServiceImpl(StudyDao studyDao, UserAccountDao userAccountDao, StudySubjectDao studySubjectDao, CrfDao crfDao,
                                        EventDefinitionCrfDao eventDefinitionCrfDao, StudyEventDao studyEventDao, EventCrfDao eventCrfDao, StudyEventDefinitionDao studyEventDefintionDao,
-                                       PageLayoutDao pageLayoutDao) {
+                                       PageLayoutDao pageLayoutDao, StudyEventService studyEventService) {
         super();
         this.studyDao = studyDao;
         this.userAccountDao = userAccountDao;
@@ -62,6 +64,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         this.eventCrfDao = eventCrfDao;
         this.studyEventDefintionDao = studyEventDefintionDao;
         this.pageLayoutDao = pageLayoutDao;
+        this.studyEventService = studyEventService;
     }
 
     public ViewStudySubjectDTO addNewForm(HttpServletRequest request, String studyOid, String studyEventDefinitionOid, String crfOid, String studySubjectOid) {
@@ -247,7 +250,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         studyEvent.setDateStart(null);
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studyEvent = studyEventService.saveOrUpdate(studyEvent);
         return studyEvent;
 
     }
@@ -293,9 +296,19 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         this.studyEventDao = studyEventDao;
     }
 
+    public StudyEventService getStudyEventService() {
+        return studyEventService;
+    }
+
+    public void setStudyEventService(StudyEventService studyEventService) {
+        this.studyEventService = studyEventService;
+    }
+
     public EventCrfDao getEventCrfDao() {
         return eventCrfDao;
     }
+
+
 
     public void setEventCrfDao(EventCrfDao eventCrfDao) {
         this.eventCrfDao = eventCrfDao;

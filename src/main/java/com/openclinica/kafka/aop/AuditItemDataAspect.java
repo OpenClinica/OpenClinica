@@ -40,7 +40,7 @@ public class AuditItemDataAspect {
         this.itemDataDao = itemDataDao;
     }
 
-    @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.ItemDataDao.saveOrUpdate(..))")
+    @AfterReturning("execution(* core.org.akaza.openclinica.service.ItemDataService.saveOrUpdate(..))")
     public void onItemDataDaoSaveOrUpdate(JoinPoint joinPoint) {
         log.info("AoP: onItemDataDaoSaveOrUpdate triggered");
         try {

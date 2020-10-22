@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.EventCrfService;
 import core.org.akaza.openclinica.service.crfdata.xform.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
@@ -104,6 +105,9 @@ public class EnketoUrlService {
 
     @Autowired
     private EventCrfDao eventCrfDao;
+
+    @Autowired
+    private EventCrfService eventCrfService;
 
     @Autowired
     private CrfDao crfDao;
@@ -602,7 +606,7 @@ public class EnketoUrlService {
         eventCrf.setValidatorId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        eventCrf = eventCrfService.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }

@@ -3,6 +3,8 @@ package org.akaza.openclinica.controller.openrosa.processor;
 import java.util.Date;
 import java.util.List;
 
+import core.org.akaza.openclinica.service.EventCrfService;
+import core.org.akaza.openclinica.service.StudyEventService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import core.org.akaza.openclinica.dao.hibernate.CompletionStatusDao;
@@ -44,10 +46,16 @@ public class EventProcessor implements Processor {
     StudyEventDao studyEventDao;
 
     @Autowired
+    StudyEventService studyEventService;
+
+    @Autowired
     StudyEventDefinitionDao studyEventDefinitionDao;
 
     @Autowired
     EventCrfDao eventCrfDao;
+
+    @Autowired
+    private EventCrfService eventCrfService;
 
     @Autowired
     CrfVersionDao crfVersionDao;
@@ -213,7 +221,7 @@ public class EventProcessor implements Processor {
         StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
 
         StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
-        studyEventDao.saveOrUpdateTransactional(container);
+        studyEventService.saveOrUpdateTransactional(container);
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(), ordinal, studySubject.getStudySubjectId());
         return studyEvent;
     }
@@ -240,7 +248,7 @@ public class EventProcessor implements Processor {
         eventCrf.setValidatorId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        eventCrf = eventCrfService.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }
@@ -298,7 +306,7 @@ public class EventProcessor implements Processor {
 
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged, false);
             StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
-            studyEvent = studyEventDao.saveOrUpdateTransactional(container);
+            studyEvent = studyEventService.saveOrUpdateTransactional(container);
             logger.debug("*********UPDATED STUDY EVENT ");
         }
         return studyEvent;
@@ -316,7 +324,7 @@ public class EventProcessor implements Processor {
         if (isAnonymous) {
             eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
         }
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        eventCrf = eventCrfService.saveOrUpdate(eventCrf);
         logger.debug("*********UPDATED EVENT CRF");
         return eventCrf;
     }

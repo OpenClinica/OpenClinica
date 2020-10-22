@@ -12,14 +12,12 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
-import core.org.akaza.openclinica.service.StudyBuildService;
-import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import com.openclinica.kafka.KafkaService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.FormCacheServiceImpl;
 import org.apache.commons.fileupload.FileItem;
@@ -74,6 +72,9 @@ public class OpenRosaSubmissionController {
     private StudyEventDao studyEventDao;
 
     @Autowired
+    private StudyEventService studyEventService;
+
+    @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
 
     @Autowired
@@ -89,6 +90,9 @@ public class OpenRosaSubmissionController {
     private EventCrfDao eventCrfDao;
 
     @Autowired
+    private EventCrfService eventCrfService;
+
+    @Autowired
     private StudyEventDefinitionDao studyEventDefinitionDao;
 
     @Autowired
@@ -96,9 +100,6 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private ItemDao itemDao;
-
-    @Autowired
-    private ItemDataDao itemDataDao;
 
     @Autowired
     private DataSource dataSource;
@@ -117,6 +118,8 @@ public class OpenRosaSubmissionController {
     private UtilService utilService;
     @Autowired
     TokenService tokenService;
+    @Autowired
+    ItemDataService itemDataService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -253,7 +256,7 @@ public class OpenRosaSubmissionController {
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
-            eventCrfDao.saveOrUpdate(eventCrf);
+            eventCrfService.saveOrUpdate(eventCrf);
 
             if (!formCacheService.expireAndRemoveForm(ecid)){
                 FormChangeDTO formChangeDTO = kafkaService.constructFormChangeDTO(eventCrf);
@@ -264,7 +267,7 @@ public class OpenRosaSubmissionController {
           checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
-        updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);
+        updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount, true);
 
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
@@ -579,7 +582,7 @@ public class OpenRosaSubmissionController {
         eventCrf.setValidatorId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf.setSdvStatus(null);
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+        eventCrf = eventCrfService.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }
@@ -593,13 +596,17 @@ public class OpenRosaSubmissionController {
         itemData.setOrdinal(1);
         itemData.setUserAccount(userAccount);
         itemData.setDeleted(false);
-        itemDataDao.saveOrUpdate(itemData);
+        itemDataService.saveOrUpdate(itemData);
     }
 
-    private void persistStudyEvent(StudyEvent studyEvent,boolean statusChanged) {
+    private void persistStudyEvent(StudyEvent studyEvent,boolean statusChanged,Boolean notifyAOP) {
         StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged, false);
         StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
-        studyEventDao.saveOrUpdateTransactional(container);
+        if(!notifyAOP)
+            studyEventService.saveOrUpdateTransactionalWithoutAOPListener(container);
+        else
+            studyEventService.saveOrUpdateTransactional(container);
+        logger.info("Updated StudyEvent: {}", studyEvent.getStudyEventDefinition().getOc_oid());
     }
 
     private UserAccount getUserAccount(HashMap<String, String> subjectContext) {
@@ -612,7 +619,7 @@ public class OpenRosaSubmissionController {
 
     }
 
-    public void updateStudyEventStatus(Study study, StudySubject studySubject, StudyEventDefinition sed, StudyEvent studyEvent, UserAccount userAccount) {
+    public void updateStudyEventStatus(Study study, StudySubject studySubject, StudyEventDefinition sed, StudyEvent studyEvent, UserAccount userAccount, Boolean notifyAOP) {
         List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
@@ -634,7 +641,7 @@ public class OpenRosaSubmissionController {
                 isEventWorkflowStatusUpDated = true;
                 if(studyEvent.isCurrentlySigned())
                     studyEvent.setSigned(false);
-                persistStudyEvent(studyEvent, true);
+                persistStudyEvent(studyEvent, true, notifyAOP);
             }
         } else {
             if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
@@ -642,7 +649,7 @@ public class OpenRosaSubmissionController {
                 isEventWorkflowStatusUpDated = true;
                 if(studyEvent.isCurrentlySigned())
                     studyEvent.setSigned(false);
-                persistStudyEvent(studyEvent, true);
+                persistStudyEvent(studyEvent, true, notifyAOP);
             }
         }
         if(isEventWorkflowStatusUpDated && studySubject.getStatus().isSigned()){

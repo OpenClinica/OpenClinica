@@ -23,6 +23,7 @@ import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -686,7 +687,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                 eventObject = importService.validateStartAndEndDateAndOrder(studyEventDataBean);
                 if (eventObject instanceof ErrorObj) return eventObject;
 
-                eventObject = importService.scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
+                eventObject = importService.scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount, true);
 
             } else {   // Non Repeat Event
                 studyEventDataBean.setStudyEventRepeatKey(String.valueOf('1'));
@@ -694,7 +695,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                 if (studyEvent == null) {
                     eventObject = importService.validateStartAndEndDateAndOrder(studyEventDataBean);
                     if (eventObject instanceof ErrorObj) return eventObject;
-                    eventObject = importService.scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
+                    eventObject = importService.scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount, true);
                 } else {
                     return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_ALREADY_EXISTS);
                 }
@@ -796,7 +797,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                 if (eventObject instanceof ErrorObj) return eventObject;
                 eventObject = importService.validateEventTransition(studyEvent, userAccount, studyEventDataBean.getEventStatus());
                 if (eventObject instanceof ErrorObj) return eventObject;
-                eventObject = importService.updateStudyEvntStatus(studyEvent, userAccount, studyEventDataBean.getEventStatus());
+                eventObject = importService.updateStudyEvntStatus(studyEvent, userAccount, studyEventDataBean.getEventStatus(), true);
             }
         }
         return eventObject;
@@ -994,6 +995,22 @@ public void convertStudyEventStatus(String value, StudyEvent studyEvent){
         return true;
     }
 
+    public StudyEvent saveOrUpdate(StudyEvent studyEvent){
+        return studyEventDao.saveOrUpdate(studyEvent);
+    }
+
+    public StudyEvent saveOrUpdateTransactional(StudyEventContainer container){
+        return studyEventDao.saveOrUpdateTransactional(container);
+    }
+
+    public StudyEvent saveOrUpdateTransactionalWithoutAOPListener(StudyEventContainer container){
+        return studyEventDao.saveOrUpdateTransactional(container);
+    }
+
+    public StudyEvent saveOrUpdateWithoutAOPListener(StudyEvent studyEvent){
+        return studyEventDao.saveOrUpdate(studyEvent);
+
+    }
     private boolean areAllEventCrfsValid(StudyEvent studyEvent) {
         List<EventCrf> eventCrfs = studyEvent.getEventCrfs();
         for (EventCrf eventCrf: eventCrfs) {

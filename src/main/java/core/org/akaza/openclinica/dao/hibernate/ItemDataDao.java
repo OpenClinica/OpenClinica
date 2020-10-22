@@ -88,6 +88,18 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (List<ItemData>) q.list();
     }
 
+    public List<ItemData> findByEventCrfGroupWithOrdinalNAndDeletedIncluded(Integer eventCrfId, Integer itemGroupId, Integer ordinal) {
+        String query = "select id.* " + "from item_data id " + "join item i on id.item_id = i.item_id "
+                + "join event_crf ec on id.event_crf_id=ec.event_crf_id "
+                + "join item_group_metadata igm on i.item_id=igm.item_id and igm.crf_version_id = ec.crf_version_id where id.event_crf_id = :eventCrfId"
+                + " and igm.item_group_id = :itemGroupId and id.ordinal= :ordinal" ;
+        Query q = getCurrentSession().createNativeQuery(query).addEntity(ItemData.class);
+        q.setParameter("eventCrfId", eventCrfId);
+        q.setParameter("itemGroupId", itemGroupId);
+        q.setParameter("ordinal", ordinal);
+        return (List<ItemData>) q.list();
+
+    }
     public List<ItemData> findByEventCrfGroup(Integer eventCrfId, Integer itemGroupId) {
         String query = "select id.* " + "from item_data id " + "join item i on id.item_id = i.item_id "
                 + "join event_crf ec on id.event_crf_id=ec.event_crf_id "
