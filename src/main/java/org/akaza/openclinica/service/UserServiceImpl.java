@@ -32,6 +32,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -63,6 +64,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static core.org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
 import static core.org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
@@ -124,6 +126,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JobService jobService;
+
+    @Autowired
+    private BeanFactory beanFactory;
 
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
@@ -1012,6 +1017,23 @@ public class UserServiceImpl implements UserService {
         return callManagementApi(getUserList, accessToken1);
     }
 
+    /*Added userAccount for import purposes*/
+    public List<OCUserRoleDTO> addOCUserFromUserService(String studyEnvUUId, String accessToken){
+        List<OCUserRoleDTO> userRolesFormUserService = getOcUserRoleDTOsFromUserService(studyEnvUUId, accessToken);
+        List<UserAccount> existingUsers = userAccountDao.findAll();
+        if(userRolesFormUserService != null && !userRolesFormUserService.isEmpty()){
+            Map<String, UserAccount> userAccountMap = new HashMap<>();
+            if(existingUsers != null)
+                userAccountMap = existingUsers.stream().collect(Collectors.toMap(UserAccount::getUserName, userAccount -> userAccount));
+            Map<String, UserAccount> finalUserAccountMap = userAccountMap;
+            List<OCUserRoleDTO> newUsers = userRolesFormUserService.stream().filter(ocUserRoleDTO -> !finalUserAccountMap.containsKey(ocUserRoleDTO.getUserInfo().getUsername())).collect(Collectors.toList());
+            for(OCUserRoleDTO ocUserRoleDTO : newUsers) {
+                UserAccount userAccount = beanFactory.getBean(UserAccount.class, ocUserRoleDTO.getUserInfo());
+                userAccount = userAccountDao.saveOrUpdate(userAccount);
+            }
+        }
+        return userRolesFormUserService;
+    }
     public List<OCUserDTO> filterUserBasedOnStudyEventUuid(List<OCUserRoleDTO> userServiceList, StudyAndSiteEnvUuid studyAndSiteEnvUuid){
         if (userServiceList == null)
             return null;
@@ -1022,7 +1044,7 @@ public class UserServiceImpl implements UserService {
             if(userInfo.getUsername().equals("root")){
                 userList.add(userInfo);
             }
-            if (userInfo.getStatus() != UserStatus.ACTIVE)
+            if (!userInfo.getStatus().equals(UserStatus.ACTIVE) && !userInfo.getStatus().equals(UserStatus.INVITED))
                 continue;
             for (StudyEnvironmentRoleDTO role : roles) {
                 boolean include = true;

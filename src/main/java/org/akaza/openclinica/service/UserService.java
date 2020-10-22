@@ -56,6 +56,8 @@ public interface UserService {
 
     List<OCUserRoleDTO> getOcUserRoleDTOsFromUserService(String studyEnvUuid, String accessToken1);
 
+    List<OCUserRoleDTO> addOCUserFromUserService(String studyEnvUUId, String accessToken);
+
     List<OCUserDTO> filterUserBasedOnStudyEventUuid(List<OCUserRoleDTO> userServiceList, StudyAndSiteEnvUuid studyAndSiteEnvUuid);
 
 }
