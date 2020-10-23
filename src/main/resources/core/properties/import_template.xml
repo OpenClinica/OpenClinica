@@ -1,31 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FileOID="D20200825211615+0000" Description="OpenClinica 4 Stack 12 Data Import Template" CreationDateTime="2020-08-31T12:00:00" FileType="snapshot" ODMVersion="1.3" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ODM1-3.xsd">
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FileOID="D20200925211615+0000" Description="OpenClinica 4 Stack 12.3 Data Import Template" CreationDateTime="2020-10-01T12:00:00" FileType="snapshot" ODMVersion="1.3" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ODM1-3.xsd">
 
 	<!-- Replace the S_OID with the Study OID of the Study to which you are importing data. -->
 	<ClinicalData StudyOID="S_OID" MetaDataVersionOID="null">
 
-		<!-- Replace the SS_OID with the Study Subject OID for whom you're importing data. This Subject must already be enrolled and scheduled for the Event to which you are importing. -->
+		<!-- Replace the SS_OID with the Study Subject OID for whom you are importing data. This Subject must already be enrolled and scheduled for the Event to which you are importing. -->
 		<SubjectData SubjectKey="SS_OID">
 
-			<!-- Replace the SE_OID with the OID of the Study Event, and the StartDate and EndDate to the appropriate values for the Event. For non-repeating Events, the StudyEventRepeatKey should be set to 1. For repeating Events, specify the ordinal for the occurrence of the Event to which you are importing. For example, specify 2 to import the data into the second repeat occurrence of an Event. -->
-			<StudyEventData StudyEventOID="SE_OID" OpenClinica:StartDate="2017-09-29" OpenClinica:EndDate="2017-09-29" StudyEventRepeatKey="1">
+			<!-- Replace the SE_OID with the OID of the Study Event, and the StartDate and EndDate to the appropriate values for the Event. For non-repeating Events, the StudyEventRepeatKey should be set to "1". For repeating Events, specify the ordinal for the occurrence of the Event to which you are importing. For example, specify "2" to import the data into the second repeat occurrence of an Event. -->
+			<!-- Delete OpenClinica:Signed unless you want to set the signature status of the event to Signed. If you are importing historical signature attestations from outside OpenClinica and want the Study Event to be set to Signed after the import is completed, it should be specified as "Yes". Note that any item data changes automatically remove an event's Signed status. -->
+			<StudyEventData StudyEventOID="SE_OID" OpenClinica:StartDate="2020-08-29" OpenClinica:EndDate="2020-08-29" StudyEventRepeatKey="1" OpenClinica:Signed="Yes|OPTIONAL">
 
-				<!-- Replace the F_OID with the OID of the Form that will be populated with the imported data. Replace the Version_ID with the Form Version ID in the study metadata. Specify the status the Form should have after the import is complete. Options are initial data entry or complete. If importing into a complete form and a specific Reason For Change is required, replace the default value. -->
-				<FormData FormOID="F_OID" OpenClinica:FormLayoutOID="Version_ID" OpenClinica:WorkflowStatus="initial data entry" OpenClinica:ReasonForChangeForCompleteForms="Update via Import">
+				<!-- Signature Attestations can be included if you are importing data that was signed outside of OpenClinica and want to preserve the historical attestation text. This will be added to the audit log for this event. If OpenClinica:Signed="Yes" is included in the StudyEventData node, the last attestation in sequence will be entered in the audit log as the attestation provided for the event's current Signed status. Only non-duplicate signature attestations will be imported for an event, except that the last attestation is always used when OpenClinica:Signed="Yes". -->
+				<Signature Attestation="Enter externally provided Signature Attestation text (if applicable)"/>
 
-					<!-- Replace the IG_OID with the Item Group OID. If the Group is a Grid, specify the row number for the insert in ItemGroupRepeatKey. TransactionType for an import should always be Insert.-->
+				<!-- Replace the F_OID with the OID of the Form that will be populated with the imported data. Replace the Version_ID with the Form Version ID in the study metadata. Specify the status the Form should have after the import is complete. Options are "initial data entry" or "complete". If importing into a complete form and a specific Reason For Change is required, replace the default value. -->
+				<!-- Delete OpenClinica:SdvStatus unless you want to set the SDV status of the form. If you are importing a Form that should have an SDV status of Verified, it should be specified as "Verified". If you are importing a Form that is currently verified and should no longer be verified, it should be specified as "Not Verified". Note that any item data changes automatically remove a form's Verified status. -->
+				<FormData FormOID="F_OID" OpenClinica:FormLayoutOID="Version_ID" OpenClinica:WorkflowStatus="initial data entry" OpenClinica:ReasonForChangeForCompleteForms="Update via Import" OpenClinica:SdvStatus="Verified|Not Verified|OPTIONAL">
+
+					<!-- Replace the IG_OID with the Item Group OID. If the Group is a Grid, specify the row number for the insert in ItemGroupRepeatKey. TransactionType for an import should always be "Insert". -->
+					<!-- To indicate that a deleted Repeating Group entry is being imported, OpenClinica:Removed="Yes" can be added within the ItemGroupData tag. -->
 					<ItemGroupData ItemGroupOID="IG_OID" ItemGroupRepeatKey="1" TransactionType="Insert">
 
-						<!-- For each Item in the Form, replace the I_OID with the Item OID and specify the value that should be imported into that Item. Add or remove lines below as needed to match the Items and values to be imported.-->
-						<ItemData ItemOID="I_OID" Value="2017-09-13"/>
-						<ItemData ItemOID="I_OID" Value="1"/>
-						<ItemData ItemOID="I_OID" Value="Headache"/>
+						<!-- For each Item in the Form, replace the I_OID with the Item OID. If the Item value of the Item is being imported, specify the value that should be imported into that Item. If the Item value is not being imported, the Value attribute can be deleted. Add or remove lines below as needed to match the Items and values to be imported. -->
+						<ItemData ItemOID="I_OID" Value="2020-09-13"></ItemData>
+						<ItemData ItemOID="I_OID" Value="1"></ItemData>
+						<ItemData ItemOID="I_OID" Value="Headache">
+
+							<!-- If you are not importing Queries or Annotations delete the DiscrepancyNotes node. If you wish to include Queries and/or Annotations for an item after import, a DiscrepancyNotes node can be included. It can contain multiple DiscrepancyNote nodes which each contain either a Query or an Annotation. Queries are specified as NoteType="Query" and each is a thread that can include one or more ChildNotes that represent individual notes. Each Query ChildNote contains the text of the note, the status of the note, the username of the creating user, and optionally an assigned user's username. -->
+							<!-- Each Query ChildNote status must be valid based on its place in the sequential Query thread. The first ChildNote must have a status of "New". Subsequent ChildNotes can have statuses of "Updated" or "Closed" if that note closed the Query. A ChildNote with a status of "Updated" following one with a status of "Closed" indicates a reopened Query. A status of "Closed-Modified" is used following a Closed Query to indicate that the Query is still Closed but the associated item value has changed since the Query was Closed. -->
+							<!-- Annotations are specified as NoteType="Annotation". An Annotation can have only one ChildNote. Each Annotation ChildNote contains the text of the note but cannot have an assigned user or status. -->
+							<!-- Annotations and Queries can include an optional ID for each DiscrepancyNote and ChildNote to persist the IDs from another system. If DiscrepancyNote or ChildNote IDs are not specified for new notes, the system will generate new IDs. To add a new ChildNote to an existing Query, the DiscrepancyNote ID and all ChildNote ID values for the Query must be included first and must be an exact match to the existing Query thread. New DiscrepancyNote and ChildNote IDs must be unique in the system among all DiscrepancyNote and ChildNote IDs. -->
+							<OpenClinica:DiscrepancyNotes>
+								<OpenClinica:DiscrepancyNote ID="DN_123450_OPTIONAL" NoteType="Query">
+									<OpenClinica:ChildNote ID="CDN_123451_OPTIONAL" Status="New" UserName="CREATING_USER_USERNAME">
+										<OpenClinica:DetailedNote>Enter Query opening text</OpenClinica:DetailedNote>
+										<UserRef UserName="ASSIGNED_USER_USERNAME_optional"/>
+									</OpenClinica:ChildNote>
+									<OpenClinica:ChildNote ID="CDN_123452_OPTIONAL" Status="Updated" UserName="CREATING_USER_USERNAME">
+										<OpenClinica:DetailedNote>Enter Query updating text</OpenClinica:DetailedNote>
+										<UserRef UserName="ASSIGNED_USER_USERNAME_optional"/>
+									</OpenClinica:ChildNote>
+									<OpenClinica:ChildNote ID="CDN_123453_OPTIONAL" Status="Closed" UserName="CREATING_USER_USERNAME">
+										<OpenClinica:DetailedNote>Enter Query closing text</OpenClinica:DetailedNote>
+										<UserRef UserName="ASSIGNED_USER_USERNAME_optional"/>
+									</OpenClinica:ChildNote>
+								</OpenClinica:DiscrepancyNote>
+								<OpenClinica:DiscrepancyNote ID="DN_123454_OPTIONAL" NoteType="Annotation">
+									<OpenClinica:ChildNote ID="CDN_123455_OPTIONAL" UserName="CREATING_USER_USERNAME">
+										<OpenClinica:DetailedNote>Enter Annotation text</OpenClinica:DetailedNote>
+									</OpenClinica:ChildNote>
+								</OpenClinica:DiscrepancyNote>
+							</OpenClinica:DiscrepancyNotes>
+						</ItemData>
 
 					</ItemGroupData>
 				</FormData>
 			</StudyEventData>
 		</SubjectData>
 
-		<!-- To import data for more than one Subject, copy and paste the opening and closing SubjectData tags, and everything between those tags. Then update OIDs and values as needed.-->
+		<!-- To import data for more than one Subject, copy and paste the opening and closing SubjectData tags, and everything between those tags. Then update OIDs and values as needed. -->
 	</ClinicalData>
 </ODM>
