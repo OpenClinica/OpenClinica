@@ -40,6 +40,8 @@ public class EventService implements EventServiceInterface {
     @Autowired
     StudyEventDao studyEventDao;
     @Autowired
+    StudyEventService studyEventService;
+    @Autowired
     StudySubjectDao studySubjectDao;
     @Autowired
     StudyEventDefinitionDao studyEventDefinitionDao;
@@ -49,6 +51,8 @@ public class EventService implements EventServiceInterface {
     EventDefinitionCrfDao eventDefinitionCrfDao;
     @Autowired
     QueryService queryService;
+    @Autowired
+    EventCrfService eventCrfService;
 
     @SuppressWarnings( {"unchecked", "rawtypes"} )
     public void archiveEventDefinition(StudyEventDefinition sed, UserAccount userAccount, Study study) {
@@ -161,7 +165,7 @@ public class EventService implements EventServiceInterface {
             studyEvent.setArchived(Boolean.TRUE);
             studyEvent.setUpdateId(userAccount.getUserId());
             studyEvent.setDateUpdated(new Date());
-            studyEventDao.saveOrUpdate(studyEvent);
+            studyEventService.saveOrUpdate(studyEvent);
             logger.debug("Archiving Study Event {}", studyEvent.getStudyEventId());
         }
     }
@@ -171,7 +175,7 @@ public class EventService implements EventServiceInterface {
             studyEvent.setArchived(Boolean.FALSE);
             studyEvent.setUpdateId(userAccount.getUserId());
             studyEvent.setDateUpdated(new Date());
-            studyEventDao.saveOrUpdate(studyEvent);
+            studyEventService.saveOrUpdate(studyEvent);
             logger.debug("UnArchiving Study Event {}", studyEvent.getStudyEventId());
         }
     }
@@ -181,7 +185,7 @@ public class EventService implements EventServiceInterface {
             eventCrf.setArchived(Boolean.TRUE);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrf.setDateUpdated(new Date());
-            eventCrfDao.saveOrUpdate(eventCrf);
+            eventCrfService.saveOrUpdate(eventCrf);
             logger.debug("Archiving Event Crf {}", eventCrf.getEventCrfId());
         }
     }
@@ -191,7 +195,7 @@ public class EventService implements EventServiceInterface {
             eventCrf.setArchived(Boolean.FALSE);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrf.setDateUpdated(new Date());
-            eventCrfDao.saveOrUpdate(eventCrf);
+            eventCrfService.saveOrUpdate(eventCrf);
             logger.debug("UnArchiving Event Crf {}", eventCrf.getEventCrfId());
         }
     }
@@ -259,7 +263,7 @@ public class EventService implements EventServiceInterface {
             studyEvent.setSigned(Boolean.FALSE);
             studyEvent.setUpdateId(userAccount.getUserId());
             studyEvent.setDateUpdated(new Date());
-            studyEventDao.saveOrUpdate(studyEvent);
+            studyEventService.saveOrUpdate(studyEvent);
         }
             unSignStudySubject(studyEvent.getStudySubject(), userAccount);
 

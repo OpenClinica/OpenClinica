@@ -43,27 +43,27 @@ public class AuditStudyEventAspect {
         this.studyEventDao = studyEventDao;
     }
 
-    @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.StudyEventDao.saveOrUpdate(..))")
+    @AfterReturning("execution(* core.org.akaza.openclinica.service.StudyEventService.saveOrUpdate(..))")
     public void onStudyEventDaoSaveOrUpdate(JoinPoint joinPoint) {
-        log.info("AoP: onStudyEventDaoSaveOrUpdate triggered");
+        log.info("AoP: onStudyEventServiceSaveOrUpdate triggered");
         try {
             StudyEvent studyEvent = (StudyEvent) joinPoint.getArgs()[0];
             kafkaService.sendEventAttributeChangeMessage(studyEvent);
             updateStudySubjectLastModifiedDetails(studyEvent);
         } catch (Exception e) {
-            log.error("Could not send kafka message triggered by StudyEventDao.saveOrUpdate: ", e);
+            log.error("Could not send kafka message triggered by StudyEventService.saveOrUpdate: ", e);
         }
     }
 
-    @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.StudyEventDao.saveOrUpdateTransactional(..))")
+    @AfterReturning("execution(* core.org.akaza.openclinica.service.StudyEventService.saveOrUpdateTransactional(..))")
     public void onStudyEventDaoSaveOrUpdateTransactional(JoinPoint joinPoint) {
-        log.info("AoP: onStudyEventDaoSaveOrUpdate triggered");
+        log.info("AoP: onStudyEventServiceSaveOrUpdate triggered");
         try {
             StudyEvent studyEvent = ((StudyEventContainer) joinPoint.getArgs()[0]).getEvent();
             kafkaService.sendEventAttributeChangeMessage((StudyEventContainer) joinPoint.getArgs()[0]);
             updateStudySubjectLastModifiedDetails(studyEvent);
         } catch (Exception e) {
-            log.error("Could not send kafka message triggered by StudyEventDao.saveOrUpdate: ", e);
+            log.error("Could not send kafka message triggered by StudyEventService.saveOrUpdate: ", e);
         }
     }
 

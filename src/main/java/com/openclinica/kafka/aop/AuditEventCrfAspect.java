@@ -39,7 +39,7 @@ public class AuditEventCrfAspect {
         this.studySubjectDao = studySubjectDao;
     }
 
-    @Around("execution(* core.org.akaza.openclinica.dao.hibernate.EventCrfDao.saveOrUpdate(..))")
+    @Around("execution(* core.org.akaza.openclinica.service.EventCrfService.saveOrUpdate(..))")
     public EventCrf beforeEventCrfDaoSaveOrUpdate(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         EventCrf eventCrf = (EventCrf) proceedingJoinPoint.getArgs()[0];
         boolean eventCrfIsSame = eventCrfIsTheSame(eventCrf, false);

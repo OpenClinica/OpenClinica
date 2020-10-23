@@ -4,8 +4,7 @@ import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.service.StudyBuildService;
-import core.org.akaza.openclinica.service.UserStatus;
+import core.org.akaza.openclinica.service.*;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
@@ -46,11 +45,13 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     @Autowired
     private QueryService queryService;
     @Autowired
+    private ItemDataService itemDataService;
+    @Autowired
     private ItemDataDao itemDataDao;
     @Autowired
-    private EventCrfDao eventCrfDao;
+    private EventCrfService eventCrfService;
     @Autowired
-    private StudyEventDao studyEventDao;
+    private StudyEventService studyEventService;
     @Autowired
     private StudySubjectDao studySubjectDao;
     @Autowired
@@ -211,7 +212,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
 
-                    itemDataDao.saveOrUpdate(existingItemData);
+                    itemDataService.saveOrUpdate(existingItemData);
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);
 
@@ -220,7 +221,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 } else if (itemOrdinal < maxRowCount) {
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);
-                    itemDataDao.saveOrUpdate(newItemData);
+                    itemDataService.saveOrUpdate(newItemData);
 
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                 }
@@ -278,7 +279,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
                 ItemData randomizeDataCheck = null;
                 if (existingItemData == null) {
-                    itemDataDao.saveOrUpdate(newItemData);
+                    itemDataService.saveOrUpdate(newItemData);
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
 
                     resetSdvStatus(container);
@@ -289,7 +290,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    itemDataDao.saveOrUpdate(existingItemData);
+                    itemDataService.saveOrUpdate(existingItemData);
 
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);
@@ -341,7 +342,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() == SdvStatus.VERIFIED)
             eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
         eventCrf.setSdvUpdateId(container.getUser().getUserId());
-        eventCrfDao.saveOrUpdate(eventCrf);
+        eventCrfService.saveOrUpdate(eventCrf);
     }
 
 
@@ -420,7 +421,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             studyEvent.setSigned(Boolean.FALSE);
             studyEvent.setUpdateId(userAccount.getUserId());
             studyEvent.setDateUpdated(new Date());
-            studyEventDao.saveOrUpdate(studyEvent);
+            studyEventService.saveOrUpdate(studyEvent);
         }
 
         if (studySubject.getStatus().equals(Status.SIGNED)) {

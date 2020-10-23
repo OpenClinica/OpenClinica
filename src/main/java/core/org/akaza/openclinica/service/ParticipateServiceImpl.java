@@ -71,7 +71,13 @@ public class ParticipateServiceImpl implements ParticipateService {
     private EventCrfDao eventCrfDao;
 
     @Autowired
+    private EventCrfService eventCrfService;
+
+    @Autowired
     private StudyEventDao studyEventDao;
+
+    @Autowired
+    private StudyEventService studyEventService;
 
     @Autowired
     private StudySubjectDao studySubjectDao;
@@ -433,7 +439,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                     if (eventDefCrf.getParicipantForm()) {
                          eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
                         eventCrf.setDateCompleted(new Date());
-                        eventCrfDao.saveOrUpdate(eventCrf);
+                        eventCrfService.saveOrUpdate(eventCrf);
                         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
                     } else if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) completeStudyEvent = false;
                 }
@@ -453,7 +459,7 @@ public class ParticipateServiceImpl implements ParticipateService {
             }
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged,false);
             StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
-            studyEventDao.saveOrUpdateTransactional(container);
+            studyEventService.saveOrUpdateTransactional(container);
             StudySubject studySubject = studyEvent.getStudySubject();
             if (statusChanged && studySubject.getStatus().isSigned())
             {

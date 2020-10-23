@@ -34,13 +34,13 @@ public interface ImportService {
 
     ErrorObj validateEventRepeatKeyIntNumber(String repeatKey);
 
-    StudyEvent scheduleEvent(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount);
+    StudyEvent scheduleEvent(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount, Boolean notifyAOP);
 
     ErrorObj validateEventTransition(StudyEvent studyEvent, UserAccount userAccount, String eventStatus);
 
      StudyEvent updateStudyEventDatesAndStatus(StudyEvent studyEvent, UserAccount userAccount, String startDate, String endDate,String eventStatus);
 
-     StudyEvent updateStudyEvntStatus(StudyEvent studyEvent, UserAccount userAccount, String eventStatus);
+     StudyEvent updateStudyEvntStatus(StudyEvent studyEvent, UserAccount userAccount, String eventStatus, Boolean notifyAOP);
 
      void writeToFile(List<DataImportReport> dataImportReports, String fileName, JobType jobType);
 

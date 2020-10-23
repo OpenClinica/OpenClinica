@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.openclinica.kafka.KafkaService;
+import core.org.akaza.openclinica.service.ItemDataService;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
@@ -47,6 +47,9 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
     private ItemDataDao itemDataDao;
+
+    @Autowired
+    private ItemDataService itemDataService;
 
     @Autowired
     private ItemDao itemDao;
@@ -188,7 +191,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setInstanceId(container.getInstanceId());
-                    itemDataDao.saveOrUpdate(newItemData);
+                    itemDataService.saveOrUpdate(newItemData);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
                     // Existing item. Value unchanged. Do nothing.
@@ -197,7 +200,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    itemDataDao.saveOrUpdate(existingItemData);
+                    itemDataService.saveOrUpdate(existingItemData);
                 }
             }
         }
@@ -254,7 +257,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     itemData.setUserAccount(container.getUser());
                     itemData.setUpdateId(container.getUser().getUserId());
                     itemData.setInstanceId(container.getInstanceId());
-                    itemData = itemDataDao.saveOrUpdate(itemData);
+                    itemData = itemDataService.saveOrUpdate(itemData);
 
                     // Close discrepancy notes
                     queryService.closeItemDiscrepancyNotesForItemData(container.getStudy(), container.getUser(), container.getSubject(), itemData);
