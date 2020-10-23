@@ -230,7 +230,7 @@ public class DeleteEventCRFServlet extends SecureController {
                 eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
                 eventCRF.setUpdater(ub);
                 eventCRF.setDateCompleted(null);
-                if(eventCRF.getSdvStatus().equals(SdvStatus.VERIFIED)) {
+                if(eventCRF.getSdvStatus()!= null && eventCRF.getSdvStatus().equals(SdvStatus.VERIFIED)) {
                     eventCRF.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
                     eventCRF.setSdvUpdateId(ub.getId());
                 }

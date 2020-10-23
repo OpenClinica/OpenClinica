@@ -489,9 +489,7 @@ public class ImportServiceImpl implements ImportService {
                     } // formDataBean for loop
                     try{
                         if(BooleanUtils.isTrue(studyEventDataBean.getSigned()) && !studyEvent.isCurrentlySigned() && studyEventDataBean.getSignatures() == null) {
-                            ArrayList<ErrorObj> errors = new ArrayList();
-                            errors.add(new ErrorObj(FAILED, ErrorConstants.ERR_CANNOT_SIGN_EVENT_WITHOUT_ATTESTATION));
-                            throw new OpenClinicaSystemException(FAILED, errors);
+                            throw new OpenClinicaSystemException(FAILED, ErrorConstants.ERR_CANNOT_SIGN_EVENT_WITHOUT_ATTESTATION);
                         }
                         if(studyEventDataBean.getSignatures() != null) {
                             importValidationService.validateSignatureForStudyEvent(studyEventDataBean, studyEvent, studySubject);
@@ -506,9 +504,15 @@ public class ImportServiceImpl implements ImportService {
                             }
                         }
                     }catch (OpenClinicaSystemException e){
-                        for (ErrorObj err : e.getMultiErrors()) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, err.getCode(), null, err.getMessage());
+                        if(e.getMultiErrors() == null) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, e.getErrorCode(), null, e.getMessage());
                             dataImportReports.add(dataImportReport);
+                        }
+                        else {
+                            for (ErrorObj err : e.getMultiErrors()) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, SIGNATURE_TYPE_KEYWORD, err.getCode(), null, err.getMessage());
+                                dataImportReports.add(dataImportReport);
+                            }
                         }
                         logger.error("Signature {} related issue", studyEventDataBean.getStudyEventOID());
                     }
