@@ -6,10 +6,7 @@ import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.JobService;
-import core.org.akaza.openclinica.service.OCUserDTO;
-import core.org.akaza.openclinica.service.StudyEventService;
-import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
@@ -49,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -192,6 +190,12 @@ public class ImportServiceImpl implements ImportService {
         if (tenantStudy == null) {
             logger.error("Study {} Not Valid", tenantStudy.getOc_oid());
         }
+        String studyEnvUUId = null;
+        if(tenantStudy.isSite())
+            studyEnvUUId = tenantStudy.getStudy().getStudyEnvUuid();
+        else
+            studyEnvUUId = tenantStudy.getStudyEnvUuid();
+        List<OCUserRoleDTO> userRolesFormUserService = userService.addOCUserFromUserService(studyEnvUUId, accessToken);
 
         List<DataImportReport> dataImportReports = new ArrayList<>();
         DataImportReport dataImportReport;
@@ -233,7 +237,7 @@ public class ImportServiceImpl implements ImportService {
                     studyAndSiteEnvUuid.setStudyEnvUuid(tenantStudy.getStudy().getStudyEnvUuid());
                 }else
                     studyAndSiteEnvUuid.setStudyEnvUuid(tenantStudy.getStudyEnvUuid());
-                List<OCUserDTO> acceptedUsers = userService.getfilteredOCUsersDTOFromUserService(studyAndSiteEnvUuid, accessToken);
+                List<OCUserDTO> acceptedUsers = userService.filterUserBasedOnStudyEventUuid(userRolesFormUserService, studyAndSiteEnvUuid);
 
                 ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
                 for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
