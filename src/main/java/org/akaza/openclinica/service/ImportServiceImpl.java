@@ -33,6 +33,8 @@ import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +133,9 @@ public class ImportServiceImpl implements ImportService {
 
     @Autowired
     private AuditLogEventDao auditLogEventDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
@@ -345,6 +350,7 @@ public class ImportServiceImpl implements ImportService {
 
 
                             itemGroupObject = validateItemGroup(itemGroupDataBean, eventCrf, crf);
+
                             if (itemGroupObject instanceof ErrorObj) {
                                 dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), null, ITEM_GROUP_TYPE_KEYWORD, ((ErrorObj) itemGroupObject).getCode(), null, ((ErrorObj) itemGroupObject).getMessage());
                                 dataImportReports.add(dataImportReport);
@@ -439,6 +445,10 @@ public class ImportServiceImpl implements ImportService {
                         if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
                             isSdvStatusUpdatedInternally = updateSdvStatusIfAlreadyVerified(eventCrf, userAccount);
                             updateEventAndSubjectStatusIfSigned(studyEvent, studySubject, userAccount);
+                            // Flushing the data after each event crf to avoid build up of data in hibernate session
+                            Session session = sessionFactory.getCurrentSession();
+                            session.flush();
+                            session.clear();
                         }
 
                         if (formDataBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
