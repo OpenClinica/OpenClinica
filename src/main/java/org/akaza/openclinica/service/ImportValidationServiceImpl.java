@@ -91,8 +91,8 @@ public class ImportValidationServiceImpl implements ImportValidationService{
             newDisplayNodeIds.add(discrepancyNoteBean.getDisplayId());
             parentDN = discrepancyNoteDao.findByDisplayIdWithoutNotePrefix(discrepancyNoteBean.getDisplayId());
             if (parentDN != null) {
-                if(itemData != null && (parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
-                        parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId()))
+                if(itemData == null || parentDN.getDnItemDataMaps() == null || parentDN.getDnItemDataMaps().size() == 0 ||
+                        parentDN.getDnItemDataMaps().get(0).getItemData().getItemDataId() != itemData.getItemDataId())
                     errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(discrepancyNoteBean.getDisplayId(), ErrorConstants.ERR_EXISTING_NOTE_ID_ON_OTHER_ITEM)));
                 if(parentDN.getParentDiscrepancyNote() != null)
                     errors.add(new ErrorObj(FAILED, generateFailedErrorMsg(discrepancyNoteBean.getDisplayId(), ErrorConstants.ERR_NOTE_ID_ALREADY_IN_USE)));

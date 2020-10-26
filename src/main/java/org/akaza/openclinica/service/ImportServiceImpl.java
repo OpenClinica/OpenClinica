@@ -417,7 +417,7 @@ public class ImportServiceImpl implements ImportService {
                                 } else if (itemObject instanceof Item) {
                                     item = (Item) itemObject;
                                 }
-                                if(item != null)
+                                if(item == null)
                                     item = itemDao.findByOcOID(itemDataBean.getItemOID());
                                 ItemData itemData = getItemDataFromItemGroup(item, itemDatasInItemGroup);
                                 for(DiscrepancyNoteBean discrepancyNoteBean : itemDataBean.getDiscrepancyNotes().getDiscrepancyNotes()){
