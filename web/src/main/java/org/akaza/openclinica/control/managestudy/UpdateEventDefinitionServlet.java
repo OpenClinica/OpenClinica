@@ -127,16 +127,17 @@ public class UpdateEventDefinitionServlet extends SecureController {
             sed.setName(fp.getString("name"));
             
             //OC-12780
-            if(sed.isRepeating() && !fp.getBoolean("repeating")) {
-            	 EventCRFDAO ecrfDao = new EventCRFDAO(sm.getDataSource());
-            	 ArrayList<EventCRFBean> crfList = ecrfDao.findAllByStudyEventDefinition(sed.getId(),parentStudyId);
-            	 if(crfList.size() >0) {
-            		  v.addValidation("repeating", Validator.CAN_NOT_CHANGE_NONE_REPEATING_NOW);
-            	 }
+            if(sed.isRepeating() && !fp.getBoolean("repeating")) {            	
             	 
             	 StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
             	 if(seDao.isThisRepeatingEventScheduledMoreThanOneTime(parentStudyId, sed.getId())) {
             		 v.addValidation("repeating", Validator.CAN_NOT_CHANGE_NONE_REPEATING_NOW);
+            	 }else {
+            		 EventCRFDAO ecrfDao = new EventCRFDAO(sm.getDataSource());
+                	 ArrayList<EventCRFBean> crfList = ecrfDao.findAllByStudyEventDefinition(sed.getId(),parentStudyId);
+                	 if(crfList.size() >0) {
+                		  v.addValidation("repeating", Validator.CAN_NOT_CHANGE_NONE_REPEATING_NOW);
+                	 }
             	 }
             }
             
