@@ -111,7 +111,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
 
         // Place the last username attempted into HttpSession for views
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(true);
         
         
         /**
