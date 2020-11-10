@@ -111,16 +111,17 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
 
         // Place the last username attempted into HttpSession for views
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
         
         
         /**
          *  OC-12286
          */
         // check the user in the current session
-        
         UserAccountBean currentSessionUser = null;
-        currentSessionUser = (UserAccountBean) session.getAttribute(SecureController.USER_BEAN_NAME);
+        if (session != null) {
+        	 currentSessionUser = (UserAccountBean) session.getAttribute(SecureController.USER_BEAN_NAME);
+        }              
         
         if(currentSessionUser !=null && !(currentSessionUser.getName().isEmpty()) && !(currentSessionUser.getName().equals(username))) {
         	//setFilterProcessesUrl("/pages/login/login?action=errorSessionLocked");
