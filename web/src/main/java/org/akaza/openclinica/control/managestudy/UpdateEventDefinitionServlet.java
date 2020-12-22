@@ -128,7 +128,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
             
             //OC-12780
             boolean canBeChanged = true;
-            if(sed.isRepeating()) {            	             	 
+           
+            if(sed.isRepeating()) {            	
+            	 
             	 StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
             	 if(seDao.isThisRepeatingEventScheduledMoreThanOneTime(parentStudyId, sed.getId())) {
             		 v.addValidation("repeating", Validator.CAN_NOT_CHANGE_NONE_REPEATING_NOW);
