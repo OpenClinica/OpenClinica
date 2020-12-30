@@ -982,8 +982,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     private String convertMessage(String message) {
+    
         message = message.replace("\n","-0-");
         message = message.replace(" ","-1-");
+    	message = encodeTarget(message);
         return message;
     }
 }
