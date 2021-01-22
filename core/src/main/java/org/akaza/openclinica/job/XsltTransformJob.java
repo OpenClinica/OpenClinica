@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -164,7 +165,31 @@ public class XsltTransformJob extends QuartzJobBean {
 
             zipped = epBean.getZipFormat();
 
-            deleteOld = epBean.getDeleteOld();
+            deleteOld = epBean.getDeleteOld();           
+            /**
+             *  exportFileName example:EXCEL_ggg_2020-12-14-131854158.xls
+             *  Temporally change the value of exportFileName, postProcExportName in epBean with current time stamp 
+             */
+            if(deleteOld) {
+            	 String[] exportFileName = epBean.getExportFileName();
+            	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
+            	 SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
+            	 String latestTimestr = sdfDir.format(new java.util.Date());
+            	 String fileType = "";
+            	 int i =0;
+            	 while(i < exportFileName.length) {
+            		 fileType = exportFileName[i].substring(exportFileName[i].lastIndexOf(".") + 1);
+            		 exportFileName[i] = exportFileName[i].substring(0, exportFileName[i].lastIndexOf("_")) + "_" + latestTimestr+ "." + fileType;;
+            		 i++;
+            	 }
+            	 epBean.setExportFileName(exportFileName);
+            	 epBean.setPostProcExportName(exportFileName[0]);
+            	 epBean.setDoNotDelFiles(exportFileName);
+            	 
+            	 dataMap.put(POST_FILE_NAME,exportFileName[0]);
+            	
+            }
+            
             long sysTimeBegin = System.currentTimeMillis();
             userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
 
@@ -175,6 +200,7 @@ public class XsltTransformJob extends QuartzJobBean {
             final long start = System.currentTimeMillis();
 
             datasetBean = (DatasetBean) datasetDao.findByPK(dsId);
+          
             ExtractBean eb = generateFileService.generateExtractBean(datasetBean, currentStudy, parentStudy);
 
             // generate file directory for file service
@@ -232,8 +258,13 @@ public class XsltTransformJob extends QuartzJobBean {
 
                 Transformer transformer = transformerFactory.newTransformer(new StreamSource(in));
 
-
-                endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
+                //endfile
+                if(outputPath.endsWith(File.separator)) {
+                	 endFile = outputPath +  epBean.getExportFileName()[fileCntr];
+                }else {
+                	 endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
+                }
+               
 
 
 
