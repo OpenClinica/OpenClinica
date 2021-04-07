@@ -188,7 +188,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 Boolean hasElm = false;
                                 String value = StringEscapeUtils.escapeXml(item.getValue());
                                 if(value != null && value.indexOf("&#") >-1) {
-                                	value = item.getValue();
+                                	if(this.hasEmojs(item.getValue())) {
+                                		if(this.hasXMLSpecialChars(item.getValue())) {
+                                			// emoji can't combine with  <  > & "
+                                			value =  StringEscapeUtils.escapeXml(value);
+                                		}else {
+                                			value = item.getValue();
+                                		}
+                                		
+                                	}
+                                	
                                 }
                                 xml.append("Value=\"" + value + "\"");
 
@@ -379,7 +388,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (o.length() > 0) {
                 	 String oldValue = StringEscapeUtils.escapeXml(o);
                      if(oldValue != null && oldValue.indexOf("&#") >-1) {
-                    	 oldValue = o;
+                    	 if(this.hasEmojs(o)) {
+                    		 if(this.hasXMLSpecialChars(o)) {
+                     			// emoji can't combine with  <  > & "
+                    			 oldValue =  StringEscapeUtils.escapeXml(oldValue);
+                     		}else {
+                     			oldValue = o;
+                     		}
+                 		}
+                    	
+                    	 
                      }                  
                     xml.append(nls);
                     xml.append(currentIndent + "                      OldValue=\"" + oldValue + "\" ");
@@ -387,7 +405,15 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (n.length() > 0) {
                 	String newValue = StringEscapeUtils.escapeXml(n);
                     if(newValue != null && newValue.indexOf("&#") >-1) {
-                   	 	newValue = n;
+                    	 if(this.hasEmojs(n)) {
+                    		 if(this.hasXMLSpecialChars(n)) {
+                      			// emoji can't combine with  <  > & "
+                     			 newValue =  StringEscapeUtils.escapeXml(newValue);
+                      		}else {
+                      			newValue = n;
+                      		}
+                 		}
+                   	 	
                     } 
                     xml.append(nls);
                     xml.append(currentIndent + "                      NewValue=\"" + newValue + "\"");
@@ -595,5 +621,45 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	    });
 	}
 	
+	/**
+	 * http://www.unicode.org/charts/PDF/U1F600.pdf
+	 * 
+	 * https://github.com/oozcitak/xmlbuilder-js/issues/147
+	 * @param inStr
+	 * @return
+	 */
+	private static boolean hasEmojs(String str) {
+				
+		    int cpCnt = str.codePointCount(0, str.length());
+	        for (int index = 0; index < cpCnt; ++index) {
+	            // i is index by code point
+	            int i = str.offsetByCodePoints(0, index);
+	            int codepoint = str.codePointAt(i);
+	            String c = Integer.toHexString(codepoint);
+	            
+	            if ((Integer.parseInt(c,16) >= Integer.parseInt("2639",16) && Integer.parseInt(c,16) <= Integer.parseInt("263b",16)) ||
+	            		(Integer.parseInt(c,16) >= Integer.parseInt("1f600",16) && Integer.parseInt(c,16) < Integer.parseInt("1f650",16)) ||
+	            		(Integer.parseInt(c,16) > Integer.parseInt("1f910",16) && Integer.parseInt(c,16) < Integer.parseInt("1f930",16)) ||
+	            		(Integer.parseInt(c,16) > Integer.parseInt("10000",16))) {
+
+	    	          return true;
+	    	        }
+	         }
+	        
+	        return false;
+	   
+	}
+	
+	private static boolean hasXMLSpecialChars(String str) {
+		 if(str!= null && (str.indexOf(">") > -1 || str.indexOf("<") > -1 || str.indexOf("\"") > -1 || str.indexOf("&") > -1 )){
+			 
+		     return true;
+	      }else {
+	    	  return false;
+	      }
+		 		
+		 		
+		
+	}
 	
 }
