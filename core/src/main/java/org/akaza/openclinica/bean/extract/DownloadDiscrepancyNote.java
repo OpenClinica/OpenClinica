@@ -42,6 +42,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     public static String CSV ="text/plain; charset=UTF-8";
     public static String PDF = "application/pdf";
     public static String COMMA = ",";
+    public static String PIPE = "|";
+    public static String TAB = "\t";
     public static Map<Integer,String> RESOLUTION_STATUS_MAP = new HashMap<Integer,String> ();
     static{
         RESOLUTION_STATUS_MAP.put(1,"New");
@@ -187,6 +189,167 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         return totalLength;
     }
 
+
+    public String serializeToString(EntityBean bean, boolean includeHeaderRow,
+                                    int threadNumber, String delimiter){
+        DiscrepancyNoteBean discNoteBean = (DiscrepancyNoteBean) bean;
+        StringBuilder writer  = new StringBuilder("");
+        //If includeHeaderRow = true, the first row of the output consists of header names, only
+        //for CSV format
+        if(includeHeaderRow) {
+            writer.append("Study Subject ID");
+            writer.append(delimiter);
+            writer.append("Subject Status");
+            writer.append(delimiter);
+            writer.append("Study/Site OID");
+            writer.append(delimiter);
+            //we're adding a thread number row
+            writer.append("Thread ID");
+            writer.append(delimiter);
+
+            writer.append("Note ID");
+            writer.append(delimiter);
+
+            writer.append("Parent Note ID");
+            writer.append(delimiter);
+
+            writer.append("Date Created");
+            writer.append(delimiter);
+            writer.append("Date Update");
+            writer.append(delimiter);
+            writer.append("Days Open");
+            writer.append(delimiter);
+            writer.append("Days Since Updated");
+            writer.append(delimiter);
+
+
+            if(discNoteBean.getDisType() != null)  {
+                writer.append("Discrepancy Type");
+                writer.append(delimiter);
+            }
+            writer.append("Resolution Status");
+            writer.append(delimiter);
+            writer.append("Event Name");
+            writer.append(delimiter);
+            writer.append("Event Occurrence");
+            writer.append(delimiter);
+            writer.append("CRF Name");
+            writer.append(delimiter);
+            writer.append("CRF Status");
+            writer.append(delimiter);
+            writer.append("Group Label");
+            writer.append(delimiter);
+            writer.append("Group Ordinal");
+            writer.append(delimiter);
+            writer.append("Entity name");
+            writer.append(delimiter);
+            writer.append("Entity value");
+            writer.append(delimiter);
+            writer.append("Description");
+            writer.append(delimiter);
+            writer.append("Detailed Notes");
+            writer.append(delimiter);
+            writer.append("Assigned User");
+            writer.append(delimiter);
+            writer.append("Study Id");
+
+            writer.append("\n");
+        }
+
+        //Fields with embedded commas must be
+        // delimited with double-quote characters.
+        writer.append(discNoteBean.getStudySub().getLabel());
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getStudySub().getStatus().getName());
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getStudy().getOid());
+        writer.append(delimiter);
+
+        writer.append(threadNumber+"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getId()+"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getParentDnId()>0?discNoteBean.getParentDnId():"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getCreatedDateString()+"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getUpdatedDateString()+"");
+        writer.append(delimiter);
+
+        if (discNoteBean.getParentDnId() == 0){
+            writer.append(discNoteBean.getAge()+"");
+            writer.append(delimiter);
+
+            String daysSinceUpdated = discNoteBean.getDays()+"";
+            writer.append(daysSinceUpdated.equals("0") ? "" : daysSinceUpdated);
+            writer.append(delimiter);
+        } else {
+            writer.append(delimiter);
+            writer.append(delimiter);
+        }
+
+        if (discNoteBean.getDisType() != null)  {
+            writer.append(discNoteBean.getDisType().getName());
+            writer.append(delimiter);
+        }
+
+        writer.append(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId())+"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getEventName());
+        writer.append(delimiter);
+
+        String eventOccurrence = null != discNoteBean.getStudyEventDefinitionBean()
+                && discNoteBean.getStudyEventDefinitionBean().isRepeating()
+                ? String.valueOf(discNoteBean.getEvent().getSampleOrdinal()) : "";
+        writer.append(eventOccurrence);
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getCrfName());
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getCrfStatus());
+        writer.append(delimiter);
+
+        String itemGroupName = discNoteBean.getItemGroupName() == null
+                ? "" : String.valueOf(discNoteBean.getItemGroupName());
+        writer.append(itemGroupName);
+        writer.append(delimiter);
+
+        String itemDataOccurence = discNoteBean.getItemDataOrdinal() == null
+                ? "" : String.valueOf(discNoteBean.getItemDataOrdinal());
+        writer.append(itemDataOccurence);
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getEntityName());
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getEntityValue());
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getDescription()+"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getDetailedNotes()+"");
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getAssignedUser().getName());
+        writer.append(delimiter);
+
+        writer.append(discNoteBean.getStudyId()+"");
+
+
+        writer.append("\n");
+        return writer.toString();
+
+
+    }
 
 
     public String serializeToString(EntityBean bean, boolean includeHeaderRow,
@@ -514,6 +677,62 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
     }
 
+    public void downLoadThreadedDiscBeans(List<DiscrepancyNoteThread> listOfThreadedBeans,
+            String format,
+            HttpServletResponse response, String studyIdentifier,String delimiter) throws Exception {
+	
+	if (listOfThreadedBeans == null ) {
+		return;
+	}
+	StringBuilder allContent = new StringBuilder();
+	String singleBeanContent="";
+	int counter=0;
+	int threadCounter=0;
+	
+	if(CSV.equalsIgnoreCase(format))  {
+		for(DiscrepancyNoteThread dnThread : listOfThreadedBeans ) {
+			threadCounter++;
+			for(DiscrepancyNoteBean discNoteBean : dnThread.getLinkedNoteList()){
+				//DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
+				++counter;
+				
+				singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter,delimiter) : serializeToString(discNoteBean, false, threadCounter,delimiter);
+				allContent.append(singleBeanContent);
+			}
+		}
+	}
+	
+	//This must be a ServletOutputStream for our purposes
+	ServletOutputStream servletStream = null;
+	
+	try{
+		if(CSV.equalsIgnoreCase(format))  {
+			String result  = StringEscapeUtils.unescapeJava(allContent.toString());
+			response.getWriter().print(result);
+			//servletStream.print(allContent.toString());
+		} else {
+		
+			//Create PDF version
+			//this.serializeListToPDF(listOfBeans,servletStream, studyIdentifier);
+			servletStream = (ServletOutputStream) response.getOutputStream();
+			this.serializeThreadsToPDF(listOfThreadedBeans,servletStream, studyIdentifier);
+			
+			
+		}
+	} catch (IOException e) {
+		e.printStackTrace();
+	} finally{
+		if(servletStream != null){
+		try {
+			servletStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		}
+	}
+	
+	}
+    
     public void downLoadThreadedDiscBeans(List<DiscrepancyNoteThread> listOfThreadedBeans,
                                           String format,
                                           HttpServletResponse response, String studyIdentifier) throws Exception {
