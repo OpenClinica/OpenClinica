@@ -251,10 +251,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 ItemDataBean itemData = null;
               
                 if(entityId == 0 && fp.isSubmitted()) {
-                	itemData = new ItemDataBean();
-                	itemData.setItemId(itemId);                	
-                	itemData.setEventCRFId(eventCRFId);
-                	itemData.setCreatedDate(new Date());
+                    itemData = new ItemDataBean();
+                    itemData.setItemId(itemId);                	
+                    itemData.setEventCRFId(eventCRFId);
+                    itemData.setCreatedDate(new Date());
                     itemData.setOrdinal(1);
                     itemData.setOwner(ub);
                     itemData.setStatus(Status.AVAILABLE);
