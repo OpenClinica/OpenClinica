@@ -420,24 +420,25 @@ public class ImportCRFDataService {
                                         blankCheck.put(newKey, itemDataBean);
                                         logger.info("adding " + newKey + " to blank checks");
                                         if (!metadataBeans.isEmpty()) {
-                                        	ItemFormMetadataBean metadataBean = null;
+                                           ItemFormMetadataBean metadataBean = null;
+
                                            //OC-14979
-                                        	for(int i=0; i<metadataBeans.size();i++ ) {
-                                           		ItemFormMetadataBean metadataBeanTemp = metadataBeans.get(i);
-                                           		
-                                           		if(metadataBeanTemp.getCrfVersionId() == crfVersion.getId()) {
-                                           			metadataBean = metadataBeanTemp;
-                                           			break;
-                                           		}
-                                           	}
-                                           	
-										if(metadataBean == null) {
-											MessageFormat mf = new MessageFormat("");
-											mf.applyPattern(respage.getString("no_metadata_could_be_found"));
-											Object[] arguments = { importItemDataBean.getItemOID() };
-											
-											throw new OpenClinicaException(mf.format(arguments), "");	 
-										}
+                                           for(int i=0; i<metadataBeans.size();i++ ) {
+                                               ItemFormMetadataBean metadataBeanTemp = metadataBeans.get(i);
+
+                                               if(metadataBeanTemp.getCrfVersionId() == crfVersion.getId()) {
+                                                   metadataBean = metadataBeanTemp;
+                                                   break;
+                                               }
+                                           }
+
+                                           if(metadataBean == null) {
+                                               MessageFormat mf = new MessageFormat("");
+                                               mf.applyPattern(respage.getString("no_metadata_could_be_found"));
+                                               Object[] arguments = { importItemDataBean.getItemOID() };
+
+                                               throw new OpenClinicaException(mf.format(arguments), "");	 
+                                            }
                                            	
                                             // also possible nullpointer
                                             displayItemBean.setData(itemDataBean);
