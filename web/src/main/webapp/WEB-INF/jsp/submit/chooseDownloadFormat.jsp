@@ -17,7 +17,9 @@
 <div id="downloadDiv">
     <form action="DiscrepancyNoteOutputServlet" name="downloadForm">
         <fmt:message key="format" bundle="${resword}"/>: <select id="fmt" name="fmt">
-           <option value="csv">comma separated values</option>
+           <option value="csv-comma">comma separated values</option>
+           <option value="csv-pipe">pipe separated values</option>
+           <option value="csv-tab">tab separated values</option>
            <option value="pdf">portable document format</option>
         </select><br /><br />
 
