@@ -186,11 +186,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             } 
                             if(printValue) {
                                 Boolean hasElm = false;
-                                String value = StringEscapeUtils.escapeXml(item.getValue());
-                                if(value != null && value.indexOf("&#") >-1) {
-                                	value = item.getValue();
-                                }
-                                xml.append("Value=\"" + value + "\"");
+                                String s= this.processEmoji(item.getValue());
+                                xml.append("Value=\"" + StringEscapeUtils.escapeXml(s) + "\"");
 
                                 String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
                                 if (muRefOid != null && muRefOid.length() > 0) {
@@ -377,20 +374,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     xml.append(currentIndent + "                      ReasonForChange=\"" + StringEscapeUtils.escapeXml(r) + "\" ");
                 }
                 if (o.length() > 0) {
-                	 String oldValue = StringEscapeUtils.escapeXml(o);
-                     if(oldValue != null && oldValue.indexOf("&#") >-1) {
-                    	 oldValue = o;
-                     }                  
-                    xml.append(nls);
-                    xml.append(currentIndent + "                      OldValue=\"" + oldValue + "\" ");
+                	String s= this.processEmoji(o);
+                	xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml(s) + "\" ");
                 }
                 if (n.length() > 0) {
-                	String newValue = StringEscapeUtils.escapeXml(n);
-                    if(newValue != null && newValue.indexOf("&#") >-1) {
-                   	 	newValue = n;
-                    } 
-                    xml.append(nls);
-                    xml.append(currentIndent + "                      NewValue=\"" + newValue + "\"");
+                    String s= this.processEmoji(n);
+                	xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(s) + "\"");
                 }
                 if (vt.length() > 0) {
                     xml.append(nls);
@@ -595,5 +584,25 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	    });
 	}
 	
+	/**
+	 *  get emoji as plain text code
+	 * @param s
+	 * @return
+	 */
+	private String processEmoji(String s) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < s.length(); i++) {
+		  if (Character.isSurrogate(s.charAt(i))) {
+		    Integer res = Character.codePointAt(s, i);
+		    i++;
+		    sb.append("U+" + Integer.toHexString(res).toUpperCase());
+		  } else {
+		    sb.append(s.charAt(i));
+		  }
+		}
+		
+		return sb.toString();
+	}
 	
 }
