@@ -186,8 +186,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             } 
                             if(printValue) {
                                 Boolean hasElm = false;
-                                String s= this.processEmoji(item.getValue());
-                                xml.append("Value=\"" + StringEscapeUtils.escapeXml(s) + "\"");
+                                xml.append("Value=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(item.getValue()) + "\"");
 
                                 String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
                                 if (muRefOid != null && muRefOid.length() > 0) {
@@ -374,12 +373,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     xml.append(currentIndent + "                      ReasonForChange=\"" + StringEscapeUtils.escapeXml(r) + "\" ");
                 }
                 if (o.length() > 0) {
-                	String s= this.processEmoji(o);
-                	xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml(s) + "\" ");
+                	xml.append(currentIndent + "                      OldValue=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(o) + "\" ");
                 }
                 if (n.length() > 0) {
-                    String s= this.processEmoji(n);
-                	xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(s) + "\"");
+                	xml.append(currentIndent + "                      NewValue=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(n) + "\"");
                 }
                 if (vt.length() > 0) {
                     xml.append(nls);
@@ -584,25 +581,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 	    });
 	}
 	
-	/**
-	 *  get emoji as plain text code
-	 * @param s
-	 * @return
-	 */
-	private String processEmoji(String s) {
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < s.length(); i++) {
-		  if (Character.isSurrogate(s.charAt(i))) {
-		    Integer res = Character.codePointAt(s, i);
-		    i++;
-		    sb.append("U+" + Integer.toHexString(res).toUpperCase());
-		  } else {
-		    sb.append(s.charAt(i));
-		  }
-		}
-		
-		return sb.toString();
-	}
+	
 	
 }
