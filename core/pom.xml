@@ -83,10 +83,10 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-        </dependency>
+        	<groupId>org.apache.commons</groupId>
+        	<artifactId>commons-lang3</artifactId>
+        	<version>3.4</version>
+		</dependency>
 		
 		<!--  Needed by commons-validator -->
 		<dependency>
