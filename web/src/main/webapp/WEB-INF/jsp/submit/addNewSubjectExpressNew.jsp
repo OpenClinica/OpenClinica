@@ -68,9 +68,16 @@
 		<c:set var="location" value="${presetValue.value}" />
 	</c:if>
 </c:forEach>
+<script>jQuery.noConflict();</script>
+<script type="text/javascript">
+   	
+	function submitOnce() {  	  	 
+	  document.getElementById('addSubjectSubmit').setAttribute("disabled","disabled");
+	  document.getElementById('subjectFormId').submit();
+	}
+</script>
 
-
-<form name="subjectForm" action="AddNewSubject" method="post">
+<form name="subjectForm" id="subjectFormId" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
 
 <div style="width: 500px; height: 550px; overflow: scroll; background:#FFFFFF; cursor:default">
@@ -404,7 +411,7 @@
     </c:choose>
     <tr>
         <td colspan="2" align="center">
-        <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button"   onclick="this.disabled=true"/>
+         <input type="submit" name="addSubject" id="addSubjectSubmit" value="<fmt:message key="add2" bundle="${resword}"/>" class="button" onclick="submitOnce()"/>
         &nbsp;
         <input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button"/>
 
