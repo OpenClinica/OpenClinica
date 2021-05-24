@@ -42,6 +42,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     public static String CSV ="text/plain; charset=UTF-8";
     public static String PDF = "application/pdf";
     public static String COMMA = ",";
+    public static String PIPE = "|";
+    public static String TAB = "\t";
     public static Map<Integer,String> RESOLUTION_STATUS_MAP = new HashMap<Integer,String> ();
     static{
         RESOLUTION_STATUS_MAP.put(1,"New");
@@ -79,7 +81,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         try{
             if(CSV.equalsIgnoreCase(format))  {
-                servletStream.print(serializeToString(discNBean, false, 0));
+                servletStream.print(serializeToString(discNBean, false, 0,this.COMMA));
             } else {
 
                 //Create PDF version
@@ -114,7 +116,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             if(! (discNoteBean instanceof DiscrepancyNoteBean)) return;
 
             DiscrepancyNoteBean discNBean = (DiscrepancyNoteBean) discNoteBean;
-            singleBeanContent = serializeToString(discNBean, false, 0);
+            singleBeanContent = serializeToString(discNBean, false, 0,this.COMMA);
             allContent.append(singleBeanContent);
             allContent.append("\n");
 
@@ -147,7 +149,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     }
 
     public int getContentLength(EntityBean bean, String format) {
-        return serializeToString(bean, false, 0).getBytes().length;
+        return serializeToString(bean, false, 0,this.COMMA).getBytes().length;
     }
 
     public int getListContentLength(List<DiscrepancyNoteBean> beans, String format) {
@@ -156,7 +158,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         for(DiscrepancyNoteBean bean : beans) {
             ++count;
             //Only count the byte length of a CSV header row for the first DNote
-            totalLength += serializeToString(bean, (count == 1), 0).getBytes().length;
+            totalLength += serializeToString(bean, (count == 1), 0,this.COMMA).getBytes().length;
             totalLength += "\n".getBytes().length;
 
         }
@@ -174,7 +176,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 //Only count the byte length of a CSV header row for the first DNote; we're only
                 //using response.setContentlength for CSV format, because apparently it is not
                 //necessary for PDF
-                totalLength += serializeToString(discNoteBean, (count == 1), 0).getBytes().length;
+                totalLength += serializeToString(discNoteBean, (count == 1), 0,this.COMMA).getBytes().length;
                 //each DN bean with have a column indicating the thread number for the
                 //note
                 totalLength += "\n".getBytes().length;
@@ -190,66 +192,66 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
 
     public String serializeToString(EntityBean bean, boolean includeHeaderRow,
-                                    int threadNumber){
+                                    int threadNumber, String delimiter){
         DiscrepancyNoteBean discNoteBean = (DiscrepancyNoteBean) bean;
         StringBuilder writer  = new StringBuilder("");
         //If includeHeaderRow = true, the first row of the output consists of header names, only
         //for CSV format
         if(includeHeaderRow) {
             writer.append("Study Subject ID");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Subject Status");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Study/Site OID");
-            writer.append(",");
+             writer.append(delimiter);
             //we're adding a thread number row
             writer.append("Thread ID");
-            writer.append(",");
+             writer.append(delimiter);
 
             writer.append("Note ID");
-            writer.append(",");
+             writer.append(delimiter);
 
             writer.append("Parent Note ID");
-            writer.append(",");
+             writer.append(delimiter);
 
             writer.append("Date Created");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Date Update");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Days Open");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Days Since Updated");
-            writer.append(",");
+             writer.append(delimiter);
 
 
             if(discNoteBean.getDisType() != null)  {
                 writer.append("Discrepancy Type");
-                writer.append(",");
+                 writer.append(delimiter);
             }
             writer.append("Resolution Status");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Event Name");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Event Occurrence");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("CRF Name");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("CRF Status");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Group Label");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Group Ordinal");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Entity name");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Entity value");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Description");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Detailed Notes");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Assigned User");
-            writer.append(",");
+             writer.append(delimiter);
             writer.append("Study Id");
 
             writer.append("\n");
@@ -258,88 +260,88 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         //Fields with embedded commas must be
         // delimited with double-quote characters.
         writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(threadNumber+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getId()+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(discNoteBean.getParentDnId()>0?discNoteBean.getParentDnId():"");
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getCreatedDateString()+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString()+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         if (discNoteBean.getParentDnId() == 0){
             writer.append(escapeQuotesInCSV(discNoteBean.getAge()+""));
-            writer.append(",");
+             writer.append(delimiter);
 
             String daysSinceUpdated = escapeQuotesInCSV(discNoteBean.getDays()+"");
             writer.append(daysSinceUpdated.equals("0") ? "" : daysSinceUpdated);
-            writer.append(",");
+             writer.append(delimiter);
         } else {
-            writer.append(",");
-            writer.append(",");
+             writer.append(delimiter);
+             writer.append(delimiter);
         }
 
         if (discNoteBean.getDisType() != null)  {
             writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
-            writer.append(",");
+             writer.append(delimiter);
         }
 
         writer.append(escapeQuotesInCSV(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId())+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEventName()));
-        writer.append(",");
+         writer.append(delimiter);
 
         String eventOccurrence = null != discNoteBean.getStudyEventDefinitionBean()
                 && discNoteBean.getStudyEventDefinitionBean().isRepeating()
                 ? String.valueOf(discNoteBean.getEvent().getSampleOrdinal()) : "";
         writer.append(escapeQuotesInCSV(eventOccurrence));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus()));
-        writer.append(",");
+         writer.append(delimiter);
 
         String itemGroupName = discNoteBean.getItemGroupName() == null
                 ? "" : String.valueOf(discNoteBean.getItemGroupName());
         writer.append(escapeQuotesInCSV(itemGroupName));
-        writer.append(",");
+         writer.append(delimiter);
 
         String itemDataOccurence = discNoteBean.getItemDataOrdinal() == null
                 ? "" : String.valueOf(discNoteBean.getItemDataOrdinal());
         writer.append(escapeQuotesInCSV(itemDataOccurence));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityName()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityValue()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getDescription()+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getDetailedNotes()+""));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getAssignedUser().getName()));
-        writer.append(",");
+         writer.append(delimiter);
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudyId()+""));
 
@@ -355,7 +357,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         ServletOutputStream servletStream = (ServletOutputStream) stream;
         DiscrepancyNoteBean discNBean = (DiscrepancyNoteBean) bean;
         StringBuilder writer  = new StringBuilder();
-        writer.append(serializeToString(discNBean, false, 0));
+        writer.append(serializeToString(discNBean, false, 0,this.COMMA));
 
         Document pdfDoc = new Document();
 
@@ -481,7 +483,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             for(DiscrepancyNoteBean discNoteBean : listOfBeans){
                 ++counter;
 
-                singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, 0) : serializeToString(discNoteBean, false, 0);
+                singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, 0,this.COMMA) : serializeToString(discNoteBean, false, 0,this.COMMA);
                 allContent.append(singleBeanContent);
                 allContent.append("\n");
 
@@ -516,7 +518,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
     public void downLoadThreadedDiscBeans(List<DiscrepancyNoteThread> listOfThreadedBeans,
                                           String format,
-                                          HttpServletResponse response, String studyIdentifier) throws Exception {
+                                          HttpServletResponse response, String studyIdentifier,String delimiter) throws Exception {
 
         if (listOfThreadedBeans == null ) {
             return;
@@ -533,7 +535,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                    //DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
                     ++counter;
 
-                    singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
+                    singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter,delimiter) : serializeToString(discNoteBean, false, threadCounter,delimiter);
                     allContent.append(singleBeanContent);
                }
             }

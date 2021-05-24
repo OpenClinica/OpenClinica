@@ -179,6 +179,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         // as entity_type 'subject'
         int subjectId = fp.getInt(SUBJECT_ID);
         int itemId = fp.getInt(ITEM_ID);
+        request.setAttribute("itemId", itemId);
+        
         String entityType = fp.getString(ENTITY_TYPE);
         
         String field = fp.getString(ENTITY_FIELD);
@@ -244,7 +246,25 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         if (!StringUtils.isBlank(entityType)) {
             if ("itemData".equalsIgnoreCase(entityType)||"itemdata".equalsIgnoreCase(entityType)) {
                 ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
-                ItemDataBean itemData = (ItemDataBean) new ItemDataDAO(sm.getDataSource()).findByPK(entityId);
+                
+                ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+                ItemDataBean itemData = null;
+              
+                if(entityId == 0 && fp.isSubmitted()) {
+                    itemData = new ItemDataBean();
+                    itemData.setItemId(itemId);                	
+                    itemData.setEventCRFId(eventCRFId);
+                    itemData.setCreatedDate(new Date());
+                    itemData.setOrdinal(1);
+                    itemData.setOwner(ub);
+                    itemData.setStatus(Status.AVAILABLE);
+                    itemData = (ItemDataBean) iddao.create(itemData);
+                    entityId = itemData.getId();
+                	
+                }else {
+                	itemData = (ItemDataBean) iddao.findByPK(entityId);	
+                }
+                
                 request.setAttribute("entityValue", itemData.getValue());
                 request.setAttribute("entityName", item.getName());
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
@@ -737,6 +757,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         }
 
                     }
+                    
                     note = (DiscrepancyNoteBean) dndao.create(note);
                     note.setEntityId(entityId);
                     dndao.createMapping(note);
