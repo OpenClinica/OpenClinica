@@ -85,7 +85,18 @@
 	  </td>
 	  <td>
 	  	<div class="formfieldXL_BG">
-	  	<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
+
+			<c:choose>
+				<c:when test="${study.studyParameterConfig.subjectIdGeneration== 'auto non-editable'}">
+				   <input style="background-color:#D3D3D3;" type="text" name="label" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldXL">
+					<br />
+				</c:when>    
+				<c:otherwise>
+				   <input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
+					<br />
+				</c:otherwise>
+			</c:choose>
+
 	  	</div>
 	  	<br>
 	  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
