@@ -372,9 +372,9 @@ public class ImportCRFDataService {
                     if (eventCRFBean == null) {
                     	eventCRFBean = eventCRFDAO.findByEventCrfID(studyEvent, crfVersion);
 
-                    	if(eventCRFBean != null) {
-							int newCRFVersionId = crfVersion.getId();
-							eventCRFBean.setCRFVersionId(newCRFVersionId);
+                    	if(eventCRFBean != null) {                    		
+                           int newCRFVersionId = crfVersion.getId();
+                           eventCRFBean.setCRFVersionId(newCRFVersionId);
                     	}
 
                     }
