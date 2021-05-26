@@ -624,11 +624,27 @@ public class ImportSpringJob extends QuartzJobBean {
                         ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
                         logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
                         itemDataDao.setFormatDates(false);
+                        int eventCrfBeanIdProcessed = 0;
+                        
                         for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                             eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                             eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
                             logger.debug("found value here: " + displayItemBean.getData().getValue());
                             logger.debug("found status here: " + eventCrfBean.getStatus().getName());
+                            
+                            /**
+                             *  OC-8254
+                             *  now  it's time to update database for the migrated CRF version
+                             */
+                            int currentCRFVersionId = eventCrfBean.getCRFVersionId();
+                            int newCRFVersionId =  displayItemBean.getMetadata().getCrfVersionId();
+                            if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
+                               eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
+                               eventCrfBeanIdProcessed = eventCrfBeanId;
+
+                               eventCrfBean.setCRFVersionId(newCRFVersionId);
+                            }
+                            
                             ItemDataBean itemDataBean = new ItemDataBean();
                             itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(),
                                     displayItemBean.getData().getOrdinal());
