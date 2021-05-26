@@ -11,8 +11,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
     List<Filter> filters = new ArrayList<Filter>();
     HashMap<String, String> columnMapping = new HashMap<String, String>();
     Integer studyEventDefinitionId;
+    Integer studyId;
 
-    public ListEventsForSubjectFilter(Integer studyEventDefinitionId) {
+    public ListEventsForSubjectFilter(Integer studyEventDefinitionId,Integer studyId) {
         columnMapping.put("studySubject.label", "ss.label");
         columnMapping.put("studySubject.status", "ss.status_id");
         columnMapping.put("studySubject.oid", "ss.oc_oid");
@@ -20,7 +21,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
         columnMapping.put("enrolledAt", "ST.unique_identifier");
         columnMapping.put("subject.charGender", "s.gender");
         this.studyEventDefinitionId = studyEventDefinitionId;
-
+        this.studyId = studyId;
     }
 
     public void addFilter(String property, Object value) {
@@ -85,6 +86,34 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
  
         
                 }
+                else if (value.equals("1")){ //DAtaEntryStage.not started
+                    criteria +="AND  SS.study_subject_id in (" + 
+                    		"SELECT  DISTINCT  SS.study_subject_id " + 
+                    		"                FROM study_subject ss LEFT JOIN study_event se ON ss.study_subject_id = se.study_subject_id,STUDY ST,SUBJECT S " + 
+                    		"                where " + 
+                    		"                    SS.SUBJECT_ID=S.SUBJECT_ID " + 
+                    		"                    AND SS.study_id = ST.study_id " + 
+                    		 "                   AND (ST.study_id=" + studyId +" or ST.parent_study_id="+ studyId +") " +
+                    		" AND  se.study_EVENT_ID  NOT IN (select study_event_id from  event_crf ec,crf_version cv where " +
+                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  AND ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) )"+
+                    		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 1 " +
+                    		 " UNION " +
+                    		 " SELECT DISTINCT  SS.study_subject_id " +
+                    		 " FROM study_subject SS,STUDY ST,SUBJECT S " +
+                    		 " WHERE "+
+                    		 " SS.SUBJECT_ID=S.SUBJECT_ID "+
+                    		 " AND SS.study_id = ST.study_id "+
+                    		 "  AND (ST.study_id=" + studyId +" or ST.parent_study_id="+ studyId +") " +
+                    		 " and  ss.study_subject_id NOT IN " + 
+                    		 "                    (select se.study_subject_id from study_event se, " + 
+                    		 "                     event_crf ec,crf_version cv " + 
+                    		 "                     where ec.crf_version_id = cv.crf_version_id and crf_id=" + crfId + "  and " + 
+                    		 "                    ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) and " + 
+                    		 "                    se.study_event_definition_id ="+studyEventDefinitionId +")  " + 
+                    		 "                    )  ";
+
+
+                }
                 else if (value.equals("4")){
                    //DAtaEntryStage.double data entry
                         criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
@@ -136,6 +165,28 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
         return criteria;
     }
 
+    boolean isFilterEventCRFNotStarted() {
+    	boolean isFilterEventCRFNotStarted = false;
+
+    	for (Filter filter : filters) {
+    		String property = filter.getProperty(); 
+    		Object value = filter.getValue();
+
+		    value = StringEscapeUtils.escapeSql(value.toString());
+	        if (value != null) {
+	             if (property.startsWith("crf_")) {
+	                int crfId = Integer.parseInt(property.toString().substring(4));
+	                //DAtaEntryStage.not started
+	                if (value.equals("1")){ 
+	                	isFilterEventCRFNotStarted = true;	 	        
+	                }
+	            } 
+	        }
+        }
+
+        return isFilterEventCRFNotStarted;
+    }
+    
     /*
      * Method to convert DataEntryStage id value into status value to be match
      * it with event_crf table rows.

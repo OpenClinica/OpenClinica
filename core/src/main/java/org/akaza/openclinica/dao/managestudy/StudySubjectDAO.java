@@ -1036,6 +1036,16 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         variables.put(new Integer(1), currentStudy.getId());
         variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getWithFilterAndSort");
+        
+        if(filter.isFilterEventCRFNotStarted()) {
+        	sql = "SELECT DISTINCT(ss.*), ST.unique_identifier  " + 
+        			"                FROM study_subject SS,STUDY ST,SUBJECT S " + 
+        			"                where " + 
+        			"                    SS.SUBJECT_ID=S.SUBJECT_ID " + 
+        			"                    AND SS.study_id = ST.study_id " + 
+        			"                    AND (ST.study_id=? or ST.parent_study_id=?)";
+        }
+        
         sql = sql + filter.execute("");
 
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -1064,6 +1074,16 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         variables.put(new Integer(1), currentStudy.getId());
         variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getCountWithFilter");
+        
+        if(filter.isFilterEventCRFNotStarted()) {
+        	sql = "SELECT COUNT( DISTINCT  SS.study_subject_id) " + 
+        			"                FROM study_subject SS,STUDY ST,SUBJECT S " + 
+        			"                where " + 
+        			"                    SS.SUBJECT_ID=S.SUBJECT_ID " + 
+        			"                    AND SS.study_id = ST.study_id " + 
+        			"                    AND (ST.study_id=? or ST.parent_study_id=?) ";
+        }
+        
         sql += filter.execute("");
 
         ArrayList rows = this.select(sql, variables);
