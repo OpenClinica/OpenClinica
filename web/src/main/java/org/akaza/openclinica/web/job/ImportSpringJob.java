@@ -641,7 +641,7 @@ public class ImportSpringJob extends QuartzJobBean {
                             int currentCRFVersionId = eventCrfBean.getCRFVersionId();
                             int newCRFVersionId =  displayItemBean.getMetadata().getCrfVersionId();
                             if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
-	                           eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
+                               eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
                                eventCrfBeanIdProcessed = eventCrfBeanId;
 
                                eventCrfBean.setCRFVersionId(newCRFVersionId);
