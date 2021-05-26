@@ -1254,6 +1254,13 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
 		this.observer = observer;
 	}
 	
+	/**
+	 * when only 1 occurrence is scheduled and has data entered
+	 *	it needs to still be able to be changed to non repeating
+	 * @param studyId
+	 * @param sed_Id
+	 * @return
+	 */
 	public boolean isThisRepeatingEventScheduledMoreThanOneTime(int studyId,int sed_Id) {
        
         setTypesExpected();
@@ -1270,7 +1277,8 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
 
         if (it.hasNext()) {
             Integer count = (Integer) ((HashMap) it.next()).get("count");
-            if(count.intValue() >= 1) {
+            //count >0 means that we found at least one subject who has been scheduled this repeating event more than once
+            if(count.intValue() > 0) {
             	return true;
             }else {
             	return false;
