@@ -639,13 +639,13 @@ public class ImportSpringJob extends QuartzJobBean {
                              *  now  it's time to update database for the migrated CRF version
                              */
                             int currentCRFVersionId = eventCrfBean.getCRFVersionId();
-              			    int newCRFVersionId =  displayItemBean.getMetadata().getCrfVersionId();
-              			    if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
-              			    	eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
-              			    	eventCrfBeanIdProcessed = eventCrfBeanId;
+                            int newCRFVersionId =  displayItemBean.getMetadata().getCrfVersionId();
+                            if(currentCRFVersionId != newCRFVersionId && eventCrfBeanIdProcessed != eventCrfBeanId) {
+	                           eventCrfDao.updateCRFVersionID(eventCrfBeanId, newCRFVersionId, ub.getId());
+                               eventCrfBeanIdProcessed = eventCrfBeanId;
 
-              			    	eventCrfBean.setCRFVersionId(newCRFVersionId);
-              			    }
+                               eventCrfBean.setCRFVersionId(newCRFVersionId);
+                            }
               			    
                             ItemDataBean itemDataBean = new ItemDataBean();
                             itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(),
