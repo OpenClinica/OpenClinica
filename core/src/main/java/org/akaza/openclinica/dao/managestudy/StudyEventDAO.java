@@ -1277,7 +1277,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
 
         if (it.hasNext()) {
             Integer count = (Integer) ((HashMap) it.next()).get("count");
-            if(count.intValue() > 1) {
+            if(count.intValue() > 0) {
             	return true;
             }else {
             	return false;
