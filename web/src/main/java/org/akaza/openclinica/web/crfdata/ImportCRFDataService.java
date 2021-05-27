@@ -150,6 +150,7 @@ public class ImportCRFDataService {
                         		  }
                         	}
                           }
+
                         
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
@@ -447,7 +448,6 @@ public class ImportCRFDataService {
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     
                     /**
-                     * OC-8255
                      * if can't find by the CRF version in the xml file, then need to check:
                      * If another user already entered a different version of the same CRF for the same Study Event & Subject
                      * if found, then will do CRF version migration
@@ -458,7 +458,6 @@ public class ImportCRFDataService {
                     	if(eventCRFBean != null) {
                 			  int newCRFVersionId = crfVersion.getId();
                 			  eventCRFBean.setCRFVersionId(newCRFVersionId);
-
                     	}
 
                     }

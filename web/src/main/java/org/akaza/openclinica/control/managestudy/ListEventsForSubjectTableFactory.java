@@ -351,7 +351,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     protected ListEventsForSubjectFilter getListEventsForSubjectFilter(Limit limit) {
-        ListEventsForSubjectFilter listEventsForSubjectFilter = new ListEventsForSubjectFilter(selectedStudyEventDefinition.getId());
+        ListEventsForSubjectFilter listEventsForSubjectFilter = new ListEventsForSubjectFilter(selectedStudyEventDefinition.getId(),selectedStudyEventDefinition.getStudyId());
         FilterSet filterSet = limit.getFilterSet();
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
