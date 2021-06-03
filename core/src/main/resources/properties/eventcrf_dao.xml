@@ -542,5 +542,31 @@
 			order by event_crf_id
 		</sql>
 	</query>
+	
+	<query>
+        <name>findByEventSubjectCRFid</name>
+        <sql>select ec.* from event_crf  ec, crf_version cv,crf
+            where ec.crf_version_id=cv.crf_version_id and 
+            crf.crf_id=cv.crf_id and
+            ec.study_event_id=? and 
+            crf.crf_id in (select crf1.crf_id from crf_version cv1,crf crf1
+            where 
+            crf1.crf_id=cv1.crf_id and
+            cv1.crf_version_id=? ) and
+            ec.study_subject_id=?	        
+        </sql>
+    </query>
+    
+     <query>
+        <name>findByEventCrfID</name>
+        <sql>select ec.* from event_crf  ec, crf_version cv,crf
+            where ec.crf_version_id=cv.crf_version_id
+            and ec.study_event_id=? and 
+            crf.crf_id in (select crf1.crf_id from crf_version cv1,crf crf1
+            where 
+            crf1.crf_id=cv1.crf_id and
+             cv1.crf_version_id=? )
+        </sql>
+    </query>
 
 </queries>

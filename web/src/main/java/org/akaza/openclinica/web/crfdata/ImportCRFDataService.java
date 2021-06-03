@@ -134,13 +134,23 @@ public class ImportCRFDataService {
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
                         
                         /**
-                         *  OC-8239
+                         *  OC-8255
                          *  need to check :
                          *  If another user already entered a different version of the same CRF for the same Study Event & Subject
+                         *  migrate to new crf version passed in xml file
                          */
-                        if (eventCrfBeans.isEmpty()) {
+                         if (eventCrfBeans.isEmpty()) {
                         	eventCrfBeans = eventCrfDAO.findByEventSubjectCRFid(studyEventBean, studySubjectBean, crfVersionBean);
-                        }
+
+                        	if(!(eventCrfBeans.isEmpty())) {
+                        		  for (EventCRFBean ecb : eventCrfBeans) {
+                        			  int newCRFVersionId = crfVersionBean.getId();
+                        			  ecb.setCRFVersionId(newCRFVersionId);
+
+                        		  }
+                        	}
+                          }
+
                         
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
@@ -438,7 +448,6 @@ public class ImportCRFDataService {
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     
                     /**
-                     * OC-8239
                      * if can't find by the CRF version in the xml file, then need to check:
                      * If another user already entered a different version of the same CRF for the same Study Event & Subject
                      * if found, then will do CRF version migration
@@ -446,9 +455,9 @@ public class ImportCRFDataService {
                     if (eventCRFBean == null) {
                     	eventCRFBean = eventCRFDAO.findByEventCrfID(studyEvent, crfVersion);
 
-                    	if(eventCRFBean != null) {                    		
-                           int newCRFVersionId = crfVersion.getId();
-                           eventCRFBean.setCRFVersionId(newCRFVersionId);
+                    	if(eventCRFBean != null) {
+                			  int newCRFVersionId = crfVersion.getId();
+                			  eventCRFBean.setCRFVersionId(newCRFVersionId);
                     	}
 
                     }
@@ -524,6 +533,7 @@ public class ImportCRFDataService {
                                         blankCheck.put(newKey, itemDataBean);
                                         logger.info("adding " + newKey + " to blank checks");
                                         if (!metadataBeans.isEmpty()) {
+
                                         	ItemFormMetadataBean metadataBean = null;
 
                                             //OC-14979

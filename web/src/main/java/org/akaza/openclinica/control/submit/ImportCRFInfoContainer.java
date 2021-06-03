@@ -86,6 +86,16 @@ public class ImportCRFInfoContainer {
                     for (CRFVersionBean crfVersionBean : crfVersionBeans) {
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        
+                        /**
+                         *  OC-8255
+                         *  need to check :
+                         *  If another user already entered a different version of the same CRF for the same Study Event & Subject
+                         */
+                        if (eventCrfBeans.isEmpty()) {
+                        	eventCrfBeans = eventCrfDAO.findByEventSubjectCRFid(studyEventBean, studySubjectBean, crfVersionBean);
+                        }
+                        
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
