@@ -36,6 +36,11 @@
             <DATATYPE>string</DATATYPE>
             <LENGTH>50</LENGTH>
         </row>
+        <row name="SiteID">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>255</LENGTH>
+        </row>
         <xsl:if test="$dobExist">
             <row name="DateofBirth">
                 <TYPE>character</TYPE>
@@ -58,6 +63,21 @@
         <row name="StudyEventRepeatKey">
             <TYPE>numeric</TYPE>
             <DATATYPE>integer</DATATYPE>
+        </row>
+         <row name="Form">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>255</LENGTH>
+        </row>
+        <row name="FormVersion">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>50</LENGTH>
+        </row>
+        <row name="FormStatus">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>50</LENGTH>
         </row>
         <row name="ItemGroupRepeatKey">
             <TYPE>numeric</TYPE>
@@ -203,6 +223,20 @@
                 <xsl:when test="$itemdef/@DataType='text' and $itemdef/@Length &lt; 256">
                     <xsl:element name="LENGTH">
                         <xsl:value-of select="$itemdef/@Length"/>
+                    </xsl:element>
+                </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="$itemdef/@Comment!=''">
+                    <xsl:element name="DESCRIPTION">
+                        <xsl:choose>
+                            <xsl:when test="string-length($itemdef/@Comment) &gt; 255">
+                                <xsl:value-of select="substring($itemdef/@Comment, 1, 255)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$itemdef/@Comment"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:element>
                 </xsl:when>
             </xsl:choose>
