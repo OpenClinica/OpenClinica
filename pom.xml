@@ -189,7 +189,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.2</version>
+			<version>1.2.0</version>
 		</dependency>
 		<!-- @pgawade 22-Nov-2010 Added the logback access; it will be needed to
 			get the web application usage pattern data -->
