@@ -684,31 +684,26 @@ public class CreateCRFVersionServlet extends SecureController {
     public ResponseOptionBean hasDifferentOption(ResponseSetBean oldRes, ResponseSetBean newRes) {
         ArrayList oldOptions = oldRes.getOptions();
         ArrayList newOptions = newRes.getOptions();
-        if (oldOptions.size() != newOptions.size()) {
-            // if the sizes are different, means the options don't match
-        	//OC-15058, but still need to compare the "overlapped" part
-        	int smallerSize =0;
-        	if(oldOptions.size() < newOptions.size()) {
-        		smallerSize = oldOptions.size();
-        	}else {
-        		smallerSize = newOptions.size();
-        	}        	
-
-            for (int i = 0; i < smallerSize; i++) {
-                ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
-                String text = rob.getText();
-                String value = rob.getValue();
-                
-                // the same position responses
-                ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(i);               
+      
+        for (int i = 0; i < oldOptions.size(); i++) {// from database
+            ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
+            String text = rob.getText();
+            String value = rob.getValue();
+            for (int j = i; j < newOptions.size(); j++) {// from
+                // spreadsheet
+                ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
+                // changed by jxu on 08-29-06, to fix the problem of cannot
+                // recognize
+                // the same responses
                 String text1 = restoreQuotes(rob1.getText());
+
                 String value1 = restoreQuotes(rob1.getValue());
 
                 if (StringUtil.isBlank(text1) && StringUtil.isBlank(value1)) {
                     // this response label appears in the spreadsheet
                     // multiple times, so
                     // ignore the checking for the repeated ones
-                    continue;
+                    break;
                 }
                 if (text1.equalsIgnoreCase(text) && !value1.equals(value)) {
                     logger.debug("different response value:" + value1 + "|" + value);
@@ -717,44 +712,11 @@ public class CreateCRFVersionServlet extends SecureController {
                     logger.debug("different response text:" + text1 + "|" + text);
                     return rob;
                 }
-                             
+                break;
             }
-
-        
-
-        } else {
-            for (int i = 0; i < oldOptions.size(); i++) {// from database
-                ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
-                String text = rob.getText();
-                String value = rob.getValue();
-                for (int j = i; j < newOptions.size(); j++) {// from
-                    // spreadsheet
-                    ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
-                    // changed by jxu on 08-29-06, to fix the problem of cannot
-                    // recognize
-                    // the same responses
-                    String text1 = restoreQuotes(rob1.getText());
-
-                    String value1 = restoreQuotes(rob1.getValue());
-
-                    if (StringUtil.isBlank(text1) && StringUtil.isBlank(value1)) {
-                        // this response label appears in the spreadsheet
-                        // multiple times, so
-                        // ignore the checking for the repeated ones
-                        break;
-                    }
-                    if (text1.equalsIgnoreCase(text) && !value1.equals(value)) {
-                        logger.debug("different response value:" + value1 + "|" + value);
-                        return rob;
-                    } else if (!text1.equalsIgnoreCase(text) && value1.equals(value)) {
-                        logger.debug("different response text:" + text1 + "|" + text);
-                        return rob;
-                    }
-                    break;
-                }
-            }
-
         }
+
+       
         return null;
     }
 
