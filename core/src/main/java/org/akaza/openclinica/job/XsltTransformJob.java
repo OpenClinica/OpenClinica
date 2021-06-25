@@ -170,24 +170,36 @@ public class XsltTransformJob extends QuartzJobBean {
             /**
              *  exportFileName example:EXCEL_ggg_2020-12-14-131854158.xls
              *  Temporally change the value of exportFileName, postProcExportName in epBean with current time stamp 
+             *             
              */
-            if(deleteOld) {
+            
+            String filedescription = epBean.getFiledescription();
+            if(deleteOld ) {
             	 String[] exportFileName = epBean.getExportFileName();
             	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
             	 SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
             	 String latestTimestr = sdfDir.format(new java.util.Date());
-            	 String fileType = "";
-            	 int i =0;
-            	 while(i < exportFileName.length) {
-            		 fileType = FilenameUtils.getExtension(exportFileName[i]);
-            		 exportFileName[i] = exportFileName[i].substring(0, exportFileName[i].lastIndexOf("_")) + "_" + latestTimestr+ "." + fileType;;
-            		 i++;
-            	 }
-            	 epBean.setExportFileName(exportFileName);
-            	 epBean.setPostProcExportName(exportFileName[0]);
-            	 epBean.setDoNotDelFiles(exportFileName);
+            	 String fileType = "";            	 
             	 
-            	 dataMap.put(POST_FILE_NAME,exportFileName[0]);
+            	 /**
+            	  *  FOR SAS:
+                  *  extract.12.exportname=SAS_MAP.xml,SAS_DATA.xml,SAS_FORMAT.sas
+                  *  no time stamp to replace in those file name
+            	  */
+            	 if(filedescription.indexOf("SAS Data") > -1) {            		 
+            		 ;//skip
+            	 }else {
+            		 int i =0;
+                	 while(i < exportFileName.length) {
+                		 fileType = FilenameUtils.getExtension(exportFileName[i]);
+                		 exportFileName[i] = exportFileName[i].substring(0, exportFileName[i].lastIndexOf("_")) + "_" + latestTimestr+ "." + fileType;;
+                		 i++;
+                	 }
+                	 
+            		 epBean.setExportFileName(exportFileName);
+            		 
+            		 dataMap.put(POST_FILE_NAME,exportFileName[0]);
+            	 }            	            	            	             	
             	
             }
             
