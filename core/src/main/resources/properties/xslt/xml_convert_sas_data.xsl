@@ -14,6 +14,11 @@
 					<xsl:element name="SubjectID">
 						<xsl:value-of select="../../../@OpenClinica:StudySubjectID"/>
 					</xsl:element>
+					<xsl:element name="SiteID">
+                        <xsl:variable name="studyOID" select="../../../../@StudyOID"/>
+                        <xsl:variable name="studyElement" select="//odm:Study[@OID = $studyOID]"/>
+                        <xsl:value-of select="$studyElement/odm:GlobalVariables/odm:ProtocolName"/>
+                    </xsl:element>
 					<xsl:if test="$dobExist">
 						<xsl:element name="DateofBirth">
 							<xsl:value-of select="../../../@OpenClinica:DateOfBirth"/>
@@ -33,6 +38,15 @@
 					<xsl:element name="StudyEventRepeatKey">
 						<xsl:value-of select="../../@StudyEventRepeatKey"/>
 					</xsl:element>
+					<xsl:element name="Form">
+                        <xsl:value-of select="../@OpenClinica:FormName"/>
+                    </xsl:element>
+                    <xsl:element name="FormVersion">
+                        <xsl:value-of select="../@OpenClinica:FormLayoutOID"/>
+                    </xsl:element>
+                    <xsl:element name="FormStatus">
+                        <xsl:value-of select="../@OpenClinica:Status"/>
+                    </xsl:element>
 					<xsl:element name="ItemGroupRepeatKey">
 						<xsl:value-of select="@ItemGroupRepeatKey"/>
 					</xsl:element>
