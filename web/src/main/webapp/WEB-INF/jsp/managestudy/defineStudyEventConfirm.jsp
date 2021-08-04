@@ -13,6 +13,14 @@
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 
+<script type="text/javascript">
+   	
+	function submitOnce(formId, submitButtonId) {  	  	 
+	  document.getElementById(submitButtonId).setAttribute("disabled","disabled");
+	  document.getElementById(formId).submit();
+	}
+</script>
+
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
@@ -196,16 +204,16 @@
 <br>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>   
-    <td><form action="DefineStudyEvent" method="POST">
+    <td><form id='confirm_and_finish' action="DefineStudyEvent" method="POST">
          <input type="hidden" name="actionName" value="submit">
          <input type="hidden" name="nextAction" value="2">
-         <input type="submit" name="submit" value="<fmt:message key="confirm_and_finish" bundle="${resword}"/>" class="button_long">
+         <input type="submit" id='cfsubmit' name="submitBtn" value="<fmt:message key="confirm_and_finish" bundle="${resword}"/>" class="button_long" onclick="submitOnce('confirm_and_finish','cfsubmit')">
         </form>
     </td>
-    <td><form action="DefineStudyEvent" method="POST">
+    <td><form id='confirm_and_create_another_definition' action="DefineStudyEvent" method="POST">
          <input type="hidden" name="actionName" value="submit">
          <input type="hidden" name="nextAction" value="3">
-         <input type="submit" name="submit" value="<fmt:message key="confirm_and_create_another_definition" bundle="${resword}"/>" class="button_xlong">
+         <input type="submit" id='ccdsubmit' name="submitBtn" value="<fmt:message key="confirm_and_create_another_definition" bundle="${resword}"/>" class="button_xlong" onclick="submitOnce('confirm_and_create_another_definition','ccdsubmit')">
         </form>
     </td>
     <td><form action="DefineStudyEvent" method="POST">
