@@ -128,8 +128,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
             
             //OC-12780
             boolean canBeChanged = true;
-           
-            if(sed.isRepeating()) {            	
+            boolean repeating = fp.getBoolean("repeating");
+            
+            if(sed.isRepeating() && !repeating) {            	
             	 
             	 StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
             	 if(seDao.isThisRepeatingEventScheduledMoreThanOneTime(parentStudyId, sed.getId())) {
@@ -139,7 +140,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
             }
             
             if(canBeChanged) {
-            	sed.setRepeating(fp.getBoolean("repeating"));
+            	sed.setRepeating(repeating);
             }
             
             sed.setCategory(fp.getString("category"));
