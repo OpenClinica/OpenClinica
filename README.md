@@ -1,5 +1,7 @@
 # Welcome!
 
+This is a fork of OpenClinica which attempts to refactor the architecture into a multi-tier architecture with Apache Webserver, Tomcat, Amazon RDS, Elasticache (HTTP Session caching) deployment on AWS. Accompanied is a Cloudformation template that will help deploy the refactored stack to AWS.
+
 OpenClinica is an open source software for Electronic Data Capture (EDC) and Clinical Data Management (CDM) used to optimize clinical trial workflow in a smart and secure fashion. Use OpenClinica to:
 
 - Build studies
