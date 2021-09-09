@@ -1,7 +1,7 @@
 package org.akaza.openclinica.bean.admin;
 
 
-public class SqlParameter {
+public class SqlParameter implements java.io.Serializable {
 	private String value;
 	private JDBCType type;
 	

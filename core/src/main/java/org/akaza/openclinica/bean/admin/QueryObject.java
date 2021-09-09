@@ -2,7 +2,7 @@ package org.akaza.openclinica.bean.admin;
 
 import java.util.ArrayList;
 
-public class QueryObject {
+public class QueryObject implements java.io.Serializable {
 	
 	private String sql;
 	private ArrayList<SqlParameter> sqlParameters;

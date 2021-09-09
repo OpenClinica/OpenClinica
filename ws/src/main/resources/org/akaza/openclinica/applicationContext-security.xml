@@ -38,7 +38,9 @@
     <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
     <security:session-management session-authentication-strategy-ref="sas"/>
     <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
-    
+    <security:port-mappings>
+		<security:port-mapping http="80" https="443" />
+	</security:port-mappings>
   </security:http>  
     <!-- 
     <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter">

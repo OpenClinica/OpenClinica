@@ -1,6 +1,6 @@
 package org.akaza.openclinica.bean.login;
 
-public class ResponseSuccessStudyDTO {
+public class ResponseSuccessStudyDTO implements java.io.Serializable {
 
 	private String message;
 	private String uniqueProtocolID;

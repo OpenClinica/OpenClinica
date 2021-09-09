@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author thickerson
  *
  */
-public class BreadcrumbTrail {
+public class BreadcrumbTrail implements java.io.Serializable {
     private ArrayList trail = new ArrayList();
 
     public BreadcrumbTrail() {

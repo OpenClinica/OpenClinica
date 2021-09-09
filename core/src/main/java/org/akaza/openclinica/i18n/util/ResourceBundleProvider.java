@@ -12,15 +12,16 @@ public class ResourceBundleProvider {
      * @author Nacho M. Castejon and Jose Martinez Garcia, BAP Health
      */
     public static HashMap<Thread, Locale> localeMap = new HashMap<Thread, Locale>();
+    
     /**
      * Contains the set of ResourceBundles associated to each locale.
      */
-    static HashMap<Locale, HashMap<String, ResourceBundle>> resBundleSetMap = new HashMap<Locale, HashMap<String, ResourceBundle>>();
+    //static HashMap<Locale, HashMap<String, ResourceBundle>> resBundleSetMap = new HashMap<Locale, HashMap<String, ResourceBundle>>();
 
     public static void updateLocale(Locale l) {
         //logger.info("* found locale " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
         localeMap.put(Thread.currentThread(), l);
-        if (!resBundleSetMap.containsKey(l)) {
+        /*if (!resBundleSetMap.containsKey(l)) {
             HashMap<String, ResourceBundle> resBundleSet = new HashMap<String, ResourceBundle>();
             resBundleSet.put("org.akaza.openclinica.i18n.admin", ResourceBundle.getBundle("org.akaza.openclinica.i18n.admin", l));
             resBundleSet.put("org.akaza.openclinica.i18n.audit_events", ResourceBundle.getBundle("org.akaza.openclinica.i18n.audit_events", l));
@@ -34,7 +35,7 @@ public class ResourceBundleProvider {
             resBundleSet.put("org.akaza.openclinica.i18n.licensing", ResourceBundle.getBundle("org.akaza.openclinica.i18n.licensing", l));
 
             resBundleSetMap.put(l, resBundleSet);
-        }
+        }*/
     }
 
     public static Locale getLocale() {
@@ -126,8 +127,9 @@ public class ResourceBundleProvider {
      * @return
      */
     private static ResourceBundle getResBundle(String name) {
-
-        return resBundleSetMap.get(localeMap.get(Thread.currentThread())).get(name);
+    	Locale l=localeMap.get(Thread.currentThread());
+    	return getResBundle(name, l);
+        // return resBundleSetMap.get(localeMap.get(Thread.currentThread())).get(name);
     }
 
     /**
@@ -139,7 +141,8 @@ public class ResourceBundleProvider {
      * @return The corresponding ResourceBundle
      */
     private static ResourceBundle getResBundle(String name, Locale locale) {
-        return resBundleSetMap.get(locale).get(name);
+        return ResourceBundle.getBundle(name, locale);
+    	//return resBundleSetMap.get(locale).get(name);
     }
 
     /**
