@@ -11,7 +11,6 @@ Description:  This template deploys a VPC, with 1 public and 1 private subnet fo
   dependencies and the static assets(html/css/js) in Apache web tier. 
 
 Parameters:
-
   KeyName:
     Description: Key Pair Name
     Type: String
@@ -490,7 +489,7 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateName: !Sub ${AWS::StackName}-${EnvironmentType}-web-launch-template
-      LaunchTemplateData:ß
+      LaunchTemplateData:
         ImageId: !Ref LatestAmiId
         InstanceType: !Ref WebInstanceType
         KeyName: !Ref KeyName
@@ -911,5 +910,3 @@ Outputs:
   OpenClinicaURL:
     Description: URL to launch the OpenClinica Portal
     Value: !Sub http://${WebAppLoadBalancer.DNSName}/OpenClinica
-
-
