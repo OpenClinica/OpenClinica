@@ -1,0 +1,915 @@
+Description:  This template deploys a VPC, with 1 public and 1 private subnet for 
+  each of the  3 tiers of the OpenClinica Open Source Clinical Trials Management System(CTMS).
+  The pairs of subnet for each of the tiers are spread across two Availability Zones. 
+  Besides the VPC and Subnets deployed in multiple AZs, It also deploys an internet gateway, 
+  with a default route on the public subnets, a pair of NAT gateways (one in each AZ), 
+  and specifies default routes for them in the private subnets to ensure internet connectivy. 
+  Additionally, To realize the multi-tier architecture of the application, Apache WebServer, 
+  Apache Tomcat, Redis Elasticache cluster for HTTP Session caching and a PostGres RDS database 
+  with the default Juno Diabetes Clinical Trials Study will be deployed. To top it off,
+  the template also provisions, Apache-tomcat AJP13 connector, Redis caching session manager 
+  dependencies and the static assets(html/css/js) in Apache web tier. 
+
+Parameters:
+
+  KeyName:
+    Description: Key Pair Name
+    Type: String
+
+  WebInstanceType:
+    Default: 't2.micro'
+    Type: String
+
+  AppInstanceType:
+    Default: 'm5.large'
+    Type: String
+
+  WebASGMinSize:
+    Description: Please enter MinSize of Auto Scaling Group for Web Tier
+    Default: 2
+    Type: Number
+    AllowedValues:
+      - 2
+      - 3
+      - 4
+
+  WebASGMaxSize:
+    Description: Please enter MaxSize of Auto Scaling Group for Web Tier
+    Default: 2
+    Type: Number
+    AllowedValues:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 8
+
+  WebASGDesiredCapacity:
+    Description: Please enter DesiredCapacity of Auto Scaling Group for Web Tier
+    Default: 2
+    Type: Number
+    AllowedValues:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 8
+
+  AppASGMinSize:
+    Description: Please enter MinSize of Auto Scaling Group for App Tier
+    Default: 2
+    Type: Number
+    AllowedValues:
+      - 2
+      - 3
+      - 4
+
+  AppASGMaxSize:
+    Description: Please enter MaxSize of Auto Scaling Group for App Tier
+    Default: 2
+    Type: Number
+    AllowedValues:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 8
+
+  AppASGDesiredCapacity:
+    Description: Please enter DesiredCapacity of Application Scaling Group for App Tier
+    Default: 2
+    Type: Number
+    AllowedValues:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 8
+
+  EnvironmentType:
+    Description: "Specify the Environment type of the stack."
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+  VpcCIDR:  
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.192.0.0/16
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.10.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.11.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.20.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.21.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PrivateDBSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.22.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  PrivateDBSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.23.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x
+
+  BootstrapInstanceType:
+    Description: Instance Type for BootstrapInstance
+    Default: t2.micro
+    Type: String
+    AllowedValues:
+      - t2.micro
+
+  DBInstanceType:
+    Description: DB node instance class
+    Type: String
+    Default: db.t3.medium
+    ConstraintDescription: Node instance class not supported
+    AllowedValues:
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
+  
+  DBUsername:
+    NoEcho: "true"
+    Description: Username for Postgresql database access
+    Type: String
+    MinLength: 4
+    MaxLength: 16
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
+    Default: postgres
+  
+  DBPassword:
+    NoEcho: "true"
+    Description: Password Postgresql database access
+    Type: String
+    MinLength: 8
+    MaxLength: 41
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must contain only alphanumeric characters.
+    Default: "postgres"
+
+  LatestAmiId:
+    Type:  'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  CacheNodeType:
+    Description: Cache node instance class, e.g. cache.t2.micro(free tier). See https://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/CacheNodes.SelectSize.html
+    Type: String
+    Default: cache.t2.micro
+    ConstraintDescription: Node instance class not supported
+    AllowedValues:
+      - cache.t2.micro
+      - cache.t2.small
+      - cache.t2.medium
+      - cache.m4.large
+      - cache.m4.xlarge
+      - cache.m4.2xlarge
+      - cache.m4.4xlarge
+      - cache.m4.10xlarge
+      - cache.r4.large
+      - cache.r4.xlarge
+      - cache.r4.2xlarge
+      - cache.r4.4xlarge
+      - cache.r4.8xlarge
+      - cache.r4.16xlarge
+
+  CacheEngine:
+    Description: The underlying HTTP Session cache engine (currently only redis)
+    Type: String
+    Default: redis
+    ConstraintDescription: Only Redis instance type is supported, no support for Memcached yet
+    AllowedValues:
+      - redis
+
+  CacheNodeCount:
+    Description: Number of nodes in the redis cluster.
+    Type: Number
+    AllowedValues:
+      - 1
+      - 2
+    ConstraintDescription: Node count must be between 1 and 2
+    Default: 1
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-VPC
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-InternetGateway
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PublicSubnet(AZ1)
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PublicSubnet(AZ2)
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateSubnet(AZ1)
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateSubnet(AZ2)
+
+  PrivateDBSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateDBSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateDBSubnet(AZ1)
+
+  PrivateDBSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateDBSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateDBSubnet(AZ2)
+
+  NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway2EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway1EIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway2EIP.AllocationId
+      SubnetId: !Ref PublicSubnet2
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PublicRoutes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateRoutes(AZ1)
+
+  DefaultPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateRoutes(AZ2)
+
+  DefaultPrivateRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateDBRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateDBRoutes(AZ1)
+
+  DefaultPrivateDBRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateDBRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+
+  PrivateDBSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateDBRouteTable1
+      SubnetId: !Ref PrivateDBSubnet1
+
+  PrivateDBRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-PrivateDBRoutes(AZ2)
+
+  DefaultPrivateDBRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateDBRouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+
+  PrivateDBSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateDBRouteTable2
+      SubnetId: !Ref PrivateDBSubnet2
+
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AWS::StackName}-${EnvironmentType}-ALBSG
+      GroupDescription: Enable HTTP access via port 80
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-ALBSG
+
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AWS::StackName}-${EnvironmentType}-WebServerSG
+      GroupDescription: Enable HTTP access via port 80
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          #CidrIp: 0.0.0.0/0
+          SourceSecurityGroupId: !GetAtt ALBSecurityGroup.GroupId
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-WebServerSG
+
+  AsgWebLaunchTemplate:
+    DependsOn: NetworkLoadBalancer
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub ${AWS::StackName}-${EnvironmentType}-web-launch-template
+      LaunchTemplateData:ß
+        ImageId: !Ref LatestAmiId
+        InstanceType: !Ref WebInstanceType
+        KeyName: !Ref KeyName
+        Monitoring:
+          Enabled: True
+        SecurityGroupIds:
+          - !Ref WebServerSecurityGroup
+        TagSpecifications:
+        - ResourceType: instance
+          Tags:
+          - Key: Name
+            Value: !Sub ${AWS::StackName}-${EnvironmentType}-web-instance
+        UserData:
+          Fn::Base64:
+            Fn::Sub:
+              - |
+                #!/bin/bash
+                sudo yum -y install httpd
+                sudo curl -LO https://github.com/Pradeep39/OpenClinica/raw/master/cloudformation/httpd.zip
+                sudo unzip httpd.zip
+                sudo cp httpd/modules/*.* /etc/httpd/modules/
+                sudo cp httpd/conf/*.* /etc/httpd/conf/
+                sudo cp httpd/conf.d/*.* /etc/httpd/conf.d/
+                sudo cp -R httpd/html/OpenClinica /var/www/html/ 
+                sudo sed -ir "s/^[#]*\s*worker.node1.host=.*/worker.node1.host=${NLBHostVar} /" /etc/httpd/conf/workers.properties
+                sudo sed -ir "s/^[#]*\s*worker.node2.host=.*/worker.node2.host=${NLBHostVar} /" /etc/httpd/conf/workers.properties
+                sudo sed -ir "s/^[#]*\s*worker.node3.host=.*/worker.node3.host=${NLBHostVar} /" /etc/httpd/conf/workers.properties
+                sudo sed -ir "s/^[#]*\s*worker.node4.host=.*/worker.node4.host=${NLBHostVar} /" /etc/httpd/conf/workers.properties
+                sudo service httpd restart
+                sudo rm httpd.zip
+                sudo rm -Rf httpd
+              - NLBHostVar: !GetAtt NetworkLoadBalancer.DNSName
+  
+  OCWebTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      HealthCheckEnabled: True
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPort: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /OpenClinica/pages/login/login
+      HealthCheckTimeoutSeconds: 3
+      HealthyThresholdCount: 2
+      Name: !Sub ${AWS::StackName}-${EnvironmentType}-WebTargetGroup
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      UnhealthyThresholdCount: 6
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-WebTargetGroup
+
+  WebAppLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub oc-${EnvironmentType}-ALB
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      Type: application
+      SecurityGroups: 
+        - !Ref ALBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-ALB
+
+  WebAppLoadBalancerListener:
+    DependsOn: WebAppLoadBalancer
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref WebAppLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OCWebTargetGroup
+
+  WebAsg:
+    DependsOn: WebAppLoadBalancerListener
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub ${AWS::StackName}-${EnvironmentType}-WebASG
+      MinSize: !Ref WebASGMinSize
+      MaxSize: !Ref WebASGMaxSize
+      DesiredCapacity: !Ref WebASGDesiredCapacity
+      HealthCheckGracePeriod: 300
+      LaunchTemplate:
+        LaunchTemplateId: !Ref AsgWebLaunchTemplate
+        Version: !GetAtt AsgWebLaunchTemplate.LatestVersionNumber
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      TargetGroupARNs:
+        - !Ref OCWebTargetGroup
+      Tags:
+        - ResourceType: auto-scaling-group
+          ResourceId: !Sub ${AWS::StackName}-${EnvironmentType}-WebASG
+          PropagateAtLaunch: true
+          Value: ${EnvironmentType}
+          Key: env
+ 
+  AppServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AWS::StackName}-${EnvironmentType}-AppServerSG
+      GroupDescription: Enable AJP/13 access via port 8009
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '8009'
+          ToPort: '8009'
+          CidrIp: !Ref VpcCIDR
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-AppServerSG
+
+  AsgAppLaunchTemplate:
+    DependsOn: 
+      - BootstrapInstance
+      - WebAppDatabase
+      - ElastiCacheCluster
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub ${AWS::StackName}-${EnvironmentType}-app-launch-template
+      LaunchTemplateData:
+        ImageId: !Ref LatestAmiId
+        InstanceType: !Ref AppInstanceType
+        KeyName: !Ref KeyName
+        Monitoring:
+          Enabled: True
+        SecurityGroupIds:
+          - !Ref AppServerSecurityGroup
+        TagSpecifications:
+        - ResourceType: instance
+          Tags:
+          - Key: Name
+            Value: !Sub ${AWS::StackName}-${EnvironmentType}-App-instance
+        UserData:
+          Fn::Base64:
+            Fn::Sub:
+              - |
+                #!/bin/bash
+                sudo amazon-linux-extras install tomcat9 -y
+                sudo curl -LO https://github.com/Pradeep39/OpenClinica/raw/master/cloudformation/tomcat.zip
+                sudo unzip tomcat.zip
+                sudo rm -rf /usr/share/tomcat/webapps/**
+                sudo cp tomcat/lib/*.* /usr/share/tomcat/lib/
+                sudo cp tomcat/conf/*.* /usr/share/tomcat/conf/
+                sudo cp tomcat/lib/*.* /usr/share/tomcat/lib/
+                sudo cp -R tomcat/openclinica-ws.config /usr/share/tomcat
+                sudo cp -R tomcat/openclinica-ws.data /usr/share/tomcat
+                sudo cp -R tomcat/openclinica.config /usr/share/tomcat
+                sudo cp -R tomcat/openclinica.data /usr/share/tomcat
+                sudo curl -LO https://github.com/Pradeep39/OpenClinica/raw/master/cloudformation/webapps/OpenClinica-ws.war
+                sudo curl -LO https://github.com/Pradeep39/OpenClinica/raw/master/cloudformation/webapps/OpenClinica.war
+                sudo cp OpenClinica-ws.war /usr/share/tomcat/webapps/
+                sudo cp OpenClinica.war /usr/share/tomcat/webapps/
+                sudo sed -ir "s/\s*memcachedNodes=.*/memcachedNodes=\"redis:\/\/${RedisEndPoint}:6379\"/" /usr/share/tomcat/conf/context.xml
+                sudo sed -ir "s/^[#]*\s*dbHost=.*/dbHost=${DBEndPoint}/" /usr/share/tomcat/openclinica.config/datainfo.properties
+                sudo sed -ir "s/^[#]*\s*dbHost=.*/dbHost=${DBEndPoint}/" /usr/share/tomcat/openclinica-ws.config/datainfo.properties
+                sudo chmod -R 777 /usr/share/tomcat/openclinica.data
+                sudo chmod -R 777 /usr/share/tomcat/openclinica-ws.data
+                sudo chmod -R 777 /usr/share/tomcat/openclinica.config
+                sudo chmod -R 777 /usr/share/tomcat/openclinica-ws.config
+                sudo service tomcat restart
+                sudo rm -Rf tomcat
+                sudo rm tomcat.zip
+              - DBEndPoint: !GetAtt WebAppDatabase.Endpoint.Address
+                RedisEndPoint: !GetAtt ElastiCacheCluster.RedisEndpoint.Address
+  
+  OCAppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      HealthCheckEnabled: True
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPort: 8009
+      HealthCheckProtocol: TCP
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      Name: !Sub ${AWS::StackName}-${EnvironmentType}-AppTG
+      Port: 8009
+      Protocol: TCP
+      TargetType: instance
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+      Tags:
+          - Key: Name
+            Value: !Sub ${AWS::StackName}-${EnvironmentType}-AppTG
+
+  NetworkLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+      - Key: 'load_balancing.cross_zone.enabled'
+        Value: true
+      Name: !Sub oc-${EnvironmentType}-NLB
+      Scheme: internal
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Type: network
+      Tags:
+          - Key: Name
+            Value: !Sub ${AWS::StackName}-${EnvironmentType}-NLB
+
+  NetworkLoadBalancerListener:
+    DependsOn: NetworkLoadBalancer
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref NetworkLoadBalancer
+      Port: 8009
+      Protocol: TCP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OCAppTargetGroup
+
+  ApplicationAsg:
+    DependsOn: NetworkLoadBalancerListener
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub ${AWS::StackName}-${EnvironmentType}-AppASG
+      MinSize: !Ref AppASGMinSize
+      MaxSize: !Ref AppASGMaxSize
+      DesiredCapacity: !Ref AppASGDesiredCapacity
+      HealthCheckGracePeriod: 300
+      LaunchTemplate:
+        LaunchTemplateId: !Ref AsgAppLaunchTemplate
+        Version: !GetAtt AsgAppLaunchTemplate.LatestVersionNumber
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      TargetGroupARNs:
+        - !Ref OCAppTargetGroup
+      Tags:
+        - ResourceType: auto-scaling-group
+          ResourceId: !Sub ${AWS::StackName}-${EnvironmentType}-AppASG
+          PropagateAtLaunch: true
+          Value: ${EnvironmentType}
+          Key: env
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: !Sub ${AWS::StackName}-${EnvironmentType}-DBSubnetGroup
+      SubnetIds:
+        - !Ref PrivateDBSubnet1
+        - !Ref PrivateDBSubnet2
+      Tags:
+          - Key: Name
+            Value: !Sub ${AWS::StackName}-${EnvironmentType}-DBSubnetGroup
+
+  WebAppDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: !Sub ${AWS::StackName}${EnvironmentType}
+      DBInstanceIdentifier: !Sub ${AWS::StackName}-${EnvironmentType}-DB
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !GetAtt DBEC2SecurityGroup.GroupId
+      AllocatedStorage: "5"
+      DBInstanceClass: !Ref DBInstanceType
+      Engine: postgres
+      EngineVersion: "11.10"
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      #MultiAZ: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-DB
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+
+  DBEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AWS::StackName}-${EnvironmentType}-DB-SG
+      GroupDescription: Allow postgres inbound traffic
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !GetAtt AppServerSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-DB-SG
+
+  BootstrapInstance:
+    DependsOn: WebAppDatabase
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref BootstrapInstanceType
+      KeyName: !Ref KeyName
+      SubnetId: !Ref PrivateSubnet1
+      ImageId: !Ref LatestAmiId
+      SecurityGroupIds:
+        - !Ref AppServerSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-bootstrap-instance
+      UserData:
+          Fn::Base64:
+            Fn::Sub:
+              - |
+                #!/bin/bash
+                sudo amazon-linux-extras install postgresql11 -y
+                export PGPASSWORD=${DBPwd}
+                psql -h ${DBEndPoint} -U ${DBUser} --no-password ${DBUser} -c "CREATE USER clinica WITH PASSWORD 'clinica'"
+                psql -h ${DBEndPoint} -U ${DBUser} --no-password ${DBUser} -c "GRANT clinica TO ${DBUser}"
+                psql -h ${DBEndPoint} -U ${DBUser} --no-password ${DBUser} -c "CREATE DATABASE openclinica WITH ENCODING='UTF8' OWNER=clinica"
+                export PGPASSWORD=clinica
+                curl -LO https://github.com/Pradeep39/OpenClinica/raw/master/cloudformation/openclinica-postgres.sql.zip
+                unzip openclinica-postgres.sql.zip
+                psql -h ${DBEndPoint} -U clinica --no-password -d openclinica < openclinica-postgres.sql
+                sudo shutdown -h now
+                sudo shutdown -h now
+              - DBEndPoint: !GetAtt WebAppDatabase.Endpoint.Address
+                DBUser: !Ref DBUsername
+                DBPwd: !Ref DBPassword
+
+  CacheSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AWS::StackName}-${EnvironmentType}-ElastiCacheSecurityGroup
+      GroupDescription: ElastiCache Security Group
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        -
+          IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !GetAtt AppServerSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-ElastiCacheSecurityGroup
+
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Cache Subnet Group
+      SubnetIds:
+        - !Ref PrivateDBSubnet1
+        - !Ref PrivateDBSubnet2
+      Tags:
+        -
+          Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-ElastiCacheSubnetGroup
+
+  ElastiCacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      AutoMinorVersionUpgrade: true
+      Engine: !Ref CacheEngine
+      CacheNodeType: !Ref CacheNodeType
+      ClusterName : !Sub oc-${EnvironmentType}-redis
+      NumCacheNodes: !Ref CacheNodeCount
+      CacheSubnetGroupName: !Ref CacheSubnetGroup
+      VpcSecurityGroupIds:
+        - !GetAtt CacheSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${EnvironmentType}-ElastiCacheCluster
+
+Outputs:
+  VPC:
+    Description: A reference to the created VPC
+    Value: !Ref VPC
+
+  PublicSubnets:
+    Description: A list of the public subnets
+    Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
+
+  PrivateSubnets:
+    Description: A list of the private subnets
+    Value: !Join [ ",", [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]]
+
+  PublicSubnet1:
+    Description: A reference to the public subnet in the 1st Availability Zone
+    Value: !Ref PublicSubnet1
+
+  PublicSubnet2:
+    Description: A reference to the public subnet in the 2nd Availability Zone
+    Value: !Ref PublicSubnet2
+
+  PrivateSubnet1:
+    Description: A reference to the private subnet in the 1st Availability Zone
+    Value: !Ref PrivateSubnet1
+
+  PrivateSubnet2:
+    Description: A reference to the private subnet in the 2nd Availability Zone
+    Value: !Ref PrivateSubnet2
+
+  PrivateDBSubnet1:
+    Description: A reference to the private subnet in the 1st Availability Zone
+    Value: !Ref PrivateDBSubnet1
+
+  PrivateDBSubnet2:
+    Description: A reference to the private subnet in the 2nd Availability Zone
+    Value: !Ref PrivateDBSubnet2
+
+  WebAppDatabase:
+    Description: A reference to the application RDS Postgres Instance
+    Value: !Ref WebAppDatabase
+
+  ElastiCacheCluster:
+    Description: A reference to the Elasticache Redis Cluster
+    Value: !Ref ElastiCacheCluster
+
+  NetworkLoadBalancer:
+    Description: A reference to the NLB between web and app tier
+    Value: !Ref NetworkLoadBalancer
+
+  WebAppLoadBalancer:
+    Description: Application Load Balancer in public subnet.
+    Value: !Ref WebAppLoadBalancer
+
+  OpenClinicaURL:
+    Description: URL to launch the OpenClinica Portal
+    Value: !Sub http://${WebAppLoadBalancer.DNSName}/OpenClinica
+
+
