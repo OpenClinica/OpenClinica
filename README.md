@@ -28,6 +28,10 @@ After the stack creation successfully completes, the outputs tab contains the AL
 - crc_A / password
 - investigator_A / password
 
+Below is an architecture diagram that illustrates what the cloudformation stack will create. Please note that to realize the below architecture, this fork of OpenClinica has incorporated not so trivial changes to make the application stateless using Redis for HTTP Session caching.
+
+![Imgur](https://raw.githubusercontent.com/Pradeep39/OpenClinica/master/cloudformation/OpenClinica_Multi_Tier_Arch.png)
+
 ## Getting Started
 
 - [System requirements](https://docs.openclinica.com/installation/system-requirements)
