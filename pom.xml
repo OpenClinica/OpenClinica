@@ -108,11 +108,7 @@
 				<artifactId>quartz-oracle</artifactId>
 				<version>1.8.6</version>
 			</dependency>
-			<dependency>
-				<groupId>log4jdbc</groupId>
-				<artifactId>log4jdbc4</artifactId>
-				<version>1.2</version>
-			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 
@@ -159,12 +155,7 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.6</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.6</version>
-			<scope>test</scope>
-		</dependency>
+		
 		<!--@pgawade 02-DEC-2010 Added jul-to-slf4j-1.5.6.jar to get liquibase
 			logs using SLF4JBridgeHandler -->
 		<dependency>
