@@ -622,7 +622,12 @@ public class OdmExtractDAO extends DatasetDAO {
         ArrayList<MeasurementUnitBean> units = basicDef.getMeasurementUnits();
         String uprev = "";
         this.setStudyMeasurementUnitsTypesExpected();
-        ArrayList rows = this.select(this.getStudyMeasurementUnitsSql(crfVersionOID));
+        
+        //OC-17141
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();        
+        param.put(new Integer(1), crfVersionOID);
+        ArrayList rows = this.select(getStudyMeasurementUnitsSqlbyCrfVersionOid(),param);
+        
         Iterator it = rows.iterator();
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
@@ -3534,6 +3539,12 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
     protected String getStudyMeasurementUnitsSql(String crfVersionOid) {
         return "select distinct mu.oc_oid as mu_oid, mu.name from  crf_version cv, versioning_map vm, item, measurement_unit mu " +
         		"where cv.oc_OID in (\'"+crfVersionOid +"\')   and cv.crf_version_id = vm.crf_version_id and vm.item_id = item.item_id " +
+        		"and item.units = mu.name order by mu.oc_oid";
+    }
+    
+    protected String getStudyMeasurementUnitsSqlbyCrfVersionOid() {
+        return "select distinct mu.oc_oid as mu_oid, mu.name from  crf_version cv, versioning_map vm, item, measurement_unit mu " +
+        		"where cv.oc_OID in (?)   and cv.crf_version_id = vm.crf_version_id and vm.item_id = item.item_id " +
         		"and item.units = mu.name order by mu.oc_oid";
     }
   
