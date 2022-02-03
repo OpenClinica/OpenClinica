@@ -412,6 +412,8 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("mail.smtps.auth", DATAINFO.getProperty("mailSmtpsAuth"));
         DATAINFO.setProperty("mail.smtps.starttls.enable", DATAINFO.getProperty("mailSmtpsStarttls.enable"));
         DATAINFO.setProperty("mail.smtp.connectiontimeout", DATAINFO.getProperty("mailSmtpConnectionTimeout"));
+        DATAINFO.setProperty("mail.smtp.starttls.required", DATAINFO.getProperty("mailSmtpStarttls.required"));
+        DATAINFO.setProperty("mail.smtp.ssl.protocols", DATAINFO.getProperty("mailSmtpSslProtocols"));
         DATAINFO.setProperty("mail.errormsg", DATAINFO.getProperty("mailErrorMsg"));
 
     }
