@@ -70,6 +70,11 @@ public class DownloadAttachedFileServlet extends SecureController {
         String filePathName = "";
         String fileName = fp.getString("fileName");
         File f = new File(fileName);
+        
+        if(fileName != null && fileName.indexOf("..") > -1) {
+        	throw new RuntimeException("Traversal attempt - absolute path not allowed " + fileName);
+        }
+        
         if (fileName != null && fileName.length() > 0) {
             int parentStudyId = currentStudy.getParentStudyId();
             String testPath = Utils.getAttachedFileRootPath();
