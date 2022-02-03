@@ -59,6 +59,7 @@ import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -125,7 +126,8 @@ public class BatchCRFMigrationController implements Runnable {
     public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws Exception {
         InputStream inputStream = null;
         try {
-            String logFileName = getFilePath() + File.separator + fileName;
+        	//Validate/Sanitize user input filename using a standard library, prevent from path traversal 
+            String logFileName = getFilePath() + File.separator + FilenameUtils.getName(fileName);
             File fileToDownload = new File(logFileName);
             inputStream = new FileInputStream(fileToDownload);
             response.setContentType("application/force-download");
