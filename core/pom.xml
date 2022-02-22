@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
-      <version>3.13</version>
+      <version>3.13.1</version>
     </parent>
     <dependencies>
 		<dependency>
@@ -248,11 +248,7 @@
 		    <groupId>org.quartz-scheduler</groupId>
 		    <artifactId>quartz-oracle</artifactId>
 		</dependency>
-		<dependency>
-		    <groupId>log4jdbc</groupId>
-		    <artifactId>log4jdbc4</artifactId>
-		</dependency>
-
+		
 		<dependency>
     <groupId>org.codehaus.jackson</groupId>
     <artifactId>jackson-core-lgpl</artifactId>
