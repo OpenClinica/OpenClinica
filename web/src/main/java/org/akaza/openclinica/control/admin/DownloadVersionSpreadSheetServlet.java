@@ -92,22 +92,13 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         } else {
             excelFile = new File(dir + excelFileName);
             // backwards compat
-
-            File oldExcelFile = new File(dir, oldExcelFileName);            
-            
-            String canonicalPath1= excelFile.getCanonicalPath();
-            String canonicalPath2= oldExcelFile.getCanonicalPath();
-            if (canonicalPath1.startsWith(dir) && canonicalPath2.startsWith(dir)) {
-            	if (oldExcelFile.exists() && oldExcelFile.length() > 0) {
-                    if (!excelFile.exists() || excelFile.length() <= 0) {
-                        // if the old name exists and the new name does not...
-                        excelFile = oldExcelFile;
-                        excelFileName = oldExcelFileName;
-                    }
-                }     
-            }else {
-            	 addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"));
-                 forwardPage(Page.CRF_LIST_SERVLET);
+            File oldExcelFile = new File(dir + oldExcelFileName);
+            if (oldExcelFile.exists() && oldExcelFile.length() > 0) {
+                if (!excelFile.exists() || excelFile.length() <= 0) {
+                    // if the old name exists and the new name does not...
+                    excelFile = oldExcelFile;
+                    excelFileName = oldExcelFileName;
+                }
             }
 
         }

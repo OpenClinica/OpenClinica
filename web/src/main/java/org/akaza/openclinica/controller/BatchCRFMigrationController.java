@@ -125,22 +125,13 @@ public class BatchCRFMigrationController implements Runnable {
     public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws Exception {
         InputStream inputStream = null;
         try {
-
-        	//Validate/Sanitize user input filename using a standard library, prevent from path traversal 
-            String logFilePath = getFilePath() + File.separator;
-            File fileToDownload = new File(logFilePath, fileName);                    
-            String canonicalPath= fileToDownload.getCanonicalPath();
-            
-            if (canonicalPath.startsWith(logFilePath)) {
-            	inputStream = new FileInputStream(fileToDownload);
-                response.setContentType("application/force-download");
-                response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-                IOUtils.copy(inputStream, response.getOutputStream());
-                response.flushBuffer();
-            }else {
-            	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
-            }
-
+            String logFileName = getFilePath() + File.separator + fileName;
+            File fileToDownload = new File(logFileName);
+            inputStream = new FileInputStream(fileToDownload);
+            response.setContentType("application/force-download");
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            IOUtils.copy(inputStream, response.getOutputStream());
+            response.flushBuffer();
         } catch (Exception e) {
             logger.debug("Request could not be completed at this moment. Please try again.");
             logger.debug(e.getStackTrace().toString());

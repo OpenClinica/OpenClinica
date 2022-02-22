@@ -70,23 +70,12 @@ public class DownloadAttachedFileServlet extends SecureController {
         String filePathName = "";
         String fileName = fp.getString("fileName");
         File f = new File(fileName);
-
         if (fileName != null && fileName.length() > 0) {
-            int parentStudyId = currentStudy.getParentStudyId();           
+            int parentStudyId = currentStudy.getParentStudyId();
             String testPath = Utils.getAttachedFileRootPath();
             String tail = File.separator + f.getName();
             String testName = testPath + currentStudy.getOid() + tail;
-            
-            String filePath = testPath + currentStudy.getOid() +File.separator;            
-            File temp = new File(filePath,f.getName());            
-            String canonicalPath= temp.getCanonicalPath();
-            
-            if (canonicalPath.startsWith(filePath)) {
-            	;
-            }else {
-            	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
-            }
-            
+            File temp = new File(testName);
             if (temp.exists()) {
                 filePathName = testName;
                 logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
