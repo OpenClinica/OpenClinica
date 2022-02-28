@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -48,6 +49,7 @@ public class DataEntryRuleRunner extends RuleRunner {
             variableAndValue = new HashMap<String, String>();
         }
 
+        HashMap allItemDatasHm = new HashMap();
         MessageContainer messageContainer = new MessageContainer();
         HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
         switch (executionMode) {
@@ -72,6 +74,14 @@ public class DataEntryRuleRunner extends RuleRunner {
                 toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
                 allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
             }
+            /**
+             *  OC-12523, this is a performance issue, user reported when update one subject form data
+             */
+            String itemOid = key;
+            String itemGroupOid = getExpressionService().getItemGroupOid(ruleSet.getExpressions().get(0).getValue());
+            int studySubjectId = ((StudySubjectBean) request.getAttribute("studySubject")).getSubjectId();
+            HashMap itemDatasHm = getItemDataDao().findByStudySubjectAndOids(ruleSet.getStudyId(), itemOid, itemGroupOid,studySubjectId);
+            allItemDatasHm.putAll(itemDatasHm);
             ItemDataBean itemData = null;
 
             for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
@@ -84,8 +94,13 @@ public class DataEntryRuleRunner extends RuleRunner {
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
                         result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-                        itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-                        
+                      
+                        String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expressionBean.getValue());
+                        itemOid = getExpressionService().getItemOid(expressionBean.getValue());
+                        itemGroupOid = getExpressionService().getItemGroupOid(expressionBean.getValue());
+                      
+                        String itemDataKey = studyEventId + itemGroupOid +itemOid;
+                        itemData = (ItemDataBean) itemDatasHm.get(itemDataKey);
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, phase);
 
@@ -153,9 +168,23 @@ public class DataEntryRuleRunner extends RuleRunner {
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
                             ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
                
-                ItemDataBean  itemData =            
-                    getExpressionService().getItemDataBeanFromDb(ruleActionContainer.getRuleSetBean().getTarget().getValue());
+              
                 
+                String expression = ruleActionContainer.getRuleSetBean().getTarget().getValue();
+                String studyEventId = getExpressionService().getStudyEventDefinitionOidOrdinalFromExpression(expression);
+                String itemOid = getExpressionService().getItemOidFromExpression(expression);
+                String itemGroupOid = getExpressionService().getItemGroupOidFromExpression(expression);
+              
+                String itemDataKey = studyEventId + itemGroupOid +itemOid;
+                ItemDataBean itemData = (ItemDataBean) allItemDatasHm.get(itemDataKey);
+                
+                // may not from dry run first, so still need to diuble check
+                if(itemData == null) {
+                	itemData =            
+                            getExpressionService().getItemDataBeanFromDb(ruleActionContainer.getRuleSetBean().getTarget().getValue());
+                        
+                }
+    
                 
                 RuleActionBean rab =
                     ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleActionContainer.getRuleAction(), itemData,
