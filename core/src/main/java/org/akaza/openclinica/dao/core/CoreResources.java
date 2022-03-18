@@ -416,15 +416,11 @@ public class CoreResources implements ResourceLoaderAware {
          * As Microsoft are currently deprecating TLS versions 1.0 and 1.1
          * set default value
          */
-        if(DATAINFO.getProperty("mailSmtpStarttls.required") == null) {
-        	DATAINFO.setProperty("mail.smtp.starttls.required", "");
-        }else {
+        if(DATAINFO.getProperty("mailSmtpStarttls.required") != null) {
         	DATAINFO.setProperty("mail.smtp.starttls.required", DATAINFO.getProperty("mailSmtpStarttls.required"));
         }
         
-        if(DATAINFO.getProperty("mailSmtpSslProtocols") == null) {
-        	DATAINFO.setProperty("mail.smtp.ssl.protocols", "");
-        }else {
+        if(DATAINFO.getProperty("mailSmtpSslProtocols") != null) {
         	DATAINFO.setProperty("mail.smtp.ssl.protocols", DATAINFO.getProperty("mailSmtpSslProtocols"));
         }
         
