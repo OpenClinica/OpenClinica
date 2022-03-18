@@ -417,13 +417,13 @@ public class CoreResources implements ResourceLoaderAware {
          * set default value
          */
         if(DATAINFO.getProperty("mailSmtpStarttls.required") == null) {
-        	DATAINFO.setProperty("mail.smtp.starttls.required", "true");
+        	DATAINFO.setProperty("mail.smtp.starttls.required", "");
         }else {
         	DATAINFO.setProperty("mail.smtp.starttls.required", DATAINFO.getProperty("mailSmtpStarttls.required"));
         }
         
         if(DATAINFO.getProperty("mailSmtpSslProtocols") == null) {
-        	DATAINFO.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
+        	DATAINFO.setProperty("mail.smtp.ssl.protocols", "");
         }else {
         	DATAINFO.setProperty("mail.smtp.ssl.protocols", DATAINFO.getProperty("mailSmtpSslProtocols"));
         }
