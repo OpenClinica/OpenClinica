@@ -435,12 +435,7 @@ public class CoreResources implements ResourceLoaderAware {
             driver = "oracle.jdbc.driver.OracleDriver";
             hibernateDialect = "org.hibernate.dialect.OracleDialect";
         }
-        // If logLevel is 'TRACE' or 'DEBUG', enagle log4jdbc
-        String logLevel = DATAINFO.getProperty("logLevel");
-        if (logLevel != null && (logLevel.equalsIgnoreCase("TRACE") || logLevel.equalsIgnoreCase("DEBUG"))) {
-            driver = "net.sf.log4jdbc.DriverSpy";
-            url = StringUtils.replace(url, "jdbc:", "jdbc:log4jdbc:");
-        }
+     
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
