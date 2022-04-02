@@ -75,7 +75,9 @@
 								<fmt:param><c:out value="${table.totalPageNumbers}" /></fmt:param>
 							</fmt:message>
 						</c:if>
-						Found <%= table.getRows().size() %> Definitions
+						<fmt:message key="found_definition" bundle="${resword}">
+							<fmt:param><%= table.getRows().size() %></fmt:param>
+						</fmt:message>
 						</td></c:otherwise>
 					</c:choose>
 				<td valign="top" class="table_tools">
@@ -155,7 +157,7 @@
 				<tr>
 					<c:set var="isFirstLink" value="${true}" />
 					<c:if test="${table.filtered}">
-						<td class="table_tools"><a href="<c:out value="${removeFilterQuery}"/>">Clear Search Keywords</a></td>
+						<td class="table_tools"><a href="<c:out value="${removeFilterQuery}"/>"><fmt:message key="clear_search_keywords" bundle="${restext}"/></a></td>
 						<c:set var="isFirstLink" value="${false}" />
 					</c:if>
 					<c:forEach var="link" items="${table.links}">
@@ -256,7 +258,7 @@
 								<c:set var="currRow" scope="request" value="${row}" />
 								<c:import url="${rowURL}">
 									<c:param name="eblRowCount" value="${eblRowCount}" />
-									<c:param name="isFirstLink" value="${isFirstLink}" />	
+									<c:param name="isFirstLink" value="${isFirstLink}" />
 								</c:import>
 								<c:set var="eblRowCount" value="${eblRowCount + 1}" />
 								<c:set var="prevRow" scope="request" value="${currRow}" />
