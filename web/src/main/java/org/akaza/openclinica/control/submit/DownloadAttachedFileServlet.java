@@ -119,7 +119,8 @@ public class DownloadAttachedFileServlet extends SecureController {
             addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
             
             // try to use the passed in the existing file
-        	file = new File(fileName);
+            //OC-17868
+        	//file = new File(fileName);
         }
         
         if (!file.exists() || file.length() <= 0) {
