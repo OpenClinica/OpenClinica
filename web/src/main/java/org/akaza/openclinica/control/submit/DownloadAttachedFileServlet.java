@@ -120,8 +120,13 @@ public class DownloadAttachedFileServlet extends SecureController {
             
             // try to use the passed in the existing file
             //OC-17868, remove any possible path traversal, will make sure only download files from defined download folder 
-            if(fileName != null && fileName.indexOf("..") == -1) {
-            	file = new File(fileName);
+            File temp = new File(fileName);            
+            String canonicalPath= temp.getCanonicalPath();
+            
+            if (canonicalPath.equals(fileName)) {
+            	file =temp;
+            }else {
+            	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
             }
         	
         }
