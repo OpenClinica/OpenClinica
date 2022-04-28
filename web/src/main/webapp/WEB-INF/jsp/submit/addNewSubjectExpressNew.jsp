@@ -396,7 +396,7 @@
     </c:choose>
     <tr>
         <td colspan="2" align="center">
-        <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button"   onclick="this.disabled=true"/>
+        <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button" />
         &nbsp;
         <input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button"/>
 
