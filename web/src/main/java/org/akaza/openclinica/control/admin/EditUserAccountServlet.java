@@ -208,8 +208,8 @@ public class EditUserAccountServlet extends SecureController {
                             addPageMessage(respage.getString("there_was_an_error_sending_reset_email_try_reset"));
                         }
                     } else {
-                        addPageMessage(respage.getString("new_user_password") + ":<br/> " + password + "<br/>"
-                            + respage.getString("please_write_down_the_password_and_provide"));
+                        addPageMessage(respage.getString("new_user_password") + ": " + password);
+                        addPageMessage(respage.getString("please_write_down_the_password_and_provide"));
                     }
                 } else {
                     udao.update(user);
