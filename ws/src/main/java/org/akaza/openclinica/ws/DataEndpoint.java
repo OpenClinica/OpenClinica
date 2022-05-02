@@ -20,16 +20,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
@@ -165,6 +162,9 @@ public class DataEndpoint {
                 List<String> auditMsgs = new DataImportService().submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
                         importedCRFStatuses);
 
+                // Migrate CRF versions, if necessary
+                dataImportService.migrateCrfVersions(odmContainer,dataSource,studyBean,userBean);
+                
                 // run rules if applicable
                 List<String> ruleActionMsgs = dataImportService.runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 
