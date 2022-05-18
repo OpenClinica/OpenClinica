@@ -212,6 +212,7 @@ public class UpdateStudySubjectServlet extends SecureController {
     private void confirm(StudyGroupDAO sgdao) throws Exception {
         ArrayList classes = (ArrayList) session.getAttribute("groups");
         StudySubjectBean sub = (StudySubjectBean) session.getAttribute("studySub");
+        StudyBean study= (StudyBean) session.getAttribute("study");
         FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
         DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
         FormProcessor fp = new FormProcessor(request);
@@ -246,8 +247,12 @@ public class UpdateStudySubjectServlet extends SecureController {
                     Validator.addError(errors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
                 }
             }
-
-            sub.setLabel(fp.getString("label"));
+            //OC-18040
+            String subIdGeneration = study.getStudyParameterConfig().getSubjectIdGeneration();
+            if(subIdGeneration != null && !(subIdGeneration.equals("auto non-editable"))) {            	 
+            	 sub.setLabel(fp.getString("label"));
+            }
+           
             sub.setSecondaryLabel(fp.getString("secondaryLabel"));
 
             try {
