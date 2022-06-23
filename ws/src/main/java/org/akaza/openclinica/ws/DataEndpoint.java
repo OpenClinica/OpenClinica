@@ -224,6 +224,8 @@ public class DataEndpoint {
 
         String xml = node2String(odmElement);
         xml = xml.replaceAll("<ODM>", this.ODM_HEADER_NAMESPACE);
+        xml = xml.replaceAll("<!\\[CDATA\\[","");
+        xml = xml.replaceAll("\\]\\]>","");
 
         if (xml == null)
             throw new Exception(respage.getString("unreadable_file"));
