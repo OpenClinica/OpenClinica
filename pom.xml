@@ -28,7 +28,7 @@
 		<config.file>src/main/resources/datainfo.properties</config.file>
 
 		<!-- Library Versions -->
-		<spring.version>3.0.5.RELEASE</spring.version>
+		<spring.version>3.2.5.RELEASE</spring.version>
 		<db.test>localhost</db.test>
 	</properties>
 	<profiles>
