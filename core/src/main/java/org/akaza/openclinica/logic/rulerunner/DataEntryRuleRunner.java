@@ -97,13 +97,19 @@ public class DataEntryRuleRunner extends RuleRunner {
                       
                         String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expressionBean.getValue());
                         itemOid = getExpressionService().getItemOid(expressionBean.getValue());
-                        itemGroupOid = getExpressionService().getItemGroupOid(expressionBean.getValue());
+                        String itemGroupOidwithOrdinal = getExpressionService().getItemGroupOidWithOrdinalFromExpression(expressionBean.getValue());
                       
-                        String itemDataKey = studyEventId + itemGroupOid +itemOid;
+                        /**
+                         * Construct full item data key                        
+                         * 
+                         * Here is an example for the unique itemDataKey:
+                         * 1435IG_ADVER_AE_2965[2].I_ADVER_AESAE
+                         */
+                        String itemDataKey = studyEventId + itemGroupOidwithOrdinal +itemOid;
                         itemData = (ItemDataBean) itemDatasHm.get(itemDataKey);
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, phase);
-
+                       
                         if (itemData != null) {
                             Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
                             String firstDDE = "firstDDEInsert_"+ruleSetRule.getOid()+"_"+itemData.getId();
@@ -119,7 +125,22 @@ public class DataEntryRuleRunner extends RuleRunner {
                                 if(request.getAttribute(firstDDE)==Boolean.TRUE) {
                                 } else {
                                     String itemDataValueFromForm = "";
-                                    if(variableAndValue.containsKey(key)) {
+                                    /**
+                                     *  In variableAndValue, There are 3 type key:
+                                     *  (1) only itemOID;
+                                     *  (2) itemGroupOid.itemOid;
+                                     *  (3) if items in repeating groups,key example: 
+                                     *  IG_ADVER_AE_2965[3].I_ADVER_AEOSPSEQ
+                                     *  
+                                     */
+                                    String keyWithGrpOidAndOrdinal = itemGroupOidwithOrdinal + "." + key;
+                                    String keyWithGrpOid = itemGroupOid + "." + key;
+                                  
+                                    if(variableAndValue.containsKey(keyWithGrpOidAndOrdinal)) {
+                                        itemDataValueFromForm = variableAndValue.get(keyWithGrpOidAndOrdinal);                                                                            
+                                    }else if(variableAndValue.containsKey(keyWithGrpOid)) {
+                                        itemDataValueFromForm = variableAndValue.get(keyWithGrpOid);
+                                    }else if(variableAndValue.containsKey(key)) {
                                         itemDataValueFromForm = variableAndValue.get(key);
                                     } else {
                                         logger.info("Cannot find value from variableAndValue for item="+key+". " +
