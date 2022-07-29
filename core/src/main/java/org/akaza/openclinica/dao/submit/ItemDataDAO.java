@@ -181,11 +181,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         while (it.hasNext()) {
         	HashMap hm = (HashMap) it.next();
-        	//construct key
-        	String key = (String) this.getKeyFromHashMap(hm);
         	
         	//construct dataItem
         	ItemDataBean eb = (ItemDataBean) this.getEntityFromHashMap(hm);	
+        	
+        	//construct full item data key, like:1435IG_ADVER_AE_2965[2].I_ADVER_AESAE
+      	    String key = (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid")+"[" + eb.getOrdinal() +"]" + (String) hm.get("item_ocoid");
+      	
         	answer.put(key, eb);       	           
         }
       
