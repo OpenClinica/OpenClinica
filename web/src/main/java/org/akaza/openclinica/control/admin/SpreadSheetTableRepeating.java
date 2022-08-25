@@ -1335,6 +1335,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 ownerId = oldItem.getOwner().getId();
                             }
                         }
+                        
+                        if(ownerId == 0) {
+                        	ownerId =  ub.getId();
+                        }
+                        
                         String sql = "";
                         sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {
