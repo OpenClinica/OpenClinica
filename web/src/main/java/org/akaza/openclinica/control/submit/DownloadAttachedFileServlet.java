@@ -114,18 +114,22 @@ public class DownloadAttachedFileServlet extends SecureController {
             }
         }
         logger.info("filePathName=" + filePathName + " fileName=" + fileName);
-        File file = new File(filePathName);
-        if (!file.exists() || file.length() <= 0) {
-            addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
+        File file = null;
+        if(filePathName != null && filePathName.trim().length() >0) {
+        	file = new File(filePathName);
+        }else {
+        	file = new File(fileName);
+        }
+        
+        if (file != null && file.exists()) {           
+            /*
+             *  try to use the passed in the existing file
+             *  OC-17868 remove any possible path traversal, will make sure only download files from defined download folder            
+             */                 	                    
+            String canonicalPath= file.getCanonicalPath();            
+            String definedDownloadPath = Utils.getAttachedFileRootPath();
             
-            // try to use the passed in the existing file
-            //OC-17868, remove any possible path traversal, will make sure only download files from defined download folder 
-            File temp = new File(fileName);            
-            String canonicalPath= temp.getCanonicalPath();
-            
-            if (canonicalPath.equals(fileName)) {
-            	file =temp;
-            }else {
+            if(!(canonicalPath.startsWith(definedDownloadPath))) {
             	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
             }
         	
