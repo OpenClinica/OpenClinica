@@ -247,6 +247,7 @@ public class SDVUtil {
         // studySubjectSDVFilter, subjectSort, rowStart, rowEnd);
         Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd, studyId, request);
         tableFacade.setItems(items);
+        tableFacade.getCoreContext().setPageItems(items);
         /*
          * Limit limit = tableFacade.getLimit();
          * FilterSet filterSet = limit.getFilterSet();
