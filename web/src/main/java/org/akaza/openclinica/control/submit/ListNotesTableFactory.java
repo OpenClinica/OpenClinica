@@ -244,6 +244,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             setStudyHasDiscNotes(true);
         }
         tableFacade.setItems(theItems);
+        tableFacade.getCoreContext().setPageItems(theItems);
     }
 
     @Override
