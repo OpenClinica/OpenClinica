@@ -79,7 +79,7 @@ public class DataEntryRuleRunner extends RuleRunner {
              */
             String itemOid = key;
             String itemGroupOid = getExpressionService().getItemGroupOid(ruleSet.getExpressions().get(0).getValue());
-            int studySubjectId = ((StudySubjectBean) request.getAttribute("studySubject")).getSubjectId();
+            int studySubjectId = ((StudySubjectBean) request.getAttribute("studySubject")).getId();
             HashMap itemDatasHm = getItemDataDao().findByStudySubjectAndOids(ruleSet.getStudyId(), itemOid, itemGroupOid,studySubjectId);
             allItemDatasHm.putAll(itemDatasHm);
             ItemDataBean itemData = null;
@@ -194,9 +194,10 @@ public class DataEntryRuleRunner extends RuleRunner {
                 String expression = ruleActionContainer.getRuleSetBean().getTarget().getValue();
                 String studyEventId = getExpressionService().getStudyEventDefinitionOidOrdinalFromExpression(expression);
                 String itemOid = getExpressionService().getItemOidFromExpression(expression);
-                String itemGroupOid = getExpressionService().getItemGroupOidFromExpression(expression);
+                String itemGroupOidwithOrdinal = getExpressionService().getItemGroupOidWithOrdinalFromExpression(ruleActionContainer.getExpressionBean().getValue());
+                
               
-                String itemDataKey = studyEventId + itemGroupOid +itemOid;
+                String itemDataKey = studyEventId + itemGroupOidwithOrdinal +itemOid;
                 ItemDataBean itemData = (ItemDataBean) allItemDatasHm.get(itemDataKey);
                 
                 // may not from dry run first, so still need to diuble check
