@@ -37,6 +37,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import java.net.URLEncoder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,6 +51,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import javax.ws.rs.Encoded;
 
 /**
  * Create a new CRF verison by uploading excel file
@@ -95,7 +98,8 @@ public class CreateCRFVersionServlet extends SecureController {
         // checks which module the requests are from
         String module = fp.getString(MODULE);
         // keep the module in the session
-        session.setAttribute(MODULE, module);
+        String safeModule = URLEncoder.encode(module,"UTF-8");
+        session.setAttribute(MODULE, safeModule);
         request.setAttribute("xformEnabled", CoreResources.getField("xform.enabled"));
         String action = request.getParameter("action");
         CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
