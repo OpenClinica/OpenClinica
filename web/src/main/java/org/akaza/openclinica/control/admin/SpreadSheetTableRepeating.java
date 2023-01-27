@@ -1331,15 +1331,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                  openQueries.put(itemName, qo);
                                  
                                 }
-                            } else {
-                                ownerId = oldItem.getOwner().getId();
+                            } else {                                
+                                int oldItemOwnerId = oldItem.getOwner().getId();
+                                if(oldItemOwnerId != 0) {
+                                	ownerId = oldItemOwnerId;
+                                }
                             }
                         }
-                        
-                        if(ownerId == 0) {
-                        	ownerId =  ub.getId();
-                        }
-                        
+                                                
                         String sql = "";
                         sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {

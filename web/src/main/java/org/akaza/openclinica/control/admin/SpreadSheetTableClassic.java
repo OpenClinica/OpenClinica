@@ -970,13 +970,12 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     openQueries.put(itemName, qo);
                                 }
                             } else {
-                                ownerId = oldItem.getOwner().getId();
+                                int oldItemOwnerId = oldItem.getOwner().getId();
+                                if(oldItemOwnerId != 0) {
+                                	ownerId = oldItemOwnerId;
+                                }
                             }
-                        }
-                        
-                        if(ownerId == 0) {
-                        	ownerId =  ub.getId();
-                        }
+                        }                                                
                         
                         String sql = "";
                         sqlParameters = new ArrayList<>();
