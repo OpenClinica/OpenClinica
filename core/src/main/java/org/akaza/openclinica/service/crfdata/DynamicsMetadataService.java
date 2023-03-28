@@ -70,8 +70,9 @@ import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.security.oauth2.common.json.JSONException;
-import org.springframework.security.oauth2.common.json.JSONObject;
+//import org.springframework.security.oauth2.common.json.JSONException;
+//import org.springframework.security.oauth2.common.json.JSONObject;
+import org.json.JSONObject;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -520,13 +521,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if(property.getValueExpression() == null) {
             logger.info("There is no ValueExpression for property ="+property.getOid());
              if (stratificationFactorBeans!=null)
-                try {
-                    value=getRandomizeService().getRandomizationCode(eventCrfBean,stratificationFactorBeans,ruleSet);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
+                 value=getRandomizeService().getRandomizationCode(eventCrfBean,stratificationFactorBeans,ruleSet);
         } else {
             String expression =
                 getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
