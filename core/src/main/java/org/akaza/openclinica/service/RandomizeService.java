@@ -46,8 +46,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
-import org.springframework.security.oauth2.common.json.JSONException;
-import org.springframework.security.oauth2.common.json.JSONObject;
+//import org.springframework.security.oauth2.common.json.JSONException;
+//import org.springframework.security.oauth2.common.json.JSONObject;
+import org.json.JSONObject;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -81,8 +82,7 @@ public class RandomizeService extends RandomizationRegistrar {
 
     // Rest Call to OCUI to get Randomization
 
-    public String getRandomizationCode(EventCRFBean eventCrfBean, List<StratificationFactorBean> stratificationFactorBeans, RuleSetBean ruleSet)
-            throws JSONException {
+    public String getRandomizationCode(EventCRFBean eventCrfBean, List<StratificationFactorBean> stratificationFactorBeans, RuleSetBean ruleSet) {
         StudySubjectDAO ssdao = new StudySubjectDAO<>(ds);
         StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(eventCrfBean.getStudySubjectId());
         String identifier = ssBean.getOid(); // study subject oid
@@ -189,7 +189,7 @@ public class RandomizeService extends RandomizationRegistrar {
         return value;
     }
 
-    private JSONObject retrieveARandomisation(String randomiseUrl, StudySubjectBean studySubject, HttpHeaders headers) throws JSONException {
+    private JSONObject retrieveARandomisation(String randomiseUrl, StudySubjectBean studySubject, HttpHeaders headers) {
         // method : GET
         randomiseUrl = randomiseUrl + "/api/randomisation?identifier=" + studySubject.getOid(); // concatenate
                                                                                                 // Study_Siubject_oid

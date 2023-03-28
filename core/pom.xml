@@ -24,7 +24,7 @@
 		<dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.10.RELEASE</version>
 			<scope>test</scope>
         </dependency>
         <dependency>
@@ -86,6 +86,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160212</version>
 		</dependency>
 		
 		<!--  Needed by commons-validator -->

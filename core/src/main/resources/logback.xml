@@ -276,12 +276,6 @@
 		<Facility>FTP</Facility>
 		<SuffixPattern>[%mdc{WEBAPP}] %mdc{USERNAME} %logger %msg</SuffixPattern>
 	</appender>
-	<appender name="SYSLOG-USAGESTATS" class="ch.qos.logback.classic.net.SyslogAppender">	
-		<SyslogHost>${usage.stats.host}</SyslogHost>
-		<port>${usage.stats.port}</port>
-		<Facility>LOCAL7</Facility>
-		<SuffixPattern>[%mdc{WEBAPP}] %mdc{HOSTNAME} %mdc{USERNAME} %logger %msg</SuffixPattern>
-	</appender>
 	
 	<!-- LOGGERS -->
   <!-- @pgawade ToDo: Commented out the follwoing loggers as these packages are covered in the new loggers added-->
