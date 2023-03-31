@@ -70,12 +70,23 @@ public class DownloadAttachedFileServlet extends SecureController {
         String filePathName = "";
         String fileName = fp.getString("fileName");
         File f = new File(fileName);
+              
         if (fileName != null && fileName.length() > 0) {
-            int parentStudyId = currentStudy.getParentStudyId();
+            int parentStudyId = currentStudy.getParentStudyId();           
             String testPath = Utils.getAttachedFileRootPath();
             String tail = File.separator + f.getName();
             String testName = testPath + currentStudy.getOid() + tail;
-            File temp = new File(testName);
+            
+            String filePath = testPath + currentStudy.getOid() +File.separator;            
+            File temp = new File(filePath,f.getName());            
+            String canonicalPath= temp.getCanonicalPath();
+            
+            if (canonicalPath.startsWith(filePath)) {
+            	;
+            }else {
+            	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
+            }
+            
             if (temp.exists()) {
                 filePathName = testName;
                 logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
@@ -103,12 +114,25 @@ public class DownloadAttachedFileServlet extends SecureController {
             }
         }
         logger.info("filePathName=" + filePathName + " fileName=" + fileName);
-        File file = new File(filePathName);
-        if (!file.exists() || file.length() <= 0) {
-            addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
-            
-            // try to use the passed in the existing file
+        File file = null;
+        if(filePathName != null && filePathName.trim().length() >0) {
+        	file = new File(filePathName);
+        }else {
         	file = new File(fileName);
+        }
+        
+        if (file != null && file.exists()) {           
+            /*
+             *  try to use the passed in the existing file
+             *  OC-17868 remove any possible path traversal, will make sure only download files from defined download folder            
+             */                 	                    
+            String canonicalPath= file.getCanonicalPath();            
+            String definedDownloadPath = Utils.getAttachedFileRootPath();
+            
+            if(!(canonicalPath.startsWith(definedDownloadPath))) {
+            	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
+            }
+        	
         }
         
         if (!file.exists() || file.length() <= 0) {

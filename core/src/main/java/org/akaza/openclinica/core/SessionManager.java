@@ -16,8 +16,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import oracle.jdbc.pool.OracleDataSource;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -47,7 +45,6 @@ public class SessionManager {
 
     private String logFileName;
 
-    private OracleDataSource ods;
 
     private Level logLevel;
 
@@ -156,11 +153,6 @@ public class SessionManager {
 
     public DataSource getDataSource() {
         return ds;
-    }
-
-    /** added 08-04-2004 by tbh, supporting Oracle 10g */
-    public OracleDataSource getOracleDataSource() {
-        return ods;
     }
 
     public static DataSource getStaticDataSource() {

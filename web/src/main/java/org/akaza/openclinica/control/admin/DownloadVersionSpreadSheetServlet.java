@@ -16,6 +16,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -76,12 +77,12 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
         boolean isTemplate = fp.getBoolean("template");
 
-        String excelFileName = crfIdString + version.getOid() + ".xls";
+        String excelFileName = FilenameUtils.getName(crfIdString + version.getOid() + ".xls");
 
         // aha, what if it's the old style? next line is for backwards compat,
         // tbh 07/2008
         File excelFile = null;
-        String oldExcelFileName = crfIdString + version.getName() + ".xls";
+        String oldExcelFileName = FilenameUtils.getName(crfIdString + version.getName() + ".xls");
         if (isTemplate) {
             // excelFile = new File(dir + CRF_VERSION_TEMPLATE);
             excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE, "crf" + File.separator + "original" + File.separator);
@@ -90,16 +91,26 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
             // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
             // IOUtils.closeQuietly(fos);
         } else {
-            excelFile = new File(dir + excelFileName);
+        	// fix path traversal issue
+            excelFile = new File(dir,excelFileName);
             // backwards compat
-            File oldExcelFile = new File(dir + oldExcelFileName);
-            if (oldExcelFile.exists() && oldExcelFile.length() > 0) {
-                if (!excelFile.exists() || excelFile.length() <= 0) {
-                    // if the old name exists and the new name does not...
-                    excelFile = oldExcelFile;
-                    excelFileName = oldExcelFileName;
-                }
+            File oldExcelFile = new File(dir, oldExcelFileName);            
+            
+            String canonicalPath1= excelFile.getCanonicalPath();
+            String canonicalPath2= oldExcelFile.getCanonicalPath();
+            if (canonicalPath1.startsWith(dir) && canonicalPath2.startsWith(dir)) {
+            	if (oldExcelFile.exists() && oldExcelFile.length() > 0) {
+                    if (!excelFile.exists() || excelFile.length() <= 0) {
+                        // if the old name exists and the new name does not...
+                        excelFile = oldExcelFile;
+                        excelFileName = oldExcelFileName;
+                    }
+                }     
+            }else {
+            	 addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"));
+                 forwardPage(Page.CRF_LIST_SERVLET);
             }
+        	             
 
         }
         logger.info("looking for : " + excelFile.getName());

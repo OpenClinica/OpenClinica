@@ -141,6 +141,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 
 <input type="hidden" name="enterData" value="<c:out value="${enterData}" />">
 <input type="hidden" name="eventCRFId" value="<c:out value="${eventCRFId}"/>">
+<input type="hidden" name="itemId" value="<c:out value="${itemId}" />">
 
           
 <c:set var="name" value="${discrepancyNote.entityType}"/>

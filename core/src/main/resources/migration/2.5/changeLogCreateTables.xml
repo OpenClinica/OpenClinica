@@ -8,12 +8,9 @@
             <sqlCheck expectedResult="t"> <![CDATA[select substring(replace((string_to_array(version(), ' '))[2],'.','')from 1 for 2)::integer < 90 ]]></sqlCheck>
         </preConditions>
         <sql splitStatements="false">
-            DROP LANGUAGE IF EXISTS plpgsql;
-            CREATE PROCEDURAL LANGUAGE plpgsql;
             SET check_function_bodies = false;
             SET client_min_messages = error;
             SET default_tablespace = '';
-            SET default_with_oids = true;
             SET search_path = public, pg_catalog;
             COMMENT ON SCHEMA public IS 'Standard public schema';
         </sql>

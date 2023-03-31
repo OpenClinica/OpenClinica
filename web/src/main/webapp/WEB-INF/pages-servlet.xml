@@ -8,12 +8,16 @@
         xmlns:oxm="http://www.springframework.org/schema/oxm"
         xmlns:util="http://www.springframework.org/schema/util"
         xsi:schemaLocation="
-            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
-            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
-            http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd">
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+            http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.2.xsd">
 
+
+    <bean id="whitelabelApprovalEndpoint" class="org.springframework.security.oauth2.provider.endpoint.WhitelabelApprovalEndpoint "/>
+
+    <!--
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
     </bean> 
@@ -26,6 +30,7 @@
     </property>
     <property name="alwaysUseFullPath" value="true"/>
   </bean>
+  -->
 
 
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->

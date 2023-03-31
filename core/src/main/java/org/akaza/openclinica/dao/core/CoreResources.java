@@ -412,6 +412,18 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("mail.smtps.auth", DATAINFO.getProperty("mailSmtpsAuth"));
         DATAINFO.setProperty("mail.smtps.starttls.enable", DATAINFO.getProperty("mailSmtpsStarttls.enable"));
         DATAINFO.setProperty("mail.smtp.connectiontimeout", DATAINFO.getProperty("mailSmtpConnectionTimeout"));
+        /**
+         * As Microsoft are currently deprecating TLS versions 1.0 and 1.1
+         * set default value
+         */
+        if(DATAINFO.getProperty("mailSmtpStarttls.required") != null) {
+        	DATAINFO.setProperty("mail.smtp.starttls.required", DATAINFO.getProperty("mailSmtpStarttls.required"));
+        }
+        
+        if(DATAINFO.getProperty("mailSmtpSslProtocols") != null) {
+        	DATAINFO.setProperty("mail.smtp.ssl.protocols", DATAINFO.getProperty("mailSmtpSslProtocols"));
+        }
+        
         DATAINFO.setProperty("mail.errormsg", DATAINFO.getProperty("mailErrorMsg"));
 
     }
@@ -435,12 +447,7 @@ public class CoreResources implements ResourceLoaderAware {
             driver = "oracle.jdbc.driver.OracleDriver";
             hibernateDialect = "org.hibernate.dialect.OracleDialect";
         }
-        // If logLevel is 'TRACE' or 'DEBUG', enagle log4jdbc
-        String logLevel = DATAINFO.getProperty("logLevel");
-        if (logLevel != null && (logLevel.equalsIgnoreCase("TRACE") || logLevel.equalsIgnoreCase("DEBUG"))) {
-            driver = "net.sf.log4jdbc.DriverSpy";
-            url = StringUtils.replace(url, "jdbc:", "jdbc:log4jdbc:");
-        }
+     
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);

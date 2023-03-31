@@ -218,8 +218,9 @@ public class SDVUtil {
         return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
     }
 
-    public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request) {
+    public int setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request) {
 
+    	int totalRows =0;
         Limit limit = tableFacade.getLimit();
 
         EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
@@ -227,10 +228,10 @@ public class SDVUtil {
 
         String restore = request.getAttribute(limit.getId() + "_restore") + "";
         if (!limit.isComplete()) {
-            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
             tableFacade.setTotalRows(totalRows);
         } else if (restore != null && "true".equalsIgnoreCase(restore)) {
-            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
             int pageNum = limit.getRowSelect().getPage();
             int maxRows = limit.getRowSelect().getMaxRows();
             tableFacade.setMaxRows(maxRows);
@@ -246,6 +247,7 @@ public class SDVUtil {
         // studySubjectSDVFilter, subjectSort, rowStart, rowEnd);
         Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd, studyId, request);
         tableFacade.setItems(items);
+        tableFacade.getCoreContext().setPageItems(items);
         /*
          * Limit limit = tableFacade.getLimit();
          * FilterSet filterSet = limit.getFilterSet();
@@ -260,6 +262,7 @@ public class SDVUtil {
          * 
          * tableFacade.setItems(items);
          */
+        return totalRows;
     }
 
     private void updateLimitRowSelect(TableFacade tableFacade, HttpServletRequest request) {
@@ -639,7 +642,7 @@ public class SDVUtil {
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"), new SDVRequirementMatcher());
 
-        this.setDataAndLimitVariables(tableFacade, studyId, request);
+        int totalRows = this.setDataAndLimitVariables(tableFacade, studyId, request);
 
         // tableFacade.setItems(items);
 
@@ -679,6 +682,7 @@ public class SDVUtil {
         tableFacade.setToolbar(sDVToolbar);
         tableFacade.setView(new SDVView(LocaleResolver.getLocale(request), request));
 
+        tableFacade.setTotalRows(totalRows);
         // Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         // i18n caption; TODO: convert to Spring messages
