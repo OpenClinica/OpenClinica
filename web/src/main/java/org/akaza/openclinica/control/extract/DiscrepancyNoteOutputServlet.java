@@ -69,6 +69,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         // the fileName contains any subject id and study unique protocol id;
         // see: chooseDownloadFormat.jsp
         String fileName = request.getParameter("fileName");
+        String delimiter = DownloadDiscrepancyNote.COMMA;
         // replace any spaces in the study's unique protocol id, so that
         // the filename is formulated correctly
         if (fileName != null) {
@@ -93,7 +94,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         int discNoteType = fp.getInt("discNoteType");
 
         DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote();
-        if ("csv".equalsIgnoreCase(format)) {
+        if ("csv".equalsIgnoreCase(format.substring(0,3))) {
             fileName = fileName + ".csv";
             response.setContentType(DownloadDiscrepancyNote.CSV);
         } else {
@@ -139,8 +140,16 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         Set<Integer> resolutionStatusIds = emptySet();
         List<DiscrepancyNoteThread> discrepancyNoteThreads =
             discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
-
-        if ("csv".equalsIgnoreCase(format)) {
+        
+        if ("csv-pipe".equalsIgnoreCase(format)) {
+        	delimiter = DownloadDiscrepancyNote.PIPE;
+        }else if ("csv-tab".equalsIgnoreCase(format)) {
+        	delimiter = DownloadDiscrepancyNote.TAB;
+        }else {
+        	delimiter = DownloadDiscrepancyNote.COMMA;
+        }
+        
+        if ("csv".equalsIgnoreCase(format.substring(0,3))) {
             /*response.setContentLength(
               downLoader.getListContentLength(allDiscNotes,DownloadDiscrepancyNote.CSV));*/
             //3014: this has been changed to only show the parent of the thread; then changed back again!
@@ -149,13 +158,13 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.CSV,response.getOutputStream(), null);*/
-            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null);
+            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null,delimiter);
         } else {
             response.setHeader("Pragma", "public");
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.PDF,
               response.getOutputStream(), studyIdentifier);*/
-            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response, studyIdentifier);
+            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response, studyIdentifier,delimiter);
         }
     }
 

@@ -6,9 +6,9 @@
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
                         http://www.springframework.org/schema/util 
-                        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+                        http://www.springframework.org/schema/util/spring-util-3.2.xsd">
     
    
      <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
@@ -26,6 +26,8 @@
           <prop key="mail.smtps.auth">s[mail.smtps.auth]</prop>
           <prop key="mail.smtps.starttls.enable">s[mail.smtps.starttls.enable]</prop>
           <prop key="mail.smtp.connectiontimeout">s[mail.smtp.connectiontimeout]</prop>
+          <prop key="mail.smtp.starttls.required">s[mail.smtp.starttls.required:false]</prop>
+          <prop key="mail.smtp.ssl.protocols">s[mail.smtp.ssl.protocols:TLSv1.1]</prop>
         </props>
       </property>
      </bean>
