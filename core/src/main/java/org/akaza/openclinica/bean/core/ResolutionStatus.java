@@ -44,27 +44,27 @@ public class ResolutionStatus extends Term {
     private String iconFilePath;
 
     public boolean isInvalid() {
-        return this == ResolutionStatus.INVALID;
+        return this.getId() == ResolutionStatus.INVALID.getId();
     }
 
     public boolean isOpen() {
-        return this == ResolutionStatus.OPEN;
+        return this.getId() == ResolutionStatus.OPEN.getId();
     }
 
     public boolean isClosed() {
-        return this == ResolutionStatus.CLOSED;
+        return this.getId() == ResolutionStatus.CLOSED.getId();
     }
 
     public boolean isUpdated() {
-        return this == ResolutionStatus.UPDATED;
+        return this.getId() == ResolutionStatus.UPDATED.getId();
     }
 
     public boolean isResolved() {
-        return this == ResolutionStatus.RESOLVED;
+        return this.getId() == ResolutionStatus.RESOLVED.getId();
     }
 
     public boolean isNotApplicable() {
-        return this == ResolutionStatus.NOT_APPLICABLE;
+        return this.getId() == ResolutionStatus.NOT_APPLICABLE.getId();
     }
 
     private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE };

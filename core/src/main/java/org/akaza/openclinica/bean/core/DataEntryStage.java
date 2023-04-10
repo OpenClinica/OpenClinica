@@ -30,35 +30,35 @@ public class DataEntryStage extends Term {
         { UNCOMPLETED, INITIAL_DATA_ENTRY, INITIAL_DATA_ENTRY_COMPLETE, DOUBLE_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, ADMINISTRATIVE_EDITING, LOCKED };
 
     public boolean isInvalid() {
-        return this == DataEntryStage.INVALID;
+        return this.getId() == DataEntryStage.INVALID.getId();
     }
 
     public boolean isUncompleted() {
-        return this == DataEntryStage.UNCOMPLETED;
+        return this.getId() == DataEntryStage.UNCOMPLETED.getId();
     }
 
     public boolean isInitialDE() {
-        return this == DataEntryStage.INITIAL_DATA_ENTRY;
+        return this.getId() == DataEntryStage.INITIAL_DATA_ENTRY.getId();
     }
 
     public boolean isInitialDE_Complete() {
-        return this == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE;
+        return this.getId() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getId();
     }
 
     public boolean isDoubleDE() {
-        return this == DataEntryStage.DOUBLE_DATA_ENTRY;
+        return this.getId() == DataEntryStage.DOUBLE_DATA_ENTRY.getId();
     }
 
     public boolean isDoubleDE_Complete() {
-        return this == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE;
+        return this.getId() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE.getId();
     }
 
     public boolean isAdmin_Editing() {
-        return this == DataEntryStage.ADMINISTRATIVE_EDITING;
+        return this.getId() == DataEntryStage.ADMINISTRATIVE_EDITING.getId();
     }
 
     public boolean isLocked() {
-        return this == DataEntryStage.LOCKED;
+        return this.getId() == DataEntryStage.LOCKED.getId();
     }
 
     public static final List<DataEntryStage> list = Arrays.asList(members);

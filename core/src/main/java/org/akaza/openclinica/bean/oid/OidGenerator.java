@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * @see Strategy Pattern, Template Pattern
  */
 
-public abstract class OidGenerator {
+public abstract class OidGenerator implements java.io.Serializable {
 
     @Override
     public int hashCode() {
