@@ -3387,7 +3387,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
 
     protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
             String studySubjectIds) {
-        return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
+        return "select distinct ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
             + " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
             + " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
             + " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order,"
