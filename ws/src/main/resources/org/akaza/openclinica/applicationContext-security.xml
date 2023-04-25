@@ -17,7 +17,6 @@
 
         <security:http pattern="/pages/login/login" security="none"/>
         <security:http pattern="/SystemStatus" security="none"/>
-        <security:http pattern="/RssReader" security="none"/>
         <security:http pattern="/RequestPassword" security="none"/>
         <security:http pattern="/RequestAccount" security="none"/>
         <security:http pattern="/includes/**" security="none"/>

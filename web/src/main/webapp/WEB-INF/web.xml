@@ -248,11 +248,6 @@
         <description>ViewLogMessage</description>
         <servlet-class>org.akaza.openclinica.control.admin.ViewLogMessageServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>RssReaderServlet</servlet-name>
-        <description>RssReaderServlet</description>
-        <servlet-class>org.akaza.openclinica.control.RssReaderServlet</servlet-class>
-    </servlet>
 
     <servlet>
         <servlet-name>AuditUserActivityServlet</servlet-name>
@@ -2186,10 +2181,6 @@
     <servlet-mapping>
         <servlet-name>ViewLogMessage</servlet-name>
         <url-pattern>/ViewLogMessage</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RssReaderServlet</servlet-name>
-        <url-pattern>/RssReader</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UploadFileServlet</servlet-name>
