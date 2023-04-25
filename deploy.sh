@@ -31,7 +31,7 @@ cp -n $EXTRACT_PATH $TOMCAT_BASE_PATH/$ws_config_folder_name
 # Stop tomcat
 $TOMCAT_CATALINA_PATH stop
 # Build
-cd WEBAPP_HOME
+cd $WEBAPP_HOME
 mvn clean package -DskipTests
 # Deploy OpenClinica-web-$ocVersion
 rm -rf $TOMCAT_WEBAPPS_PATH/OpenClinica-web-$ocVersion
@@ -41,8 +41,8 @@ cp -R  $web_path $TOMCAT_WEBAPPS_PATH/OpenClinica-web-$ocVersion
 rm -rf $TOMCAT_WEBAPPS_PATH/OpenClinica-ws-$ocVersion
 cp -R  $ws_path $TOMCAT_WEBAPPS_PATH/OpenClinica-ws-$ocVersion
 
-# Start tomcat
-$TOMCAT_CATALINA_PATH start
+# Start tomcat in debug mode
+$TOMCAT_CATALINA_PATH jpda start
 
 
 
