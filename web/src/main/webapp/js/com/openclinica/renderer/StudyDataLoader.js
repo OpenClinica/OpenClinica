@@ -333,42 +333,48 @@ function StudyDataLoader(study, json) {
      }
     }
   }
- 
-  
-  this.loadFormsData = function(studyEventOID,studyEventRepeatKey,formsData){
-	  if (formsData == undefined) {
-	      return;
-	    }
-	    if(app_formVersionOID!="*")
-	    {
-	    	for (var i=0;i<formsData.length;i++) {
-	     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
-       var formOID = formsData[i]["@FormOID"];
-       app_formData = formsData[i];
-	        app_thisFormData = app_formData;
-   //      if (app_displayDNs =='y')   app_eventCRFdns[formOID] = formsData[i]["OpenClinica:DiscrepancyNotes"];
-    //     if (app_displayAudits =='y')   app_eventCRFaudits[formOID] = formsData[i]["OpenClinica:AuditLogs"];
-	//        break;
-	      }
-	    }
-	   // load itemGroupData into a hash map and determine repeating group row lengths 
-	   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
-	   if (itemGroupData) {
-		   this.loadItemGroupData(studyEventOID,studyEventRepeatKey,itemGroupData);
-	   }
-	   }
-	    else{
-	    	for(var i=0;i<formsData.length;i++){
-	    		app_formData= formsData[i];
-	    		app_thisFormData = app_formData;
-	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
-	    		if (itemGroupData) {
-	    			   this.loadItemGroupData(studyEventOID,studyEventRepeatKey,itemGroupData);
-	    		   }
-	    	}
-	    }
-	    app_studySubjectStatus = app_formData["@OpenClinica:Status"];
-  }
+
+
+    this.loadFormsData = function (studyEventOID, studyEventRepeatKey, formsData) {
+        if (formsData == undefined) {
+            return;
+        }
+        if (app_formVersionOID != "*") {
+            for (var i = 0; i < formsData.length; i++) {
+                if (formsData[i]["@FormOID"] == app_formVersionOID) {
+                    var formOID = formsData[i]["@FormOID"];
+                    app_formData = formsData[i];
+                    app_thisFormData = app_formData;
+                    //      if (app_displayDNs =='y')   app_eventCRFdns[formOID] = formsData[i]["OpenClinica:DiscrepancyNotes"];
+                    //     if (app_displayAudits =='y')   app_eventCRFaudits[formOID] = formsData[i]["OpenClinica:AuditLogs"];
+                    //        break;
+                }
+            }
+            // load itemGroupData into a hash map and determine repeating group row lengths
+            if (app_formData) {
+                var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+            }
+            if (itemGroupData) {
+                this.loadItemGroupData(studyEventOID, studyEventRepeatKey, itemGroupData);
+            }
+        } else {
+            for (var i = 0; i < formsData.length; i++) {
+                app_formData = formsData[i];
+                app_thisFormData = app_formData;
+                if (app_formData) {
+                    itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+                }
+                if (itemGroupData) {
+                    this.loadItemGroupData(studyEventOID, studyEventRepeatKey, itemGroupData);
+                }
+            }
+        }
+        if(app_formData){
+            app_studySubjectStatus = app_formData["@OpenClinica:Status"];
+        }else{
+            app_studySubjectStatus = '';
+        }
+    }
   
   
   this.loadItemGroupData = function(studyEventOID,studyEventRepeatKey,itemGroupData){
