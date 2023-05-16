@@ -78,6 +78,9 @@ public class EnterDataForStudyEventServlet extends SecureController {
     // property; this
     // value will be saved as a request attribute
     public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
+    public final static String LOCATION_NOTE_ICON = "locationNoteIcon";
+    public final static String START_DATE_NOTE_ICON = "startDateNoteIcon";
+    public final static String END_DATE_NOTE_ICON = "endDateNoteIcon";
 
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
@@ -623,11 +626,13 @@ public class EnterDataForStudyEventServlet extends SecureController {
         for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
             if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_LOCATION_NOTE, "yes");
+                request.setAttribute(LOCATION_NOTE_ICON, discrepancyNoteBean.getResStatus().getIconFilePath());
             } else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_START_DATE_NOTE, "yes");
-
+                request.setAttribute(START_DATE_NOTE_ICON, discrepancyNoteBean.getResStatus().getIconFilePath());
             } else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_END_DATE_NOTE, "yes");
+                request.setAttribute(END_DATE_NOTE_ICON, discrepancyNoteBean.getResStatus().getIconFilePath());
             }
 
         }
