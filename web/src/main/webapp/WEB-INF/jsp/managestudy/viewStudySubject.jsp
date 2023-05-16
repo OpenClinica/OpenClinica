@@ -402,7 +402,7 @@
 							<td class="table_header_row"><fmt:message key="site_name" bundle="${resword}"/></td>
 		                    <td class="table_cell_top">
 		                        <c:if test="${subjectStudy.parentStudyId>0}">
-		                            <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>"><c:out value="${subjectStudy.name}"/></a>
+		                            <a href="ViewSite?id=<c:out value="${subjectStudy.id}"/>"><c:out value="${subjectStudy.name}"/></a>
 		                        </c:if>&nbsp;</td>
 						</tr>
 
