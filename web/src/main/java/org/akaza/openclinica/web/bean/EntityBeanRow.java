@@ -8,7 +8,9 @@
 package org.akaza.openclinica.web.bean;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -75,6 +77,13 @@ public abstract class EntityBeanRow implements Comparable {
      * <code>false</code> otherwise
      */
     private boolean ascendingSort;
+
+    protected static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_format_string"), ResourceBundleProvider.getLocale());
+        }
+    };
 
     public EntityBeanRow() {
         bean = new EntityBean();

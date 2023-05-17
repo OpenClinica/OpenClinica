@@ -63,7 +63,7 @@ public class StudyEventRow extends EntityBeanRow {
     @Override
     public String getSearchString() {
         StudyEventBean thisEvent = (StudyEventBean) bean;
-        return thisEvent.getStudySubjectLabel() + " " + thisEvent.getSubjectEventStatus().getName();
+        return thisEvent.getStudySubjectLabel() + " " + DATE_FORMAT.get().format(thisEvent.getDateStarted()) + " " + thisEvent.getSubjectEventStatus().getName();
     }
 
     /*
