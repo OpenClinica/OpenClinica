@@ -233,7 +233,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.0.1-FINAL</version>
+			<version>5.2.3</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -241,6 +241,12 @@
 			<artifactId>jxl</artifactId>
 			<version>2.6.10</version>
 			<scope>compile</scope>
+			<exclusions>
+			<exclusion>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+			</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Struts web framework -->
 		<dependency>
