@@ -48,6 +48,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -771,7 +772,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         cell = sheet.getRow(k).getCell((short) 19);
                         // String phi = getValue(cell);
                         String phi = "";
-                        if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                        if (cell.getCellType() == CellType.NUMERIC) {
                             double dphi = cell.getNumericCellValue();
                             if ((dphi - (int) dphi) * 1000 == 0) {
                                 phi = (int) dphi + "";
@@ -794,7 +795,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         // String required = "";
                         if (StringUtil.isBlank(required)) {
                             required = "0";
-                        } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                        } else if (cell.getCellType() == CellType.NUMERIC) {
                             double dr = cell.getNumericCellValue();
                             if ((dr - (int) dr) * 1000 == 0) {
                                 required = (int) dr + "";
@@ -1753,25 +1754,25 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
 
                     for (int y = 0; y < numCells; y++) {
                         HSSFCell cell = sheet.getRow(i).getCell((short) y);
-                        int cellType = 0;
+                        CellType cellType = null;
                         String error = "&nbsp;";
                         String errorKey = j + "," + i + "," + y;
                         if (htmlErrors.containsKey(errorKey)) {
                             error = "<span class=\"alert\">" + htmlErrors.get(errorKey) + "</span>";
                         }
                         if (cell == null) {
-                            cellType = HSSFCell.CELL_TYPE_BLANK;
+                            cellType = CellType.BLANK;
                         } else {
                             cellType = cell.getCellType();
                         }
                         switch (cellType) {
-                        case HSSFCell.CELL_TYPE_BLANK:
+                        case BLANK:
                             buf.append("<td class=\"table_cell\">" + error + "</td>");
                             break;
-                        case HSSFCell.CELL_TYPE_NUMERIC:
+                        case NUMERIC:
                             buf.append("<td class=\"table_cell\">" + cell.getNumericCellValue() + " " + error + "</td>");
                             break;
-                        case HSSFCell.CELL_TYPE_STRING:
+                        case STRING:
                             buf.append("<td class=\"table_cell\">" + cell.getStringCellValue() + " " + error + "</td>");
                             break;
                         default:
@@ -1827,18 +1828,18 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
 
     public String getValue(HSSFCell cell) {
         String val = null;
-        int cellType = 0;
+        CellType cellType = null;
         if (cell == null) {
-            cellType = HSSFCell.CELL_TYPE_BLANK;
+            cellType = CellType.BLANK;
         } else {
             cellType = cell.getCellType();
         }
 
         switch (cellType) {
-        case HSSFCell.CELL_TYPE_BLANK:
+        case BLANK:
             val = "";
             break;
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case NUMERIC:
             // YW << Modify code so that floating number alone can be used for
             // CRF version. Before it must use, e.g. v1.1
             // Meanwhile modification has been done for read PHI cell and
@@ -1859,7 +1860,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
             // cell.getNumericCellValue()
             // + "</font></td>");
             break;
-        case HSSFCell.CELL_TYPE_STRING:
+        case STRING:
             val = cell.getStringCellValue();
             if (val.matches("'")) {
                 // logger.info("Found single quote! "+val);
@@ -1901,21 +1902,21 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                 for (int y = 0; y < numCells; y++) {
 
                     HSSFCell cell = sheet.getRow(i).getCell((short) y);
-                    int cellType = 0;
+                    CellType cellType = null;
                     if (cell == null) {
-                        cellType = HSSFCell.CELL_TYPE_BLANK;
+                        cellType = CellType.BLANK;
                     } else {
                         cellType = cell.getCellType();
                     }
 
                     switch (cellType) {
-                    case HSSFCell.CELL_TYPE_BLANK:
+                    case BLANK:
                         buf.append("<td> </td>");
                         break;
-                    case HSSFCell.CELL_TYPE_NUMERIC:
+                    case NUMERIC:
                         buf.append("<td>" + cell.getNumericCellValue() + "</td>");
                         break;
-                    case HSSFCell.CELL_TYPE_STRING:
+                    case STRING:
                         buf.append("<td>" + cell.getStringCellValue() + "</td>");
                         break;
                     default:

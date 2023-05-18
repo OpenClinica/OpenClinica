@@ -5,6 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,7 +118,7 @@ public final class SpreadsheetPreview implements Preview {
                     }
                     // item_name
 
-                    allRows.put(new Integer(j), rowCells);
+                    allRows.put(Integer.valueOf(j), rowCells);
                 }// end inner for loop
             }// end if
         }// end outer for
@@ -172,14 +173,14 @@ public final class SpreadsheetPreview implements Preview {
         if (cell == null)
             return "";
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_STRING:
-            return cell.getStringCellValue();
-        case HSSFCell.CELL_TYPE_NUMERIC:
-            return Double.toString(cell.getNumericCellValue());
-        case HSSFCell.CELL_TYPE_BOOLEAN:
-            return new Boolean(cell.getBooleanCellValue()).toString();
-        case HSSFCell.CELL_TYPE_FORMULA:
-            return cell.getCellFormula().toString();
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return Double.toString(cell.getNumericCellValue());
+            case BOOLEAN:
+                return Boolean.valueOf(cell.getBooleanCellValue()).toString();
+            case FORMULA:
+                return cell.getCellFormula().toString();
         }
         return "";
     }
@@ -238,16 +239,16 @@ public final class SpreadsheetPreview implements Preview {
                         // Set the Map key to the crf header
 
                         switch (cell.getCellType()) {
-                        case HSSFCell.CELL_TYPE_STRING:
+                        case STRING:
                             val = cell.getStringCellValue();
                             break;
-                        case HSSFCell.CELL_TYPE_NUMERIC:
+                        case NUMERIC:
                             val = Double.toString(cell.getNumericCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_BOOLEAN:
-                            val = new Boolean(cell.getBooleanCellValue()).toString();
+                        case BOOLEAN:
+                            val = Boolean.valueOf(cell.getBooleanCellValue()).toString();
                             break;
-                        case HSSFCell.CELL_TYPE_FORMULA:
+                        case FORMULA:
                             cell.getCellFormula().toString();
                             break;
                         }

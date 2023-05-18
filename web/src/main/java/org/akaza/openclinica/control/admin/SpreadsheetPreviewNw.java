@@ -243,9 +243,9 @@ public final class SpreadsheetPreviewNw implements Preview {
             return "";
         // new SimpleDateFormat("yyyy-MM-dd").format(cell.getDateCellValue());
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_STRING:
+        case STRING:
             return cell.getStringCellValue();
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case NUMERIC:
             val = Double.toString(cell.getNumericCellValue());
             // code derived from SpreadsheetTableRepeating.java
             double dphi = cell.getNumericCellValue();
@@ -253,9 +253,9 @@ public final class SpreadsheetPreviewNw implements Preview {
                 val = (int) dphi + "";
             }
             return val;
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case BOOLEAN:
             return Boolean.toString(cell.getBooleanCellValue());
-        case HSSFCell.CELL_TYPE_FORMULA:
+        case FORMULA:
             return cell.getCellFormula();
 
         }
@@ -313,16 +313,16 @@ public final class SpreadsheetPreviewNw implements Preview {
                         // Set the Map key to the crf header
 
                         switch (cell.getCellType()) {
-                        case HSSFCell.CELL_TYPE_STRING:
+                        case STRING:
                             val = cell.getStringCellValue();
                             break;
-                        case HSSFCell.CELL_TYPE_NUMERIC:
+                        case NUMERIC:
                             val = Double.toString(cell.getNumericCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_BOOLEAN:
+                        case BOOLEAN:
                             val = Boolean.toString(cell.getBooleanCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_FORMULA:
+                        case FORMULA:
                             cell.getCellFormula();
                             break;
                         }
