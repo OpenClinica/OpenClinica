@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet id="2023-05-19-21028-1" author="sqasim">
+        <sql>
+            ALTER TABLE oc_qrtz_job_details
+            ALTER COLUMN job_data TYPE bytea
+            USING E'\\x' || lpad(job_data::text, 2, '0')::bytea;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2023-05-19-21028-2" author="sqasim">
+        <sql>
+            ALTER TABLE oc_qrtz_triggers
+            ALTER COLUMN job_data TYPE bytea
+            USING E'\\x' || lpad(job_data::text, 2, '0')::bytea;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
