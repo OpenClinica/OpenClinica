@@ -87,8 +87,9 @@
 	  	<div class="formfieldXL_BG">
 
 			<c:choose>
-				<c:when test="${study.studyParameterConfig.subjectIdGeneration== 'auto non-editable'}">
-				   <input style="background-color:#D3D3D3;" type="text" name="label" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldXL">
+				<c:when test="${study.studyParameterConfig.subjectIdGeneration == 'auto non-editable'}">
+					<input type="hidden" name="label" value="<c:out value="${studySub.label}"/>" />
+				   <input style="background-color:#D3D3D3;" type="text" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldXL">
 					<br />
 				</c:when>    
 				<c:otherwise>
@@ -143,15 +144,18 @@
 
 	<div class="tablebox_center">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
-	  <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell">
-	  <input type="text" name="label" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldM">
-	  </td></tr>
-	  <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell">
-	  <input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" disabled="disabled" class="formfieldM">
-	  </td></tr>
-	  <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td><td class="table_cell">
-	  <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" disabled="disabled" class="formfieldM" id="enrollmentDateField">
-	  </td></tr>
+		<tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell">
+			<input type="hidden" name="label" value="<c:out value="${studySub.label}"/>" />
+			<input type="text" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldM">
+		</td></tr>
+		<tr valign="top"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell">
+			<input type="hidden" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" />
+			<input type="text" value="<c:out value="${studySub.secondaryLabel}"/>" disabled="disabled" class="formfieldM">
+		</td></tr>
+		<tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td><td class="table_cell">
+			<input type="hidden" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" id="enrollmentDateField" />
+			<input type="text" value="<c:out value="${enrollDateStr}" />" disabled="disabled" class="formfieldM" >
+		</td></tr>
 	 </table>
 
 	 </div>
