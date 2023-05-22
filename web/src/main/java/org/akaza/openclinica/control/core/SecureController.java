@@ -292,6 +292,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 int state = getScheduler(request).getTriggerState(jobName, groupName);
                 org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
                 List contexts = getScheduler(request).getCurrentlyExecutingJobs();
+                if (details == null) {
+                    return;
+                }
                 // will we get the above, even if its completed running?
                 // ProcessingResultType message = null;
                 // for (int i = 0; i < contexts.size(); i++) {
