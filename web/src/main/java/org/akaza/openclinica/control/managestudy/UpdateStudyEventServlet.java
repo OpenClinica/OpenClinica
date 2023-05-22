@@ -88,6 +88,9 @@ public class UpdateStudyEventServlet extends SecureController {
     public final static String HAS_LOCATION_NOTE = "hasLocationNote";
     public final static String HAS_START_DATE_NOTE = "hasStartDateNote";
     public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
+    public final static String LOCATION_NOTE_ICON = "locationNoteIcon";
+    public final static String START_DATE_NOTE_ICON = "startDateNoteIcon";
+    public final static String END_DATE_NOTE_ICON = "endDateNoteIcon";
 
 
     @Override
@@ -805,11 +808,13 @@ public class UpdateStudyEventServlet extends SecureController {
         for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
             if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_LOCATION_NOTE, "yes");
+                request.setAttribute(LOCATION_NOTE_ICON, discrepancyNoteBean.getResStatus().getIconFilePath());
             } else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_START_DATE_NOTE, "yes");
-
+                request.setAttribute(START_DATE_NOTE_ICON, discrepancyNoteBean.getResStatus().getIconFilePath());
             } else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_END_DATE_NOTE, "yes");
+                request.setAttribute(END_DATE_NOTE_ICON, discrepancyNoteBean.getResStatus().getIconFilePath());
             }
 
         }
