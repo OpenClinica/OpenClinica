@@ -186,8 +186,7 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-			<scope>compile</scope>
+			<version>2.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>httpunit</groupId>
