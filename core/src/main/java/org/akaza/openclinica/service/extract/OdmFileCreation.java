@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -212,16 +213,21 @@ public class OdmFileCreation {
                 report.setODMVersion(odmVersion);
                 //report.setOdmStudy(mdc.getOdmStudy());
                 report.setOdmBean(mdc.getODMBean());
+                StudyParameterConfig spc = u.getStudy().getStudyParameterConfig();
+                // Collect Date Of Birth = 1
+                // Collect Year Of Birth = 2
+                // Not Used = 3
+                boolean includeDOB = !("3".equals(spc.getCollectDob()));
                 if (firstIteration && fromIndex >= newRows.size()) {
-                    report.createChunkedOdmXml(Boolean.TRUE, true, true);
+                    report.createChunkedOdmXml(Boolean.TRUE, true, true, includeDOB);
                     firstIteration = false;
                 } else if (firstIteration) {
-                    report.createChunkedOdmXml(Boolean.TRUE, true, false);
+                    report.createChunkedOdmXml(Boolean.TRUE, true, false, includeDOB);
                     firstIteration = false;
                 } else if (fromIndex >= newRows.size()) {
-                    report.createChunkedOdmXml(Boolean.TRUE, false, true);
+                    report.createChunkedOdmXml(Boolean.TRUE, false, true, includeDOB);
                 } else {
-                    report.createChunkedOdmXml(Boolean.TRUE, false, false);
+                    report.createChunkedOdmXml(Boolean.TRUE, false, false, includeDOB);
                 }
                 fId = createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
                                     false, zipped, deleteOld, userBean);
