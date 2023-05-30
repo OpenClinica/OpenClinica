@@ -181,11 +181,11 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         GlobalVariablesBean gv = odmstudy.getGlobalVariables();
         xml.append(currentIndent + "<GlobalVariables>");
         xml.append(nls);
-        xml.append(currentIndent + indent + "<StudyName>" + StringEscapeUtils.escapeXml(gv.getStudyName()) + "</StudyName>");
+        xml.append(currentIndent + indent + "<StudyName>" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(gv.getStudyName()) + "</StudyName>");
         xml.append(nls);
         xml.append(currentIndent + indent + "<StudyDescription>");
         xml.append(nls);
-        xml.append(currentIndent + indent + indent + StringEscapeUtils.escapeXml(gv.getStudyDescription()));
+        xml.append(currentIndent + indent + indent + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(gv.getStudyDescription()));
         xml.append(nls);
         xml.append(currentIndent + indent + "</StudyDescription>");
         xml.append(nls);
@@ -324,7 +324,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>) odmstudy.getMetaDataVersion().getStudyEventDefs();
         for (StudyEventDefBean sed : seds) {
             xml.append(currentIndent + "<StudyEventDef OID=\"" + StringEscapeUtils.escapeXml(sed.getOid()) + "\"  Name=\""
-                + StringEscapeUtils.escapeXml(sed.getName()) + "\" Repeating=\"" + sed.getRepeating() + "\" Type=\"" + sed.getType() + "\">");
+                + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(sed.getName()) + "\" Repeating=\"" + sed.getRepeating() + "\" Type=\"" + sed.getType() + "\">");
             xml.append(nls);
             ArrayList<ElementRefBean> forms = (ArrayList<ElementRefBean>) sed.getFormRefs();
             for (ElementRefBean form : forms) {
@@ -348,7 +348,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>) odmstudy.getMetaDataVersion().getFormDefs();
         for (FormDefBean form : forms) {
             xml.append(currentIndent + "<FormDef OID=\"" + StringEscapeUtils.escapeXml(form.getOid()) + "\" Name=\""
-                + StringEscapeUtils.escapeXml(form.getName()) + "\" Repeating=\"" + form.getRepeating() + "\">");
+                + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(form.getName()) + "\" Repeating=\"" + form.getRepeating() + "\">");
             xml.append(nls);
             ArrayList<ElementRefBean> igs = (ArrayList<ElementRefBean>) form.getItemGroupRefs();
             for (ElementRefBean ig : igs) {
@@ -376,7 +376,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>) odmstudy.getMetaDataVersion().getFormDefs();
         for (FormDefBean form : forms) {
             xml.append(currentIndent + "<FormDef OID=\"" + StringEscapeUtils.escapeXml(form.getOid()) + "\" Name=\""
-                + StringEscapeUtils.escapeXml(form.getName()) + "\" Repeating=\"" + form.getRepeating() + "\">");
+                + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(form.getName()) + "\" Repeating=\"" + form.getRepeating() + "\">");
             xml.append(nls);
             ArrayList<ElementRefBean> igs = (ArrayList<ElementRefBean>) form.getItemGroupRefs();
             for (ElementRefBean ig : igs) {
@@ -670,12 +670,12 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             if(study.getParentStudyId()>0){
                      	temp = study.getName();
             	if(temp!=null && temp.length()>0){
-            		xml.append(" SiteName=\""+ StringEscapeUtils.escapeXml(temp) + "\"");
+            		xml.append(" SiteName=\""+ org.apache.commons.lang3.StringEscapeUtils.escapeXml11(temp) + "\"");
             		
             	}
             	temp = study.getParentStudyName();
             	if(temp!=null && temp.length()>0){
-            		xml.append(" ParentStudyName=\""+ StringEscapeUtils.escapeXml(temp) + "\"");
+            		xml.append(" ParentStudyName=\""+ org.apache.commons.lang3.StringEscapeUtils.escapeXml11(temp) + "\"");
             	}
 //            	
             }
