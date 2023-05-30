@@ -361,13 +361,16 @@
 			<xsl:apply-templates select="(@OpenClinica:Sex)" />
 			<xsl:value-of select="$sep"/>
 		</xsl:if>
-		<xsl:if test="$dobExist">
+		<xsl:if test="$dobExist and $dobExist != 'Not Used'">
 			<!-- @pgawade 21-Mar-2012 #12213 convert ISO 8601 format date into american date -->
 			<!--<xsl:value-of select="@OpenClinica:DateOfBirth"/>>-->
 			<xsl:call-template name="convert-date-ISO8601-to-ADate">
 				<xsl:with-param name="dateSrc" select="@OpenClinica:DateOfBirth"/>
 			</xsl:call-template>			
 			<xsl:value-of select="$delimiter" />
+		</xsl:if>
+		<xsl:if test="$dobExist and $dobExist = 'Not Used'">
+			<xsl:value-of select="@OpenClinica:DateOfBirth"/>
 		</xsl:if>
 		<xsl:if test="$dobYearExist">
 			<xsl:apply-templates select="(@OpenClinica:YearOfBirth)"/>

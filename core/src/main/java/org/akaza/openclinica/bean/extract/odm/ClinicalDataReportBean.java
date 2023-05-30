@@ -36,6 +36,14 @@ import org.apache.commons.lang.StringEscapeUtils;
 public class ClinicalDataReportBean extends OdmXmlReportBean {
     private OdmClinicalDataBean clinicalData;
 
+    private boolean includeDOB = true;
+    public void setIncludeDOB(boolean includeDOB) {
+        this.includeDOB = includeDOB;
+    }
+    public boolean isIncludeDOB() {
+        return includeDOB;
+    }
+
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata) {
         super();
         this.clinicalData = clinicaldata;
@@ -80,13 +88,17 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (secondaryId != null && secondaryId.length() > 0) {
                     xml.append("\"  OpenClinica:SecondaryID=\"" + StringEscapeUtils.escapeXml(secondaryId));
                 }
-                Integer year = sub.getYearOfBirth();
-                if (year != null) {
-                    xml.append("\" OpenClinica:YearOfBirth=\"" + sub.getYearOfBirth());
-                } else {
-                    if (sub.getDateOfBirth() != null) {
-                        xml.append("\" OpenClinica:DateOfBirth=\"" + sub.getDateOfBirth());
+                if(this.isIncludeDOB()){
+                    Integer year = sub.getYearOfBirth();
+                    if (year != null) {
+                        xml.append("\" OpenClinica:YearOfBirth=\"" + sub.getYearOfBirth());
+                    } else {
+                        if (sub.getDateOfBirth() != null) {
+                            xml.append("\" OpenClinica:DateOfBirth=\"" + sub.getDateOfBirth());
+                        }
                     }
+                }else {
+                    xml.append("\" OpenClinica:DateOfBirth=\"" + "Not Used");
                 }
                 String gender = sub.getSubjectGender();
                 if (gender != null && gender.length() > 0) {
