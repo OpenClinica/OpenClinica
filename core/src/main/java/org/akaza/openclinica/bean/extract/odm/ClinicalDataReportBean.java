@@ -67,10 +67,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         for (ExportSubjectDataBean sub : subs) {
             xml.append(indent + indent + "<SubjectData SubjectKey=\"" + StringEscapeUtils.escapeXml(sub.getSubjectOID()));
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                xml.append("\" OpenClinica:StudySubjectID=\"" + StringEscapeUtils.escapeXml(sub.getStudySubjectId()));
+                xml.append("\" OpenClinica:StudySubjectID=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(sub.getStudySubjectId()));
                 String uniqueIdentifier = sub.getUniqueIdentifier();
                 if (uniqueIdentifier != null && uniqueIdentifier.length() > 0) {
-                    xml.append("\" OpenClinica:UniqueIdentifier=\"" + StringEscapeUtils.escapeXml(uniqueIdentifier));
+                    xml.append("\" OpenClinica:UniqueIdentifier=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(uniqueIdentifier));
                 }
                 String status = sub.getStatus();
                 if (status != null && status.length() > 0) {
