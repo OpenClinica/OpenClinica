@@ -547,7 +547,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         try{
             if(CSV.equalsIgnoreCase(format))  {
                 String result  = StringEscapeUtils.unescapeJava(allContent.toString());
-                response.getWriter().print(HtmlUtils.htmlEscape(result));
+                response.getWriter().print(result);
                 //servletStream.print(allContent.toString());
             } else {
 
