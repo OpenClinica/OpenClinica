@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -49,7 +48,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
         }
 
         return new User(returnUsername, userFromUserQuery.getPassword(), userFromUserQuery.isEnabled(), true, true, userFromUserQuery.isAccountNonLocked(),
-                Arrays.asList(combinedAuthorities));
+                combinedAuthorities);
     }
 
     /**
@@ -68,8 +67,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
             String password = rs.getString(2);
             boolean enabled = rs.getBoolean(3);
             boolean nonLocked = rs.getBoolean(4);
-            UserDetails user = new User(username, password, enabled, true, true, nonLocked,
-                    Arrays.asList(new GrantedAuthority[] { new GrantedAuthorityImpl("HOLDER") }));
+            UserDetails user = new User(username, password, enabled, true, true, nonLocked, new GrantedAuthority[] { new GrantedAuthorityImpl("HOLDER") });
 
             return user;
         }
