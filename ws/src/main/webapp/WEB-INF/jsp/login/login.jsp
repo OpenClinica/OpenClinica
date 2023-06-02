@@ -50,6 +50,7 @@
     <table border="0" cellpadding="0" cellspacing="0" class="loginBoxes">
         <tr>
             <td class="loginBox_T">&nbsp;</td>
+            <td class="loginBox_T">&nbsp;</td>
        </tr>
        <tr>
             <td class="loginBox">
@@ -62,6 +63,13 @@
                    <%-- <a href="<c:url value="/RequestPassword"/>"> <fmt:message key="forgot_password" bundle="${resword}"/></a> --%>
                </div>
             <!-- End Login box contents -->
+            </div>
+            </td>
+            <td class="loginBox">
+            <div ID="newsBox">
+                <!-- News box contents -->
+                <h1>News</h1><fmt:message key="login_no_rss_feed" bundle="${resword}"/>
+                <!-- End News box contents -->
             </div>
             </td>
       </tr>
@@ -95,6 +103,15 @@
         document.getElementById('j_password').setAttribute( 'autocomplete', 'off' );
 
         jQuery(document).ready(function() {
+
+        	$.get("../../RssReader", function(data){
+                //alert("Data Loaded: " + data);
+                $("#newsBox").html(data);
+            });
+
+
+           
+
             jQuery('#cancel').click(function() {
                 jQuery.unblockUI();
                 return false;
