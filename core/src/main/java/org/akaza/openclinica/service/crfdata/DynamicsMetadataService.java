@@ -523,8 +523,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 try {
                     value=getRandomizeService().getRandomizationCode(eventCrfBean,stratificationFactorBeans,ruleSet);
                 } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error(e.getMessage(),e);
                 }
 
         } else {
