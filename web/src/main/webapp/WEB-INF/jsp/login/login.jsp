@@ -82,6 +82,7 @@
     <table border="0" cellpadding="0" cellspacing="0" class="loginBoxes">
         <tr>
             <td class="loginBox_T">&nbsp;</td>
+            <td class="loginBox_T">&nbsp;</td>
        </tr>
        <tr>
             <td class="loginBox">
@@ -108,6 +109,13 @@
             <!-- End Login box contents -->
             </div>
             </td>
+            <td class="loginBox">
+            <div ID="newsBox">
+                <!-- News box contents -->
+                <h1><fmt:message key="news" bundle="${resword}"/></h1><fmt:message key="loading" bundle="${resword}"/> ...
+                <!-- End News box contents -->
+            </div>
+            </td>
       </tr>
     </table>
 
@@ -118,6 +126,13 @@
         document.getElementById('j_password').setAttribute( 'autocomplete', 'off' );
 
         jQuery(document).ready(function() {
+
+        	jQuery.get("../../RssReader", function(data){
+//                alert("Data Loaded: " + data);
+                jQuery("#newsBox").html(data);
+            });
+
+
             jQuery('#requestPassword').click(function() {
                 jQuery.blockUI({ message: jQuery('#requestPasswordForm'), css:{left: "200px", top:"180px" } });
             });
