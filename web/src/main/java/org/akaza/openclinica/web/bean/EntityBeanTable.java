@@ -4,10 +4,12 @@
 package org.akaza.openclinica.web.bean;
 
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Link;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -505,21 +507,39 @@ public class EntityBeanTable {
                                     // continue searching the next row
                                     continue loopRows;
                                 }
+                                // Handling date explicitly
+                                if(isDate(component)){
+                                    subStrings = component.split("-");
+                                    String dateMonthCombo = subStrings[0] + "-" + subStrings[1];
+                                    String monthYearCombo = subStrings[1] + "-" + subStrings[2];
 
-                                // if the component does contain a "-" but the
-                                // entire
-                                // component does not match the keyword
-                                subStrings = component.split("-");
-                                for (String innerStr : subStrings) {
-                                    // An exact match has been requested here;
-                                    // see 2640
-                                    // This allows the breaking up of ids like
-                                    // ATS-120-5 and
-                                    // and exact seaches on the separate parts
-                                    // like 120
-                                    if (innerStr.equalsIgnoreCase(keyword)) {
+                                    if (dateMonthCombo.equalsIgnoreCase(keyword) || monthYearCombo.equalsIgnoreCase(keyword)) {
                                         temprows.add(row);
+                                        continue loopRows;
+                                    }
 
+                                    for (String innerStr : subStrings) {
+                                        if (innerStr.equalsIgnoreCase(keyword)) {
+                                            temprows.add(row);
+
+                                        }
+                                    }
+                                } else {
+                                    // if the component does contain a "-" but the
+                                    // entire
+                                    // component does not match the keyword
+                                    subStrings = component.split("-");
+                                    for (String innerStr : subStrings) {
+                                        // An exact match has been requested here;
+                                        // see 2640
+                                        // This allows the breaking up of ids like
+                                        // ATS-120-5 and
+                                        // and exact seaches on the separate parts
+                                        // like 120
+                                        if (innerStr.equalsIgnoreCase(keyword)) {
+                                            temprows.add(row);
+
+                                        }
                                     }
                                 }
                             }
@@ -657,6 +677,18 @@ public class EntityBeanTable {
             EntityBeanColumn c = (EntityBeanColumn) columns.get(i);
             c.setShowLink(false);
             columns.set(i, c);
+        }
+    }
+
+    public boolean isDate(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_format_string"));
+        dateFormat.setLenient(false);
+
+        try {
+            dateFormat.parse(dateString);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
