@@ -33,10 +33,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
@@ -57,6 +59,7 @@ public class OdmFileCreation {
     private RuleSetRuleDao ruleSetRuleDao;
     private DataSource dataSource;
     private CoreResources coreResources;
+    private static final String COLLECT_DOB_HANDLE = "collectDob";
 
     private static File files[]=null;
     private static List<File> oldFiles = new LinkedList<File>();
@@ -213,11 +216,10 @@ public class OdmFileCreation {
                 report.setODMVersion(odmVersion);
                 //report.setOdmStudy(mdc.getOdmStudy());
                 report.setOdmBean(mdc.getODMBean());
-                StudyParameterConfig spc = u.getStudy().getStudyParameterConfig();
                 // Collect Date Of Birth = 1
                 // Collect Year Of Birth = 2
                 // Not Used = 3
-                boolean includeDOB = !("3".equals(spc.getCollectDob()));
+                boolean includeDOB = !("3".equals(getDOBStudyParamter(u.getStudy())));
                 if (firstIteration && fromIndex >= newRows.size()) {
                     report.createChunkedOdmXml(Boolean.TRUE, true, true, includeDOB);
                     firstIteration = false;
@@ -391,6 +393,12 @@ public class OdmFileCreation {
         }catch (NumberFormatException e) {
             return 99;
         }
+    }
+
+    private String getDOBStudyParamter(StudyBean study){
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getId(), COLLECT_DOB_HANDLE);
+        return spvb.getValue();
     }
 
     public DataSource getDataSource() {
