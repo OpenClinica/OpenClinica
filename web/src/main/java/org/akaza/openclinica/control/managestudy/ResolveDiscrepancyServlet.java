@@ -11,17 +11,14 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -94,7 +91,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
             // UpdateStudyEvent?event_id=12&ss_id=12
         } else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
 
-            if (currentRole.getRole().equals(Role.MONITOR)) {
+            if (currentRole.getRole().equals(Role.MONITOR) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED)
+            ) {
                 return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
             }else if(!isCompleted){
@@ -156,7 +156,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
             ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
 
-            if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
+            if (currentRole.getRole().equals(Role.MONITOR) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                !isCompleted) {
                 StudyEventDAO sedao = new StudyEventDAO(ds);
                 StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
                 request.setAttribute(EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
@@ -245,8 +248,15 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
-            discrepancyNoteBean.setEventCRFId(idb.getEventCRFId()); //set to open in View Within Record
-
+            discrepancyNoteBean.setEventCRFId(idb.getEventCRFId());//set to open in View Within Record
+            int eventId = ecb.getStudyEventId();
+            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+            StudyBean studyWithSED = currentStudy;
+            if (currentStudy.getParentStudyId() > 0) {
+                studyWithSED = new StudyBean();
+                studyWithSED.setId(currentStudy.getParentStudyId());
+            }
+            discrepancyNoteBean.setEvent((StudyEventBean) sedao.findByPKAndStudy(eventId, studyWithSED));
             if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
                 isCompleted = true;
             }
