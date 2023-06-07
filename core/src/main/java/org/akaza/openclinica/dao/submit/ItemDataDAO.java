@@ -180,11 +180,12 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         while (it.hasNext()) {
         	HashMap hm = (HashMap) it.next();
-        	//construct key
-        	String key = (String) this.getKeyFromHashMap(hm);
         	
         	//construct dataItem
         	ItemDataBean eb = (ItemDataBean) this.getEntityFromHashMap(hm);	
+        	
+        	//construct full item data key, like:1435IG_ADVER_AE_2965[2].I_ADVER_AESAE      	    
+      	    String key = (String) this.getKeyFromHashMap(hm, eb.getOrdinal());
         	answer.put(key, eb);       	           
         }
       
@@ -523,8 +524,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
      * @param hm
      * @return
      */
-    public Object getKeyFromHashMap(HashMap hm) {
-       String key = (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid") + (String) hm.get("item_ocoid");
+    public Object getKeyFromHashMap(HashMap hm, int ordinal) {
+       String key = null;
+       
+	   if(ordinal < 0 ) {
+	   	 key = (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid") + (String) hm.get("item_ocoid"); 
+	   }else {
+	   	  key = (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid")+"[" + ordinal +"]" + (String) hm.get("item_ocoid");
+	       	
+	   }       
        
        return key;
     }
@@ -571,7 +579,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         while (it.hasNext()) {
         	HashMap hm = (HashMap) it.next();
         	//construct key
-        	String key = (String) this.getKeyFromHashMap(hm);
+        	String key = (String) this.getKeyFromHashMap(hm,-1);
         	
         	Integer count = (Integer) hm.get("cnt");
         	answer.put(key, count);       	           

@@ -819,7 +819,7 @@ public class ExpressionService {
         return getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
     }
 
-    private String getItemGroupOidWithOrdinalFromExpression(String expression) throws OpenClinicaSystemException {
+    public String getItemGroupOidWithOrdinalFromExpression(String expression) throws OpenClinicaSystemException {
         return getOidFromExpression(expression, 1, 1);
     }
 
