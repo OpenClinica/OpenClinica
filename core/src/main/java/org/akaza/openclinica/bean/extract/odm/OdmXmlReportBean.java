@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import org.akaza.openclinica.bean.extract.ODMSASFormatNameValidator;
 import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +70,9 @@ public abstract class OdmXmlReportBean {
     public void addRootStartLine() {
         String ov = odmbean.getODMVersion();
         ov = ov.startsWith("oc") ? ov.substring(2) : ov;
-        xmlOutput.append("<ODM FileOID=\"" + StringEscapeUtils.escapeXml(odmbean.getFileOID()) + "\" Description=\""
-            + StringEscapeUtils.escapeXml(odmbean.getDescription()) + "\" CreationDateTime=\"" + odmbean.getCreationDateTime() + "\" FileType=\""
-            + odmbean.getFileType() + "\" ODMVersion=\"" + StringEscapeUtils.escapeXml(ov) + "\" ");
+        xmlOutput.append("<ODM FileOID=\"" + StringEscapeUtils.escapeXml11(odmbean.getFileOID()) + "\" Description=\""
+            + StringEscapeUtils.escapeXml11(odmbean.getDescription()) + "\" CreationDateTime=\"" + odmbean.getCreationDateTime() + "\" FileType=\""
+            + odmbean.getFileType() + "\" ODMVersion=\"" + StringEscapeUtils.escapeXml11(ov) + "\" ");
         for (String s : odmbean.getXmlnsList()) {
             xmlOutput.append(s + " ");
         }

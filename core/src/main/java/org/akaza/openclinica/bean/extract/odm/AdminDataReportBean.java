@@ -22,7 +22,7 @@ import org.akaza.openclinica.bean.odmbeans.MetaDataVersionRefBean;
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 
 /**
@@ -69,7 +69,7 @@ public class AdminDataReportBean extends OdmXmlReportBean {
         if(a.getUsers().size()>0) {
             StringBuffer xml = this.getXmlOutput();
             String indent = this.getIndent();
-            xml.append(indent + "<AdminData StudyOID=\"" + StringEscapeUtils.escapeXml(a.getStudyOID()) + "\">");
+            xml.append(indent + "<AdminData StudyOID=\"" + StringEscapeUtils.escapeXml11(a.getStudyOID()) + "\">");
             xml.append(nls);
             for(UserBean u : a.getUsers()) {
                 addOneUser(u, indent+indent);
@@ -86,7 +86,7 @@ public class AdminDataReportBean extends OdmXmlReportBean {
         if(this.adminData.getUsers().size()>0) {
             StringBuffer xml = this.getXmlOutput();
             String indent = this.getIndent();
-            xml.append(indent + "<AdminData StudyOID=\"" + StringEscapeUtils.escapeXml(adminData.getStudyOID()) + "\">");
+            xml.append(indent + "<AdminData StudyOID=\"" + StringEscapeUtils.escapeXml11(adminData.getStudyOID()) + "\">");
             xml.append(nls);
             for(UserBean u : this.adminData.getUsers()) {
                 addOneUser(u, indent+indent);
@@ -102,26 +102,26 @@ public class AdminDataReportBean extends OdmXmlReportBean {
     public void addOneUser(UserBean user, String currentIndent) {
        StringBuffer xml = this.getXmlOutput();
        String indent = this.getIndent();
-       xml.append(currentIndent+"<User OID=\"" + StringEscapeUtils.escapeXml(user.getOid()) + "\">");
+       xml.append(currentIndent+"<User OID=\"" + StringEscapeUtils.escapeXml11(user.getOid()) + "\">");
        xml.append(nls);
        String fn = user.getFirstName()!=null?user.getFirstName():"";
        String ln = user.getLastName()!=null?user.getLastName():"";
        String fullName = fn.length()>0&&ln.length()>0?fn+" "+ln:"";
        if(fullName.length()>0) {
-           xml.append(currentIndent+indent+"<FullName>"+StringEscapeUtils.escapeXml(fullName)+"</FullName>");
+           xml.append(currentIndent+indent+"<FullName>"+StringEscapeUtils.escapeXml11(fullName)+"</FullName>");
            xml.append(nls);
        }
        if(fn.length()>0) {
-           xml.append(currentIndent+indent+"<FirstName>"+StringEscapeUtils.escapeXml(fn)+"</FirstName>");
+           xml.append(currentIndent+indent+"<FirstName>"+StringEscapeUtils.escapeXml11(fn)+"</FirstName>");
            xml.append(nls);
        }
        if(ln.length()>0) {
-           xml.append(currentIndent+indent+"<LastName>"+StringEscapeUtils.escapeXml(ln)+"</LastName>");
+           xml.append(currentIndent+indent+"<LastName>"+StringEscapeUtils.escapeXml11(ln)+"</LastName>");
            xml.append(nls);
        }
        String og = user.getOrganization()!=null?user.getOrganization():"";
        if(og.length()>0) {
-           xml.append(currentIndent+indent+"<Organization>"+StringEscapeUtils.escapeXml(og)+"</Organization>");
+           xml.append(currentIndent+indent+"<Organization>"+StringEscapeUtils.escapeXml11(og)+"</Organization>");
            xml.append(nls);
        }
        xml.append(currentIndent+"</User>");
@@ -131,12 +131,12 @@ public class AdminDataReportBean extends OdmXmlReportBean {
     public void addOneLocation(LocationBean loc, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
-        xml.append(currentIndent+"<Location OID=\"" + StringEscapeUtils.escapeXml(loc.getOid())
-                +"\" Name=\"" + StringEscapeUtils.escapeXml(loc.getName()) + "\">");
+        xml.append(currentIndent+"<Location OID=\"" + StringEscapeUtils.escapeXml11(loc.getOid())
+                +"\" Name=\"" + StringEscapeUtils.escapeXml11(loc.getName()) + "\">");
         xml.append(nls);
         MetaDataVersionRefBean m = loc.getMetaDataVersionRef();
-        xml.append(currentIndent+indent+"<MetaDataVersionRef StudyOID=\"" + StringEscapeUtils.escapeXml(m.getStudyOID())
-                +"\" MetaDataVersionOID=\""+StringEscapeUtils.escapeXml(m.getElementDefOID())
+        xml.append(currentIndent+indent+"<MetaDataVersionRef StudyOID=\"" + StringEscapeUtils.escapeXml11(m.getStudyOID())
+                +"\" MetaDataVersionOID=\""+StringEscapeUtils.escapeXml11(m.getElementDefOID())
                 +"\" EffectiveDate=\""+new SimpleDateFormat("yyyy-MM-dd").format(m.getEffectiveDate())+"\"/>"); 
         xml.append(nls);
         xml.append(currentIndent+"</Location>");
