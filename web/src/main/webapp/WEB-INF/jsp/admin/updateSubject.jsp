@@ -49,6 +49,7 @@
 <input type="hidden" name="id" value="<c:out value="${id}"/>">
 <input type="hidden" name="studySubId" value="<c:out value="${studySubId}"/>">
 <jsp:useBean scope="request" id="subjectToUpdate" class="org.akaza.openclinica.bean.submit.SubjectBean" />
+<jsp:useBean scope="request" id="subjectGender" class="java.lang.String" />
 
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
@@ -71,8 +72,7 @@
 		<td colspan="2">
 		  <input type="radio" name="gender" <c:if test="${subjectToUpdate.gender == 109}">checked</c:if> value="m"><fmt:message key="male" bundle="${resword}"/>
           <input type="radio" name="gender" <c:if test="${subjectToUpdate.gender == 102}">checked</c:if> value="f"><fmt:message key="female" bundle="${resword}"/>
-          <input type="radio" name="gender"  <c:if test="${!(subjectToUpdate.gender == 109 || subjectToUpdate.gender == 102)}">checked</c:if> value=" "><fmt:message key="not_specified" bundle="${resword}"/>
-         
+
        
         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 		<a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
@@ -124,7 +124,21 @@
  <input type="submit" name="Submit" value="<fmt:message key="confirm" bundle="${resword}"/>" class="button_medium">
  <input type="button" onclick="confirmCancel('ListSubject');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 </form>
-
+<script>
+    // To unspecify gender once it has been specified already, when study is not configured to collect sex
+	let genderSelection = '${subjectGender}';
+	const radioButtons = document.querySelectorAll('input[type="radio"][name="gender"]');
+	radioButtons.forEach((radioButton) => {
+		radioButton.addEventListener('click', function () {
+			if(genderSelection !== this.value){
+				genderSelection = this.value;
+			}else{
+				genderSelection = ""
+				this.checked = false;
+			}
+		});
+	});
+</script>
 </body>
 
 <jsp:include page="../include/footer.jsp"/>
