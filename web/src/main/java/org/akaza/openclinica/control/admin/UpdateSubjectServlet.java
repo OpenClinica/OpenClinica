@@ -111,6 +111,7 @@ public class UpdateSubjectServlet extends SecureController {
                 request.setAttribute("genderDNFlag","icon_noNote");
                 request.setAttribute("birthDNFlag","icon_noNote");
                 request.setAttribute("subjectToUpdate",subject);
+                request.setAttribute("subjectGender", String.valueOf(subject.getGender()));
                 setDNFlag( subjectId);
                 
                 forwardPage(Page.UPDATE_SUBJECT);
