@@ -55,6 +55,7 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.core.XMLContextFactory;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
@@ -205,7 +206,7 @@ public class OpenRosaServices {
             }
 
             // Create the XML formList using a Castor mapping file.
-            XMLContext xmlContext = new XMLContext();
+            XMLContext xmlContext = XMLContextFactory.getXmlContextNoNamespace();
             Mapping mapping = xmlContext.createMapping();
             mapping.loadMapping(getCoreResources().getURL("openRosaFormListMapping.xml"));
             xmlContext.addMapping(mapping);
@@ -272,7 +273,7 @@ public class OpenRosaServices {
         }
         try {
             // Create the XML manifest using a Castor mapping file.
-            XMLContext xmlContext = new XMLContext();
+            XMLContext xmlContext = XMLContextFactory.getXmlContextNoNamespace();
             Mapping mapping = xmlContext.createMapping();
             mapping.loadMapping(getCoreResources().getURL("openRosaManifestMapping.xml"));
             xmlContext.addMapping(mapping);

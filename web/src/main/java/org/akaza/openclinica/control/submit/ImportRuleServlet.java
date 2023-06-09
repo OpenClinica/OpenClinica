@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.core.XMLContextFactory;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
@@ -153,7 +154,7 @@ public class ImportRuleServlet extends SecureController {
         RulesPostImportContainer ruleImport = null;
         try {
             // create an XMLContext instance
-            XMLContext xmlContext = new XMLContext();
+            XMLContext xmlContext = XMLContextFactory.getXmlContextNoNamespace();
             // create and set a Mapping instance
             Mapping mapping = xmlContext.createMapping();
             // mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");

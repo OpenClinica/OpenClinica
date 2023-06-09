@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.managestudy.CRFVersionMetadataUtil;
+import org.akaza.openclinica.core.XMLContextFactory;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
@@ -83,7 +84,7 @@ public class OpenRosaXmlGenerator {
         this.ruleActionPropertyDao = ruleActionPropertyDao;
 
         try {
-            xmlContext = new XMLContext();
+            xmlContext = XMLContextFactory.getXmlContextNoNamespace();
             Mapping mapping = xmlContext.createMapping();
             mapping.loadMapping(core.getURL("openRosaXFormMapping.xml"));
             xmlContext.addMapping(mapping);
