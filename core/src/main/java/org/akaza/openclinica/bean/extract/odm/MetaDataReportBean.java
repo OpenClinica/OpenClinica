@@ -39,6 +39,7 @@ import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
 import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.core.XMLContextFactory;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -135,8 +136,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             Mapping mapping = new Mapping();
             mapping.loadMapping(getCoreResources().getURL("mappingMarshallerMetadata.xml"));
             // Create XMLContext
-            XMLContext xmlContext = new XMLContext();
-            xmlContext.setProperty(XMLConfiguration.NAMESPACES, "true");
+            XMLContext xmlContext = XMLContextFactory.getXmlContext();
             xmlContext.addMapping(mapping);
 
             StringWriter writer = new StringWriter();

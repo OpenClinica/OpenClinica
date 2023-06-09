@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.core.XMLContextFactory;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
@@ -68,7 +69,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
             Mapping mapping = new Mapping();
             mapping.loadMapping(getCoreResources().getURL("mappingMarshaller.xml"));
             // Create XMLContext
-            XMLContext xmlContext = new XMLContext();
+            XMLContext xmlContext = XMLContextFactory.getXmlContextNoNamespace();
             xmlContext.addMapping(mapping);
 
             Marshaller marshaller = xmlContext.createMarshaller();

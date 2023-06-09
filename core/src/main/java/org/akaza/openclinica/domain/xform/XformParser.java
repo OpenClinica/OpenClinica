@@ -6,6 +6,7 @@ import java.io.StringWriter;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.core.XMLContextFactory;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -23,16 +24,10 @@ public class XformParser {
     protected final Logger log = LoggerFactory.getLogger(XformParser.class);
     private CoreResources coreResources;
 
-    /*
-     * public XformParser() throws Exception { try { xmlContext = new XMLContext(); Mapping mapping =
-     * xmlContext.createMapping(); mapping.loadMapping(coreResources.getURL("openRosaXFormMapping.xml"));
-     * xmlContext.addMapping(mapping); } catch (Exception e) { log.error(e.getMessage());
-     * log.error(ExceptionUtils.getStackTrace(e)); throw new Exception(e); } }
-     */
     public String marshall(Html html) throws Exception {
         StringWriter writer = new StringWriter();
 
-        xmlContext = new XMLContext();
+        xmlContext = XMLContextFactory.getXmlContextNoNamespace();
         Mapping mapping = xmlContext.createMapping();
         mapping.loadMapping(coreResources.getURL("openRosaXFormMapping.xml"));
         xmlContext.addMapping(mapping);
@@ -51,7 +46,7 @@ public class XformParser {
 
     public Html unMarshall(String xml) throws Exception {
 
-        xmlContext = new XMLContext();
+        xmlContext = XMLContextFactory.getXmlContextNoNamespace();
         Mapping mapping = xmlContext.createMapping();
         mapping.loadMapping(coreResources.getURL("xformMapping.xml"));
         xmlContext.addMapping(mapping);
