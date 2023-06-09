@@ -138,6 +138,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             XMLContext xmlContext = new XMLContext();
             xmlContext.setProperty(XMLConfiguration.NAMESPACES, "true");
             xmlContext.addMapping(mapping);
+            xmlContext.setProperty(org.castor.xml.XMLProperties.SERIALIZER_FACTORY,
+                    org.exolab.castor.xml.XercesXMLSerializerFactory.class.getName());
+            logger.info("I AM HERE .... ");
 
             StringWriter writer = new StringWriter();
             Marshaller marshaller = xmlContext.createMarshaller();
