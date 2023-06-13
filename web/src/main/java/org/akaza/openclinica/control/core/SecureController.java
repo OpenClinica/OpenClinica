@@ -1206,9 +1206,21 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
              return;
 			
-		}        		
-        
+		}
 	}
+
+    public String getPropertiesDir() {
+        String resource = "properties/placeholder.properties";
+        String absolutePath = null;
+        URL path = this.getClass().getClassLoader().getResource(resource);
+        if (null != path) {
+            absolutePath = path.getPath();
+        }else{
+            throw new RuntimeException("Could not get a path please investigate !!");
+        }
+        absolutePath = absolutePath.replaceAll("placeholder.properties", "");
+        return absolutePath;
+    }
     
     
 }
