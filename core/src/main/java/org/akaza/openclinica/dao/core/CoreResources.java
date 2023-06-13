@@ -857,24 +857,6 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
-    public void setPROPERTIES_DIR() {
-        String resource = "classpath:properties/placeholder.properties";
-        // System.out.println("Resource " + resource);
-        Resource scr = resourceLoader.getResource(resource);
-        String absolutePath = null;
-        try {
-            // System.out.println("Resource" + resource);
-            absolutePath = scr.getFile().getAbsolutePath();
-            // System.out.println("Resource" + ((ClassPathResource) scr).getPath());
-            // System.out.println("Resource" + resource);
-            PROPERTIES_DIR = absolutePath.replaceAll("placeholder.properties", "");
-            // System.out.println("Resource " + PROPERTIES_DIR);
-        } catch (IOException e) {
-            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-        }
-
-    }
-
     /**
      * @pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute file path value to point to "odm_mapping"
      *          in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this

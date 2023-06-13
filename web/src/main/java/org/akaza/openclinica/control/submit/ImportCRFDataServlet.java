@@ -36,6 +36,7 @@ import org.exolab.castor.xml.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,8 +99,9 @@ public class ImportCRFDataServlet extends SecureController {
         String action = request.getParameter("action");
         CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
 
-        File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "ODM1-3-0.xsd");
-        File xsdFile2 = new File(SpringServletAccess.getPropertiesDir(context) + "ODM1-2-1.xsd");
+        String path = getPropertiesDir();
+        File xsdFile = new File(path + "ODM1-3-0.xsd");
+        File xsdFile2 = new File(path + "ODM1-2-1.xsd");
 
         if (StringUtil.isBlank(action)) {
             logger.info("action is blank");
