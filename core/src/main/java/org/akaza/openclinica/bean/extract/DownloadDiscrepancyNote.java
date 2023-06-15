@@ -576,12 +576,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         if(csvValue == null) return "";
 
-        if(csvValue.contains("\u2018")){
-            csvValue = csvValue.replaceAll("\u2018", "'");
+        if(csvValue.contains("‘") || csvValue.contains("’")){
+            csvValue = csvValue.replaceAll("[‘’]", "'");
         }
 
-        if(csvValue.contains("\u201C")){
-            csvValue = csvValue.replaceAll("\u201C", "\"");
+        if(csvValue.contains("“") || csvValue.contains("”")){
+            csvValue = csvValue.replaceAll("[“”]", "\"");
         }
 
         if(csvValue.contains("\r\n")){
@@ -596,8 +596,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         csvValue = StringEscapeUtils.escapeJava(csvValue);
 
 
-        if(csvValue.contains(",")){
-            return new StringBuilder("\"").append(csvValue).append("\"").toString();
+        if(csvValue.contains(",") || csvValue.contains("\"")){
+            return "\"" + csvValue.replaceAll("\"", "\"\"") + "\"";
         }  else {
             return csvValue;
         }
