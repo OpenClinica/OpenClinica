@@ -92,11 +92,6 @@
 			<artifactId>json</artifactId>
 			<version>20230227</version>
 		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.12.2</version>
-		</dependency>
 		
 		<!--  Needed by commons-validator -->
 		<dependency>
