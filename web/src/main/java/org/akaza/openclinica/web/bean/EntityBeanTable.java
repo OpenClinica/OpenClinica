@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * A class for displaying a table of EntityBean objects on the screen.
@@ -506,28 +507,11 @@ public class EntityBeanTable {
                                     continue loopRows;
                                 }
 
-                                // if the component does contain a "-" but the
-                                // entire
-                                // component does not match the keyword
-                                subStrings = component.split("-");
-                                for (String innerStr : subStrings) {
-                                    // An exact match has been requested here;
-                                    // see 2640
-                                    // This allows the breaking up of ids like
-                                    // ATS-120-5 and
-                                    // and exact seaches on the separate parts
-                                    // like 120
-                                    if (innerStr.equalsIgnoreCase(keyword)) {
-                                        temprows.add(row);
-
-                                    }
+                                String regex = "^(?=.*?(?<=^|[-])(" + keyword.replaceAll("-", "-.*?") + ")(?=[-]|$)).*$";
+                                if (Pattern.matches(regex, component)) {
+                                    temprows.add(row);
                                 }
                             }
-                            // continue to the next row, because the
-                            // searchString contained a "-",
-                            // and the keyword was searched for in both ways,
-                            // with and without
-                            // splitting on "-"
                             continue;
                         } // end searchString.contains("-")
                         // the search string doesn't contain "-"
@@ -659,4 +643,5 @@ public class EntityBeanTable {
             columns.set(i, c);
         }
     }
+
 }
