@@ -70,6 +70,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -430,6 +431,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             session.setAttribute("userBean", ub);
 
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
+            UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
             if (currentStudy == null || currentStudy.getId() <= 0) {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
@@ -537,7 +539,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // if current study has been "removed", current role will be
                 // kept as "invalid" -- YW 06-21-2007
                 if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
-                    currentRole = ub.getRoleByStudy(currentStudy.getId());
+                    ArrayList studyUserRoles = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
+                    for (int i = 0; i < studyUserRoles.size(); i++) {
+                        StudyUserRoleBean studyUserRole = (StudyUserRoleBean) studyUserRoles.get(i);
+                        if (studyUserRole.getStudyId() == currentStudy.getId()) {
+                            currentRole = studyUserRole;
+                            break;
+                        }
+                    }
                     
                     // logger.info("currentRole:" + currentRole.getRoleName());
                 } else {
