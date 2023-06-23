@@ -157,12 +157,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
             discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
         
         if ("csv".equalsIgnoreCase(format.substring(0,3))) {
-            /*response.setContentLength(
-              downLoader.getListContentLength(allDiscNotes,DownloadDiscrepancyNote.CSV));*/
-            //3014: this has been changed to only show the parent of the thread; then changed back again!
-            int contentLen = downLoader.getThreadListContentLength(discrepancyNoteThreads);
-            response.setContentLength(contentLen);
-
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.CSV,response.getOutputStream(), null);*/
             downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null,delimiter);
