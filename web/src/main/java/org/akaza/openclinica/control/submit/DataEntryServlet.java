@@ -353,6 +353,35 @@ public abstract class DataEntryServlet extends CoreSecureController {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
         }
 
+        Boolean b = (Boolean) request.getAttribute(INPUT_IGNORE_PARAMETERS);
+        isSubmitted = fp.isSubmitted() && b == null;
+        // variable is used for fetching any null values like "not applicable"
+        int eventDefinitionCRFId = 0;
+        if (fp != null) {
+            eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
+        }
+
+        StudyBean study = (StudyBean) session.getAttribute("study");
+        // constructs the list of items used on UI
+        // tbh>>
+        // logger.trace("trying event def crf id: "+eventDefinitionCRFId);
+        logMe("Entering some EVENT DEF CRF CHECK "+System.currentTimeMillis());
+
+
+        if (eventDefinitionCRFId <= 0) {
+            // TODO we have to get that id before we can continue
+            EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
+            eventDefinitionCRFId = edcBean.getId();
+        }
+
+        logMe("Entering some EVENT DEF CRF CHECK DONE "+System.currentTimeMillis());
+        logMe("Entering some Study EVENT DEF CRF CHECK  "+System.currentTimeMillis());
+        StudyEventDAO seDao = new StudyEventDAO(getDataSource());
+        EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
+        request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);//JN:Putting the event_def_crf_bean in the request attribute.
+
+
         logMe("Enterting DataEntry Get the status/number of item discrepancy notes"+System.currentTimeMillis());
         // Get the status/number of item discrepancy notes
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
@@ -361,8 +390,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
         // BWP: this try block is not necessary try {
         dndao = new DiscrepancyNoteDAO(getDataSource());
-        allNotes = dndao.findAllTopNotesByEventCRF(ecb.getId());
-        eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
+        if(!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) && edcBean.isDoubleEntry())){
+            allNotes = dndao.findAllTopNotesByEventCRF(ecb.getId());
+            eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
+        }
         if (!eventCrfNotes.isEmpty()) {
             allNotes.addAll(eventCrfNotes);
 
@@ -494,34 +525,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // for repeating items
         // hasGroup = getInputBeans();
         hasGroup = checkGroups(fp, ecb);
-
-        Boolean b = (Boolean) request.getAttribute(INPUT_IGNORE_PARAMETERS);
-        isSubmitted = fp.isSubmitted() && b == null;
-        // variable is used for fetching any null values like "not applicable"
-        int eventDefinitionCRFId = 0;
-        if (fp != null) {
-            eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
-        }
-
-        StudyBean study = (StudyBean) session.getAttribute("study");
-        // constructs the list of items used on UI
-        // tbh>>
-        // logger.trace("trying event def crf id: "+eventDefinitionCRFId);
-        logMe("Entering some EVENT DEF CRF CHECK "+System.currentTimeMillis());
-
-
-        if (eventDefinitionCRFId <= 0) {
-            // TODO we have to get that id before we can continue
-            EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
-            eventDefinitionCRFId = edcBean.getId();
-        }
-
-        logMe("Entering some EVENT DEF CRF CHECK DONE "+System.currentTimeMillis());
-        logMe("Entering some Study EVENT DEF CRF CHECK  "+System.currentTimeMillis());
-        StudyEventDAO seDao = new StudyEventDAO(getDataSource());
-        EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
-        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
-        request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);//JN:Putting the event_def_crf_bean in the request attribute.
 
         StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPK(ecb.getStudyEventId());
         edcBean.setId(eventDefinitionCRFId);
