@@ -558,25 +558,32 @@ include the default value first in the select list --%>
 
 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
     <c:choose>
-      <c:when test="${displayItem.discrepancyNoteStatus == 0}">
+      <c:when test="${originJSP eq 'doubleDataEntry' && displayItem.eventDefinitionCRF.doubleEntry && section.eventCRF.stage.initialDE_Complete && ddeEntered}">
           <c:set var="imageFileName" value="icon_noNote" />
       </c:when>
-      <c:when test="${displayItem.discrepancyNoteStatus == 1}">
-          <c:set var="imageFileName" value="icon_Note" />
-      </c:when>
-      <c:when test="${displayItem.discrepancyNoteStatus == 2}">
-          <c:set var="imageFileName" value="icon_flagYellow" />
-      </c:when>
-      <c:when test="${displayItem.discrepancyNoteStatus == 3}">
-          <c:set var="imageFileName" value="icon_flagGreen" />
-      </c:when>
-      <c:when test="${displayItem.discrepancyNoteStatus == 4}">
-          <c:set var="imageFileName" value="icon_flagBlack" />
-      </c:when>
-      <c:when test="${displayItem.discrepancyNoteStatus == 5}">
-          <c:set var="imageFileName" value="icon_flagWhite" />
-      </c:when>
       <c:otherwise>
+          <c:choose>
+              <c:when test="${displayItem.discrepancyNoteStatus == 0}">
+                  <c:set var="imageFileName" value="icon_noNote" />
+              </c:when>
+              <c:when test="${displayItem.discrepancyNoteStatus == 1}">
+                  <c:set var="imageFileName" value="icon_Note" />
+              </c:when>
+              <c:when test="${displayItem.discrepancyNoteStatus == 2}">
+                  <c:set var="imageFileName" value="icon_flagYellow" />
+              </c:when>
+              <c:when test="${displayItem.discrepancyNoteStatus == 3}">
+                  <c:set var="imageFileName" value="icon_flagGreen" />
+              </c:when>
+              <c:when test="${displayItem.discrepancyNoteStatus == 4}">
+                  <c:set var="imageFileName" value="icon_flagBlack" />
+              </c:when>
+              <c:when test="${displayItem.discrepancyNoteStatus == 5}">
+                  <c:set var="imageFileName" value="icon_flagWhite" />
+              </c:when>
+              <c:otherwise>
+              </c:otherwise>
+          </c:choose>
       </c:otherwise>
     </c:choose>
 
@@ -622,7 +629,7 @@ include the default value first in the select list --%>
     </c:when>
     <c:otherwise>
     <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0}">
+    <c:when test="${displayItem.numDiscrepancyNotes > 0 && !(originJSP eq 'doubleDataEntry' && displayItem.eventDefinitionCRF.doubleEntry && section.eventCRF.stage.initialDE_Complete)}">
     	<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips_ItemInput(${itemId}));"
 	           onmouseout="UnTip()" onClick=
 	    "openDNWindow('ViewDiscrepancyNote?isGroup=-1&eventCRFId=${eventCRFId}&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
