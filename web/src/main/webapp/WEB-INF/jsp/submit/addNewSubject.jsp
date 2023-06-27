@@ -167,22 +167,24 @@
 	</c:otherwise>
 	</c:choose>
 
-	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldXL_BG">
-						<input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" size="50" class="formfieldXL">
-					</div></td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
+	<c:if test="${study.studyParameterConfig.secondaryLabelViewable== 'true'}">
+		<tr valign="top">
+			<td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
+			<td valign="top">
+				<table border="0" cellpadding="0" cellspacing="0">
+					<tr>
+						<td valign="top"><div class="formfieldXL_BG">
+							<input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" size="50" class="formfieldXL">
+						</div></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</c:if>
 	<tr valign="top">
 
 		<td class="formlabel">
