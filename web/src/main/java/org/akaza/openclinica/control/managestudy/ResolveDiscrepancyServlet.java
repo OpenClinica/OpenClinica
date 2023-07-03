@@ -62,7 +62,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
 
-    public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted, boolean isLockedCrf) {
+    public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted, boolean isArchivedCrf, boolean isDeletedEventorCrf) {
         String entityType = note.getEntityType().toLowerCase();
         request.setAttribute("fromResolvingNotes", "yes");
 
@@ -97,7 +97,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
-                isLockedCrf
+                isArchivedCrf ||
+                isDeletedEventorCrf
             ) {
                 return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
@@ -241,7 +242,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         boolean toView = false;
         boolean isCompleted = false;
-        boolean isLockedCrf = false;
+        boolean isArchivedCrf = false;
+        boolean isDeletedEventorCrf = false;
         if ("itemdata".equalsIgnoreCase(entityType)) {
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
@@ -253,7 +255,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
             Map<Integer, CRFVersionBean> crfVersionById = crfVersionDao.buildCrfVersionById(studySubjectBean.getId());
             CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
-            isLockedCrf = cvb.getStatus().isLocked();
+            isArchivedCrf = cvb.getStatus().isLocked();
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
@@ -265,7 +267,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 studyWithSED = new StudyBean();
                 studyWithSED.setId(currentStudy.getParentStudyId());
             }
-            discrepancyNoteBean.setEvent((StudyEventBean) sedao.findByPKAndStudy(eventId, studyWithSED));
+            StudyEventBean seb = (StudyEventBean) sedao.findByPKAndStudy(eventId, studyWithSED);
+            discrepancyNoteBean.setEvent(seb);
+            isDeletedEventorCrf = seb.getStatus().isDeleted() || ecb.getStatus().isDeleted();
             if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
                 isCompleted = true;
             }
@@ -277,7 +281,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // System.out.println("set up pop up url: " + createNoteURL);
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
 
-        Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted, isLockedCrf);
+        Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted, isArchivedCrf, isDeletedEventorCrf);
 
         // logger.info("found page for forwarding: " + p.getFileName());
         if (p == null) {
