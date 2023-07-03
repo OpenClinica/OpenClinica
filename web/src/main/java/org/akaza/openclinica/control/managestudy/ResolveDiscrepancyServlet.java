@@ -11,6 +11,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.servlet.RequestDispatcher;
@@ -23,6 +24,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -35,6 +37,7 @@ import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -59,7 +62,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
 
-    public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
+    public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted, boolean isLockedCrf) {
         String entityType = note.getEntityType().toLowerCase();
         request.setAttribute("fromResolvingNotes", "yes");
 
@@ -93,7 +96,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
-                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED)
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                isLockedCrf
             ) {
                 return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
@@ -237,14 +241,19 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         boolean toView = false;
         boolean isCompleted = false;
+        boolean isLockedCrf = false;
         if ("itemdata".equalsIgnoreCase(entityType)) {
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
 
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
 
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
+            Map<Integer, CRFVersionBean> crfVersionById = crfVersionDao.buildCrfVersionById(studySubjectBean.getId());
+            CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
+            isLockedCrf = cvb.getStatus().isLocked();
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
@@ -268,7 +277,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // System.out.println("set up pop up url: " + createNoteURL);
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
 
-        Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted);
+        Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted, isLockedCrf);
 
         // logger.info("found page for forwarding: " + p.getFileName());
         if (p == null) {
