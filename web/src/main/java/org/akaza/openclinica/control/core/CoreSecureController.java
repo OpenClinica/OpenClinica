@@ -1034,6 +1034,21 @@ public abstract class CoreSecureController extends HttpServlet {
         }
     }
 
+    protected static boolean isStudyLevelUser(HttpServletRequest request){
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        ArrayList studyUserRoles = ub.getRoles();
+        boolean isStudyLevelUser = true;
+        for(int i = 0; i < studyUserRoles.size(); i++) {
+            StudyUserRoleBean studyUserRole = (StudyUserRoleBean) studyUserRoles.get(i);
+            if (studyUserRole.getStudyId() == currentStudy.getId() && currentStudy.getParentStudyId() > 0) {
+                isStudyLevelUser = false;
+                break;
+            }
+        }
+        return isStudyLevelUser;
+    }
+
 
     public CRFLocker getCrfLocker() {
         return crfLocker;
