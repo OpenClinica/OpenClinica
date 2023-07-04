@@ -112,7 +112,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return null;
     }
 
-    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted) {
+    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted,
+                                               boolean isArchivedCrf, boolean isDeletedEventorCrf) {
         String entityType = note.getEntityType().toLowerCase();
         int id = note.getEntityId();
         if ("subject".equalsIgnoreCase(entityType)) {
@@ -164,6 +165,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                isArchivedCrf ||
+                isDeletedEventorCrf ||
                 !isCompleted) {
                 StudyEventDAO sedao = new StudyEventDAO(ds);
                 StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
@@ -279,7 +282,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
         // logger.info("set up pop up url: " + createNoteURL);
         // System.out.println("set up pop up url: " + createNoteURL);
-        boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
+        boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted, isArchivedCrf, isDeletedEventorCrf);
 
         Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted, isArchivedCrf, isDeletedEventorCrf);
 
