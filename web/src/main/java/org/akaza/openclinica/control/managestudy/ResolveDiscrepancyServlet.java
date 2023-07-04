@@ -93,7 +93,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
-                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED)
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.LOCKED)
             ) {
                 return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
@@ -159,6 +160,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.LOCKED) ||
                 !isCompleted) {
                 StudyEventDAO sedao = new StudyEventDAO(ds);
                 StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
