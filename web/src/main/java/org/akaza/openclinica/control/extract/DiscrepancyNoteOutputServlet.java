@@ -61,13 +61,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     public static String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public static String CONTENT_DISPOSITION_VALUE = "attachment; filename=";
 
-    Map<String, String> delimitedOptions = new HashMap<>();
-    {
-        delimitedOptions.put(",", "csv");
-        delimitedOptions.put("|", "tsv");
-        delimitedOptions.put("\t", "tsv");
-    }
-
     /* Handle the HTTP Get or Post request. */
     @Override
     protected void processRequest() throws Exception {
@@ -100,17 +93,9 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         int subjectId = fp.getInt("subjectId");
         int discNoteType = fp.getInt("discNoteType");
 
-        if ("csv-pipe".equalsIgnoreCase(format)) {
-            delimiter = DownloadDiscrepancyNote.PIPE;
-        }else if ("csv-tab".equalsIgnoreCase(format)) {
-            delimiter = DownloadDiscrepancyNote.TAB;
-        }else {
-            delimiter = DownloadDiscrepancyNote.COMMA;
-        }
-
         DownloadDiscrepancyNote downLoader = new DownloadDiscrepancyNote();
-        if ("csv".equalsIgnoreCase(format.substring(0,3))) {
-            fileName = fileName + "." + delimitedOptions.get(delimiter);
+        if (DownloadDiscrepancyNote.CSV_EXTENSION.equalsIgnoreCase(format)) {
+            fileName = fileName + "." + DownloadDiscrepancyNote.CSV_EXTENSION;
             response.setContentType(DownloadDiscrepancyNote.CSV);
         } else {
             response.setContentType(DownloadDiscrepancyNote.PDF);
@@ -156,16 +141,16 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         List<DiscrepancyNoteThread> discrepancyNoteThreads =
             discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
         
-        if ("csv".equalsIgnoreCase(format.substring(0,3))) {
+        if (DownloadDiscrepancyNote.CSV_EXTENSION.equalsIgnoreCase(format)) {
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.CSV,response.getOutputStream(), null);*/
-            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null,delimiter);
+            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null,DownloadDiscrepancyNote.COMMA);
         } else {
             response.setHeader("Pragma", "public");
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.PDF,
               response.getOutputStream(), studyIdentifier);*/
-            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response, studyIdentifier,delimiter);
+            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response, studyIdentifier,DownloadDiscrepancyNote.COMMA);
         }
     }
 

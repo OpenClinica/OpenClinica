@@ -97,6 +97,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.LOCKED) ||
                 isArchivedCrf ||
                 isDeletedEventorCrf
             ) {
@@ -165,6 +166,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (currentRole.getRole().equals(Role.MONITOR) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
+                Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.LOCKED) ||
                 isArchivedCrf ||
                 isDeletedEventorCrf ||
                 !isCompleted) {

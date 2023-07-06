@@ -174,6 +174,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         
         boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); //this should be set based on a new property of DisplayItemBean
         boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
+        request.setAttribute(IS_REASON_FOR_CHANGE, String.valueOf(isReasonForChange));
         int entityId = fp.getInt(ENTITY_ID);
         // subjectId has to be added to the database when disc notes area saved
         // as entity_type 'subject'
