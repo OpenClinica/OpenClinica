@@ -7,6 +7,7 @@
 <jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
 <jsp:useBean scope='request' id='unlock' class='java.lang.String' />
 <jsp:useBean scope='request' id='autoView' class='java.lang.String' />
+<jsp:useBean scope='request' id='isRfc' class='java.lang.String' />
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -251,7 +252,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 				<c:choose>
 				<c:when test="${typeId1 == type.id}">
 				 	<c:choose>
-				    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+				    <c:when test="${study.status.frozen && isRfc != 'true' &&  (type.id==2 || type.id==4)}">
 						<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
 				    </c:when>
 				    <c:otherwise>
@@ -261,7 +262,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 				 </c:when>
 				 <c:otherwise>
 					<c:choose>
-					<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+					<c:when test="${study.status.frozen && isRfc != 'true' && (type.id==2 || type.id==4)}">
 						<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
 					</c:when>
 					<c:otherwise>

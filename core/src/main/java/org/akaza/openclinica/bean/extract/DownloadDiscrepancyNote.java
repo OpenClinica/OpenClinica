@@ -42,8 +42,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     public static String CSV ="text/plain; charset=UTF-8";
     public static String PDF = "application/pdf";
     public static String COMMA = ",";
-    public static String PIPE = "|";
-    public static String TAB = "\t";
+    public static final String CSV_EXTENSION = "csv";
     public static Map<Integer,String> RESOLUTION_STATUS_MAP = new HashMap<Integer,String> ();
     static{
         RESOLUTION_STATUS_MAP.put(1,"New");
@@ -81,7 +80,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         try{
             if(CSV.equalsIgnoreCase(format))  {
-                servletStream.print(serializeToString(discNBean, false, 0,this.COMMA));
+                servletStream.print(serializeToString(discNBean, false, 0,COMMA));
             } else {
 
                 //Create PDF version
@@ -116,7 +115,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             if(! (discNoteBean instanceof DiscrepancyNoteBean)) return;
 
             DiscrepancyNoteBean discNBean = (DiscrepancyNoteBean) discNoteBean;
-            singleBeanContent = serializeToString(discNBean, false, 0,this.COMMA);
+            singleBeanContent = serializeToString(discNBean, false, 0,COMMA);
             allContent.append(singleBeanContent);
             allContent.append("\n");
 
@@ -149,7 +148,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     }
 
     public int getContentLength(EntityBean bean, String format) {
-        return serializeToString(bean, false, 0,this.COMMA).getBytes().length;
+        return serializeToString(bean, false, 0,COMMA).getBytes().length;
     }
 
     public int getListContentLength(List<DiscrepancyNoteBean> beans, String format) {
@@ -158,7 +157,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         for(DiscrepancyNoteBean bean : beans) {
             ++count;
             //Only count the byte length of a CSV header row for the first DNote
-            totalLength += serializeToString(bean, (count == 1), 0,this.COMMA).getBytes().length;
+            totalLength += serializeToString(bean, (count == 1), 0,COMMA).getBytes().length;
             totalLength += "\n".getBytes().length;
 
         }
@@ -176,7 +175,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 //Only count the byte length of a CSV header row for the first DNote; we're only
                 //using response.setContentlength for CSV format, because apparently it is not
                 //necessary for PDF
-                totalLength += serializeToString(discNoteBean, (count == 1), 0,this.COMMA).getBytes().length;
+                totalLength += serializeToString(discNoteBean, (count == 1), 0,COMMA).getBytes().length;
                 //each DN bean with have a column indicating the thread number for the
                 //note
                 totalLength += "\n".getBytes().length;
@@ -357,7 +356,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         ServletOutputStream servletStream = (ServletOutputStream) stream;
         DiscrepancyNoteBean discNBean = (DiscrepancyNoteBean) bean;
         StringBuilder writer  = new StringBuilder();
-        writer.append(serializeToString(discNBean, false, 0,this.COMMA));
+        writer.append(serializeToString(discNBean, false, 0,COMMA));
 
         Document pdfDoc = new Document();
 
@@ -483,7 +482,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             for(DiscrepancyNoteBean discNoteBean : listOfBeans){
                 ++counter;
 
-                singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, 0,this.COMMA) : serializeToString(discNoteBean, false, 0,this.COMMA);
+                singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, 0, COMMA) : serializeToString(discNoteBean, false, 0,COMMA);
                 allContent.append(singleBeanContent);
                 allContent.append("\n");
 
