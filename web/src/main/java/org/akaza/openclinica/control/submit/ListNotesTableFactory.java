@@ -21,6 +21,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.DropdownFilter;
@@ -168,6 +169,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         		getCurrentStudy(),
         		filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
+        Map<Integer, EventCRFBean> eventCrfCache = new HashMap<>();
+        for (DiscrepancyNoteBean discrepancyNoteBean : items) {
+            discrepancyNoteBean.setCrfStatus(getCrfStatus(eventCrfCache, discrepancyNoteBean));
+        }
         return items;
     }
 
@@ -211,6 +216,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         this.setAllNotes(items);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
+        Map<Integer, EventCRFBean> eventCrfCache = new HashMap<>();
 
         for (DiscrepancyNoteBean discrepancyNoteBean : items) {
 
@@ -229,7 +235,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
-            h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
+            h.put("crfStatus", getCrfStatus(eventCrfCache, discrepancyNoteBean));
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
@@ -681,6 +687,18 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public DiscrepancyNotesSummary getNotesSummary() {
         return notesSummary;
+    }
+
+    private String getCrfStatus(Map<Integer, EventCRFBean> eventCrfCache, DiscrepancyNoteBean discrepancyNoteBean){
+        EventCRFBean eventCrf;
+        int event_crf_id = discrepancyNoteBean.getEventCRFId();
+        if(eventCrfCache.containsKey(event_crf_id)) {
+            eventCrf = eventCrfCache.get(event_crf_id);
+        } else {
+            eventCrf = (EventCRFBean) getEventCRFDao().findByPK(event_crf_id);
+            eventCrfCache.put(event_crf_id, eventCrf);
+        }
+        return eventCrf.getStage().getName();
     }
 
 }

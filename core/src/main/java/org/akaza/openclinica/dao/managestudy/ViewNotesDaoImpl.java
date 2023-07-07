@@ -77,6 +77,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             b.setEventName(rs.getString("event_name"));
             b.setEventStart(rs.getDate("date_start"));
             b.setCrfName(rs.getString("crf_name"));
+            b.setEventCRFId(rs.getInt("event_crf_id"));
             int statusId = rs.getInt("status_id");
             if (statusId != 0) {
                 b.setCrfStatus(DataEntryStage.get(statusId).getName());
