@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -273,14 +274,23 @@ public class SubjectTransferValidator implements Validator {
         }
 
         String secondaryId = subjectTransferBean.getSecondaryId();
-        if (secondaryId != null && secondaryId.length() > 30) {
-            e.reject("subjectTransferValidator.secondaryId_invalid_length", new Object[] { secondaryId }, "secondaryId: " + secondaryId
-                + " cannot be longer than 30 characters.");
-            return;
-        }
-        if (secondaryId.contains("<") || secondaryId.contains(">")) {
-            e.reject("subjectTransferValidator.secondary_id_can_not_contain_html_lessthan_or_greaterthan_elements");
-            return;
+        if(StringUtils.isNotEmpty(secondaryId)){
+            studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "secondaryLabelViewable");
+            if("true".equals(studyParameter.getValue())){
+                if (secondaryId.length() > 30) {
+                    e.reject("subjectTransferValidator.secondaryId_invalid_length", new Object[] { secondaryId }, "secondaryId: " + secondaryId
+                            + " cannot be longer than 30 characters.");
+                    return;
+                }
+                if (secondaryId.contains("<") || secondaryId.contains(">")) {
+                    e.reject("subjectTransferValidator.secondary_id_can_not_contain_html_lessthan_or_greaterthan_elements");
+                    return;
+                }
+            }else{
+                e.reject("subjectTransferValidator.secondaryId_notused", new Object[] { study.getName() },
+                        "Secondary Label is not used for the study " + study.getName());
+                return;
+            }
         }
 
         String gender = String.valueOf(subjectTransferBean.getGender());
