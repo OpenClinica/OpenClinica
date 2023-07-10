@@ -326,10 +326,6 @@ public class ImportCRFDataService {
                     ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
                     for (CRFVersionBean crfVersionBean : crfVersionBeans) {
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
-                        // OC-8255 check if data entered for a different version of the same CRF for the same Study Event & Subject
-                        if (eventCrfBeans.isEmpty()) {
-                            eventCrfBeans = eventCrfDAO.findByEventSubjectCRFid(studyEventBean, studySubjectBean, crfVersionBean);
-                        }
                         for (EventCRFBean ecb : eventCrfBeans) {
                             Integer ecbId = new Integer(ecb.getId());
 
