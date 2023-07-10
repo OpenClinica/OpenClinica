@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="rehman-ali" id="2023-07-10-OC-21311-01" runOnChange="true">
+        <comment>increasing size of column user_name in table study_user_role</comment>
+        <modifyDataType tableName="study_user_role" columnName="user_name" newDataType="varchar(64)"/>
+    </changeSet>
+
+    <changeSet author="rehman-ali" id="2023-07-10-OC-21311-02" runOnChange="true">
+        <comment>increasing size of column username in table authorities</comment>
+        <modifyDataType tableName="authorities" columnName="username" newDataType="varchar(64)"/>
+    </changeSet>
+
+</databaseChangeLog>
