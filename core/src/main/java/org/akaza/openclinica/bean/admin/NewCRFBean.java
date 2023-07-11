@@ -661,10 +661,10 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             Collection<QueryObject> values = itemQueries.values();
             for (QueryObject queryObj : values) {
                 qo = queryObj;
-                cur_query = qo.getSql();
-                if (cur_query == null || cur_query.trim().length() < 1) {
+                if (qo == null || qo.getSql() == null || qo.getSql().trim().length() < 1) {
                     continue;
                 }
+                cur_query = qo.getSql();
                 int parCnt = qo.getSqlParameters().size();
                 
                 statement = con.prepareStatement(cur_query);
