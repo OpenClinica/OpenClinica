@@ -157,7 +157,7 @@ public class RestoreEventCRFServlet extends SecureController {
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
                     if (item.getStatus().equals(Status.AUTO_DELETED)) {
-                        item.setStatus(Status.AVAILABLE);
+                        item.setStatus(Status.UNAVAILABLE);
                         item.setUpdater(ub);
                         item.setUpdatedDate(new Date());
                         iddao.update(item);
