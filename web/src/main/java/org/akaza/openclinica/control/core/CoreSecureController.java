@@ -49,6 +49,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -68,6 +69,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Abstract class for creating a controller servlet and extending capabilities of SecureController. However, not using the SingleThreadModel.
  * @author jnyayapathi
@@ -120,6 +122,8 @@ public abstract class CoreSecureController extends HttpServlet {
     private CRFLocker crfLocker;
 
     private DataSource dataSource = null;
+
+    protected ValidateService validateService;
 
     // user is in
 
@@ -1034,23 +1038,18 @@ public abstract class CoreSecureController extends HttpServlet {
         }
     }
 
-    protected static boolean isStudyLevelUser(HttpServletRequest request){
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        ArrayList studyUserRoles = ub.getRoles();
-        boolean isStudyLevelUser = true;
-        for(int i = 0; i < studyUserRoles.size(); i++) {
-            StudyUserRoleBean studyUserRole = (StudyUserRoleBean) studyUserRoles.get(i);
-            if (studyUserRole.getStudyId() == currentStudy.getId() && currentStudy.getParentStudyId() > 0) {
-                isStudyLevelUser = false;
-                break;
-            }
-        }
-        return isStudyLevelUser;
-    }
 
 
     public CRFLocker getCrfLocker() {
         return crfLocker;
     }
+
+    protected ValidateService getValidateService() {
+        if (validateService == null) {
+            validateService = (ValidateService) WebApplicationContextUtils.getWebApplicationContext(
+                    getServletContext()).getBean("validateService");
+        }
+        return validateService;
+    }
+
 }

@@ -123,6 +123,8 @@
         <property name="viewNotesDao" ref="viewNotesDao"/>
     </bean>
 
+    <bean id="validateService" class="org.akaza.openclinica.service.ValidateServiceImpl" />
+
     <bean id="crfLocker" class="org.akaza.openclinica.core.CRFLocker"/>
 
     <bean id = "generateClinicalDataService" class="org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl">

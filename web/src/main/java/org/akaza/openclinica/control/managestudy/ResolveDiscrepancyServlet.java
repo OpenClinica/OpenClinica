@@ -98,7 +98,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.LOCKED) ||
-                (!isStudyLevelUser(request) && currentStudy.getParentStudyId() > 0 && currentStudy.getStatus().equals(Status.FROZEN)) ||
+                (!getValidateService().isStudyLevelUser(request) && currentStudy.getParentStudyId() > 0 && currentStudy.getStatus().equals(Status.FROZEN)) ||
                 isArchivedCrf ||
                 isDeletedEventorCrf
             ) {
@@ -168,7 +168,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.STOPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.SKIPPED) ||
                 Objects.equals(note.getEvent().getSubjectEventStatus(), SubjectEventStatus.LOCKED) ||
-                (!isStudyLevelUser(request) && currentStudy.getParentStudyId() > 0 && currentStudy.getStatus().equals(Status.FROZEN)) ||
+                (!getValidateService().isStudyLevelUser(request) && currentStudy.getParentStudyId() > 0 && currentStudy.getStatus().equals(Status.FROZEN)) ||
                 isArchivedCrf ||
                 isDeletedEventorCrf ||
                 !isCompleted) {

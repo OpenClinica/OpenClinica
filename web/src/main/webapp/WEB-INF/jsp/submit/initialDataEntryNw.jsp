@@ -20,6 +20,7 @@
 <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='markComplete' class='java.lang.String'/>
+<jsp:useBean scope="request" id="fromResolvingNotes" class="java.lang.String" />
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
@@ -127,6 +128,7 @@
 <input type="hidden" name="sid" value="${section.eventDefinitionCRF.studyId}" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
+<input type="hidden" name="fromResolvingNotes" value="<c:out value="${fromResolvingNotes}"/>" />
 
 <%--FF: ${requestScope['formFirstField']}<br />--%>
 

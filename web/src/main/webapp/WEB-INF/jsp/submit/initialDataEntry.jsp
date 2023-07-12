@@ -40,6 +40,7 @@
 
 <jsp:useBean scope="request" id="section" class=
   "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="fromResolvingNotes" class="java.lang.String" />
 
 <%-- set button text depending on whether or not the user is confirming values --%>
 <c:choose>
@@ -96,6 +97,7 @@
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
+<input type="hidden" name="fromResolvingNotes" value="<c:out value="${fromResolvingNotes}"/>" />
 
 
 <c:import url="interviewer.jsp"/>

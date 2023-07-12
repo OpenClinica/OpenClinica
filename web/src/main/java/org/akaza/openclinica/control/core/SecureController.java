@@ -89,6 +89,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -109,6 +110,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * This class enhances the Controller in several ways.
@@ -207,6 +209,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static final String MODULE = "module";// to determine which module
 
     private CRFLocker crfLocker;
+
+    protected ValidateService validateService;
 
     // user is in
 
@@ -1231,19 +1235,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return absolutePath;
     }
 
-    protected static boolean isStudyLevelUser(HttpServletRequest request){
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        ArrayList studyUserRoles = ub.getRoles();
-        boolean isStudyLevelUser = true;
-        for(int i = 0; i < studyUserRoles.size(); i++) {
-            StudyUserRoleBean studyUserRole = (StudyUserRoleBean) studyUserRoles.get(i);
-            if (studyUserRole.getStudyId() == currentStudy.getId() && currentStudy.getParentStudyId() > 0) {
-                isStudyLevelUser = false;
-                break;
-            }
+    protected ValidateService getValidateService() {
+        if (validateService == null) {
+            validateService = (ValidateService) WebApplicationContextUtils.getWebApplicationContext(
+                    getServletContext()).getBean("validateService");
         }
-        return isStudyLevelUser;
+        return validateService;
     }
     
 }
