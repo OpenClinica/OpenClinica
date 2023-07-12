@@ -31,10 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +60,9 @@ public class InitialDataEntryServlet extends DataEntryServlet {
     protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         mayAccess(request);
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+        if(!(getValidateService().isStudyLevelUser(request) && ("yes".equalsIgnoreCase((String) request.getAttribute("fromResolvingNotes")) || "yes".equalsIgnoreCase(request.getParameter("fromResolvingNotes"))))){
+            checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+        }
         this.checkUpdateDataPermission(request);
         
         HttpSession session = request.getSession();
