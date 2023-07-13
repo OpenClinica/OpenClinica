@@ -70,18 +70,18 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                 if (value.equals("3") || value.equals("6")) { // DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
                     criteria += " and  se.study_EVENT_ID  in (select study_event_id from  event_crf ec,crf_version cv where " +
                             "ec.crf_version_id = cv.crf_version_id and crf_id=" + crfId +
-                            " and ec.validator_id= 0 and DATE_COMPLETED is not null )" +
+                            " and ec.validator_id = 0 and ec.status_id = 4 )" +
                             " and se.study_event_definition_id = "+studyEventDefinitionId;
                 } 
                 else if(value.equals("5")){
                     criteria += " and  se.study_EVENT_ID  in (select study_event_id from  event_crf ec,crf_version cv where " +
                     "ec.crf_version_id = cv.crf_version_id and crf_id=" + crfId +
-                    " and ec.validator_id= 0 and date_validate_completed is not null )" +
+                    " and ec.status_id = 2 )" +
                     " and se.study_event_definition_id = "+studyEventDefinitionId;
                 }
                 else if (value.equals("2")){ //DAtaEntryStage.Initial_data_entry with subject_event_status is DES and status is AVAILABLE
                     criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
-                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) )"+
+                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( ec.date_validate_completed is  null  or ec.date_completed is NULL ) )"+
                     		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 3 and se.status_id = 1";
  
         
@@ -95,7 +95,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                     		"                    AND SS.study_id = ST.study_id " + 
                     		 "                   AND (ST.study_id=" + studyId +" or ST.parent_study_id="+ studyId +") " +
                     		" AND  se.study_EVENT_ID  NOT IN (select study_event_id from  event_crf ec,crf_version cv where " +
-                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  AND ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) )"+
+                    		"ec.crf_version_id = cv.crf_version_id and crf_id= " + crfId + "  AND ( ec.date_validate_completed is  null  or ec.date_completed is NULL ) )"+
                     		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 1 " +
                     		 " UNION " +
                     		 " SELECT DISTINCT  SS.study_subject_id " +
@@ -108,7 +108,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                     		 "                    (select se.study_subject_id from study_event se, " + 
                     		 "                     event_crf ec,crf_version cv " + 
                     		 "                     where ec.crf_version_id = cv.crf_version_id and crf_id=" + crfId + "  and " + 
-                    		 "                    ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) and " + 
+                    		 "                    ( ec.date_validate_completed is  null  or ec.date_completed is NULL ) and " +
                     		 "                    se.study_event_definition_id ="+studyEventDefinitionId +")  " + 
                     		 "                    )  ";
 
@@ -117,14 +117,14 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                 else if (value.equals("4")){
                    //DAtaEntryStage.double data entry
                         criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
-                                "ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( DATE_COMPLETED is not NULL and date_validate_completed is null ) )"+
+                                "ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( ec.validator_id != 0 and ec.status_id = 4 ) )"+
                                  "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 3";
      
                 }
                 else if (value.equals("7"))
                 {
                     criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
-                    "ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( DATE_COMPLETED is not NULL and date_validate_completed is null ) )"+
+                    "ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( ec.date_completed is not NULL and ec.date_validate_completed is null ) )"+
                      "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 7";
                 }
               /*  else if (!value.equals("1")) { // crf data entry stages other than
