@@ -11,6 +11,7 @@
 <jsp:useBean scope='request' id='whichResStatus' class='java.lang.String' />
 <jsp:useBean scope='session' id='boxDNMap'  class="java.util.HashMap"/>
 <jsp:useBean scope='session' id='boxToShow'  class="java.lang.String"/>
+<jsp:useBean scope='request' id='isRfc' class='java.lang.String' />
 
 
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -233,7 +234,7 @@ function setYPos(id) {
 						<c:choose>
 						<c:when test="${typeIdl == type.id}">
 						 	<c:choose>
-						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+						    <c:when test="${study.status.frozen && isRfc != 'true' && (type.id==2 || type.id==4)}">
 								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
 						    </c:when>
 						    <c:otherwise>
@@ -243,7 +244,7 @@ function setYPos(id) {
 						 </c:when>
 						 <c:otherwise>
 							<c:choose>
-							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+							<c:when test="${study.status.frozen && isRfc != 'true' && (type.id==2 || type.id==4)}">
 								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
 							</c:when>
 							<c:otherwise>
@@ -261,7 +262,7 @@ function setYPos(id) {
 						<c:choose>
 						<c:when test="${typeIdl == type.id}">
 						 	<c:choose>
-						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+						    <c:when test="${study.status.frozen && isRfc != 'true' && (type.id==2 || type.id==4)}">
 								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
 						    </c:when>
 						    <c:otherwise>
@@ -271,7 +272,7 @@ function setYPos(id) {
 						 </c:when>
 						 <c:otherwise>
 							<c:choose>
-							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+							<c:when test="${study.status.frozen && isRfc != 'true' && (type.id==2 || type.id==4)}">
 								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
 							</c:when>
 							<c:otherwise>
