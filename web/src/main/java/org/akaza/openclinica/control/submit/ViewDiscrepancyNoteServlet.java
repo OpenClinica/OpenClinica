@@ -89,6 +89,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String CAN_MONITOR = "canMonitor";
     public static final String ERROR_FLAG = "errorFlag";
     public static final String FROM_BOX = "fromBox";
+    public static final String FROM_RESOLVING_NOTES ="fromResolvingNotes";
 
     public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
     public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
@@ -165,7 +166,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
         // logic from CreateDiscrepancyNoteServlet
         request.setAttribute("unlock", "0");
-        fp.getBoolean(IS_REASON_FOR_CHANGE);
+        boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
+        boolean fromResolvingNotes = "yes".equalsIgnoreCase(fp.getString(FROM_RESOLVING_NOTES, true));
+        request.setAttribute(IS_REASON_FOR_CHANGE, String.valueOf(fromResolvingNotes && isReasonForChange));
         fp.getBoolean(ERROR_FLAG);
         String monitor = fp.getString("monitor");
         // String enterData = fp.getString("enterData");

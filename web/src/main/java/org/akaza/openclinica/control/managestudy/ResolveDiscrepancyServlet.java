@@ -231,19 +231,20 @@ public class ResolveDiscrepancyServlet extends SecureController {
         String entityType = discrepancyNoteBean.getEntityType().toLowerCase();
         discrepancyNoteBean.setResStatus(ResolutionStatus.get(discrepancyNoteBean.getResolutionStatusId()));
         discrepancyNoteBean.setDisType(DiscrepancyNoteType.get(discrepancyNoteBean.getDiscrepancyNoteTypeId()));
+        String isRfc = "true".equalsIgnoreCase(currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange()) ? "1" : "0";
         // BWP 03/17/2009 3166: if it's not an ItemData type note, redirect
         // Monitors to View Subject or
         // View Study Events <<
         if (currentRole.getRole().equals(Role.MONITOR) && !"itemdata".equalsIgnoreCase(entityType)
                 && !"eventcrf".equalsIgnoreCase(entityType)) {
-            redirectMonitor(module, discrepancyNoteBean);
+            redirectMonitor(module, discrepancyNoteBean, isRfc);
             return;
         }
         // >>
         // If Study is Frozen or Locked
         if (currentStudy.getStatus().isFrozen() && !"itemdata".equalsIgnoreCase(entityType) 
                 && !"eventcrf".equalsIgnoreCase(entityType)) {
-            redirectMonitor(module, discrepancyNoteBean);
+            redirectMonitor(module, discrepancyNoteBean, isRfc);
             return;
         }
 
@@ -303,7 +304,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             p.setFileName(p.getFileName()+ "?eventCRFId=" + discrepancyNoteBean.getEventCRFId() + "&exitTo=ViewNotes&fromViewNotes=1");
 
-            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true, isRfc);
             setPopUpURL(createNoteURL);
         }else {
             if(p.getFileName().contains("?")) {
@@ -313,7 +314,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             } else {
                 p.setFileName(p.getFileName()+"?fromViewNotes=1");
             }
-            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true, isRfc);
             setPopUpURL(createNoteURL);
         }
 
@@ -414,7 +415,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
      *            A String like "managestudy" or "admin"
      * @param discrepancyNoteBean
      */
-    private void redirectMonitor(String module, DiscrepancyNoteBean discrepancyNoteBean) {
+    private void redirectMonitor(String module, DiscrepancyNoteBean discrepancyNoteBean, String isRfc) {
 
         if (discrepancyNoteBean != null) {
 
@@ -448,7 +449,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 // processing Servlet will initiate.
                 // 'true' parameter means that ViewDiscrepancyNote is the
                 // handling Servlet.
-                createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+                createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true, isRfc);
                 request.setAttribute(POP_UP_URL, createNoteURL);
 
                 try {

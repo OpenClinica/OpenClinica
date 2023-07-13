@@ -448,7 +448,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             HtmlBuilder builder = new HtmlBuilder();
             //for "view" as action
             //This createNoteURL uses the same method as in ResolveDiscrepancyServlet
-            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
+            String isRfc = "true".equalsIgnoreCase(currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange()) ? "1" : "0";
+            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true, isRfc);
             builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.close();
             builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))

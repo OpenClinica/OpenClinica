@@ -142,7 +142,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
     
     public static final String FLAG_DISCREPANCY_RFC ="flagDNRFC";
-    
+    public static final String FROM_RESOLVING_NOTES ="fromResolvingNotes";
     
      
     /*
@@ -174,7 +174,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         
         boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); //this should be set based on a new property of DisplayItemBean
         boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
-        request.setAttribute(IS_REASON_FOR_CHANGE, String.valueOf(isReasonForChange));
+        boolean fromResolvingNotes = "yes".equalsIgnoreCase(fp.getString(FROM_RESOLVING_NOTES, true));
+        request.setAttribute(IS_REASON_FOR_CHANGE, String.valueOf(fromResolvingNotes && isReasonForChange));
         int entityId = fp.getInt(ENTITY_ID);
         // subjectId has to be added to the database when disc notes area saved
         // as entity_type 'subject'
@@ -896,13 +897,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
      * @param preset
      * @return
      */
-    public static String getAddChildURL(DiscrepancyNoteBean note, ResolutionStatus preset, boolean toView) {
+    public static String getAddChildURL(DiscrepancyNoteBean note, ResolutionStatus preset, boolean toView, String isRfc) {
         ArrayList<String> arguments = new ArrayList<String>();
 
         arguments.add(ENTITY_TYPE + "=" + note.getEntityType());
         arguments.add(ENTITY_ID + "=" + note.getEntityId());
         arguments.add(WRITE_TO_DB + "=" + "1");
         arguments.add("monitor" + "=" + 1);// of course, when resolving a note,
+        arguments.add(IS_REASON_FOR_CHANGE + "=" + isRfc);
+        arguments.add(FROM_RESOLVING_NOTES + "=" + "yes");
         // we have monitor privilege
 
         if (preset.isActive()) {
