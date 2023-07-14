@@ -41,10 +41,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author jxu
@@ -274,6 +271,19 @@ public class ChangeStudyServlet extends SecureController {
                     }
                 }
             }
+
+            Enumeration<String> attributeNames = session.getAttributeNames();
+            StringBuilder sessionAttributes = new StringBuilder();
+            while (attributeNames.hasMoreElements()) {
+                String attributeName = attributeNames.nextElement();
+                sessionAttributes.append(attributeName);
+                if (attributeNames.hasMoreElements()) {
+                    sessionAttributes.append(", ");
+                }
+            }
+            StudyUserRoleBean sessionRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
+            logger.debug("Session state: {}", "[ " + sessionAttributes + " ]");
+            logger.debug("User role in session: {}", sessionRole != null ? sessionRole.getRoleName() : "NoSuchRole");
 
             currentRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
             session.setAttribute("userRole", currentRole);
