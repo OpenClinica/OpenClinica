@@ -131,6 +131,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         } else if ("eventcrf".equalsIgnoreCase(entityType)) {
             request.setAttribute("editInterview", "1");
 
+            note.setEventCRFId(id);
             EventCRFDAO ecdao = new EventCRFDAO(ds);
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(id);
             request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
