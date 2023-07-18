@@ -507,7 +507,7 @@ public class EntityBeanTable {
                                     continue loopRows;
                                 }
 
-                                String regex = "^(?=.*?(?<=^|[-])(" + keyword.replaceAll("-", "-.*?") + ")(?=[-]|$)).*$";
+                                String regex = "^(?=.*?(?<=^|[-])(" + Pattern.quote(keyword).replaceAll("-", "-.*?") + ")(?=[-]|$)).*$";
                                 if (Pattern.matches(regex, component)) {
                                     temprows.add(row);
                                 }
