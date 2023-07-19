@@ -22,8 +22,22 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<c:set var="interviewer" value="${toc.eventCRF.interviewerName}" />
-<c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
+<c:set var="originJSP" value="${param.originJSP}" />
+
+<c:choose>
+    <c:when test="${
+                    (originJSP eq 'doubleDataEntry') &&
+                    (toc.eventCRF.validatorId == 0 && toc.eventCRF.status.id == 4) &&
+                    empty formMessages
+                    }">
+        <c:set var="interviewer" value="" />
+        <c:set var="interviewDate" value="" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="interviewer" value="${toc.eventCRF.interviewerName}" />
+        <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
+    </c:otherwise>
+</c:choose>
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 
@@ -213,10 +227,32 @@ function callTip(html)
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <c:forEach var="presetValue" items="${presetValues}">
     <c:if test='${presetValue.key == "interviewer"}'>
-        <c:set var="interviewer" value="${presetValue.value}" />
+        <c:choose>
+            <c:when test="${
+                    (originJSP eq 'doubleDataEntry') &&
+                    (toc.eventCRF.validatorId == 0 && toc.eventCRF.status.id == 4) &&
+                    empty formMessages
+                    }">
+                <c:set var="interviewer" value="" />
+            </c:when>
+            <c:otherwise>
+                <c:set var="interviewer" value="${presetValue.value}" />
+            </c:otherwise>
+        </c:choose>
     </c:if>
     <c:if test='${presetValue.key == "interviewDate"}'>
-        <c:set var="interviewDate" value="${presetValue.value}" />
+        <c:choose>
+            <c:when test="${
+                    (originJSP eq 'doubleDataEntry') &&
+                    (toc.eventCRF.validatorId == 0 && toc.eventCRF.status.id == 4) &&
+                    empty formMessages
+                    }">
+                <c:set var="interviewDate" value="" />
+            </c:when>
+            <c:otherwise>
+                <c:set var="interviewDate" value="${presetValue.value}" />
+            </c:otherwise>
+        </c:choose>
     </c:if>
 </c:forEach>
 <!-- End of Alert Box -->
