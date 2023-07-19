@@ -142,6 +142,7 @@
 </script>
 
 <c:import url="interviewer.jsp">
+  <c:param name="originJSP" value="doubleDataEntry" />
   <c:param name="hasNameNote" value="${hasNameNote}"/>
   <c:param name="hasDateNote" value="${hasDateNote}"/>
 </c:import>
