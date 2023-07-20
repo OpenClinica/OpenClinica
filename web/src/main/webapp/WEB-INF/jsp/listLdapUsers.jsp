@@ -73,7 +73,7 @@ body {
             <td class="table_cell"><c:out value="${m.lastName}"/>&nbsp;</td>
             <td class="table_cell"><c:out value="${m.email}"/>&nbsp;</td>
             <td class="table_cell">
-            <a href="<c:url value="/pages/selectLdapUser"><c:param name="dn" value="${m.distinguishedName}"/></c:url>" target="_parent">
+            <a href="<c:url value="/pages/selectLdapUser"><c:param name="dn" value="${m.username}"/></c:url>" target="_parent">
             <img src="../images/create_new.gif" 
             alt="<fmt:message key="listLdapUsers.list.table.selectUser.tooltip" bundle="${resword}"/>" 
             title="<fmt:message key="listLdapUsers.list.table.selectUser.tooltip" bundle="${resword}"/>" border="0"/></a></td>
