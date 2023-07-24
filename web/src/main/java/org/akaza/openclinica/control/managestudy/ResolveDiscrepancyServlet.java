@@ -133,7 +133,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             note.setEventCRFId(id);
             EventCRFDAO ecdao = new EventCRFDAO(ds);
+            StudyEventDAO sedao = new StudyEventDAO(ds);
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(id);
+            StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+            note.setEvent(seb);
             request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
             // If the request is passed along to ViewSectionDataEntryServlet,
             // that code needs
