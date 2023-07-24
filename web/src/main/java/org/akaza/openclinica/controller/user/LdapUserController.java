@@ -63,12 +63,16 @@ public class LdapUserController {
     }
 
     @RequestMapping("/selectLdapUser")
-    public String selectLdapUser(HttpServletRequest req, @RequestParam(value="dn", required = false) String dn) {
-        // A request without "dn" parameter is used to just close the iFrame
+    public String selectLdapUser(HttpServletRequest req,
+                                 @RequestParam(value="dn", required = false) String dn,
+                                 @RequestParam(value="un", required = false) String un
+                                 ) {
+        // A request without "dn" or "un" parameter is used to just close the iFrame
         try{
             if (!StringUtils.isEmpty(dn)) {
-                DirContextOperations context = openClinicaLdapUserSearch.searchForUser(dn);
-                req.getSession().setAttribute("ldapUser", ldapUserService.getLdapUser(context));
+                req.getSession().setAttribute("ldapUser", ldapUserService.loadUser(dn));
+            } else if(!StringUtils.isEmpty(un)) {
+                req.getSession().setAttribute("ldapUser", ldapUserService.getLdapUser(openClinicaLdapUserSearch.searchForUser(un)));
             }
         }catch (Exception ex){
             logger.error("Error getting ldap user: " + ex.getMessage(), ex);
