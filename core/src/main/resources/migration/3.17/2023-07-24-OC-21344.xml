@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="rehman-ali" id="2023-07-24-OC-21344-01" runOnChange="true">
+        <comment>increasing size of column user_name in table audit_log_event</comment>
+        <modifyDataType tableName="audit_log_event" columnName="old_value" newDataType="varchar(4000)"/>
+        <modifyDataType tableName="audit_log_event" columnName="new_value" newDataType="varchar(4000)"/>
+    </changeSet>
+
+</databaseChangeLog>
