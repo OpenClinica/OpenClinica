@@ -14,13 +14,12 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
@@ -697,7 +696,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             eventCrf = eventCrfCache.get(event_crf_id);
         } else {
             eventCrf = (EventCRFBean) getEventCRFDao().findByPK(event_crf_id);
+            eventCrf.setStudyEvent((StudyEventBean) getStudyEventDao().findByPK(eventCrf.getStudyEventId()));
             eventCrfCache.put(event_crf_id, eventCrf);
+        }
+        SubjectEventStatus status = eventCrf.getStudyEvent().getSubjectEventStatus();
+        if (status.equals(SubjectEventStatus.LOCKED) ||
+                status.equals(SubjectEventStatus.SKIPPED) ||
+                status.equals(SubjectEventStatus.STOPPED)) {
+            eventCrf.setStage(DataEntryStage.LOCKED);
         }
         return eventCrf.getStage().getName();
     }
