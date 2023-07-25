@@ -13,7 +13,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 /**
  * @author ssachs
  */
-public class ItemFormMetadataBean extends EntityBean implements Comparable {
+public class ItemFormMetadataBean extends EntityBean implements Comparable, Cloneable {
     //
     private int itemId;
     private int crfVersionId;
@@ -58,6 +58,44 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
         result = prime * result + ((subHeader == null) ? 0 : subHeader.hashCode());
         result = prime * result + ((widthDecimal == null) ? 0 : widthDecimal.hashCode());
         return result;
+    }
+
+    public ItemFormMetadataBean(int itemId, int crfVersionId, String header, String subHeader, int parentId, String parentLabel, int columnNumber,
+                                String pageNumberLabel, String questionNumberLabel, String leftItemText, String rightItemText, int sectionId,
+                                int descisionConditionId, int responseSetId, String regexp, String regexpErrorMsg, int ordinal, boolean required,
+                                String defaultValue, String widthDecimal, boolean showItem, String groupLabel, String responseLayout,
+                                String crfVersionName, String crfName, String sectionName, int repeatMax, boolean isHighlighted,
+                                ResponseSetBean responseSet, String conditionalDisplay) {
+        this.itemId = itemId;
+        this.crfVersionId = crfVersionId;
+        this.header = header;
+        this.subHeader = subHeader;
+        this.parentId = parentId;
+        this.parentLabel = parentLabel;
+        this.columnNumber = columnNumber;
+        this.pageNumberLabel = pageNumberLabel;
+        this.questionNumberLabel = questionNumberLabel;
+        this.leftItemText = leftItemText;
+        this.rightItemText = rightItemText;
+        this.sectionId = sectionId;
+        this.descisionConditionId = descisionConditionId;
+        this.responseSetId = responseSetId;
+        this.regexp = regexp;
+        this.regexpErrorMsg = regexpErrorMsg;
+        this.ordinal = ordinal;
+        this.required = required;
+        this.defaultValue = defaultValue;
+        this.widthDecimal = widthDecimal;
+        this.showItem = showItem;
+        this.groupLabel = groupLabel;
+        this.responseLayout = responseLayout;
+        this.crfVersionName = crfVersionName;
+        this.crfName = crfName;
+        this.sectionName = sectionName;
+        this.repeatMax = repeatMax;
+        this.isHighlighted = isHighlighted;
+        this.responseSet = responseSet;
+        this.conditionalDisplay = conditionalDisplay;
     }
 
     @Override
@@ -690,5 +728,15 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public ItemFormMetadataBean clone() {
+        return new ItemFormMetadataBean(this.getItemId(), this.getCrfVersionId(), this.getHeader(), this.getSubHeader(), this.getParentId(),
+                this.getParentLabel(), this.getColumnNumber(), this.getPageNumberLabel(), this.getQuestionNumberLabel(), this.getLeftItemText(),
+                this.getRightItemText(), this.getSectionId(), this.getDescisionConditionId(), this.getResponseSetId(), this.getRegexp(),
+                this.getRegexpErrorMsg(), this.getOrdinal(), this.isRequired(), this.getDefaultValue(), this.getWidthDecimal(), this.isShowItem(),
+                this.getGroupLabel(), this.getResponseLayout(), this.getCrfVersionName(), this.getCrfName(), this.getSectionName(), this.getRepeatMax(),
+                this.isHighlighted(), this.getResponseSet().clone(), this.getConditionalDisplay());
     }
 }

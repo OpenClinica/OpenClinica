@@ -18,7 +18,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
  *
  *
  */
-public class ItemDataBean extends AuditableEntityBean {
+public class ItemDataBean extends AuditableEntityBean implements Cloneable {
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -31,6 +31,17 @@ public class ItemDataBean extends AuditableEntityBean {
         result = prime * result + (selected ? 1231 : 1237);
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
+    }
+
+    public ItemDataBean(int eventCRFId, int itemId, ItemBean item, String value, int ordinal, boolean deleted, boolean selected, boolean auditLog) {
+        this.eventCRFId = eventCRFId;
+        this.itemId = itemId;
+        this.item = item;
+        this.value = value;
+        this.ordinal = ordinal;
+        this.deleted = deleted;
+        this.selected = selected;
+        this.auditLog = auditLog;
     }
 
     @Override
@@ -183,5 +194,10 @@ public class ItemDataBean extends AuditableEntityBean {
 	public void setItem(ItemBean item) {
 		this.item = item;
 	}
-    
+
+    @Override
+    public ItemDataBean clone() {
+        return new ItemDataBean(this.getEventCRFId(), this.getItemId(), this.getItem(), this.getValue(),
+                this.getOrdinal(), this.isDeleted(), this.isSelected(), this.isAuditLog());
+    }
 }

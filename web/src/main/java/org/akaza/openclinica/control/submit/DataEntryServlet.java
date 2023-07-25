@@ -2526,6 +2526,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int newDataRowOrdinal = 0;  //holds the ordinal of new data
         int existingGroupSize = dbGroups.size(); //Size of existing repeating data retrieved from database
         ////////////////////////////////////////////////////////////////////////////////////////////
+        List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
 
         //Need to go through all of the rows of data
         for (int i = 0; i < repeatMax; i++) {
@@ -2537,7 +2538,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
             // want to do deep copy here, so always get a fresh copy for items,
             // may use other better way to do, like clone
-            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
 
             //Process preexisting data marked by the word "manual" from the UI
             if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")) {
@@ -2547,9 +2547,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 formGroup.setInputId(igb.getOid() + "_manual" + i);
                 LOGGER.debug("1: set auto to false for " + igb.getOid() + " " + i);
 
-                dibs = processInputForGroupItem(fp, dibs, i, digb, false);
+                List<DisplayItemBean> clonedDibs = processInputForGroupItem(fp, deepCloneDisplayItems(dibs), i, digb, false);
 
-                formGroup.setItems(dibs);
+                formGroup.setItems(clonedDibs);
                 formGroups.add(formGroup);
                 manualRows++;
             } else if (!StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"))) {
@@ -2562,9 +2562,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                 LOGGER.debug("2: set auto to false for " + igb.getOid() + " " + i);
 
-                dibs = processInputForGroupItem(fp, dibs, i, digb, false);
+                List<DisplayItemBean> clonedDibs = processInputForGroupItem(fp, deepCloneDisplayItems(dibs), i, digb, false);
 
-                formGroup.setItems(dibs);
+                formGroup.setItems(clonedDibs);
                 formGroups.add(formGroup);
                 manualRows++;
             } else if (manualRows == existingGroupSize || isNewRepeatingDataPresent(fp, i, igb)){//process new data or the very first row of data
@@ -5688,10 +5688,10 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
             }
             formGroup.setAuto(true);
             LOGGER.debug("1: set auto to TRUE for " + igb.getOid() + " " + i);
-            dibs = processInputForGroupItem(fp, dibs, i, digb, true);
+            List<DisplayItemBean> clonedDibs = processInputForGroupItem(fp, deepCloneDisplayItems(dibs), i, digb, true);
             LOGGER.trace("+++ group ordinal: " + i + " igb name " + igb.getName());
 
-            formGroup.setItems(dibs);
+            formGroup.setItems(clonedDibs);
             //formGroups.add(formGroup);
             return formGroup;
         } else if (!StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
@@ -5718,10 +5718,10 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
 
             LOGGER.debug("2: set auto to TRUE for " + igb.getOid() + " " + i);
 
-            dibs = processInputForGroupItem(fp, dibs, i, digb, true);
+            List<DisplayItemBean> clonedDibs = processInputForGroupItem(fp, deepCloneDisplayItems(dibs), i, digb, true);
             LOGGER.trace("+++ group ordinal: " + i + " igb name " + igb.getName());
 
-            formGroup.setItems(dibs);
+            formGroup.setItems(clonedDibs);
             //formGroups.add(formGroup);
             return formGroup;
         }
@@ -5736,4 +5736,13 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
         }
         return false;
     }
+
+    private List<DisplayItemBean> deepCloneDisplayItems(List<DisplayItemBean> dibs) {
+        List<DisplayItemBean> clonedDibs = new ArrayList<>();
+        for(DisplayItemBean dib: dibs){
+            clonedDibs.add(dib.clone());
+        }
+        return clonedDibs;
+    }
+
 }

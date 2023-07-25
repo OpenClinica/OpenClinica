@@ -8,6 +8,8 @@
 package org.akaza.openclinica.bean.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.ResponseType;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +17,18 @@ import java.util.HashMap;
 /**
  * @author ssachs
  */
-public class ResponseSetBean extends EntityBean {
+public class ResponseSetBean extends EntityBean implements Cloneable {
     private int responseTypeId;
 
     private org.akaza.openclinica.bean.core.ResponseType responseType;
+
+    public ResponseSetBean(int responseTypeId, ResponseType responseType, ArrayList options, HashMap optionIndexesByValue, String value) {
+        this.responseTypeId = responseTypeId;
+        this.responseType = responseType;
+        this.options = options;
+        this.optionIndexesByValue = optionIndexesByValue;
+        this.value = value;
+    }
 
     /**
      * A set of options to display to the user. The elements are
@@ -96,6 +106,10 @@ public class ResponseSetBean extends EntityBean {
      */
     public void setResponseTypeId(int responseTypeId) {
         responseType = org.akaza.openclinica.bean.core.ResponseType.get(responseTypeId);
+    }
+
+    public HashMap getOptionIndexesByValue() {
+        return optionIndexesByValue;
     }
 
     public void setOptions(String optionsText, String optionsValues) {
@@ -202,4 +216,22 @@ public class ResponseSetBean extends EntityBean {
         }
         return list;
     }
+
+    @Override
+    public ResponseSetBean clone() {
+        return new ResponseSetBean(this.getResponseTypeId(), this.getResponseType(), this.getClonedOptions(),
+                this.getOptionIndexesByValue(), this.getValue());
+    }
+
+    private ArrayList getClonedOptions(){
+        ArrayList clonedOptions = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(this.getOptions())){
+            for(int i = 0; i < this.getOptions().size(); i++){
+                ResponseOptionBean option = (ResponseOptionBean) this.getOptions().get(i);
+                clonedOptions.add(option.clone());
+            }
+        }
+        return clonedOptions;
+    }
+
 }

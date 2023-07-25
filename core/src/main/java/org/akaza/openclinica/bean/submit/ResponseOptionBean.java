@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * @author ssachs
  */
-public class ResponseOptionBean implements Serializable {
+public class ResponseOptionBean implements Serializable, Cloneable {
     /**
      * This will be displayed to the user.
      */
@@ -72,11 +72,22 @@ public class ResponseOptionBean implements Serializable {
         return selected;
     }
 
+    public ResponseOptionBean(String text, String value, boolean selected) {
+        this.text = text;
+        this.value = value;
+        this.selected = selected;
+    }
+
     /**
      * @param selected
      *            The selected to set.
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    @Override
+    public ResponseOptionBean clone() {
+        return new ResponseOptionBean(this.getText(), this.getValue(), this.isSelected());
     }
 }
