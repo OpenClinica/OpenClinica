@@ -313,6 +313,7 @@ public class ExpressionService {
                     getItemGroupOidFromExpression(expression));
 
             expression = fixGroupOrdinal(expression, ruleSetExpression, itemData, expressionWrapper.getEventCrf());
+            map.put("expressionWithFixedOrdinals", expression);
 
             Integer index = getItemGroupOidOrdinalFromExpression(expression).equals("") ? 0 : Integer
                     .valueOf(getItemGroupOidOrdinalFromExpression(expression)) - 1;
@@ -460,6 +461,7 @@ public class ExpressionService {
                 String valueFromDb = null;
                 String matchEvents = null;
                 String valueFromForm = null;
+                expression = map.get("expressionWithFixedOrdinals");
                 if (checkSyntax(expression)) {
                     valueFromDb = map.get("value");
                     matchEvents = map.get("match");
