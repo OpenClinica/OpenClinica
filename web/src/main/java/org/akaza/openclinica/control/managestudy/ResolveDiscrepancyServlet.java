@@ -86,7 +86,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
          * Page.TABLE_OF_CONTENTS_SERVLET; //
          * TableOfContents?action=ae&ecid=51&submitted=1&editInterview=1&interviewer=abc&interviewDate=12/04/2003 }
          */else if ("studyevent".equalsIgnoreCase(entityType)) {
-            if (ub.isSysAdmin() || ub.isTechAdmin()) {
+            if ((ub.isSysAdmin() || ub.isTechAdmin()) && !isDeletedEventorCrf) {
                 return Page.UPDATE_STUDY_EVENT_SERVLET;
             } else {
                 return Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET;
@@ -288,6 +288,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             toView = true;// we want to go to view note page if the note is
             // for item data
+        }else if("eventcrf".equalsIgnoreCase(entityType)){
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(discrepancyNoteBean.getEntityId());
+            StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+            isDeletedEventorCrf = seb.getStatus().isDeleted() || ecb.getStatus().isDeleted();
+        }else if("studyevent".equalsIgnoreCase(entityType)){
+            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+            StudyEventBean seb = (StudyEventBean) sedao.findByPK(discrepancyNoteBean.getEntityId());
+            isDeletedEventorCrf = seb.getStatus().isDeleted();
         }
         // logger.info("set up pop up url: " + createNoteURL);
         // System.out.println("set up pop up url: " + createNoteURL);
