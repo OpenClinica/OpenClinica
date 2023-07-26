@@ -698,11 +698,11 @@ function updateThis(multiSelEle, count) {
                           <br />
                 <c:choose>
                   <c:when test="${edc.allowAnonymousSubmission == true && def.repeating == true  && edc.offline == true}">
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                <fmt:message key="offline_not_supported" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" disabled checked>
                   </c:when>
                   <c:when test="${edc.allowAnonymousSubmission == true && def.repeating == true  && edc.offline == false}">
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                <fmt:message key="offline_not_supported" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" disabled>
                   </c:when>
                 </c:choose>
