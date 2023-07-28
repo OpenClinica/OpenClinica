@@ -18,9 +18,42 @@ import java.util.ArrayList;
 /**
  * @author ssachs
  */
-public class DisplayItemBean implements Comparable {
+public class DisplayItemBean implements Comparable, Cloneable {
     private ItemDataBean data;
     private ItemBean item;
+
+    public DisplayItemBean(ItemDataBean data, ItemBean item, ItemFormMetadataBean metadata,
+                           String editFlag, ItemDataBean dbData, boolean isNewItem,
+                           String fieldName, int totNew, int totUpdated, int totRes,
+                           int totClosed, int totNA, ArrayList<DiscrepancyNoteBean> discrepancyNotes,
+                           ArrayList children, int numChildren, int numColumns, int numDiscrepancyNotes,
+                           EventDefinitionCRFBean eventDefinitionCRF, int discrepancyNoteStatus, boolean isSCDtoBeShown,
+                           SCDData scdData, boolean blankDwelt, InstantOnChangeFrontStrGroup instantFrontStrGroup) {
+        this.data = data;
+        this.item = item;
+        this.metadata = metadata;
+        this.editFlag = editFlag;
+        this.dbData = dbData;
+        this.isNewItem = isNewItem;
+        this.fieldName = fieldName;
+        this.totNew = totNew;
+        this.totUpdated = totUpdated;
+        this.totRes = totRes;
+        this.totClosed = totClosed;
+        this.totNA = totNA;
+        this.discrepancyNotes = discrepancyNotes;
+        this.children = children;
+        this.numChildren = numChildren;
+        this.numColumns = numColumns;
+        this.numDiscrepancyNotes = numDiscrepancyNotes;
+        this.eventDefinitionCRF = eventDefinitionCRF;
+        this.discrepancyNoteStatus = discrepancyNoteStatus;
+        this.isSCDtoBeShown = isSCDtoBeShown;
+        this.scdData = scdData;
+        this.blankDwelt = blankDwelt;
+        this.instantFrontStrGroup = instantFrontStrGroup;
+    }
+
     private ItemFormMetadataBean metadata;
     private String editFlag = "";// used for items in a group
     private ItemDataBean dbData; // used for DDE, items in a group
@@ -630,4 +663,13 @@ public class DisplayItemBean implements Comparable {
 	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
 	}
+
+    @Override
+    public DisplayItemBean clone() {
+        return new DisplayItemBean(this.getData().clone(), this.getItem(), this.getMetadata().clone(), this.getEditFlag(), this.getDbData().clone(), this.getIsNewItem(),
+                this.getFieldName(), this.getTotNew(), this.getTotUpdated(), this.getTotRes(),
+                this.getTotClosed(), this.getTotNA(), this.getDiscrepancyNotes(), this.getChildren(), this.getNumChildren(),
+                this.getNumColumns(), this.getNumDiscrepancyNotes(), this.getEventDefinitionCRF(),
+                this.getDiscrepancyNoteStatus(), this.getIsSCDtoBeShown(), this.getScdData(), this.isBlankDwelt(), this.getInstantFrontStrGroup());
+    }
 }
