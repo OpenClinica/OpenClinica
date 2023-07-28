@@ -171,7 +171,7 @@
                 <c:choose>
                   <c:when test="${definition.repeating == true }">
                           <br />
-                    <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <fmt:message key="offline_not_supported" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
                   </c:when>
                 </c:choose>

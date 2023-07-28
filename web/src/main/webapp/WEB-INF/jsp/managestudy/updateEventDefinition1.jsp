@@ -415,11 +415,11 @@
                  <br />
                 <c:choose>
                   <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == true}">
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                <fmt:message key="offline_not_supported" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes"  checked>
                   </c:when>
                   <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline != true}">
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                <fmt:message key="offline_not_supported" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >
                   </c:when>
                 </c:choose>
@@ -435,7 +435,7 @@
                 <c:choose>
                   <c:when test="${definition.repeating == true }">
                           <br />
-                    <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <fmt:message key="offline_not_supported" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
                   </c:when>
                 </c:choose>                
