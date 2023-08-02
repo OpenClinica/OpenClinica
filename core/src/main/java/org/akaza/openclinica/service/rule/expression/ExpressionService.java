@@ -461,7 +461,9 @@ public class ExpressionService {
                 String valueFromDb = null;
                 String matchEvents = null;
                 String valueFromForm = null;
-                expression = map.get("expressionWithFixedOrdinals");
+                if (map.get("expressionWithFixedOrdinals") != null) {
+                    expression = map.get("expressionWithFixedOrdinals");
+                }
                 if (checkSyntax(expression)) {
                     valueFromDb = map.get("value");
                     matchEvents = map.get("match");
