@@ -561,6 +561,7 @@
         <name>findByEventCrfID</name>
         <sql>select ec.* from event_crf  ec, crf_version cv,crf
             where ec.crf_version_id=cv.crf_version_id
+            and crf.crf_id=cv.crf_id
             and ec.study_event_id=? and 
             crf.crf_id in (select crf1.crf_id from crf_version cv1,crf crf1
             where 
