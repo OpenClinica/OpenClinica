@@ -121,7 +121,7 @@ public class StudySubjectEndpoint {
 
             DataBinder dataBinder = new DataBinder((subjectTransferBean));
             errors = dataBinder.getBindingResult();
-            subjectTransferBean.setOwner(getUserAccount());
+            subjectTransferBean.setOwner(this.subjectService.getUserAccount());
             SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
             subjectTransferValidator.validate((subjectTransferBean), errors);
             if (!errors.hasErrors()) {
@@ -304,7 +304,7 @@ public class StudySubjectEndpoint {
             if (study == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
             }
-            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
+            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(this.subjectService.getUserAccount().getName(), study.getId());
             if (studySur.getStatus() != Status.AVAILABLE) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
                         "You do not have sufficient privileges to proceed with this operation.");
@@ -318,7 +318,7 @@ public class StudySubjectEndpoint {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_site_identifier",
                         "The study/site identifier you provided is not valid.");
             }
-            StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), site.getId());
+            StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(this.subjectService.getUserAccount().getName(), site.getId());
             if (siteSur.getStatus() != Status.AVAILABLE) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
                         "You do not have sufficient privileges to proceed with this operation.");
@@ -402,7 +402,7 @@ public class StudySubjectEndpoint {
 
         SubjectStudyDefinitionBean subjectTransferBean = new SubjectStudyDefinitionBean(
         		studyIdentifier,  siteIdentifier, 
-        		getUserAccount(),  studySubjectIdValue);
+        		this.subjectService.getUserAccount(),  studySubjectIdValue);
 
   
         return subjectTransferBean;
@@ -569,23 +569,6 @@ public class StudySubjectEndpoint {
         	throw new Exception("Unparsable date: "+dateAsString);
         }
         return dd;
-    }
-
-    /**
-     * Helper Method to get the user account
-     * 
-     * @return UserAccountBean
-     */
-    private UserAccountBean getUserAccount() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = null;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-        return (UserAccountBean) userAccountDao.findByUserName(username);
     }
 
     public String getDateFormat() {
