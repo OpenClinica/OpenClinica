@@ -1,5 +1,6 @@
 package org.akaza.openclinica.ws.client;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
@@ -76,6 +77,10 @@ public class SoapCreateSubject extends WebServiceGatewaySupport implements Subje
     }
     
     public List<StudySubjectBean> getStudySubject(StudyBean study){
+        return null;
+    }
+
+    public UserAccountBean getUserAccount(){
         return null;
     }
 

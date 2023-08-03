@@ -15,6 +15,8 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Date;
 import java.util.List;
@@ -69,7 +71,7 @@ public class SubjectService implements SubjectServiceInterface {
     private StudySubjectBean createStudySubject(SubjectBean subject, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
         StudySubjectBean studySubject = new StudySubjectBean();
         studySubject.setSecondaryLabel(secondaryId);
-        studySubject.setOwner(subject.getOwner());
+        studySubject.setOwner(getUserAccount());
         studySubject.setEnrollmentDate(enrollmentDate);
         studySubject.setSubjectId(subject.getId());
         studySubject.setStudyId(studyBean.getId());
@@ -97,15 +99,20 @@ public class SubjectService implements SubjectServiceInterface {
     }
 
     /**
-     * Getting the first user account from the database. This would be replaced by an authenticated user who is doing the SOAP requests .
-     * 
+     * Helper Method to get the user account
+     *
      * @return UserAccountBean
      */
-    private UserAccountBean getUserAccount() {
-
-        UserAccountBean user = new UserAccountBean();
-        user.setId(1);
-        return user;
+    public UserAccountBean getUserAccount() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = null;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+        return (UserAccountBean) userAccountDao.findByUserName(username);
     }
 
     /**

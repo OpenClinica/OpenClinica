@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service.subject;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -12,5 +13,7 @@ public interface SubjectServiceInterface {
     public abstract String createSubject(SubjectBean subjectBean, StudyBean studyBean, Date enrollmentDate, String secondaryId);
 
     public List<StudySubjectBean> getStudySubject(StudyBean study);
+
+    public UserAccountBean getUserAccount();
 
 }
