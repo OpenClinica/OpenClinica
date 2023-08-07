@@ -145,6 +145,24 @@ public class LdapUserService {
         return (LdapUser) ldapTemplate.lookup(dn, ldapUserAttributesMapper);
     }
 
+    public LdapUser getLdapUser(DirContextOperations context) throws NamingException {
+        LdapUser ldapUser = new LdapUser();
+        ldapUser.setUsername(getLdapAttribute(context, keyUsername));
+        ldapUser.setFirstName(getLdapAttribute(context, keyFirstName));
+        ldapUser.setLastName(getLdapAttribute(context, keyLastname));
+        ldapUser.setEmail(getLdapAttribute(context, keyEmail));
+        ldapUser.setOrganization(getLdapAttribute(context, keyOrganization));
+        ldapUser.setDistinguishedName(context.getDn().toString());
+        return ldapUser;
+    }
+
+    private String getLdapAttribute(DirContextOperations context, String attribute) throws NamingException {
+        if(context.getAttributes().get(attribute) == null){
+            return "";
+        }
+        return (String) context.getAttributes().get(attribute).get();
+    }
+
     public DirContextOperations searchForUser(String username) {
         try {
             return ldapTemplate.searchForSingleEntry(userSearchBase, loginQuery, new String[] { username });
