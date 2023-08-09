@@ -154,7 +154,7 @@ function handleUserSource() {
         jQuery(".passwordRow").show();
         jQuery(".webservicesRow").show();
         jQuery(".ldapSelect").hide();
-        jQuery("#userName").prop('readonly', 'false');
+        jQuery("#userName").removeAttr("readonly");
     }
 }
 </script>
@@ -194,7 +194,7 @@ function handleUserSource() {
         jQuery(".passwordRow").show();
         jQuery(".webservicesRow").show();
         jQuery(".ldapSelect").hide();
-        jQuery("#userName").prop('readonly', 'false');
+		jQuery("#userName").removeAttr("readonly");
     }
 }
 </script>
