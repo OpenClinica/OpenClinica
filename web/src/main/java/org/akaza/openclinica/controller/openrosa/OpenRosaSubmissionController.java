@@ -146,7 +146,7 @@ public class OpenRosaSubmissionController {
             return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
         } else {
             logger.info("Submission contained errors. Sending error response");
-            return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<String>(org.springframework.http.HttpStatus.BAD_REQUEST);
         }
     }
 

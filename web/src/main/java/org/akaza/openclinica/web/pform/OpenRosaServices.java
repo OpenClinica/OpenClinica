@@ -411,9 +411,10 @@ public class OpenRosaServices {
             LOGGER.debug("Successful OpenRosa submission");
             builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
             return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
-        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.NOT_ACCEPTABLE)) {
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.BAD_REQUEST)) {
             LOGGER.debug("Failed OpenRosa submission");
-            return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
+            builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>Form contains errors. Please see fields marked in red.</message>" + "</OpenRosaResponse>");
+            return builder.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
         } else {
             LOGGER.debug("Failed OpenRosa submission with unhandled error");
             return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
