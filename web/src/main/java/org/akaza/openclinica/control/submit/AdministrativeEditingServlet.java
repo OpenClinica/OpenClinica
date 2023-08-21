@@ -176,8 +176,9 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         getInputBeans(request);
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
+        String exitTo = fp.getString("exitTo", true);
 
-        if (StringUtil.isBlank(fromResolvingNotes)) {
+        if (!(getValidateService().isStudyLevelUser(request) && ("yes".equalsIgnoreCase(fromResolvingNotes) || "ViewNotes".equalsIgnoreCase(exitTo)))) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
             session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
             checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
