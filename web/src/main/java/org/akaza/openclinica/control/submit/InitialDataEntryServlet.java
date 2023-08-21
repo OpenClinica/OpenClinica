@@ -60,7 +60,10 @@ public class InitialDataEntryServlet extends DataEntryServlet {
     protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         mayAccess(request);
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
-        if(!(getValidateService().isStudyLevelUser(request) && ("yes".equalsIgnoreCase((String) request.getAttribute("fromResolvingNotes")) || "yes".equalsIgnoreCase(request.getParameter("fromResolvingNotes"))))){
+        if(!(getValidateService().isStudyLevelUser(request) && ("yes".equalsIgnoreCase((String) request.getAttribute("fromResolvingNotes"))
+                || "yes".equalsIgnoreCase(request.getParameter("fromResolvingNotes"))
+                || "ViewNotes".equalsIgnoreCase(request.getParameter("exitTo"))
+        ))){
             checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
         }
         this.checkUpdateDataPermission(request);
