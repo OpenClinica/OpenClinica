@@ -801,9 +801,15 @@ public class ExpressionService {
             if (j == 3 && i == 2 && !groupOidFromItem.equalsIgnoreCase(groupOidWithoutOrdinal)) {
                 ArrayList<ItemFormMetadataBean> itemFormMetadataBeans = getItemFormMetadataDao().findAllByItemId(
                         item.getId());
-                List<ItemGroupMetadataBean> itemGroupMetadataBeans = getItemGroupMetadataDao().findByCrfVersion(
-                        itemFormMetadataBeans.get(0).getCrfVersionId());
-                if (!itemGroupMetadataBeans.get(0).isRepeatingGroup()) {
+
+                ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean)
+                        getItemGroupMetadataDao().findByItemAndCrfVersion(
+                                item.getId(),itemFormMetadataBeans.get(0).getCrfVersionId());
+
+                if (itemGroupMetadataBean!= null &&
+                        !itemGroupMetadataBean.isRepeatingGroup()) {
+                    logger.debug("itemGroupMetadataBean ID: " +itemGroupMetadataBean.getId()
+                            + " isRepeaing? " + itemGroupMetadataBean.isRepeatingGroup());
                     repeatOrdinal = "[1]";
                 }
                 buildExpression = buildExpression + groupOidFromItem + repeatOrdinal + SEPERATOR;
