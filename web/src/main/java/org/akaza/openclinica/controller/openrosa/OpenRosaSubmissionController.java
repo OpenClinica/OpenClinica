@@ -174,7 +174,10 @@ public class OpenRosaSubmissionController {
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString();
 
         // enabled or disabled
-        String participateStatus = pStatus.getValue().toString();
+        String participateStatus = "disabled";
+        if(pStatus != null){
+            participateStatus = pStatus.getValue().toString();
+        }
 
         // available, pending, frozen, or locked
         String studyStatus = study.getStatus().getName().toString();
