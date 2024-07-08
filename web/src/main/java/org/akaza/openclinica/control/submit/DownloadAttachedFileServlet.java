@@ -69,17 +69,24 @@ public class DownloadAttachedFileServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String filePathName = "";
         String fileName = fp.getString("fileName");
+        System.out.println("fileName .... " + fileName);
         File f = new File(fileName);
               
         if (fileName != null && fileName.length() > 0) {
             int parentStudyId = currentStudy.getParentStudyId();           
             String testPath = Utils.getAttachedFileRootPath();
+            System.out.println("testPath .... " + testPath);
             String tail = File.separator + f.getName();
+            System.out.println("tail .... " + tail);
             String testName = testPath + currentStudy.getOid() + tail;
+            System.out.println("testName .... " + testName);
             
-            String filePath = testPath + currentStudy.getOid() +File.separator;            
+            String filePath = testPath + currentStudy.getOid() +File.separator;
+            System.out.println("filePath .... " + filePath);
             File temp = new File(filePath,f.getName());            
             String canonicalPath= temp.getCanonicalPath();
+            System.out.println("canonicalPath .... " + canonicalPath);
+            System.out.println("canonicalPath.startsWith(filePath) .... " + canonicalPath);
             
             if (canonicalPath.startsWith(filePath)) {
             	;
