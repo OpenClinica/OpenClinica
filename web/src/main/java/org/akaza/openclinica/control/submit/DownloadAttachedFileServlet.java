@@ -86,9 +86,10 @@ public class DownloadAttachedFileServlet extends SecureController {
             File temp = new File(filePath,f.getName());            
             String canonicalPath= temp.getCanonicalPath();
             logger.info("canonicalPath .... " + canonicalPath);
-            logger.info("canonicalPath.startsWith(filePath) .... " + canonicalPath);
-            
-            if (canonicalPath.startsWith(filePath)) {
+            logger.info("canonicalPath.startsWith(filePath) .... " + canonicalPath); //C:\Program Files\Apache Software Foundation\Tomcat 9.0\openclinica.data\attached_files\S_OC3DEMO\_oc546589500512684E19CEBC9DDC3BB16164B602E7D.png
+
+            if (startsWithIgnoringSlashes(canonicalPath,filePath)) {
+            //if (canonicalPath.startsWith(filePath)) {
             	;
             }else {
             	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
@@ -177,6 +178,18 @@ public class DownloadAttachedFileServlet extends SecureController {
                 }
             }
         }
+    }
+
+    private boolean startsWithIgnoringSlashes(String str1, String str2) {
+        // Replace all forward slashes with empty strings
+        String normalizedStr1 = str1.replace("/", "").replace("\\", "");
+        String normalizedStr2 = str2.replace("/", "").replace("\\", "");
+
+        logger.info("normalizedStr1 .... " + normalizedStr1);
+        logger.info("normalizedStr2 .... " + normalizedStr2);
+
+        // Compare the normalized strings
+        return normalizedStr1.startsWith(normalizedStr2);
     }
 
 }
