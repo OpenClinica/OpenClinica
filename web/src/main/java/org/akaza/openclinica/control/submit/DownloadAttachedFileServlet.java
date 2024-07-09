@@ -69,24 +69,24 @@ public class DownloadAttachedFileServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String filePathName = "";
         String fileName = fp.getString("fileName");
-        System.out.println("fileName .... " + fileName);
+        logger.info("fileName .... " + fileName);
         File f = new File(fileName);
               
         if (fileName != null && fileName.length() > 0) {
             int parentStudyId = currentStudy.getParentStudyId();           
             String testPath = Utils.getAttachedFileRootPath();
-            System.out.println("testPath .... " + testPath);
+            logger.info("testPath .... " + testPath);
             String tail = File.separator + f.getName();
-            System.out.println("tail .... " + tail);
+            logger.info("tail .... " + tail);
             String testName = testPath + currentStudy.getOid() + tail;
-            System.out.println("testName .... " + testName);
+            logger.info("testName .... " + testName);
             
             String filePath = testPath + currentStudy.getOid() +File.separator;
-            System.out.println("filePath .... " + filePath);
+            logger.info("filePath .... " + filePath);
             File temp = new File(filePath,f.getName());            
             String canonicalPath= temp.getCanonicalPath();
-            System.out.println("canonicalPath .... " + canonicalPath);
-            System.out.println("canonicalPath.startsWith(filePath) .... " + canonicalPath);
+            logger.info("canonicalPath .... " + canonicalPath);
+            logger.info("canonicalPath.startsWith(filePath) .... " + canonicalPath);
             
             if (canonicalPath.startsWith(filePath)) {
             	;
