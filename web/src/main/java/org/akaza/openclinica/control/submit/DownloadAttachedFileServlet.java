@@ -138,7 +138,6 @@ public class DownloadAttachedFileServlet extends SecureController {
 
 
             if (!startsWithIgnoringSlashes(canonicalPath,definedDownloadPath)) {
-            //if(!(canonicalPath.startsWith(definedDownloadPath))) {
             	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
             }
         	
