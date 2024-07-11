@@ -69,24 +69,24 @@ public class DownloadAttachedFileServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String filePathName = "";
         String fileName = fp.getString("fileName");
-        logger.info("fileName .... " + fileName);
+        logger.debug("fileName .... " + fileName);
         File f = new File(fileName);
               
         if (fileName != null && fileName.length() > 0) {
             int parentStudyId = currentStudy.getParentStudyId();           
             String testPath = Utils.getAttachedFileRootPath();
-            logger.info("testPath .... " + testPath);
+            logger.debug("testPath .... " + testPath);
             String tail = File.separator + f.getName();
-            logger.info("tail .... " + tail);
+            logger.debug("tail .... " + tail);
             String testName = testPath + currentStudy.getOid() + tail;
-            logger.info("testName .... " + testName);
+            logger.debug("testName .... " + testName);
             
             String filePath = testPath + currentStudy.getOid() +File.separator;
-            logger.info("filePath .... " + filePath);
+            logger.debug("filePath .... " + filePath);
             File temp = new File(filePath,f.getName());            
             String canonicalPath= temp.getCanonicalPath();
-            logger.info("canonicalPath .... " + canonicalPath);
-            logger.info("canonicalPath.startsWith(filePath) .... " + canonicalPath); //C:\Program Files\Apache Software Foundation\Tomcat 9.0\openclinica.data\attached_files\S_OC3DEMO\_oc546589500512684E19CEBC9DDC3BB16164B602E7D.png
+            logger.debug("canonicalPath .... " + canonicalPath);
+            logger.debug("canonicalPath.startsWith(filePath) .... " + canonicalPath);
 
             if (startsWithIgnoringSlashes(canonicalPath,filePath)) {
             //if (canonicalPath.startsWith(filePath)) {
