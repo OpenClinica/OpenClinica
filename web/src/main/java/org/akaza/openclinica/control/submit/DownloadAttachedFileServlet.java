@@ -89,7 +89,6 @@ public class DownloadAttachedFileServlet extends SecureController {
             logger.debug("canonicalPath.startsWith(filePath) .... " + canonicalPath);
 
             if (startsWithIgnoringSlashes(canonicalPath,filePath)) {
-            //if (canonicalPath.startsWith(filePath)) {
             	;
             }else {
             	throw new RuntimeException("Traversal attempt - file path not allowed " + fileName);
@@ -187,8 +186,8 @@ public class DownloadAttachedFileServlet extends SecureController {
         String normalizedStr1 = str1.replace("/", "").replace("\\", "");
         String normalizedStr2 = str2.replace("/", "").replace("\\", "");
 
-        logger.info("normalizedStr1 .... " + normalizedStr1);
-        logger.info("normalizedStr2 .... " + normalizedStr2);
+        logger.debug("normalizedStr1 .... {}", normalizedStr1);
+        logger.debug("normalizedStr2 .... {}", normalizedStr2);
 
         // Compare the normalized strings
         return normalizedStr1.startsWith(normalizedStr2);
