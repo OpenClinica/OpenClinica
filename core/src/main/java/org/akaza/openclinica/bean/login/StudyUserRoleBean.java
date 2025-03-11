@@ -224,7 +224,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     }
 
     public boolean isInvalid() {
-        return this.role == Role.INVALID;
+        return this.role.getId() == Role.INVALID.getId();
     }
 
     public boolean isSubmitData() {
@@ -244,22 +244,22 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     }
 
     public boolean isInvestigator() {
-        return this.role == Role.INVESTIGATOR;
+        return this.role.getId() == Role.INVESTIGATOR.getId();
     }
 
     public boolean isResearchAssistant() {
-        return this.role == Role.RESEARCHASSISTANT;
+        return this.role.getId() == Role.RESEARCHASSISTANT.getId();
     }
 
     public boolean isResearchAssistant2() {
-        return this.role == Role.RESEARCHASSISTANT2;
+        return this.role.getId() == Role.RESEARCHASSISTANT2.getId();
     }
 
     public boolean isCoordinator() {
-        return this.role == Role.COORDINATOR;
+        return this.role.getId() == Role.COORDINATOR.getId();
     }
 
     public boolean isDirector() {
-        return this.role == Role.STUDYDIRECTOR;
+        return this.role.getId() == Role.STUDYDIRECTOR.getId();
     }
 }

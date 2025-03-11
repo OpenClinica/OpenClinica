@@ -158,39 +158,39 @@ public class Status extends Term implements Comparable {
     }
 
     public boolean isInvalid() {
-        return this == Status.INVALID;
+        return this.getId() == Status.INVALID.getId();
     }
 
     public boolean isAvailable() {
-        return this == Status.AVAILABLE;
+        return this.getId() == Status.AVAILABLE.getId();
     }
 
     public boolean isPending() {
-        return this == Status.PENDING;
+        return this.getId() == Status.PENDING.getId();
     }
 
     public boolean isPrivate() {
-        return this == Status.PRIVATE;
+        return this.getId() == Status.PRIVATE.getId();
     }
 
     public boolean isUnavailable() {
-        return this == Status.UNAVAILABLE;
+        return this.getId() == Status.UNAVAILABLE.getId();
     }
 
     public boolean isDeleted() {
-        return this == Status.DELETED || this == Status.AUTO_DELETED;
+        return this.getId() == Status.DELETED.getId() || this.getId() == Status.AUTO_DELETED.getId();
     }
 
     public boolean isLocked() {
-        return this == Status.LOCKED;
+        return this.getId() == Status.LOCKED.getId();
     }
 
     public boolean isSigned() {
-        return this == Status.SIGNED;
+        return this.getId() == Status.SIGNED.getId();
     }
 
     public boolean isFrozen() {
-        return this == Status.FROZEN;
+        return this.getId() == Status.FROZEN.getId();
     }
 
     /* public static void main(String[] args) {

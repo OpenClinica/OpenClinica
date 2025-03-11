@@ -49,7 +49,7 @@ public class AuditableEntityBean extends EntityBean {
     protected Status oldStatus;
 
     // used to retrieve the owner and updater when needed
-    protected UserAccountDAO udao;
+    protected transient UserAccountDAO udao;
 
     public AuditableEntityBean() {
         createdDate = new Date(0);

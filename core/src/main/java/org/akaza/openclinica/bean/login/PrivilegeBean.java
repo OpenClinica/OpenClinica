@@ -12,7 +12,7 @@ package org.akaza.openclinica.bean.login;
  *
  *
  */
-public class PrivilegeBean {
+public class PrivilegeBean implements java.io.Serializable {
     // does it really extend entity bean?
     // should it extend a simple entity bean instead?
     private String name;

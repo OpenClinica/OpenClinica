@@ -14,7 +14,7 @@ package org.akaza.openclinica.bean.service;
  * @author jxu
  *
  */
-public class StudyParameterConfig {
+public class StudyParameterConfig implements java.io.Serializable {
     private String collectDob;
 
     private String discrepancyManagement;

@@ -2,7 +2,7 @@ package org.akaza.openclinica.bean.login;
 
 import java.util.ArrayList;
 
-public class EventDefinitionDTO {
+public class EventDefinitionDTO implements java.io.Serializable {
 
 	private String name;
 	private String description;

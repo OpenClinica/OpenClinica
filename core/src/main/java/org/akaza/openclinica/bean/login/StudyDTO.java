@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import org.akaza.openclinica.bean.core.Status;
 
-public class StudyDTO {
+public class StudyDTO implements java.io.Serializable {
 	private String uniqueProtocolID;
 	private String briefTitle;
 	private String principalInvestigator;

@@ -10,7 +10,7 @@ package org.akaza.openclinica.view;
 /**
  * @author ssachs
  */
-public class Link {
+public class Link implements java.io.Serializable {
     private String caption = "";
     private String url = "";
 

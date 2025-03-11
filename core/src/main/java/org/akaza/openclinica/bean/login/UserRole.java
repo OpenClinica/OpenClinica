@@ -1,6 +1,6 @@
 package org.akaza.openclinica.bean.login;
 
-public class UserRole {
+public class UserRole implements java.io.Serializable {
 private String username;
 private String role;
 

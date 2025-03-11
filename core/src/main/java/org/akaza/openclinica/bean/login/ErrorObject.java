@@ -1,6 +1,6 @@
 package org.akaza.openclinica.bean.login;
 
-public class ErrorObject {
+public class ErrorObject implements java.io.Serializable {
 
 private String resource;
 private String field;

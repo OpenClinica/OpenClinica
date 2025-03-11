@@ -5,7 +5,7 @@ import java.util.Date;
 /*
  * @author S.M. Shamim 28/01/2008
  */
-public class DeletedEventCRFBean {
+public class DeletedEventCRFBean implements java.io.Serializable {
     private int studyEventId;
     private String crfName;
     private String crfVersion;

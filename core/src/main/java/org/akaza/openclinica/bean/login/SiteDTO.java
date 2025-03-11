@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class SiteDTO {
+public class SiteDTO implements java.io.Serializable {
 	private String uniqueSiteProtocolID;
 	private String briefTitle;
 	private String principalInvestigator;

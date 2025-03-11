@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public abstract class Table {
+public abstract class Table implements java.io.Serializable {
     public static final int NUM_ROWS_PER_PAGE = 10;
 
     protected ArrayList rows; // an array of Entities

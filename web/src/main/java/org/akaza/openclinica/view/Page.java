@@ -13,7 +13,7 @@ package org.akaza.openclinica.view;
  *         Provides a type-safe enumeration for JSP Page,converted from original static class.
  *         @author jnyayapathi
  */
-public enum Page {
+public enum Page implements java.io.Serializable {
 	
 	
 	

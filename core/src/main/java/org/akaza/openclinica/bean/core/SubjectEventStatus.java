@@ -63,39 +63,39 @@ public class SubjectEventStatus extends Term implements Comparable {
     }
 
     public boolean isInvalid() {
-        return this == SubjectEventStatus.INVALID;
+        return this.getId() == SubjectEventStatus.INVALID.getId();
     }
 
     public boolean isScheduled() {
-        return this == SubjectEventStatus.SCHEDULED;
+        return this.getId() == SubjectEventStatus.SCHEDULED.getId();
     }
 
     public boolean isNotScheduled() {
-        return this == SubjectEventStatus.NOT_SCHEDULED;
+        return this.getId() == SubjectEventStatus.NOT_SCHEDULED.getId();
     }
 
     public boolean isDE_Started() {
-        return this == SubjectEventStatus.DATA_ENTRY_STARTED;
+        return this.getId() == SubjectEventStatus.DATA_ENTRY_STARTED.getId();
     }
 
     public boolean isCompleted() {
-        return this == SubjectEventStatus.COMPLETED;
+        return this.getId() == SubjectEventStatus.COMPLETED.getId();
     }
 
     public boolean isStopped() {
-        return this == SubjectEventStatus.STOPPED;
+        return this.getId() == SubjectEventStatus.STOPPED.getId();
     }
 
     public boolean isSkipped() {
-        return this == SubjectEventStatus.SKIPPED;
+        return this.getId() == SubjectEventStatus.SKIPPED.getId();
     }
 
     public boolean isLocked() {
-        return this == SubjectEventStatus.LOCKED;
+        return this.getId() == SubjectEventStatus.LOCKED.getId();
     }
 
     public boolean isSigned() {
-        return this == SubjectEventStatus.SIGNED;
+        return this.getId() == SubjectEventStatus.SIGNED.getId();
     }
 
     private SubjectEventStatus(int id, String name) {

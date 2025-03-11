@@ -83,6 +83,8 @@
             </c:choose>
             (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            Request Serviced by: <b><c:out value="<%=java.net.InetAddress.getLocalHost().getHostName()%>" /></b>
         </div>
         <div id="UserInfo">
             <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)&nbsp;

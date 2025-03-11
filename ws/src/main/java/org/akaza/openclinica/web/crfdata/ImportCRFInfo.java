@@ -2,7 +2,7 @@ package org.akaza.openclinica.web.crfdata;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 
-public class ImportCRFInfo {
+public class ImportCRFInfo implements java.io.Serializable {
     private String studyOID;
     private String studySubjectOID;
     private String studyEventOID;

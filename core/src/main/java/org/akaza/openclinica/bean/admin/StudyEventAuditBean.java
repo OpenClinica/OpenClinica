@@ -17,7 +17,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-public class StudyEventAuditBean {
+public class StudyEventAuditBean implements java.io.Serializable {
     private StudyEventDefinitionBean definition;
     private SubjectEventStatus oldSubjectEventStatus;
     private SubjectEventStatus newSubjectEventStatus;

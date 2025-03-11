@@ -47,10 +47,10 @@ import org.slf4j.LoggerFactory;
  * @author thickerson
  *
  */
-public class StudyInfoPanel {
+public class StudyInfoPanel implements java.io.Serializable {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    ResourceBundle resword;
+    //ResourceBundle resword;
 
     private TreeMap data = new TreeMap();
 
@@ -185,7 +185,7 @@ public class StudyInfoPanel {
     public void setData(Page page, HttpSession session, HttpServletRequest request) {
 
         Locale locale = request.getLocale();
-        resword = ResourceBundleProvider.getWordsBundle();
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
         local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
         // logger.info("found date format string: " +
         // ResourceBundleProvider.getFormatBundle
@@ -587,7 +587,7 @@ public class StudyInfoPanel {
      */
     public ArrayList generateTreeFromBeans(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject, EventCRFBean ecb) {
         Iterator itRows = rows.iterator();
-
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
         displayData.add(new StudyInfoPanelLine(resword.getString("study_events"), "(" + rows.size() + ")", true, false, false));
 
         while (itRows.hasNext()) {

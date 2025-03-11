@@ -1,6 +1,6 @@
 package org.akaza.openclinica.bean.login;
 
-public class UserDTO {
+public class UserDTO implements java.io.Serializable {
 
 private String fName ;
 private String lName ;

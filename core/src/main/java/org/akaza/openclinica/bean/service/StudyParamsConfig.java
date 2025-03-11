@@ -7,7 +7,7 @@
  */
 package org.akaza.openclinica.bean.service;
 
-public class StudyParamsConfig {
+public class StudyParamsConfig implements java.io.Serializable{
     private StudyParameterValueBean value;
     private StudyParameter parameter;
 

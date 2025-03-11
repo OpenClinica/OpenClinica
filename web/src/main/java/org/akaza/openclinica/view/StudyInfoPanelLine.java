@@ -10,7 +10,7 @@ package org.akaza.openclinica.view;
 /**
  * @author ssachs
  */
-public class StudyInfoPanelLine {
+public class StudyInfoPanelLine implements java.io.Serializable {
     protected String title;
     protected String info;
     protected boolean colon;

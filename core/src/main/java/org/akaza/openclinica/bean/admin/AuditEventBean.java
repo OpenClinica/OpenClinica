@@ -43,11 +43,11 @@ public class AuditEventBean extends AuditableEntityBean {
     private String subjectName = "NULL";
     private int studyId = 0;
     private int subjectId = 0;
-    private ResourceBundle resaudit;
+    //private ResourceBundle resaudit;
 
     public AuditEventBean() {
         super();
-        this.resaudit = ResourceBundleProvider.getAuditEventsBundle();
+        //this.resaudit = ResourceBundleProvider.getAuditEventsBundle();
     }
 
     /**
@@ -144,6 +144,7 @@ public class AuditEventBean extends AuditableEntityBean {
      * @return Returns the internationalized reasonForChange.
      */
     public String getReasonForChange() {
+    	ResourceBundle resaudit=ResourceBundleProvider.getAuditEventsBundle();
         String rfc;
         try {
             rfc = resaudit.getString(reasonForChange);
@@ -233,6 +234,7 @@ public class AuditEventBean extends AuditableEntityBean {
      * @return Returns the internationalized actionMessage.
      */
     public String getActionMessage() {
+    	ResourceBundle resaudit=ResourceBundleProvider.getAuditEventsBundle();
         String am;
         try {
             am = resaudit.getString(actionMessage);
