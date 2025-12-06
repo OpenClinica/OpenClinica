@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.owasp.encoder.Encode;
 
 /**
  * Servlet for creating a table.
@@ -139,6 +140,19 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
         String findSubjectsHtml = factory.createTable(request, response).render();
 
+        /**
+         * check unsafe input
+         */
+        int index = findSubjectsHtml.indexOf("jQuery.jmesa.addFilterToLimit('findSubjects','studySubject.label',");
+        if(index > 0) {
+        	int indexEnd = findSubjectsHtml.indexOf(");", index);
+            String unsafeStr = findSubjectsHtml.substring(index, indexEnd);
+            String safeStr = Encode.forHtmlContent(unsafeStr);
+            safeStr = "jQuery.jmesa.addFilterToLimit('findSubjects','studySubject.label'," + safeStr + ");";
+            
+            findSubjectsHtml=findSubjectsHtml.substring(0,index) + safeStr + findSubjectsHtml.substring(indexEnd);
+        }
+        
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
         // A. Hamid.
         // For event definitions and group class list in the add subject popup
