@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -112,15 +114,55 @@ public class ListStudySubjectsServlet extends SecureController {
                 request.setAttribute("id", new Integer(studySubject.getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
-                createTable();
+            	if(fp.getWrappedRequest() != null) {
+            		createTable(fp.getWrappedRequest());
+            	}else {
+            		createTable();
+            	}
+                
             }
         } else {
-            createTable();
+        	if(fp.getWrappedRequest() != null) {
+        		createTable(fp.getWrappedRequest());
+        	}else {
+        		createTable();
+        	}
         }
 
     }
 
     private void createTable() {
+
+        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
+        factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
+        factory.setSubjectDAO(getSubjectDAO());
+        factory.setStudySubjectDAO(getStudySubjectDAO());
+        factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyBean(currentStudy);
+        factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
+        factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
+        factory.setStudyDAO(getStudyDAO());
+        factory.setCurrentRole(currentRole);
+        factory.setCurrentUser(ub);
+        factory.setEventCRFDAO(getEventCRFDAO());
+        factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
+        factory.setStudyGroupDAO(getStudyGroupDAO());
+        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
+        String findSubjectsHtml = factory.createTable(request, response).render();
+
+        request.setAttribute("findSubjectsHtml", findSubjectsHtml);
+        // A. Hamid.
+        // For event definitions and group class list in the add subject popup
+        request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
+        request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
+        FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
+        session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+
+        forwardPage(Page.LIST_STUDY_SUBJECTS);
+
+    }
+    
+    private void createTable(HttpServletRequest request) {
 
         ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());

@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,8 +25,10 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 // import javax.servlet.*;
 // import java.io.*;
@@ -72,8 +76,17 @@ public class FormProcessor {
     public static final String EBL_FILTERED = "ebl_filtered";
     public static final String EBL_FILTER_KEYWORD = "ebl_filterKeyword";
     public static final String EBL_PAGINATED = "ebl_paginated";
+    public HttpServletRequest wrappedRequest;
 
-    public FormProcessor(HttpServletRequest request) {
+    public HttpServletRequest getWrappedRequest() {
+		return wrappedRequest;
+	}
+
+	public void setWrappedRequest(HttpServletRequest wrappedRequest) {
+		this.wrappedRequest = wrappedRequest;
+	}
+
+	public FormProcessor(HttpServletRequest request) {
         this.request = request;
         this.presetValues = new HashMap();
         this.locale = LocaleResolver.getLocale(request);
@@ -132,7 +145,38 @@ public class FormProcessor {
                 return DEFAULT_STRING;
             }
         }
-        return result;
+        
+        /**
+         * OC-17705
+         * 10005-00"--></style></script><script>alert(0x00991E)</script>
+         * 
+         * don't allow JavaScript inject through URL parameters 
+         * white list
+         */
+        String escapedStr = result;
+        int scriptStart = result.indexOf("<script>");
+        int scriptEnd = result.lastIndexOf("</script>");
+        if(scriptStart > -1 && scriptEnd > -1 && scriptEnd >= scriptStart) {        
+        	escapedStr= result.substring(0, scriptStart) + result.substring(scriptEnd);
+        }
+        
+        escapedStr= escapedStr.replaceAll("<script>", "");
+        escapedStr= escapedStr.replaceAll("</script>", "");
+        escapedStr= escapedStr.replaceAll("<style>", "");
+        escapedStr= escapedStr.replaceAll("</style>", "");
+        escapedStr = StringEscapeUtils.escapeJavaScript(escapedStr);
+        
+        // update parameters in request          
+        if (result != null && escapedStr !=null && !(result.equals(escapedStr))) {
+            	//"request" is the current HttpServletRequest
+            	Map<String, String[]> extraParams = new TreeMap<String, String[]>();
+            	String[] value= {escapedStr};
+            	extraParams.put(fieldName, value);
+            	wrappedRequest = new OCwrappedRequest(request, extraParams);           
+        }
+        
+        
+        return escapedStr;
     }
 
     public String getString(String fieldName) {
