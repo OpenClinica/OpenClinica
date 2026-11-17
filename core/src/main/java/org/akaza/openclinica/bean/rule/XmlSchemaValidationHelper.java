@@ -29,8 +29,7 @@ public class XmlSchemaValidationHelper {
     public void validateAgainstSchema(File xmlFile, File xsdFile) {
         try {
             // parse an XML document into a DOM tree
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
+            DocumentBuilderFactory builderFactory = newSecureDocumentBuilderFactory();
             DocumentBuilder parser = builderFactory.newDocumentBuilder();
             Document document = parser.parse(xmlFile);
 
@@ -65,8 +64,7 @@ public class XmlSchemaValidationHelper {
     public void validateAgainstSchema(String xml, File xsdFile) {
         try {
             // parse an XML document into a DOM tree
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
+            DocumentBuilderFactory builderFactory = newSecureDocumentBuilderFactory();
             DocumentBuilder parser = builderFactory.newDocumentBuilder();
             Document document = parser.parse(xml);
 
@@ -102,8 +100,7 @@ public class XmlSchemaValidationHelper {
     public void validateAgainstSchema(String xml, InputStream xsdFile) {
         try {
             // parse an XML document into a DOM tree
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
+            DocumentBuilderFactory builderFactory = newSecureDocumentBuilderFactory();
             DocumentBuilder parser = builderFactory.newDocumentBuilder();
             Document document = parser.parse(new InputSource(new StringReader(xml)));
 
@@ -139,8 +136,7 @@ public class XmlSchemaValidationHelper {
     public void validateAgainstSchema(File xmlFile, InputStream xsdFile) {
         try {
             // parse an XML document into a DOM tree
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
+            DocumentBuilderFactory builderFactory = newSecureDocumentBuilderFactory();
             DocumentBuilder parser = builderFactory.newDocumentBuilder();
             // parser.isNamespaceAware();
             Document document = parser.parse(xmlFile);
@@ -171,5 +167,17 @@ public class XmlSchemaValidationHelper {
         } catch (ParserConfigurationException pce) {
             throw new OpenClinicaSystemException(pce.getMessage(), pce.getCause());
         }
+    }
+    private static DocumentBuilderFactory newSecureDocumentBuilderFactory() throws ParserConfigurationException {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setNamespaceAware(true);
+        // Prevent XXE: disable DOCTYPE declarations and external entity resolution.
+        builderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        builderFactory.setXIncludeAware(false);
+        builderFactory.setExpandEntityReferences(false);
+        return builderFactory;
     }
 }
